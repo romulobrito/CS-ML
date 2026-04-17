@@ -60,5 +60,20 @@
   "log_progress": true,
   "test_log_interval": 50,
   "config_profile": "explore",
-  "reset_warm_start_each_lambda": false
+  "reset_warm_start_each_lambda": false,
+  "artifact_log_path": null,
+  "dual_cs_solver": false,
+  "spgl1_iter_lim": 2000,
+  "spgl1_opt_tol": 0.0001,
+  "spgl1_bp_tol": 0.0001,
+  "spgl1_ls_tol": 0.0001,
+  "spgl1_tau_grid": [
+    0.0001,
+    0.0003,
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1
+  ]
 }

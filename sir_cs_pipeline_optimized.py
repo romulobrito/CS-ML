@@ -27,13 +27,15 @@ Dependências:
 Uso:
     python sir_cs_pipeline_optimized.py
     python sir_cs_pipeline_optimized.py --profile phase0_baseline
+    python sir_cs_pipeline_optimized.py --profile solver_comparison
     python sir_cs_pipeline_optimized.py --profile paper
     python sir_cs_pipeline_optimized.py --profile explore
 
 Perfis:
-    paper            defaults na classe Config (grade lambda refinada)
-    phase0_baseline  roadmap Fase 0: 10 seeds, rho em 0.2..0.6, outputs/phase0_baseline/
-    explore          poucos dados, iteracao rapida
+    paper               defaults na classe Config (grade lambda refinada)
+    phase0_baseline     roadmap Fase 0: 10 seeds, rho em 0.2..0.6, outputs/phase0_baseline/
+    solver_comparison   Etapa 1: FISTA vs SPGL1; artefactos em outputs/solver_comparison/runs/<id>/
+    explore             poucos dados, iteracao rapida
 
 Saídas:
     outputs/
@@ -50,6 +52,7 @@ import argparse
 import json
 import math
 import os
+import sys
 import time
 from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Literal, Optional, Tuple, cast
@@ -143,10 +146,25 @@ class Config:
     # imprimir a cada N amostras no loop de teste; 0 = apenas inicio e fim do teste
     test_log_interval: int = 50
 
-    # "paper": defaults above; "explore": fast iteration; "phase0_baseline": roadmap Fase 0 reference run
-    config_profile: Literal["paper", "explore", "phase0_baseline"] = "paper"
+    # "paper": defaults above; "explore": fast iteration; "phase0_baseline": roadmap Fase 0;
+    # "solver_comparison": Etapa 1 roadmap — hybrid e cs_only com FISTA e SPGL1 (sem weighted).
+    config_profile: Literal["paper", "explore", "phase0_baseline", "solver_comparison"] = "paper"
     # se True, zera warm-start a cada novo lambda na grade (mais limpo, mais lento)
     reset_warm_start_each_lambda: bool = False
+
+    # Opcional: se definido, append de cada log_line (perfil solver_comparison preenche)
+    artifact_log_path: Optional[str] = None
+
+    # Etapa 1: comparar nucleo sparse FISTA vs SPGL1 (PyLops) nos mesmos dados
+    dual_cs_solver: bool = False
+    spgl1_iter_lim: int = 2000
+    spgl1_opt_tol: float = 1e-4
+    spgl1_bp_tol: float = 1e-4
+    spgl1_ls_tol: float = 1e-4
+    # Grade de tau para modo LASSO do SPGL1 (tau>0, sigma=0); afinar se necessario
+    spgl1_tau_grid: List[float] = field(
+        default_factory=lambda: [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2, 0.1]
+    )
 
 
 # ============================================================
@@ -164,6 +182,17 @@ def apply_config_profile(cfg: Config) -> None:
         cfg.save_dir = "outputs/phase0_baseline"
         cfg.plots_subdir = "../paper/figures/phase0_baseline"
         return
+    if cfg.config_profile == "solver_comparison":
+        # Roadmap Etapa 1: mesmo protocolo Phase 0, hybrid e cs_only com FISTA + SPGL1 (sem weighted).
+        cfg.seeds = [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.save_dir = "outputs/solver_comparison"
+        cfg.plots_subdir = "../paper/figures/solver_comparison"
+        cfg.dual_cs_solver = True
+        cfg.run_weighted_hybrid = False
+        cfg.run_cs_only = True
+        return
     if cfg.config_profile == "explore":
         cfg.seeds = [7]
         cfg.measurement_ratios = [0.3, 0.5]
@@ -174,12 +203,63 @@ def apply_config_profile(cfg: Config) -> None:
         cfg.l1_lambda_grid = [1e-3, 1e-2, 1e-1]
         cfg.lambda_selection_max_samples = 80
         cfg.power_iteration_n_iter = 80
+        return
 
 
 def log_line(cfg: Config, msg: str) -> None:
     """Print com flush para aparecer em tempo real em pipelines longos."""
     if cfg.log_progress:
         print(msg, flush=True)
+    if cfg.artifact_log_path:
+        with open(cfg.artifact_log_path, "a", encoding="utf-8") as fp:
+            fp.write(msg + "\n")
+
+
+def layout_solver_comparison_run(cfg: Config, run_id: str) -> None:
+    """
+    Organiza artefactos da Etapa 1 sob outputs/solver_comparison/runs/<run_id>/
+    e figuras em paper/figures/solver_comparison/runs/<run_id>/.
+    Atualiza cfg.save_dir, cfg.plots_subdir e cria symlink outputs/solver_comparison/LATEST.
+    """
+    base_save = cfg.save_dir
+    cfg.save_dir = os.path.join(base_save, "runs", run_id)
+    cwd = os.getcwd()
+    fig_abs = os.path.abspath(
+        os.path.join(cwd, "paper", "figures", "solver_comparison", "runs", run_id)
+    )
+    save_abs = os.path.abspath(os.path.join(cwd, cfg.save_dir))
+    cfg.plots_subdir = os.path.relpath(fig_abs, save_abs)
+    os.makedirs(fig_abs, exist_ok=True)
+    os.makedirs(save_abs, exist_ok=True)
+
+    latest = os.path.join(cwd, base_save, "LATEST")
+    try:
+        os.remove(latest)
+    except FileNotFoundError:
+        pass
+    os.symlink(os.path.join("runs", run_id), latest, target_is_directory=False)
+
+    readme = os.path.join(save_abs, "README_RUN.txt")
+    started = time.strftime("%Y-%m-%dT%H:%M:%S")
+    lines = [
+        "SIR-CS solver_comparison run",
+        "run_id: " + run_id,
+        "started_local: " + started,
+        "cwd: " + cwd,
+        "argv: " + json.dumps(sys.argv),
+        "",
+        "Artifacts (this folder):",
+        "  detailed_results.csv, summary_by_seed.csv, summary.csv",
+        "  config.json, PROTOCOL.txt, run_console.log, README_RUN.txt",
+        "",
+        "Figures (relative to repo root):",
+        "  paper/figures/solver_comparison/runs/" + run_id + "/",
+        "",
+        "Symlink: outputs/solver_comparison/LATEST -> runs/" + run_id,
+        "",
+    ]
+    with open(readme, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 def orthonormal_dct_matrix(n: int) -> np.ndarray:
     """
@@ -288,6 +368,59 @@ def fista_lasso(
         if rel < tol:
             break
     return x
+
+
+def spgl1_lasso_alpha(A: np.ndarray, b: np.ndarray, tau: float, cfg: Config) -> np.ndarray:
+    """
+    SPGL1 (PyLops) em modo LASSO: tau > 0, sigma = 0.
+    Operador A denso via MatrixMult (adequado para measurement_kind gaussian).
+    """
+    import pylops
+    from pylops.optimization.sparsity import spgl1
+
+    Op = pylops.MatrixMult(np.asarray(A, dtype=np.float64))
+    y = np.asarray(b, dtype=np.float64).reshape(-1)
+    xinv, _, _info = spgl1(
+        Op,
+        y,
+        tau=float(tau),
+        sigma=0.0,
+        show=False,
+        iter_lim=int(cfg.spgl1_iter_lim),
+        opt_tol=float(cfg.spgl1_opt_tol),
+        bp_tol=float(cfg.spgl1_bp_tol),
+        ls_tol=float(cfg.spgl1_ls_tol),
+    )
+    return np.asarray(xinv, dtype=float).reshape(-1)
+
+
+def solve_sparse_alpha(
+    A: np.ndarray,
+    b: np.ndarray,
+    cs_engine: str,
+    regularization: float,
+    weights: Optional[np.ndarray],
+    L_A: Optional[float],
+    cfg: Config,
+    x0: Optional[np.ndarray] = None,
+) -> np.ndarray:
+    """Dispatcher: fista (penalized L1) ou spgl1 (LASSO via PyLops)."""
+    if cs_engine == "fista":
+        return fista_lasso(
+            A=A,
+            b=b,
+            lam=float(regularization),
+            weights=weights,
+            max_iter=cfg.fista_max_iter,
+            tol=cfg.fista_tol,
+            x0=x0,
+            L=L_A,
+        )
+    if cs_engine == "spgl1":
+        if weights is not None:
+            raise ValueError("spgl1: weighted l1 ainda nao suportado neste pipeline.")
+        return spgl1_lasso_alpha(A, b, tau=float(regularization), cfg=cfg)
+    raise ValueError(f"cs_engine desconhecido: {cs_engine}")
 
 
 def rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -552,6 +685,112 @@ def build_lambda_selection_arrays(
     return Y_sel, Ybg_sel, b_sel, z_sel, alpha_pred_sel
 
 
+def select_regularization_for_cs_method(
+    log_label: str,
+    method_kind: str,
+    cs_engine: str,
+    cfg: Config,
+    A: np.ndarray,
+    Psi: np.ndarray,
+    y_sel: np.ndarray,
+    ybg_sel: np.ndarray,
+    b_sel: np.ndarray,
+    z_sel: np.ndarray,
+    alpha_pred_sel: Optional[np.ndarray],
+    L_A: Optional[float],
+) -> float:
+    """
+    Seleciona lambda (FISTA) ou tau (SPGL1 LASSO) em validacao para hybrid / weighted_hybrid / cs_only.
+    log_label: texto no log (ex.: hybrid_fista); method_kind: hybrid | weighted_hybrid | cs_only.
+    """
+    if cs_engine == "fista":
+        grid: List[float] = list(cfg.l1_lambda_grid)
+        reg_short = "lam"
+    elif cs_engine == "spgl1":
+        grid = list(cfg.spgl1_tau_grid)
+        reg_short = "tau"
+    else:
+        raise ValueError(f"cs_engine invalido: {cs_engine}")
+
+    if len(grid) == 0:
+        raise ValueError("grade de regularizacao vazia")
+
+    best_reg = float(grid[0])
+    best_score = float("inf")
+
+    if L_A is None:
+        L_A = power_iteration_lipschitz(A, n_iter=cfg.power_iteration_n_iter)
+
+    n_code = A.shape[1]
+    n_samples = len(y_sel)
+    use_warm = cfg.use_warm_starts and cs_engine == "fista"
+    warm_starts = np.zeros((n_samples, n_code)) if use_warm else None
+
+    t_method0 = time.perf_counter()
+    grid_n = len(grid)
+    log_line(
+        cfg,
+        f"    [cs] {log_label} ({cs_engine}) start | n_sel={n_samples} | grid={grid_n} {reg_short}",
+    )
+
+    for j, reg in enumerate(grid):
+        if cfg.reset_warm_start_each_lambda and warm_starts is not None:
+            warm_starts.fill(0.0)
+        t_lam0 = time.perf_counter()
+        preds = np.zeros_like(y_sel)
+        for i in range(n_samples):
+            if method_kind == "hybrid":
+                rhs = z_sel[i]
+                weights_i = None
+            elif method_kind == "weighted_hybrid":
+                if alpha_pred_sel is None:
+                    raise ValueError("weighted_hybrid requer alpha_pred_sel.")
+                rhs = z_sel[i]
+                weights_i = build_weights_from_alpha_prediction(alpha_pred_sel[i], cfg)
+            elif method_kind == "cs_only":
+                rhs = b_sel[i]
+                weights_i = None
+            else:
+                raise ValueError(f"method_kind desconhecido: {method_kind}")
+
+            alpha_hat = solve_sparse_alpha(
+                A=A,
+                b=rhs,
+                cs_engine=cs_engine,
+                regularization=float(reg),
+                weights=weights_i,
+                L_A=L_A,
+                cfg=cfg,
+                x0=warm_starts[i] if warm_starts is not None else None,
+            )
+            if method_kind in ("hybrid", "weighted_hybrid"):
+                y_hat = ybg_sel[i] + Psi @ alpha_hat
+            else:
+                y_hat = Psi @ alpha_hat
+
+            if warm_starts is not None:
+                warm_starts[i] = alpha_hat
+            preds[i] = y_hat
+
+        score = evaluate_metric(y_sel, preds, cfg.model_selection_metric)
+        dt_lam = time.perf_counter() - t_lam0
+        log_line(
+            cfg,
+            f"    [cs] {log_label} grid {j + 1}/{grid_n} {reg_short}={reg:g} "
+            f"{cfg.model_selection_metric}={score:.6f} ({dt_lam:.2f}s)",
+        )
+        if score < best_score:
+            best_score = score
+            best_reg = float(reg)
+
+    dt_method = time.perf_counter() - t_method0
+    log_line(
+        cfg,
+        f"    [cs] {log_label} ({cs_engine}) best_{reg_short}={best_reg:g} ({dt_method:.1f}s total)",
+    )
+    return best_reg
+
+
 def select_lambda_for_method(
     method_name: str,
     cfg: Config,
@@ -564,92 +803,21 @@ def select_lambda_for_method(
     alpha_pred_sel: Optional[np.ndarray],
     L_A: Optional[float],
 ) -> float:
-    best_lam = cfg.l1_lambda_grid[0]
-    best_score = float("inf")
-
-    if L_A is None:
-        L_A = power_iteration_lipschitz(A, n_iter=cfg.power_iteration_n_iter)
-
-    n_code = A.shape[1]
-    n_samples = len(y_sel)
-    warm_starts = np.zeros((n_samples, n_code)) if cfg.use_warm_starts else None
-
-    t_method0 = time.perf_counter()
-    grid_n = len(cfg.l1_lambda_grid)
-    log_line(
-        cfg,
-        f"    [lambda] {method_name} start | n_sel={n_samples} | grid={grid_n} values",
+    """Compat: FISTA apenas, nomes de metodo legacy (hybrid, ...)."""
+    return select_regularization_for_cs_method(
+        log_label=method_name,
+        method_kind=method_name,
+        cs_engine="fista",
+        cfg=cfg,
+        A=A,
+        Psi=Psi,
+        y_sel=y_sel,
+        ybg_sel=ybg_sel,
+        b_sel=b_sel,
+        z_sel=z_sel,
+        alpha_pred_sel=alpha_pred_sel,
+        L_A=L_A,
     )
-
-    for j, lam in enumerate(cfg.l1_lambda_grid):
-        if cfg.reset_warm_start_each_lambda and warm_starts is not None:
-            warm_starts.fill(0.0)
-        t_lam0 = time.perf_counter()
-        preds = np.zeros_like(y_sel)
-        for i in range(n_samples):
-            if method_name == "hybrid":
-                alpha_hat = fista_lasso(
-                    A=A,
-                    b=z_sel[i],
-                    lam=lam,
-                    weights=None,
-                    max_iter=cfg.fista_max_iter,
-                    tol=cfg.fista_tol,
-                    x0=warm_starts[i] if warm_starts is not None else None,
-                    L=L_A,
-                )
-                y_hat = ybg_sel[i] + Psi @ alpha_hat
-            elif method_name == "weighted_hybrid":
-                if alpha_pred_sel is None:
-                    raise ValueError("weighted_hybrid requer alpha_pred_sel.")
-                weights_i = build_weights_from_alpha_prediction(alpha_pred_sel[i], cfg)
-                alpha_hat = fista_lasso(
-                    A=A,
-                    b=z_sel[i],
-                    lam=lam,
-                    weights=weights_i,
-                    max_iter=cfg.fista_max_iter,
-                    tol=cfg.fista_tol,
-                    x0=warm_starts[i] if warm_starts is not None else None,
-                    L=L_A,
-                )
-                y_hat = ybg_sel[i] + Psi @ alpha_hat
-            elif method_name == "cs_only":
-                alpha_hat = fista_lasso(
-                    A=A,
-                    b=b_sel[i],
-                    lam=lam,
-                    weights=None,
-                    max_iter=cfg.fista_max_iter,
-                    tol=cfg.fista_tol,
-                    x0=warm_starts[i] if warm_starts is not None else None,
-                    L=L_A,
-                )
-                y_hat = Psi @ alpha_hat
-            else:
-                raise ValueError(f"Método desconhecido: {method_name}")
-
-            if warm_starts is not None:
-                warm_starts[i] = alpha_hat
-            preds[i] = y_hat
-
-        score = evaluate_metric(y_sel, preds, cfg.model_selection_metric)
-        dt_lam = time.perf_counter() - t_lam0
-        log_line(
-            cfg,
-            f"    [lambda] {method_name} grid {j + 1}/{grid_n} lam={lam:g} "
-            f"{cfg.model_selection_metric}={score:.6f} ({dt_lam:.2f}s)",
-        )
-        if score < best_score:
-            best_score = score
-            best_lam = lam
-
-    dt_method = time.perf_counter() - t_method0
-    log_line(
-        cfg,
-        f"    [lambda] {method_name} best_lam={best_lam:g} ({dt_method:.1f}s total)",
-    )
-    return best_lam
 
 
 # ============================================================
@@ -732,38 +900,77 @@ def run_single_setting(
         f"  [val] arrays for lambda selection | n_sel={len(y_sel)} | noise_std={cfg.measurement_noise_std}",
     )
 
-    lam_hybrid = select_lambda_for_method(
-        method_name="hybrid",
-        cfg=cfg,
-        A=A,
-        Psi=Psi,
-        y_sel=y_sel,
-        ybg_sel=ybg_sel,
-        b_sel=b_sel,
-        z_sel=z_sel,
-        alpha_pred_sel=None,
-        L_A=L_A,
-    )
+    lam_hf: Optional[float] = None
+    tau_hs: Optional[float] = None
+    lam_cf: Optional[float] = None
+    tau_cs: Optional[float] = None
+    lam_hybrid: float = 0.0
+    lam_weighted: Optional[float] = None
+    lam_cs_only: Optional[float] = None
 
-    lam_weighted = None
-    if cfg.run_weighted_hybrid and cfg.use_alpha_predictor:
-        lam_weighted = select_lambda_for_method(
-            method_name="weighted_hybrid",
-            cfg=cfg,
-            A=A,
-            Psi=Psi,
-            y_sel=y_sel,
-            ybg_sel=ybg_sel,
-            b_sel=b_sel,
-            z_sel=z_sel,
-            alpha_pred_sel=alpha_pred_sel,
-            L_A=L_A,
+    if cfg.dual_cs_solver:
+        lam_hf = select_regularization_for_cs_method(
+            "hybrid_fista",
+            "hybrid",
+            "fista",
+            cfg,
+            A,
+            Psi,
+            y_sel,
+            ybg_sel,
+            b_sel,
+            z_sel,
+            None,
+            L_A,
         )
-
-    lam_cs_only = None
-    if cfg.run_cs_only:
-        lam_cs_only = select_lambda_for_method(
-            method_name="cs_only",
+        tau_hs = select_regularization_for_cs_method(
+            "hybrid_spgl1",
+            "hybrid",
+            "spgl1",
+            cfg,
+            A,
+            Psi,
+            y_sel,
+            ybg_sel,
+            b_sel,
+            z_sel,
+            None,
+            L_A,
+        )
+        if cfg.run_cs_only:
+            lam_cf = select_regularization_for_cs_method(
+                "cs_only_fista",
+                "cs_only",
+                "fista",
+                cfg,
+                A,
+                Psi,
+                y_sel,
+                ybg_sel,
+                b_sel,
+                z_sel,
+                None,
+                L_A,
+            )
+            tau_cs = select_regularization_for_cs_method(
+                "cs_only_spgl1",
+                "cs_only",
+                "spgl1",
+                cfg,
+                A,
+                Psi,
+                y_sel,
+                ybg_sel,
+                b_sel,
+                z_sel,
+                None,
+                L_A,
+            )
+        lam_hybrid = float(lam_hf)
+        lam_cs_only = float(lam_cf) if lam_cf is not None else None
+    else:
+        lam_hybrid = select_lambda_for_method(
+            method_name="hybrid",
             cfg=cfg,
             A=A,
             Psi=Psi,
@@ -775,7 +982,35 @@ def run_single_setting(
             L_A=L_A,
         )
 
-    log_line(cfg, "  [val] lambda grid search finished for enabled methods")
+        if cfg.run_weighted_hybrid and cfg.use_alpha_predictor:
+            lam_weighted = select_lambda_for_method(
+                method_name="weighted_hybrid",
+                cfg=cfg,
+                A=A,
+                Psi=Psi,
+                y_sel=y_sel,
+                ybg_sel=ybg_sel,
+                b_sel=b_sel,
+                z_sel=z_sel,
+                alpha_pred_sel=alpha_pred_sel,
+                L_A=L_A,
+            )
+
+        if cfg.run_cs_only:
+            lam_cs_only = select_lambda_for_method(
+                method_name="cs_only",
+                cfg=cfg,
+                A=A,
+                Psi=Psi,
+                y_sel=y_sel,
+                ybg_sel=ybg_sel,
+                b_sel=b_sel,
+                z_sel=z_sel,
+                alpha_pred_sel=None,
+                L_A=L_A,
+            )
+
+    log_line(cfg, "  [val] sparse regularization grid search finished for enabled methods")
 
     Ybg_test = baseline.predict(X_test)
     if alpha_model is not None:
@@ -784,133 +1019,227 @@ def run_single_setting(
         Alpha_pred_test = np.zeros_like(Alpha_test)
 
     rows = []
-    stored_examples = {
-        "Y_true": [],
-        "Y_bg": [],
-        "Y_hybrid": [],
-        "Y_weighted": [],
-        "Y_cs_only": [],
-    }
+    if cfg.dual_cs_solver:
+        stored_examples = {
+            "Y_true": [],
+            "Y_bg": [],
+            "Y_hybrid_fista": [],
+            "Y_hybrid_spgl1": [],
+            "Y_cs_only_fista": [],
+            "Y_cs_only_spgl1": [],
+        }
+    else:
+        stored_examples = {
+            "Y_true": [],
+            "Y_bg": [],
+            "Y_hybrid": [],
+            "Y_weighted": [],
+            "Y_cs_only": [],
+        }
+
     flat_true: List[np.ndarray] = []
     flat_ml: List[np.ndarray] = []
     flat_hybrid: List[np.ndarray] = []
     flat_weighted: List[np.ndarray] = []
     flat_cs: List[np.ndarray] = []
+    flat_hf: List[np.ndarray] = []
+    flat_hs: List[np.ndarray] = []
+    flat_cf: List[np.ndarray] = []
+    flat_csg: List[np.ndarray] = []
 
     n_test_samples = len(X_test)
-    log_line(cfg, f"  [test] evaluating {n_test_samples} test samples (FISTA per method)...")
+    log_line(
+        cfg,
+        f"  [test] evaluating {n_test_samples} test samples (sparse recovery per method)...",
+    )
 
     for i in range(len(X_test)):
         noise = cfg.measurement_noise_std * rng.normal(size=m)
         b_i = M @ Y_test[i] + noise
 
-        # 1) ML-only
         y_ml = Ybg_test[i]
-        rows.append({
-            "seed": seed,
-            "measurement_ratio": measurement_ratio,
-            "method": "ml_only",
-            "sample_id": i,
-            "rmse": rmse(Y_test[i], y_ml),
-            "mae": float(mean_absolute_error(Y_test[i], y_ml)),
-            "relative_l2": relative_l2(Y_test[i], y_ml),
-            "support_f1": np.nan,
-            "lambda": np.nan,
-            "m": m,
-        })
-
-        # 2) Hybrid
-        z_i = b_i - M @ y_ml
-        alpha_h = fista_lasso(
-            A=A,
-            b=z_i,
-            lam=lam_hybrid,
-            weights=None,
-            max_iter=cfg.fista_max_iter,
-            tol=cfg.fista_tol,
-            L=L_A,
+        rows.append(
+            {
+                "seed": seed,
+                "measurement_ratio": measurement_ratio,
+                "method": "ml_only",
+                "sample_id": i,
+                "rmse": rmse(Y_test[i], y_ml),
+                "mae": float(mean_absolute_error(Y_test[i], y_ml)),
+                "relative_l2": relative_l2(Y_test[i], y_ml),
+                "support_f1": np.nan,
+                "lambda": np.nan,
+                "cs_engine": "none",
+                "m": m,
+            }
         )
-        y_h = y_ml + Psi @ alpha_h
-        flat_true.append(np.asarray(Y_test[i], dtype=float).ravel())
-        flat_ml.append(np.asarray(y_ml, dtype=float).ravel())
-        flat_hybrid.append(np.asarray(y_h, dtype=float).ravel())
 
-        rows.append({
-            "seed": seed,
-            "measurement_ratio": measurement_ratio,
-            "method": "hybrid",
-            "sample_id": i,
-            "rmse": rmse(Y_test[i], y_h),
-            "mae": float(mean_absolute_error(Y_test[i], y_h)),
-            "relative_l2": relative_l2(Y_test[i], y_h),
-            "support_f1": support_f1(Alpha_test[i], alpha_h),
-            "lambda": lam_hybrid,
-            "m": m,
-        })
+        z_i = b_i - M @ y_ml
 
-        # 3) Weighted Hybrid
-        y_wh = None
-        if lam_weighted is not None:
-            weights_i = build_weights_from_alpha_prediction(Alpha_pred_test[i], cfg)
-            alpha_wh = fista_lasso(
+        if cfg.dual_cs_solver:
+            assert lam_hf is not None and tau_hs is not None
+            specs = [
+                ("hybrid_fista", "fista", float(lam_hf), "hybrid"),
+                ("hybrid_spgl1", "spgl1", float(tau_hs), "hybrid"),
+            ]
+            if cfg.run_cs_only and lam_cf is not None and tau_cs is not None:
+                specs.extend(
+                    [
+                        ("cs_only_fista", "fista", float(lam_cf), "cs_only"),
+                        ("cs_only_spgl1", "spgl1", float(tau_cs), "cs_only"),
+                    ]
+                )
+            preds_ex: Dict[str, np.ndarray] = {}
+            for method_tag, engine, reg, kind in specs:
+                rhs = z_i if kind == "hybrid" else b_i
+                alpha_hat = solve_sparse_alpha(
+                    A=A,
+                    b=rhs,
+                    cs_engine=engine,
+                    regularization=reg,
+                    weights=None,
+                    L_A=L_A,
+                    cfg=cfg,
+                    x0=None,
+                )
+                if kind == "hybrid":
+                    y_hat = y_ml + Psi @ alpha_hat
+                else:
+                    y_hat = Psi @ alpha_hat
+                preds_ex[method_tag] = y_hat
+                rows.append(
+                    {
+                        "seed": seed,
+                        "measurement_ratio": measurement_ratio,
+                        "method": method_tag,
+                        "sample_id": i,
+                        "rmse": rmse(Y_test[i], y_hat),
+                        "mae": float(mean_absolute_error(Y_test[i], y_hat)),
+                        "relative_l2": relative_l2(Y_test[i], y_hat),
+                        "support_f1": support_f1(Alpha_test[i], alpha_hat),
+                        "lambda": reg,
+                        "cs_engine": engine,
+                        "m": m,
+                    }
+                )
+
+            flat_true.append(np.asarray(Y_test[i], dtype=float).ravel())
+            flat_ml.append(np.asarray(y_ml, dtype=float).ravel())
+            flat_hf.append(np.asarray(preds_ex["hybrid_fista"], dtype=float).ravel())
+            flat_hs.append(np.asarray(preds_ex["hybrid_spgl1"], dtype=float).ravel())
+            if "cs_only_fista" in preds_ex:
+                flat_cf.append(np.asarray(preds_ex["cs_only_fista"], dtype=float).ravel())
+                flat_csg.append(np.asarray(preds_ex["cs_only_spgl1"], dtype=float).ravel())
+
+            if len(stored_examples["Y_true"]) < cfg.n_example_plots:
+                stored_examples["Y_true"].append(Y_test[i].copy())
+                stored_examples["Y_bg"].append(y_ml.copy())
+                stored_examples["Y_hybrid_fista"].append(preds_ex["hybrid_fista"].copy())
+                stored_examples["Y_hybrid_spgl1"].append(preds_ex["hybrid_spgl1"].copy())
+                if "cs_only_fista" in preds_ex:
+                    stored_examples["Y_cs_only_fista"].append(preds_ex["cs_only_fista"].copy())
+                    stored_examples["Y_cs_only_spgl1"].append(preds_ex["cs_only_spgl1"].copy())
+        else:
+            alpha_h = solve_sparse_alpha(
                 A=A,
                 b=z_i,
-                lam=lam_weighted,
-                weights=weights_i,
-                max_iter=cfg.fista_max_iter,
-                tol=cfg.fista_tol,
-                L=L_A,
-            )
-            y_wh = y_ml + Psi @ alpha_wh
-            flat_weighted.append(np.asarray(y_wh, dtype=float).ravel())
-            rows.append({
-                "seed": seed,
-                "measurement_ratio": measurement_ratio,
-                "method": "weighted_hybrid",
-                "sample_id": i,
-                "rmse": rmse(Y_test[i], y_wh),
-                "mae": float(mean_absolute_error(Y_test[i], y_wh)),
-                "relative_l2": relative_l2(Y_test[i], y_wh),
-                "support_f1": support_f1(Alpha_test[i], alpha_wh),
-                "lambda": lam_weighted,
-                "m": m,
-            })
-
-        # 4) CS-only
-        y_cs = None
-        if lam_cs_only is not None:
-            alpha_cs = fista_lasso(
-                A=A,
-                b=b_i,
-                lam=lam_cs_only,
+                cs_engine="fista",
+                regularization=float(lam_hybrid),
                 weights=None,
-                max_iter=cfg.fista_max_iter,
-                tol=cfg.fista_tol,
-                L=L_A,
+                L_A=L_A,
+                cfg=cfg,
+                x0=None,
             )
-            y_cs = Psi @ alpha_cs
-            flat_cs.append(np.asarray(y_cs, dtype=float).ravel())
-            rows.append({
-                "seed": seed,
-                "measurement_ratio": measurement_ratio,
-                "method": "cs_only",
-                "sample_id": i,
-                "rmse": rmse(Y_test[i], y_cs),
-                "mae": float(mean_absolute_error(Y_test[i], y_cs)),
-                "relative_l2": relative_l2(Y_test[i], y_cs),
-                "support_f1": support_f1(Alpha_test[i], alpha_cs),
-                "lambda": lam_cs_only,
-                "m": m,
-            })
+            y_h = y_ml + Psi @ alpha_h
+            flat_true.append(np.asarray(Y_test[i], dtype=float).ravel())
+            flat_ml.append(np.asarray(y_ml, dtype=float).ravel())
+            flat_hybrid.append(np.asarray(y_h, dtype=float).ravel())
 
-        if len(stored_examples["Y_true"]) < cfg.n_example_plots:
-            stored_examples["Y_true"].append(Y_test[i].copy())
-            stored_examples["Y_bg"].append(y_ml.copy())
-            stored_examples["Y_hybrid"].append(y_h.copy())
-            if y_wh is not None:
-                stored_examples["Y_weighted"].append(y_wh.copy())
-            if y_cs is not None:
-                stored_examples["Y_cs_only"].append(y_cs.copy())
+            rows.append(
+                {
+                    "seed": seed,
+                    "measurement_ratio": measurement_ratio,
+                    "method": "hybrid",
+                    "sample_id": i,
+                    "rmse": rmse(Y_test[i], y_h),
+                    "mae": float(mean_absolute_error(Y_test[i], y_h)),
+                    "relative_l2": relative_l2(Y_test[i], y_h),
+                    "support_f1": support_f1(Alpha_test[i], alpha_h),
+                    "lambda": lam_hybrid,
+                    "cs_engine": "fista",
+                    "m": m,
+                }
+            )
+
+            y_wh = None
+            if lam_weighted is not None:
+                weights_i = build_weights_from_alpha_prediction(Alpha_pred_test[i], cfg)
+                alpha_wh = solve_sparse_alpha(
+                    A=A,
+                    b=z_i,
+                    cs_engine="fista",
+                    regularization=float(lam_weighted),
+                    weights=weights_i,
+                    L_A=L_A,
+                    cfg=cfg,
+                    x0=None,
+                )
+                y_wh = y_ml + Psi @ alpha_wh
+                flat_weighted.append(np.asarray(y_wh, dtype=float).ravel())
+                rows.append(
+                    {
+                        "seed": seed,
+                        "measurement_ratio": measurement_ratio,
+                        "method": "weighted_hybrid",
+                        "sample_id": i,
+                        "rmse": rmse(Y_test[i], y_wh),
+                        "mae": float(mean_absolute_error(Y_test[i], y_wh)),
+                        "relative_l2": relative_l2(Y_test[i], y_wh),
+                        "support_f1": support_f1(Alpha_test[i], alpha_wh),
+                        "lambda": lam_weighted,
+                        "cs_engine": "fista",
+                        "m": m,
+                    }
+                )
+
+            y_cs = None
+            if lam_cs_only is not None:
+                alpha_cs = solve_sparse_alpha(
+                    A=A,
+                    b=b_i,
+                    cs_engine="fista",
+                    regularization=float(lam_cs_only),
+                    weights=None,
+                    L_A=L_A,
+                    cfg=cfg,
+                    x0=None,
+                )
+                y_cs = Psi @ alpha_cs
+                flat_cs.append(np.asarray(y_cs, dtype=float).ravel())
+                rows.append(
+                    {
+                        "seed": seed,
+                        "measurement_ratio": measurement_ratio,
+                        "method": "cs_only",
+                        "sample_id": i,
+                        "rmse": rmse(Y_test[i], y_cs),
+                        "mae": float(mean_absolute_error(Y_test[i], y_cs)),
+                        "relative_l2": relative_l2(Y_test[i], y_cs),
+                        "support_f1": support_f1(Alpha_test[i], alpha_cs),
+                        "lambda": lam_cs_only,
+                        "cs_engine": "fista",
+                        "m": m,
+                    }
+                )
+
+            if len(stored_examples["Y_true"]) < cfg.n_example_plots:
+                stored_examples["Y_true"].append(Y_test[i].copy())
+                stored_examples["Y_bg"].append(y_ml.copy())
+                stored_examples["Y_hybrid"].append(y_h.copy())
+                if y_wh is not None:
+                    stored_examples["Y_weighted"].append(y_wh.copy())
+                if y_cs is not None:
+                    stored_examples["Y_cs_only"].append(y_cs.copy())
 
         if cfg.log_progress and cfg.test_log_interval > 0:
             step = cfg.test_log_interval
@@ -926,15 +1255,26 @@ def run_single_setting(
     for k in list(stored_examples.keys()):
         stored_examples[k] = np.array(stored_examples[k]) if len(stored_examples[k]) > 0 else None
 
-    gt_pred_bundle: Dict[str, np.ndarray] = {
-        "y_true": np.concatenate(flat_true),
-        "ml_only": np.concatenate(flat_ml),
-        "hybrid": np.concatenate(flat_hybrid),
-    }
-    if len(flat_weighted) == len(flat_true):
-        gt_pred_bundle["weighted_hybrid"] = np.concatenate(flat_weighted)
-    if len(flat_cs) == len(flat_true):
-        gt_pred_bundle["cs_only"] = np.concatenate(flat_cs)
+    if cfg.dual_cs_solver:
+        gt_pred_bundle = {
+            "y_true": np.concatenate(flat_true),
+            "ml_only": np.concatenate(flat_ml),
+            "hybrid_fista": np.concatenate(flat_hf),
+            "hybrid_spgl1": np.concatenate(flat_hs),
+        }
+        if len(flat_cf) == len(flat_true):
+            gt_pred_bundle["cs_only_fista"] = np.concatenate(flat_cf)
+            gt_pred_bundle["cs_only_spgl1"] = np.concatenate(flat_csg)
+    else:
+        gt_pred_bundle = {
+            "y_true": np.concatenate(flat_true),
+            "ml_only": np.concatenate(flat_ml),
+            "hybrid": np.concatenate(flat_hybrid),
+        }
+        if len(flat_weighted) == len(flat_true):
+            gt_pred_bundle["weighted_hybrid"] = np.concatenate(flat_weighted)
+        if len(flat_cs) == len(flat_true):
+            gt_pred_bundle["cs_only"] = np.concatenate(flat_cs)
 
     return df, stored_examples, gt_pred_bundle
 
@@ -1006,8 +1346,25 @@ METHOD_COLORS: Dict[str, str] = {
     "hybrid": "#ff7f0e",
     "weighted_hybrid": "#2ca02c",
     "cs_only": "#d62728",
+    "hybrid_fista": "#ff7f0e",
+    "hybrid_spgl1": "#bcbd22",
+    "cs_only_fista": "#d62728",
+    "cs_only_spgl1": "#9467bd",
 }
-METHOD_ORDER = ["ml_only", "hybrid", "weighted_hybrid", "cs_only"]
+METHOD_ORDER_DEFAULT = ["ml_only", "hybrid", "weighted_hybrid", "cs_only"]
+METHOD_ORDER_SOLVER_CMP = [
+    "ml_only",
+    "hybrid_fista",
+    "hybrid_spgl1",
+    "cs_only_fista",
+    "cs_only_spgl1",
+]
+
+
+def method_order_for_cfg(cfg: Config) -> List[str]:
+    if cfg.dual_cs_solver:
+        return list(METHOD_ORDER_SOLVER_CMP)
+    return list(METHOD_ORDER_DEFAULT)
 
 
 def plots_directory(cfg: Config) -> str:
@@ -1023,9 +1380,11 @@ def plot_metric_vs_measurement_ratio(
     ylabel: str,
     title: str,
     save_path: str,
+    cfg: Config,
 ) -> None:
     plt.figure(figsize=(9, 5))
-    methods = [m for m in METHOD_ORDER if m in set(summary["method"].unique())]
+    order = method_order_for_cfg(cfg)
+    methods = [m for m in order if m in set(summary["method"].unique())]
     for method in methods:
         sdf = summary[summary["method"] == method].sort_values("measurement_ratio")
         x = sdf["measurement_ratio"].values
@@ -1051,9 +1410,11 @@ def plot_grouped_bars_metric(
     ylabel: str,
     title: str,
     save_path: str,
+    cfg: Config,
 ) -> None:
     ratios = sorted(summary["measurement_ratio"].unique())
-    methods = [m for m in METHOD_ORDER if m in set(summary["method"].unique())]
+    order = method_order_for_cfg(cfg)
+    methods = [m for m in order if m in set(summary["method"].unique())]
     if not ratios or not methods:
         return
     n_r = len(ratios)
@@ -1135,11 +1496,13 @@ def plot_gain_vs_ml_only(
     gain_summary: pd.DataFrame,
     metric_name: str,
     save_path: str,
+    cfg: Config,
 ) -> None:
     if len(gain_summary) == 0:
         return
     plt.figure(figsize=(9, 5))
-    methods = [m for m in METHOD_ORDER if m in set(gain_summary["method"].unique()) and m != "ml_only"]
+    order = method_order_for_cfg(cfg)
+    methods = [m for m in order if m in set(gain_summary["method"].unique()) and m != "ml_only"]
     for method in methods:
         sdf = gain_summary[gain_summary["method"] == method].sort_values("measurement_ratio")
         x = sdf["measurement_ratio"].values
@@ -1182,6 +1545,7 @@ def save_all_comparison_plots(
         "RMSE (mean over test; bars = std across seeds)",
         "RMSE vs measurement ratio",
         _save("01_rmse_vs_measurement_ratio.png"),
+        cfg,
     )
     plot_metric_vs_measurement_ratio(
         summary,
@@ -1190,6 +1554,7 @@ def save_all_comparison_plots(
         "MAE (mean over test; bars = std across seeds)",
         "MAE vs measurement ratio",
         _save("02_mae_vs_measurement_ratio.png"),
+        cfg,
     )
     plot_metric_vs_measurement_ratio(
         summary,
@@ -1198,6 +1563,7 @@ def save_all_comparison_plots(
         "Relative L2 error (mean over test; bars = std across seeds)",
         "Relative L2 vs measurement ratio",
         _save("03_relative_l2_vs_measurement_ratio.png"),
+        cfg,
     )
 
     sub_f1 = summary.dropna(subset=["support_f1_mean"])
@@ -1209,6 +1575,7 @@ def save_all_comparison_plots(
             "Support F1 (mean over test; bars = std across seeds)",
             "Support F1 vs measurement ratio",
             _save("04_support_f1_vs_measurement_ratio.png"),
+            cfg,
         )
 
     plot_grouped_bars_metric(
@@ -1217,17 +1584,18 @@ def save_all_comparison_plots(
         "RMSE",
         "RMSE grouped by measurement ratio (bars = methods)",
         _save("05_rmse_grouped_bars_by_ratio.png"),
+        cfg,
     )
 
     g_rmse = build_gain_vs_baseline(per_seed, "ml_only", "rmse_mean")
     if len(g_rmse) > 0:
         gsum = summarize_gain_across_seeds(g_rmse)
-        plot_gain_vs_ml_only(gsum, "RMSE", _save("06_gain_rmse_over_ml_only.png"))
+        plot_gain_vs_ml_only(gsum, "RMSE", _save("06_gain_rmse_over_ml_only.png"), cfg)
 
     g_mae = build_gain_vs_baseline(per_seed, "ml_only", "mae_mean")
     if len(g_mae) > 0:
         gsum_m = summarize_gain_across_seeds(g_mae)
-        plot_gain_vs_ml_only(gsum_m, "MAE", _save("07_gain_mae_over_ml_only.png"))
+        plot_gain_vs_ml_only(gsum_m, "MAE", _save("07_gain_mae_over_ml_only.png"), cfg)
 
     return paths
 
@@ -1272,7 +1640,8 @@ def plot_parity_ground_truth_vs_predictions(
         return
     y_true_full = merged["y_true"]
     rng = np.random.default_rng(12345)
-    methods_plot = [m for m in METHOD_ORDER if m in merged and m != "y_true"]
+    order = method_order_for_cfg(cfg)
+    methods_plot = [m for m in order if m in merged and m != "y_true"]
     if not methods_plot:
         return
     n_m = len(methods_plot)
@@ -1309,6 +1678,7 @@ def plot_parity_ground_truth_vs_predictions(
 
 
 def plot_residual_distributions_gt_vs_models(
+    cfg: Config,
     merged: Dict[str, np.ndarray],
     save_path: str,
 ) -> None:
@@ -1316,7 +1686,8 @@ def plot_residual_distributions_gt_vs_models(
     if "y_true" not in merged:
         return
     y_t = merged["y_true"]
-    methods_plot = [m for m in METHOD_ORDER if m in merged and m != "y_true"]
+    order = method_order_for_cfg(cfg)
+    methods_plot = [m for m in order if m in merged and m != "y_true"]
     if not methods_plot:
         return
     n_m = len(methods_plot)
@@ -1354,18 +1725,14 @@ def save_ground_truth_vs_model_plots(
     p1 = os.path.join(pdir, "09_parity_ground_truth_vs_prediction.png")
     p2 = os.path.join(pdir, "10_residual_distributions_gt_vs_models.png")
     plot_parity_ground_truth_vs_predictions(cfg, merged_gt, p1)
-    plot_residual_distributions_gt_vs_models(merged_gt, p2)
+    plot_residual_distributions_gt_vs_models(cfg, merged_gt, p2)
     paths.extend([p1, p2])
     return paths
 
 
-def plot_examples(examples: Dict[str, np.ndarray], save_path: str) -> None:
+def plot_examples(cfg: Config, examples: Dict[str, np.ndarray], save_path: str) -> None:
     Y_true = examples["Y_true"]
     Y_bg = examples["Y_bg"]
-    Y_h = examples["Y_hybrid"]
-    Y_wh = examples.get("Y_weighted", None)
-    Y_cs = examples.get("Y_cs_only", None)
-
     if Y_true is None or len(Y_true) == 0:
         return
 
@@ -1376,11 +1743,28 @@ def plot_examples(examples: Dict[str, np.ndarray], save_path: str) -> None:
         ax = axes[i, 0]
         ax.plot(Y_true[i], label="ground_truth")
         ax.plot(Y_bg[i], label="ml_only")
-        ax.plot(Y_h[i], label="hybrid")
-        if Y_wh is not None and len(Y_wh) > i:
-            ax.plot(Y_wh[i], label="weighted_hybrid")
-        if Y_cs is not None and len(Y_cs) > i:
-            ax.plot(Y_cs[i], label="cs_only")
+        if cfg.dual_cs_solver:
+            y_hf = examples.get("Y_hybrid_fista")
+            y_hs = examples.get("Y_hybrid_spgl1")
+            y_cf = examples.get("Y_cs_only_fista")
+            y_cg = examples.get("Y_cs_only_spgl1")
+            if y_hf is not None and len(y_hf) > i:
+                ax.plot(y_hf[i], label="hybrid_fista")
+            if y_hs is not None and len(y_hs) > i:
+                ax.plot(y_hs[i], label="hybrid_spgl1")
+            if y_cf is not None and len(y_cf) > i:
+                ax.plot(y_cf[i], label="cs_only_fista")
+            if y_cg is not None and len(y_cg) > i:
+                ax.plot(y_cg[i], label="cs_only_spgl1")
+        else:
+            Y_h = examples["Y_hybrid"]
+            Y_wh = examples.get("Y_weighted", None)
+            Y_cs = examples.get("Y_cs_only", None)
+            ax.plot(Y_h[i], label="hybrid")
+            if Y_wh is not None and len(Y_wh) > i:
+                ax.plot(Y_wh[i], label="weighted_hybrid")
+            if Y_cs is not None and len(Y_cs) > i:
+                ax.plot(Y_cs[i], label="cs_only")
         ax.set_title(f"Example {i}")
         ax.grid(True, alpha=0.3)
         ax.legend()
@@ -1420,8 +1804,8 @@ def parse_cli_args() -> argparse.Namespace:
         "--profile",
         type=str,
         default="paper",
-        choices=["paper", "explore", "phase0_baseline"],
-        help="Config profile: paper (default), explore (fast), phase0_baseline (roadmap Fase 0).",
+        choices=["paper", "explore", "phase0_baseline", "solver_comparison"],
+        help="Config profile: paper, explore, phase0_baseline, solver_comparison (FISTA vs SPGL1).",
     )
     return parser.parse_args()
 
@@ -1429,9 +1813,41 @@ def parse_cli_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_cli_args()
     cfg = Config()
-    cfg.config_profile = cast(Literal["paper", "explore", "phase0_baseline"], args.profile)
+    cfg.config_profile = cast(
+        Literal["paper", "explore", "phase0_baseline", "solver_comparison"],
+        args.profile,
+    )
     apply_config_profile(cfg)
-    os.makedirs(cfg.save_dir, exist_ok=True)
+    run_artifact_id = ""
+    if cfg.config_profile == "solver_comparison":
+        run_artifact_id = time.strftime("%Y%m%d_%H%M%S")
+        layout_solver_comparison_run(cfg, run_artifact_id)
+        cfg.artifact_log_path = os.path.join(cfg.save_dir, "run_console.log")
+    else:
+        os.makedirs(cfg.save_dir, exist_ok=True)
+
+    if cfg.config_profile == "solver_comparison":
+        protocol = "\n".join(
+            [
+                "Solver comparison protocol (roadmap Etapa 1).",
+                "dual_cs_solver=True: hybrid_fista, hybrid_spgl1, cs_only_fista, cs_only_spgl1 + ml_only.",
+                "Requires: pylops and spgl1 (pip install pylops spgl1).",
+                "",
+                "run_id: " + run_artifact_id,
+                "save_dir (relative): " + cfg.save_dir,
+                "plots_subdir (relative to save_dir): " + cfg.plots_subdir,
+                "",
+                "seeds: " + str(cfg.seeds),
+                "measurement_ratios: " + str(cfg.measurement_ratios),
+                "l1_lambda_grid (FISTA): " + str(cfg.l1_lambda_grid),
+                "spgl1_tau_grid (SPGL1 LASSO): " + str(cfg.spgl1_tau_grid),
+                "",
+                "Figures (repo): paper/figures/solver_comparison/runs/" + run_artifact_id + "/",
+                "Symlink: outputs/solver_comparison/LATEST -> this run",
+            ]
+        )
+        with open(os.path.join(cfg.save_dir, "PROTOCOL.txt"), "w", encoding="utf-8") as f:
+            f.write(protocol + "\n")
 
     if cfg.config_profile == "phase0_baseline":
         protocol = "\n".join(
@@ -1498,7 +1914,7 @@ def main() -> None:
 
     if first_examples is not None:
         ex_path = os.path.join(plots_directory(cfg), "08_example_ground_truth_vs_models.png")
-        plot_examples(first_examples, save_path=ex_path)
+        plot_examples(cfg, first_examples, save_path=ex_path)
         plot_paths.append(ex_path)
 
     merged_gt = merge_gt_pred_bundles(all_gt_bundles)
@@ -1506,6 +1922,25 @@ def main() -> None:
         plot_paths.extend(save_ground_truth_vs_model_plots(cfg, merged_gt))
 
     elapsed = time.time() - t0
+
+    if run_artifact_id:
+        readme_p = os.path.join(cfg.save_dir, "README_RUN.txt")
+        finished = time.strftime("%Y-%m-%dT%H:%M:%S")
+        extra = [
+            "",
+            "finished_local: " + finished,
+            "elapsed_seconds: {:.1f}".format(elapsed),
+            "",
+            "CSV and logs in this directory; figures under paper/figures/solver_comparison/runs/"
+            + run_artifact_id
+            + "/",
+            "",
+            "Plot files:",
+        ]
+        with open(readme_p, "a", encoding="utf-8") as f:
+            f.write("\n".join(extra) + "\n")
+            for pp in sorted(plot_paths):
+                f.write("  " + os.path.basename(pp) + "\n")
 
     print("\n" + "=" * 72)
     print("RESUMO")

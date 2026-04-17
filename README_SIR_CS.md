@@ -60,6 +60,7 @@ O pipeline implementa:
 - `paper` (default em `python sir_cs_pipeline_optimized.py`): hiperparametros do `Config` (3 seeds, grade de `lambda` refinada no codigo).
 - `explore`: menos dados e grade curta via `apply_config_profile` (iteracao rapida).
 - `phase0_baseline`: **Fase 0 do roadmap** (`paper/roadmap_proximos_passos.md`) — 10 seeds, `measurement_ratio` em `{0.2,0.3,0.4,0.5,0.6}`, mesma grade de `lambda` que o paper, saidas em `outputs/phase0_baseline/`, figuras em `paper/figures/phase0_baseline/`, mais `PROTOCOL.txt` no diretorio de saida.
+- `solver_comparison`: **Etapa 1 do roadmap** — mesmo protocolo numerico que a Fase 0, mas com `dual_cs_solver=True`: metodos `hybrid_fista`, `hybrid_spgl1`, `cs_only_fista`, `cs_only_spgl1` mais `ml_only`. Requer **PyLops** e o pacote **spgl1** (`pip install pylops spgl1` ou `pip install -r requirements.txt`) para o ramo SPGL1. Cada execucao cria `outputs/solver_comparison/runs/<YYYYMMDD_HHMMSS>/` (CSVs, `config.json`, `PROTOCOL.txt`, `README_RUN.txt`, `run_console.log`) e `paper/figures/solver_comparison/runs/<mesmo_id>/` (PNG). Symlink `outputs/solver_comparison/LATEST` aponta para a ultima corrida.
 
 Opcional: `reset_warm_start_each_lambda=True` zera warm-start a cada novo `lambda` na selecao (mais limpo, mais lento).
 
@@ -75,12 +76,25 @@ No `sir_cs_pipeline_optimized.py`, `Config.log_progress` (default `True`) imprim
 - cada valor da grade de `lambda` por metodo (metrica e tempo);
 - progresso no teste a cada `test_log_interval` amostras (use `0` para so mostrar inicio/fim do teste).
 
+### Ambiente virtual (recomendado)
+
+Na raiz do repositorio (a pasta `.venv/` ja esta no `.gitignore`):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### Rodar
 ```bash
 python sir_cs_pipeline_optimized.py
 python sir_cs_pipeline_optimized.py --profile phase0_baseline
 python sir_cs_pipeline_optimized.py --profile explore
+python sir_cs_pipeline_optimized.py --profile solver_comparison
 ```
+
+Dependencia extra (perfil `solver_comparison`): pacotes `pylops` e `spgl1` (ver `requirements.txt` na raiz do repositorio).
 
 Saidas esperadas (perfil `paper`):
 - `outputs/detailed_results.csv`
