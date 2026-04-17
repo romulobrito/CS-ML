@@ -1,0 +1,131 @@
+% SIR-CS: Sparse Innovation Regression with Compressed Sensing
+% Standalone snippet: include in your main document with amsmath, amssymb, amsthm,
+% and algorithm packages (e.g., algorithm + algpseudocode, or algorithm2e).
+% All ASCII.
+
+\section{Sparse Innovation Regression with Compressed Sensing (SIR-CS)}
+\label{sec:sir_cs}
+
+\subsection{Problem setup}
+Let $u \in \mathbb{R}^p$ denote inputs and $y \in \mathbb{R}^N$ a high-dimensional target.
+At inference time we observe compressive measurements
+\begin{equation}
+  b = M y + \eta,
+\end{equation}
+where $M \in \mathbb{R}^{m \times N}$ has $m \ll N$ and $\eta$ models measurement noise.
+
+We decompose the target into a learned background predictor and a residual:
+\begin{equation}
+  y = f_\theta(u) + r,
+\end{equation}
+where $f_\theta$ is a machine learning model and $r$ is the modeling error.
+The structural assumption is that the innovation admits a sparse or compressible representation in a dictionary $\Psi \in \mathbb{R}^{N \times N}$:
+\begin{equation}
+  r = \Psi \alpha^\star + \xi,
+\end{equation}
+with $\alpha^\star$ sparse (or compressible) and $\xi$ a small non-sparse mismatch term.
+
+Substituting into the measurement model yields the reduced sensing model for the innovation coefficients:
+\begin{equation}
+  z := b - M f_\theta(u) = A \alpha^\star + \varepsilon,
+  \qquad
+  A := M \Psi,
+  \qquad
+  \varepsilon := M \xi + \eta.
+\end{equation}
+Thus inference reduces to recovering $\alpha^\star$ from the linear measurements $z$ rather than reconstructing all $N$ coordinates of $y$ directly.
+
+\subsection{Inference: recovery of the innovation}
+The basic estimator is the LASSO / BPDN problem
+\begin{equation}
+  \hat{\alpha} \in \arg\min_{\alpha \in \mathbb{R}^N}
+  \frac{1}{2} \| A \alpha - z \|_2^2 + \lambda \| \alpha \|_1,
+\end{equation}
+followed by
+\begin{equation}
+  \hat{y} = f_\theta(u) + \Psi \hat{\alpha}.
+\end{equation}
+
+\paragraph{Structured variants.}
+When prior support information, spatial regularity, or physics are available, we use
+\begin{equation}
+  \hat{\alpha} \in \arg\min_{\alpha}
+  \frac{1}{2} \| A \alpha - z \|_2^2
+  + \lambda_1 \| W \alpha \|_1
+  + \lambda_2 \, \Omega_{\mathrm{str}}(\alpha)
+  + \lambda_3 \, \mathcal{P}(\Psi \alpha),
+\end{equation}
+where $W$ is a diagonal weight matrix (weighted $\ell_1$), $\Omega_{\mathrm{str}}$ encodes structured sparsity (e.g., group/tree penalties), and $\mathcal{P}$ encodes domain constraints (e.g., TV or physics-based penalties).
+
+\subsection{Optional learned support prior}
+Let $g_\phi$ predict support-related scores $\pi(u) \in [0,1]^N$.
+A simple weighting scheme sets, for thresholds $\tau \in (0,1)$ and $0 < \omega_{\mathrm{low}} < 1$,
+\begin{equation}
+  w_i =
+  \begin{cases}
+    \omega_{\mathrm{low}}, & \pi_i(u) \ge \tau, \\
+    1, & \text{otherwise},
+  \end{cases}
+\end{equation}
+and solves weighted $\ell_1$ with $\| W \alpha \|_1 = \sum_i w_i |\alpha_i|$.
+
+\subsection{Training objectives (two regimes)}
+\paragraph{Supervised training with sparse residual encouragement.}
+When full $y$ is available during training, one may train $\theta$ with
+\begin{equation}
+  \mathcal{L}_{\mathrm{train}}
+  =
+  \| f_\theta(u) - y \|_2^2
+  + \beta \| \Psi^\top (y - f_\theta(u)) \|_1
+  + \gamma \, \Omega_{\mathrm{str}}\!\left(\Psi^\top (y - f_\theta(u))\right),
+\end{equation}
+when $\Psi$ is orthonormal and analysis coefficients are appropriate; more generally, replace $\Psi^\top r$ by the analysis representation consistent with the chosen dictionary.
+
+\paragraph{Task-aware training with simulated compression.}
+Simulate $b = M y + \eta$ during training and minimize end-to-end error after recovery,
+\begin{equation}
+  \mathcal{L}_{\mathrm{task}} = \| \hat{y}(u,b) - y \|_2^2,
+\end{equation}
+using unrolled proximal methods or implicit differentiation if differentiability is required.
+
+\subsection{Informal stability statement (recovery stage only)}
+\begin{proposition}[Informal]
+Assume $A = M\Psi$ satisfies a restricted isometry property of sufficient order for $k$-sparse vectors, and $\alpha^\star$ is $k$-compressible.
+Let $\hat{\alpha}$ be a BPDN/LASSO solution for noise level $\|\varepsilon\|_2$.
+Then typical stable recovery bounds imply
+\begin{equation}
+  \| \hat{\alpha} - \alpha^\star \|_2
+  \le
+  C_1 \| \varepsilon \|_2
+  + C_2 \frac{\sigma_k(\alpha^\star)_1}{\sqrt{k}},
+\end{equation}
+and consequently
+\begin{equation}
+  \| \hat{y} - y \|_2
+  \le
+  \| \Psi \|_{2 \to 2} \, \| \hat{\alpha} - \alpha^\star \|_2 + \| \xi \|_2.
+\end{equation}
+\end{proposition}
+
+\subsection{Algorithm}
+\begin{algorithm}
+\caption{SIR-CS (inference)}
+\label{alg:sir_cs}
+\begin{algorithmic}[1]
+\Require Measurements $b$, operator $M$, model $f_\theta$, dictionary $\Psi$, weights $W$ (optional), penalties $\Omega_{\mathrm{str}},\mathcal{P}$ (optional)
+\State $\hat{y}_{\mathrm{bg}} \gets f_\theta(u)$
+\State $z \gets b - M \hat{y}_{\mathrm{bg}}$
+\If{support prior available}
+  \State $\pi \gets g_\phi(u)$; build $W(\pi)$
+\EndIf
+\State $\hat{\alpha} \gets \arg\min_{\alpha} \frac{1}{2}\|M\Psi \alpha - z\|_2^2 + \lambda_1 \|W\alpha\|_1 + \lambda_2 \Omega_{\mathrm{str}}(\alpha) + \lambda_3 \mathcal{P}(\Psi \alpha)$
+\State $\hat{y} \gets \hat{y}_{\mathrm{bg}} + \Psi \hat{\alpha}$
+\Ensure $\hat{y}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Method variants (abbreviations)}
+\textbf{V1 (SIR-CS):} basic $\ell_1$ on $\alpha$.
+\textbf{V2 (WSIR-CS):} weighted $\ell_1$ using $W$.
+\textbf{V3 (TSIR-CS):} temporal smoothing on $\alpha_t$ (e.g., $\|\alpha_t-\hat{\alpha}_{t-1}\|_2^2$).
+\textbf{V4 (Joint-SIR-CS):} shared $\alpha_c$ and channel-specific $\alpha_j$ across multiple outputs/sensors.

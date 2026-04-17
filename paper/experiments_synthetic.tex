@@ -1,0 +1,183 @@
+% Synthetic experiments section for SIR-CS draft.
+% Figures: paper/figures/phase0_baseline/ (Phase 0 run, sir_cs_pipeline_optimized.py --profile phase0_baseline).
+% All ASCII.
+
+\section{Experiments: synthetic validation (Phase~0 baseline)}
+\label{sec:exp_synthetic}
+
+This section reports a \emph{Phase~0} controlled synthetic study: a frozen protocol aligned with the project's ablation roadmap.
+The goal is to verify that the SIR-CS pipeline behaves consistently with Section~\ref{sec:sir_cs} in a favorable regime (learnable global component, sparse innovation in the recovery basis, Gaussian compressive sensing).
+Uncertainty is quantified across \emph{independent} random seeds (not pseudo-replications over test samples).
+A complementary evaluation on \emph{real data} remains future work (Section~\ref{sec:outlook_real_data}).
+
+\subsection{Protocol}
+\label{sec:exp_protocol}
+
+\paragraph{Phase~0 reference configuration.}
+We fix the data-generating process and training protocol, then aggregate statistics across ten seeds
+$\{7,13,23,29,31,37,41,43,47,53\}$.
+Measurement ratios are $\rho \in \{0.20,0.30,0.40,0.50,0.60\}$ with $N=128$ and $m=\lfloor \rho N\rfloor$.
+All other hyperparameters match the implementation defaults for this profile: $p=12$, $k=6$, $\Psi=I$, \texttt{residual\_mode}$=$\texttt{support\_from\_u}$, Gaussian $M$, \texttt{measurement\_noise\_std}$=0.02$, \texttt{output\_noise\_std}$=0.01$.
+
+\paragraph{Data generation.}
+Inputs $u \in \mathbb{R}^{p}$ are drawn i.i.d.\ standard Gaussian.
+Targets satisfy $y = y_{\mathrm{bg}} + \Psi \alpha^\star + \xi_{\mathrm{out}}$ where $y_{\mathrm{bg}}$ is a smooth nonlinear random-feature map of $u$, $\alpha^\star$ is $k$-sparse in canonical coordinates, $\Psi=I$, and $\xi_{\mathrm{out}}$ is small output noise.
+
+\paragraph{Train and test splits.}
+We use $n_{\mathrm{train}}=1200$, $n_{\mathrm{val}}=300$, and $n_{\mathrm{test}}=300$ samples per seed.
+
+\paragraph{Measurement model.}
+Observations are $b = M y + \eta$ with additive Gaussian measurement noise at fixed standard deviation, shared consistently between validation-based $\lambda$ selection and test evaluation in the code.
+
+\paragraph{Methods.}
+\textbf{ml\_only:} multi-output MLP predicting $y$ from $u$ without using $M$ at inference.
+\textbf{hybrid:} SIR-CS with FISTA/LASSO on the innovation after subtracting $M f_\theta(u)$ from $b$.
+\textbf{weighted\_hybrid:} same as hybrid with diagonal weights in the $\ell_1$ term derived from an auxiliary predictor of coefficient magnitudes.
+\textbf{cs\_only:} sparse reconstruction of $y$ in $\Psi$ from $b$ without the learned background (misspecified reference).
+
+\paragraph{Hyperparameters and model selection.}
+The $\ell_1$ penalty is selected on the validation set over the grid
+$\{10^{-4},3\!\cdot\!10^{-4},10^{-3},3\!\cdot\!10^{-3},10^{-2},3\!\cdot\!10^{-2}\}$.
+Lipschitz constants for FISTA are precomputed once per $(M,\Psi)$.
+Reported numbers aggregate \emph{first} over test samples within each $(\mathrm{seed},\rho)$, then \emph{across seeds} as mean $\pm$ standard deviation.
+
+\subsection{Main quantitative results}
+\label{sec:exp_main_table}
+
+Table~\ref{tab:synthetic_rmse_mae} summarizes test RMSE and MAE.
+The ml-only baseline is \emph{flat} in $\rho$ because its prediction does not use the realized compressive measurements at test time.
+
+\begin{table}[t]
+  \centering
+  \caption{Test RMSE and MAE (mean $\pm$ std across ten seeds) versus $\rho=m/N$.
+  Best RMSE in each row in bold (excluding \texttt{cs\_only}).}
+  \label{tab:synthetic_rmse_mae}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    $\rho$ & \texttt{ml\_only} & \texttt{hybrid} & \texttt{weighted\_hybrid} & \texttt{cs\_only} \\
+    \midrule
+    \multicolumn{5}{@{}l}{\emph{RMSE}} \\
+    $0.20$ & $0.369 \pm 0.011$ & $\mathbf{0.336} \pm 0.011$ & $0.340 \pm 0.011$ & $0.625 \pm 0.015$ \\
+    $0.30$ & $0.369 \pm 0.011$ & $\mathbf{0.319} \pm 0.011$ & $0.325 \pm 0.011$ & $0.593 \pm 0.016$ \\
+    $0.40$ & $0.369 \pm 0.011$ & $\mathbf{0.296} \pm 0.011$ & $0.305 \pm 0.011$ & $0.553 \pm 0.015$ \\
+    $0.50$ & $0.369 \pm 0.011$ & $\mathbf{0.272} \pm 0.011$ & $0.283 \pm 0.010$ & $0.508 \pm 0.013$ \\
+    $0.60$ & $0.369 \pm 0.011$ & $\mathbf{0.245} \pm 0.010$ & $0.258 \pm 0.010$ & $0.455 \pm 0.015$ \\
+    \midrule
+    \multicolumn{5}{@{}l}{\emph{MAE}} \\
+    $0.20$ & $0.283 \pm 0.011$ & $\mathbf{0.262} \pm 0.010$ & $0.266 \pm 0.010$ & $0.500 \pm 0.012$ \\
+    $0.30$ & $0.283 \pm 0.011$ & $\mathbf{0.251} \pm 0.010$ & $0.256 \pm 0.010$ & $0.475 \pm 0.013$ \\
+    $0.40$ & $0.283 \pm 0.011$ & $\mathbf{0.234} \pm 0.009$ & $0.241 \pm 0.009$ & $0.443 \pm 0.012$ \\
+    $0.50$ & $0.283 \pm 0.011$ & $\mathbf{0.215} \pm 0.009$ & $0.225 \pm 0.009$ & $0.407 \pm 0.011$ \\
+    $0.60$ & $0.283 \pm 0.011$ & $\mathbf{0.194} \pm 0.008$ & $0.205 \pm 0.008$ & $0.364 \pm 0.012$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Reading Table~\ref{tab:synthetic_rmse_mae}.}
+\texttt{hybrid} achieves the lowest RMSE and MAE at every $\rho$.
+The margin over ml-only grows monotonically with $\rho$ in this table: RMSE drops from $0.369$ to $0.245$ at $\rho=0.60$ (absolute reduction $0.124$ relative to ml-only at the same $\rho$).
+\texttt{cs\_only} remains far worse because it omits the global component $f_\theta(u)$.
+\texttt{weighted\_hybrid} improves consistently over ml-only but remains above \texttt{hybrid}; the RMSE gap \texttt{weighted\_hybrid}$-$\texttt{hybrid} widens slightly as $\rho$ increases, which motivates dedicated prior diagnostics (support correlation, oracle weights) rather than treating the weighted variant as the primary estimator in this regime.
+
+\subsection{Error versus measurement ratio}
+\label{sec:exp_vs_rho}
+
+Figure~\ref{fig:rmse_mae_rel} shows RMSE, MAE, and relative $\ell_2$ error versus $\rho$.
+Error bars show the standard deviation across seeds.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.32\linewidth]{01_rmse_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{02_mae_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{03_relative_l2_vs_measurement_ratio.png}
+  \caption{Test error versus $\rho=m/N$ for four methods (Phase~0). Bars: std across ten seeds. ml-only is flat in $\rho$ by construction.}
+  \label{fig:rmse_mae_rel}
+\end{figure}
+
+\paragraph{Discussion.}
+The monotone improvement of \texttt{hybrid} with $\rho$ matches the inverse-problem interpretation in Section~\ref{sec:sir_cs}: more linear measurements improve conditioning of the effective operator $M\Psi$ at fixed noise.
+The flat ml-only curve is expected: the baseline ignores $M$ at prediction time.
+Relative $\ell_2$ tracks RMSE/MAE: \texttt{cs\_only} saturates at high error, while hybrid methods follow the same ordering as in Table~\ref{tab:synthetic_rmse_mae}.
+
+\subsection{Structured recovery metrics and grouped RMSE}
+\label{sec:exp_support_bars}
+
+Figure~\ref{fig:support_bars} (left) reports support F1 for methods that yield sparse coefficients comparable to ground truth.
+\texttt{ml\_only} is omitted.
+Figure~\ref{fig:support_bars} (right) shows grouped RMSE by $\rho$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{04_support_f1_vs_measurement_ratio.png}
+  \includegraphics[width=0.48\linewidth]{05_rmse_grouped_bars_by_ratio.png}
+  \caption{Left: support F1 (Phase~0). Right: grouped RMSE by $\rho$.}
+  \label{fig:support_bars}
+\end{figure}
+
+\paragraph{Discussion.}
+Support F1 stays in a narrow band for all sparse methods, with hybrid methods slightly above \texttt{cs\_only}; this metric should be read jointly with reconstruction error, because high F1 alone does not rescue \texttt{cs\_only} under misspecification.
+The bar panel mirrors Table~\ref{tab:synthetic_rmse_mae}: decreasing hybrid error with $\rho$, flat ml-only, and elevated \texttt{cs\_only}.
+
+\subsection{Gains over the ml-only baseline}
+\label{sec:exp_gains}
+
+Figure~\ref{fig:gains} shows per-seed gains $\mathrm{RMSE}_{\mathrm{ml}}-\mathrm{RMSE}_{\mathrm{method}}$ (and MAE analog), aggregated across seeds.
+Positive values mean improvement over ml-only.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{06_gain_rmse_over_ml_only.png}
+  \includegraphics[width=0.48\linewidth]{07_gain_mae_over_ml_only.png}
+  \caption{Gain over ml-only (positive is better). \texttt{hybrid} and \texttt{weighted\_hybrid} are positive at all $\rho$; \texttt{cs\_only} is negative throughout.}
+  \label{fig:gains}
+\end{figure}
+
+\paragraph{Discussion.}
+\texttt{hybrid} and \texttt{weighted\_hybrid} yield uniformly positive gains in this Phase~0 window, with larger gains at higher $\rho$.
+\texttt{hybrid} dominates \texttt{weighted\_hybrid} in both panels, consistent with Table~\ref{tab:synthetic_rmse_mae}.
+\texttt{cs\_only} remains strongly negative, quantifying the mismatch when the dense background is ignored.
+
+\subsection{Parity plots, residuals, and example traces}
+\label{sec:exp_qualitative}
+
+Figure~\ref{fig:parity} pools test coordinates across seeds and $\rho$.
+Figure~\ref{fig:residuals} shows histograms of $\hat{y}-y$.
+Figure~\ref{fig:examples} shows example traces along the output index.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\linewidth]{09_parity_ground_truth_vs_prediction.png}
+  \caption{Parity plots (Phase~0): ground truth versus prediction. The identity line is dashed. \texttt{hybrid} aligns most tightly with identity; \texttt{cs\_only} shows a horizontal band near $\hat{y}\approx 0$ for a range of true values.}
+  \label{fig:parity}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\linewidth]{10_residual_distributions_gt_vs_models.png}
+  \caption{Residual histograms $\hat{y}-y$ (Phase~0). Hybrid methods concentrate more mass near zero than ml-only; \texttt{cs\_only} is heavy-tailed.}
+  \label{fig:residuals}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{08_example_ground_truth_vs_models.png}
+  \caption{Example reconstructions along output index (Phase~0). ML-based methods track the ground truth; \texttt{cs\_only} deviates toward an overly sparse profile.}
+  \label{fig:examples}
+\end{figure}
+
+\paragraph{Discussion.}
+Parity plots provide a global calibration check: \texttt{hybrid} tracks the identity line most closely, while \texttt{cs\_only} exhibits the classic artifact of a misspecified sparse model under dense targets.
+Residual histograms and traces reinforce the quantitative ordering in Table~\ref{tab:synthetic_rmse_mae}.
+
+\subsection{Limitations}
+\label{sec:exp_limits}
+
+These results establish internal consistency and a favorable synthetic regime.
+They do \emph{not} guarantee performance under arbitrary real-world conditions (non-Gaussian $M$, basis mismatch, ill-conditioned subsampling operators, heavy-tailed noise, or poorly calibrated $\lambda$ grids).
+In validation logs for Phase~0, the selected $\lambda$ often lies at the \emph{smallest} grid value ($10^{-4}$), suggesting that future sweeps could extend the grid toward smaller penalties if computational budget allows.
+
+\subsection{Outlook: evaluation on real data}
+\label{sec:outlook_real_data}
+
+The next experimental milestone is to instantiate the same comparison template on a real dataset with physically motivated $M$ and $\Psi$ (for example, a field subsampled at sensor locations).
+The Phase~0 section then serves as a reproducible sanity check and ablation reference, while the real-data study targets external validity and domain baselines.

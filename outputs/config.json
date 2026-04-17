@@ -1,0 +1,64 @@
+{
+  "seeds": [
+    7
+  ],
+  "n_train": 600,
+  "n_val": 80,
+  "n_test": 100,
+  "p_input": 12,
+  "n_output": 128,
+  "residual_basis": "identity",
+  "residual_k": 6,
+  "residual_amplitude": 1.2,
+  "residual_mode": "support_from_u",
+  "measurement_noise_std": 0.02,
+  "output_noise_std": 0.01,
+  "measurement_kind": "gaussian",
+  "measurement_ratios": [
+    0.3,
+    0.5
+  ],
+  "baseline_hidden": [
+    128,
+    128
+  ],
+  "baseline_max_iter": 500,
+  "baseline_learning_rate_init": 0.001,
+  "baseline_alpha": 0.0001,
+  "baseline_early_stopping": true,
+  "use_alpha_predictor": true,
+  "alpha_hidden": [
+    128,
+    128
+  ],
+  "alpha_max_iter": 400,
+  "alpha_learning_rate_init": 0.001,
+  "alpha_alpha": 0.0001,
+  "alpha_early_stopping": true,
+  "fista_max_iter": 150,
+  "fista_tol": 1e-06,
+  "power_iteration_n_iter": 80,
+  "l1_lambda_grid": [
+    0.001,
+    0.01,
+    0.1
+  ],
+  "use_warm_starts": true,
+  "lambda_selection_max_samples": 80,
+  "weight_mode": "inverse_magnitude",
+  "weight_eps": 0.001,
+  "weight_clip_min": 0.15,
+  "weight_clip_max": 2.5,
+  "weight_power": 0.6,
+  "run_cs_only": true,
+  "run_weighted_hybrid": true,
+  "save_dir": "outputs",
+  "plots_subdir": "../paper/figures/synthetic",
+  "n_example_plots": 3,
+  "max_gt_scatter_points": 50000,
+  "model_selection_metric": "rmse",
+  "log_progress": true,
+  "test_log_interval": 50,
+  "config_profile": "explore",
+  "reset_warm_start_each_lambda": false
+}

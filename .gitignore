@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+.env
+
+# LaTeX auxiliary (keep .tex and optional main.pdf tracked)
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Local / runtime
+agent.log
+*.pid
+*_run.log
+outputs/full_run_log.txt
+nohup.out
+.DS_Store
+
+# Duplicate figure tree if pipeline wrote under outputs/
+outputs/paper/
