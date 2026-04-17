@@ -1,0 +1,52 @@
+{
+  "profile": "explore",
+  "seeds": [
+    7
+  ],
+  "n_train": 600,
+  "n_val": 80,
+  "n_test": 100,
+  "p_input": 12,
+  "n_output": 128,
+  "residual_basis": "identity",
+  "residual_k": 6,
+  "residual_amplitude": 1.2,
+  "residual_mode": "support_from_u",
+  "measurement_kind": "gaussian",
+  "measurement_ratios": [
+    0.3,
+    0.5
+  ],
+  "measurement_noise_std": 0.02,
+  "output_noise_std": 0.01,
+  "bg_hidden": [
+    128,
+    128
+  ],
+  "bg_dropout": 0.0,
+  "lfista_steps": 5,
+  "learn_step_sizes": true,
+  "learn_thresholds": true,
+  "init_step_scale": 1.0,
+  "init_threshold": 0.01,
+  "use_momentum": true,
+  "batch_size": 128,
+  "num_epochs_bg": 25,
+  "num_epochs_frozen": 20,
+  "num_epochs_joint": 25,
+  "lr_bg": 0.001,
+  "lr_frozen": 0.001,
+  "lr_joint": 0.0005,
+  "weight_decay": 1e-05,
+  "patience": 12,
+  "loss_alpha_weight": 0.0,
+  "loss_l1_alpha_weight": 0.0,
+  "save_dir": "outputs/lfista_explore/runs/20260417_163806",
+  "plots_subdir": "../../../../paper/figures/lfista_explore/runs/20260417_163806",
+  "n_example_plots": 3,
+  "max_gt_scatter_points": 50000,
+  "log_progress": true,
+  "artifact_log_path": "outputs/lfista_explore/runs/20260417_163806/run_console.log",
+  "run_artifact_id": "20260417_163806",
+  "device": "cuda"
+}

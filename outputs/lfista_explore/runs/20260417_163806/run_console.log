@@ -1,0 +1,23 @@
+=== LFISTA start | profile=explore | run_id=20260417_163806 | seeds=[7] | measurement_ratios=[0.3, 0.5] | device=cuda ===
+--- seed=7 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.669672
+[bg] epoch=010 val_rmse=0.472335
+[bg] epoch=020 val_rmse=0.444335
+[frozen] epoch=001 val_rmse=0.372966 val_f1=0.0892
+[frozen] epoch=010 val_rmse=0.372776 val_f1=0.0893
+[frozen] epoch=020 val_rmse=0.372595 val_f1=0.0891
+[joint] epoch=001 val_rmse=0.372476 val_f1=0.0891
+[joint] epoch=010 val_rmse=0.370931 val_f1=0.0895
+[joint] epoch=020 val_rmse=0.370499 val_f1=0.0895
+[done] seed=7 rho=0.30 | ml_rmse=0.4519 | frozen_rmse=0.3820 | joint_rmse=0.3818
+--- seed=7 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.672443
+[bg] epoch=010 val_rmse=0.476827
+[bg] epoch=020 val_rmse=0.447606
+[frozen] epoch=001 val_rmse=0.329573 val_f1=0.0898
+[frozen] epoch=010 val_rmse=0.328826 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.328060 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.327595 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.325558 val_f1=0.0902
+[joint] epoch=020 val_rmse=0.324522 val_f1=0.0901
+[done] seed=7 rho=0.50 | ml_rmse=0.4480 | frozen_rmse=0.3292 | joint_rmse=0.3283

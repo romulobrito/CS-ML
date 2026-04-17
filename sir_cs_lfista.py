@@ -47,6 +47,11 @@ Dependências
 - torch
 - scikit-learn (apenas para train/val/test scalers opcionais, aqui não usado)
 
+Artefactos
+----------
+Cada execucao cria ``outputs/<base>/runs/<run_id>/`` (CSVs, config, PROTOCOL, README_RUN, run_console.log)
+e ``paper/figures/<base>/runs/<run_id>/`` (PNG 01--05), com symlink ``outputs/<base>/LATEST``.
+
 Uso
 ---
     python sir_cs_lfista.py
@@ -60,6 +65,7 @@ import argparse
 import json
 import math
 import os
+import sys
 import time
 from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Literal, Optional, Tuple
@@ -132,18 +138,27 @@ class LFISTAConfig:
     loss_alpha_weight: float = 0.0  # use >0 no sintético se quiser supervisionar alpha
     loss_l1_alpha_weight: float = 0.0
 
-    # saída
+    # saida (base; layout_lfista_run acrescenta runs/<run_id>/)
     save_dir: str = "outputs/lfista_baseline"
     plots_subdir: str = "../paper/figures/lfista_baseline"
     n_example_plots: int = 3
     max_gt_scatter_points: int = 50000
     log_progress: bool = True
+    artifact_log_path: Optional[str] = None
+    run_artifact_id: str = ""
 
     # dispositivo
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def apply_profile(cfg: LFISTAConfig) -> None:
+    if cfg.profile == "phase2_lfista":
+        # Alinhado ao Phase 0 / roadmap: 10 seeds, mesmos rho
+        cfg.seeds = [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.save_dir = "outputs/lfista_baseline"
+        cfg.plots_subdir = "../paper/figures/lfista_baseline"
+        return
     if cfg.profile == "explore":
         cfg.seeds = [7]
         cfg.measurement_ratios = [0.3, 0.5]
@@ -156,6 +171,7 @@ def apply_profile(cfg: LFISTAConfig) -> None:
         cfg.lfista_steps = 5
         cfg.save_dir = "outputs/lfista_explore"
         cfg.plots_subdir = "../paper/figures/lfista_explore"
+        return
 
 
 # ============================================================
@@ -166,6 +182,56 @@ def apply_profile(cfg: LFISTAConfig) -> None:
 def log(msg: str, cfg: LFISTAConfig) -> None:
     if cfg.log_progress:
         print(msg, flush=True)
+    if cfg.artifact_log_path:
+        with open(cfg.artifact_log_path, "a", encoding="utf-8") as fp:
+            fp.write(msg + "\n")
+
+
+def layout_lfista_run(cfg: LFISTAConfig, run_id: str) -> None:
+    """
+    Artefactos em <save_dir>/runs/<run_id>/ e figuras em
+    paper/figures/<basename>/runs/<run_id>/ (relpath desde save_dir).
+    Symlink <save_dir>/LATEST -> runs/<run_id>.
+    """
+    base_save = cfg.save_dir
+    cfg.save_dir = os.path.join(base_save, "runs", run_id)
+    cfg.run_artifact_id = run_id
+    cwd = os.getcwd()
+    base_name = os.path.basename(os.path.normpath(base_save))
+    fig_abs = os.path.abspath(os.path.join(cwd, "paper", "figures", base_name, "runs", run_id))
+    save_abs = os.path.abspath(os.path.join(cwd, cfg.save_dir))
+    cfg.plots_subdir = os.path.relpath(fig_abs, save_abs)
+    os.makedirs(fig_abs, exist_ok=True)
+    os.makedirs(save_abs, exist_ok=True)
+
+    latest = os.path.join(cwd, base_save, "LATEST")
+    try:
+        os.remove(latest)
+    except FileNotFoundError:
+        pass
+    os.symlink(os.path.join("runs", run_id), latest, target_is_directory=False)
+
+    readme = os.path.join(save_abs, "README_RUN.txt")
+    started = time.strftime("%Y-%m-%dT%H:%M:%S")
+    lines = [
+        "SIR-CS LFISTA lab (Etapa 2 prototype)",
+        "run_id: " + run_id,
+        "profile: " + cfg.profile,
+        "started_local: " + started,
+        "cwd: " + cwd,
+        "argv: " + json.dumps(sys.argv),
+        "",
+        "Artifacts in this folder:",
+        "  config.json, PROTOCOL.txt, detailed_results.csv, summary_by_seed.csv, summary.csv",
+        "  run_console.log",
+        "",
+        "Figures (repo): paper/figures/" + base_name + "/runs/" + run_id + "/",
+        "",
+        "Symlink: " + base_save + "/LATEST -> runs/" + run_id,
+        "",
+    ]
+    with open(readme, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def orthonormal_dct_matrix(n: int) -> np.ndarray:
@@ -624,6 +690,37 @@ def plots_dir(cfg: LFISTAConfig) -> str:
     return p
 
 
+def plot_gain_over_ml(summary: pd.DataFrame, metric: str, save_path: str) -> None:
+    """Gain = ml_only_torch metric minus method (positive means method is better if lower is better for error)."""
+    col_mean = f"{metric}_mean"
+    ml = summary[summary["method"] == "ml_only_torch"][["measurement_ratio", col_mean]].rename(
+        columns={col_mean: "ml_val"}
+    )
+    colors = {"hybrid_lfista_frozen": "#ff7f0e", "hybrid_lfista_joint": "#2ca02c"}
+    plt.figure(figsize=(8.5, 5))
+    for method in ["hybrid_lfista_frozen", "hybrid_lfista_joint"]:
+        sdf = summary[summary["method"] == method].merge(ml, on="measurement_ratio", how="inner")
+        if len(sdf) == 0:
+            continue
+        gain = sdf["ml_val"].values - sdf[col_mean].values
+        plt.plot(
+            sdf["measurement_ratio"].values,
+            gain,
+            marker="o",
+            label=method,
+            color=colors.get(method),
+        )
+    plt.axhline(0.0, color="gray", linestyle="--", linewidth=0.8)
+    plt.xlabel("Measurement ratio m / N")
+    plt.ylabel("ml_only - method (" + metric + ")")
+    plt.title("Gain over ml_only_torch (" + metric + ", higher is better)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=180)
+    plt.close()
+
+
 def plot_metric(summary: pd.DataFrame, metric: str, save_path: str) -> None:
     colors = {
         "ml_only_torch": "#1f77b4",
@@ -652,6 +749,27 @@ def plot_metric(summary: pd.DataFrame, metric: str, save_path: str) -> None:
     plt.tight_layout()
     plt.savefig(save_path, dpi=180)
     plt.close()
+
+
+def save_lfista_plots(cfg: LFISTAConfig, summary: pd.DataFrame) -> List[str]:
+    """Salva figuras numeradas 01--05 no diretorio de plots do run."""
+    pdir = plots_dir(cfg)
+    out: List[str] = []
+    for fname, metric in [
+        ("01_rmse_vs_measurement_ratio.png", "rmse"),
+        ("02_mae_vs_measurement_ratio.png", "mae"),
+        ("03_relative_l2_vs_measurement_ratio.png", "relative_l2"),
+    ]:
+        path = os.path.join(pdir, fname)
+        plot_metric(summary, metric, path)
+        out.append(path)
+    g1 = os.path.join(pdir, "04_gain_rmse_over_ml_only_torch.png")
+    plot_gain_over_ml(summary, "rmse", g1)
+    out.append(g1)
+    g2 = os.path.join(pdir, "05_gain_mae_over_ml_only_torch.png")
+    plot_gain_over_ml(summary, "mae", g2)
+    out.append(g2)
+    return out
 
 
 # ============================================================
@@ -866,12 +984,37 @@ def main() -> None:
     args = parse_args()
     cfg = LFISTAConfig(profile=args.profile)
     apply_profile(cfg)
-    os.makedirs(cfg.save_dir, exist_ok=True)
+
+    run_id = time.strftime("%Y%m%d_%H%M%S")
+    layout_lfista_run(cfg, run_id)
+    cfg.artifact_log_path = os.path.join(cfg.save_dir, "run_console.log")
+
     with open(os.path.join(cfg.save_dir, "config.json"), "w", encoding="utf-8") as f:
         json.dump(asdict(cfg), f, indent=2)
 
+    base_out = os.path.dirname(os.path.dirname(cfg.save_dir))
+    protocol_lines = [
+        "LFISTA lab protocol (roadmap Etapa 2 prototype, sir_cs_lfista.py).",
+        "PyTorch background MLP + LFISTAUnrolled; frozen then joint training.",
+        "",
+        "run_id: " + run_id,
+        "profile: " + cfg.profile,
+        "save_dir (relative): " + cfg.save_dir,
+        "plots_subdir (relative to save_dir): " + cfg.plots_subdir,
+        "",
+        "seeds: " + str(cfg.seeds),
+        "measurement_ratios: " + str(cfg.measurement_ratios),
+        "lfista_steps (K): " + str(cfg.lfista_steps),
+        "device: " + str(cfg.device),
+        "",
+        "Figures: paper/figures/" + os.path.basename(base_out) + "/runs/" + run_id + "/",
+        "Symlink: " + base_out + "/LATEST -> runs/" + run_id,
+    ]
+    with open(os.path.join(cfg.save_dir, "PROTOCOL.txt"), "w", encoding="utf-8") as f:
+        f.write("\n".join(protocol_lines) + "\n")
+
     log(
-        f"=== LFISTA start | profile={cfg.profile} | seeds={cfg.seeds} | "
+        f"=== LFISTA start | profile={cfg.profile} | run_id={run_id} | seeds={cfg.seeds} | "
         f"measurement_ratios={cfg.measurement_ratios} | device={cfg.device} ===",
         cfg,
     )
@@ -890,17 +1033,36 @@ def main() -> None:
     per_seed.to_csv(os.path.join(cfg.save_dir, "summary_by_seed.csv"), index=False)
     summary.to_csv(os.path.join(cfg.save_dir, "summary.csv"), index=False)
 
-    pdir = plots_dir(cfg)
-    plot_metric(summary, "rmse", os.path.join(pdir, "01_rmse_vs_measurement_ratio.png"))
-    plot_metric(summary, "mae", os.path.join(pdir, "02_mae_vs_measurement_ratio.png"))
-    plot_metric(summary, "relative_l2", os.path.join(pdir, "03_relative_l2_vs_measurement_ratio.png"))
+    plot_paths = save_lfista_plots(cfg, summary)
 
     elapsed = time.time() - t0
+
+    readme_p = os.path.join(cfg.save_dir, "README_RUN.txt")
+    finished = time.strftime("%Y-%m-%dT%H:%M:%S")
+    extra = [
+        "",
+        "finished_local: " + finished,
+        "elapsed_seconds: {:.1f}".format(elapsed),
+        "",
+        "Plot files:",
+    ]
+    with open(readme_p, "a", encoding="utf-8") as f:
+        f.write("\n".join(extra) + "\n")
+        for pp in sorted(plot_paths):
+            f.write("  " + os.path.basename(pp) + "\n")
+
     print("\n" + "=" * 72)
     print("RESUMO LFISTA")
     print("=" * 72)
     print(summary.round(4).to_string(index=False))
-    print(f"\nArquivos salvos em: {os.path.abspath(cfg.save_dir)}")
+    out_abs = os.path.abspath(cfg.save_dir)
+    base_out = os.path.dirname(os.path.dirname(cfg.save_dir))
+    base_name = os.path.basename(base_out)
+    print(f"\nArquivos salvos em: {out_abs}")
+    print("  detailed_results.csv, summary_by_seed.csv, summary.csv, config.json, PROTOCOL.txt, run_console.log")
+    print(f"Figuras em: paper/figures/{base_name}/runs/{run_id}/")
+    for pp in sorted(plot_paths):
+        print(f"  - {os.path.basename(pp)}")
     print(f"Tempo total: {elapsed:.2f} s")
 
 

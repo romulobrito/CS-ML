@@ -1,0 +1,1328 @@
+=== LFISTA start | profile=phase2_lfista | run_id=20260417_164048 | seeds=[7, 13, 23, 29, 31, 37, 41, 43, 47, 53] | measurement_ratios=[0.2, 0.3, 0.4, 0.5, 0.6] | device=cuda ===
+--- seed=7 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.627107
+[bg] epoch=010 val_rmse=0.423870
+[bg] epoch=020 val_rmse=0.415258
+[bg] epoch=030 val_rmse=0.412237
+[bg] epoch=040 val_rmse=0.407307
+[bg] epoch=050 val_rmse=0.399507
+[bg] epoch=060 val_rmse=0.393436
+[bg] epoch=070 val_rmse=0.387028
+[bg] epoch=080 val_rmse=0.382321
+[frozen] epoch=001 val_rmse=0.337445 val_f1=0.0898
+[frozen] epoch=010 val_rmse=0.337441 val_f1=0.0898
+[frozen] epoch=020 val_rmse=0.337438 val_f1=0.0897
+[frozen] epoch=030 val_rmse=0.337436 val_f1=0.0897
+[frozen] epoch=040 val_rmse=0.337434 val_f1=0.0896
+[frozen] epoch=050 val_rmse=0.337432 val_f1=0.0896
+[frozen] epoch=060 val_rmse=0.337431 val_f1=0.0898
+[joint] epoch=001 val_rmse=0.337529 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.334579 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.332548 val_f1=0.0897
+[joint] epoch=030 val_rmse=0.331114 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.328948 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.327156 val_f1=0.0906
+[joint] epoch=060 val_rmse=0.324964 val_f1=0.0912
+[joint] epoch=070 val_rmse=0.323805 val_f1=0.0905
+[joint] epoch=080 val_rmse=0.322532 val_f1=0.0909
+[done] seed=7 rho=0.20 | ml_rmse=0.3641 | frozen_rmse=0.3149 | joint_rmse=0.3150
+--- seed=7 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.627394
+[bg] epoch=010 val_rmse=0.425811
+[bg] epoch=020 val_rmse=0.416448
+[bg] epoch=030 val_rmse=0.412073
+[bg] epoch=040 val_rmse=0.405534
+[bg] epoch=050 val_rmse=0.398819
+[bg] epoch=060 val_rmse=0.393468
+[bg] epoch=070 val_rmse=0.387293
+[bg] epoch=080 val_rmse=0.379572
+[frozen] epoch=001 val_rmse=0.314659 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.314592 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.314551 val_f1=0.0906
+[frozen] epoch=030 val_rmse=0.314520 val_f1=0.0909
+[frozen] epoch=040 val_rmse=0.314501 val_f1=0.0910
+[frozen] epoch=050 val_rmse=0.314494 val_f1=0.0907
+[frozen] epoch=060 val_rmse=0.314490 val_f1=0.0906
+[joint] epoch=001 val_rmse=0.314542 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.310992 val_f1=0.0906
+[joint] epoch=020 val_rmse=0.308673 val_f1=0.0907
+[joint] epoch=030 val_rmse=0.305421 val_f1=0.0906
+[joint] epoch=040 val_rmse=0.302625 val_f1=0.0902
+[joint] epoch=050 val_rmse=0.300524 val_f1=0.0904
+[joint] epoch=060 val_rmse=0.298621 val_f1=0.0903
+[joint] epoch=070 val_rmse=0.298084 val_f1=0.0908
+[joint] epoch=080 val_rmse=0.295808 val_f1=0.0908
+[done] seed=7 rho=0.30 | ml_rmse=0.3625 | frozen_rmse=0.2915 | joint_rmse=0.2919
+--- seed=7 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.629072
+[bg] epoch=010 val_rmse=0.424893
+[bg] epoch=020 val_rmse=0.415281
+[bg] epoch=030 val_rmse=0.410598
+[bg] epoch=040 val_rmse=0.402615
+[bg] epoch=050 val_rmse=0.395478
+[bg] epoch=060 val_rmse=0.390070
+[bg] epoch=070 val_rmse=0.385150
+[bg] epoch=080 val_rmse=0.380566
+[frozen] epoch=001 val_rmse=0.292944 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.292742 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.292595 val_f1=0.0903
+[frozen] epoch=030 val_rmse=0.292504 val_f1=0.0905
+[frozen] epoch=040 val_rmse=0.292432 val_f1=0.0904
+[frozen] epoch=050 val_rmse=0.292404 val_f1=0.0904
+[frozen] epoch=060 val_rmse=0.292381 val_f1=0.0902
+[joint] epoch=001 val_rmse=0.291074 val_f1=0.0903
+[joint] epoch=010 val_rmse=0.288549 val_f1=0.0904
+[joint] epoch=020 val_rmse=0.285184 val_f1=0.0901
+[joint] epoch=030 val_rmse=0.282417 val_f1=0.0903
+[joint] epoch=040 val_rmse=0.280249 val_f1=0.0903
+[joint] epoch=050 val_rmse=0.278318 val_f1=0.0902
+[joint] epoch=060 val_rmse=0.275944 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.274806 val_f1=0.0904
+[joint] epoch=080 val_rmse=0.272597 val_f1=0.0901
+[done] seed=7 rho=0.40 | ml_rmse=0.3647 | frozen_rmse=0.2673 | joint_rmse=0.2673
+--- seed=7 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.629709
+[bg] epoch=010 val_rmse=0.424215
+[bg] epoch=020 val_rmse=0.414841
+[bg] epoch=030 val_rmse=0.410573
+[bg] epoch=040 val_rmse=0.405202
+[bg] epoch=050 val_rmse=0.397073
+[bg] epoch=060 val_rmse=0.389413
+[bg] epoch=070 val_rmse=0.383614
+[bg] epoch=080 val_rmse=0.378010
+[frozen] epoch=001 val_rmse=0.269021 val_f1=0.0899
+[frozen] epoch=010 val_rmse=0.268464 val_f1=0.0902
+[frozen] epoch=020 val_rmse=0.267951 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.267539 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.267218 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.267057 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.266927 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.266536 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.264056 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.261644 val_f1=0.0900
+[joint] epoch=030 val_rmse=0.259829 val_f1=0.0900
+[joint] epoch=040 val_rmse=0.258399 val_f1=0.0900
+[joint] epoch=050 val_rmse=0.256010 val_f1=0.0900
+[joint] epoch=060 val_rmse=0.254889 val_f1=0.0900
+[joint] epoch=070 val_rmse=0.253182 val_f1=0.0901
+[joint] epoch=080 val_rmse=0.251925 val_f1=0.0900
+[done] seed=7 rho=0.50 | ml_rmse=0.3708 | frozen_rmse=0.2483 | joint_rmse=0.2476
+--- seed=7 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.626473
+[bg] epoch=010 val_rmse=0.423063
+[bg] epoch=020 val_rmse=0.414453
+[bg] epoch=030 val_rmse=0.410975
+[bg] epoch=040 val_rmse=0.406271
+[bg] epoch=050 val_rmse=0.399704
+[bg] epoch=060 val_rmse=0.393788
+[bg] epoch=070 val_rmse=0.388150
+[bg] epoch=080 val_rmse=0.381874
+[frozen] epoch=001 val_rmse=0.245093 val_f1=0.0903
+[frozen] epoch=010 val_rmse=0.243980 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.242913 val_f1=0.0898
+[frozen] epoch=030 val_rmse=0.242031 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.241303 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.240979 val_f1=0.0902
+[frozen] epoch=060 val_rmse=0.240682 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.240468 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.238226 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.236117 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.233743 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.231441 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.229704 val_f1=0.0897
+[joint] epoch=060 val_rmse=0.228188 val_f1=0.0896
+[joint] epoch=070 val_rmse=0.226448 val_f1=0.0898
+[joint] epoch=080 val_rmse=0.225751 val_f1=0.0898
+[done] seed=7 rho=0.60 | ml_rmse=0.3733 | frozen_rmse=0.2225 | joint_rmse=0.2207
+--- seed=13 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.672408
+[bg] epoch=010 val_rmse=0.442578
+[bg] epoch=020 val_rmse=0.428215
+[bg] epoch=030 val_rmse=0.420504
+[bg] epoch=040 val_rmse=0.413639
+[bg] epoch=050 val_rmse=0.405448
+[bg] epoch=060 val_rmse=0.399829
+[bg] epoch=070 val_rmse=0.394681
+[bg] epoch=080 val_rmse=0.387701
+[frozen] epoch=001 val_rmse=0.347498 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.347494 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.347491 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.347488 val_f1=0.0903
+[frozen] epoch=040 val_rmse=0.347487 val_f1=0.0904
+[frozen] epoch=050 val_rmse=0.347485 val_f1=0.0903
+[frozen] epoch=060 val_rmse=0.347484 val_f1=0.0905
+[joint] epoch=001 val_rmse=0.347384 val_f1=0.0904
+[joint] epoch=010 val_rmse=0.344893 val_f1=0.0907
+[joint] epoch=020 val_rmse=0.342912 val_f1=0.0910
+[joint] epoch=030 val_rmse=0.340147 val_f1=0.0905
+[joint] epoch=040 val_rmse=0.338093 val_f1=0.0906
+[joint] epoch=050 val_rmse=0.336552 val_f1=0.0906
+[joint] epoch=060 val_rmse=0.335409 val_f1=0.0912
+[joint] epoch=070 val_rmse=0.333711 val_f1=0.0917
+[joint] epoch=080 val_rmse=0.332139 val_f1=0.0926
+[done] seed=13 rho=0.20 | ml_rmse=0.3692 | frozen_rmse=0.3268 | joint_rmse=0.3269
+--- seed=13 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.674930
+[bg] epoch=010 val_rmse=0.441861
+[bg] epoch=020 val_rmse=0.428158
+[bg] epoch=030 val_rmse=0.422310
+[bg] epoch=040 val_rmse=0.416396
+[bg] epoch=050 val_rmse=0.408087
+[bg] epoch=060 val_rmse=0.399770
+[bg] epoch=070 val_rmse=0.391777
+[bg] epoch=080 val_rmse=0.385703
+[frozen] epoch=001 val_rmse=0.324092 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.324027 val_f1=0.0902
+[frozen] epoch=020 val_rmse=0.323970 val_f1=0.0904
+[frozen] epoch=030 val_rmse=0.323938 val_f1=0.0906
+[frozen] epoch=040 val_rmse=0.323914 val_f1=0.0906
+[frozen] epoch=050 val_rmse=0.323896 val_f1=0.0910
+[frozen] epoch=060 val_rmse=0.323889 val_f1=0.0907
+[joint] epoch=001 val_rmse=0.323468 val_f1=0.0907
+[joint] epoch=010 val_rmse=0.321933 val_f1=0.0905
+[joint] epoch=020 val_rmse=0.319953 val_f1=0.0902
+[joint] epoch=030 val_rmse=0.317770 val_f1=0.0905
+[joint] epoch=040 val_rmse=0.316091 val_f1=0.0910
+[joint] epoch=050 val_rmse=0.314600 val_f1=0.0906
+[joint] epoch=060 val_rmse=0.313279 val_f1=0.0905
+[joint] epoch=070 val_rmse=0.311747 val_f1=0.0905
+[joint] epoch=080 val_rmse=0.310505 val_f1=0.0904
+[done] seed=13 rho=0.30 | ml_rmse=0.3753 | frozen_rmse=0.3094 | joint_rmse=0.3096
+--- seed=13 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.669493
+[bg] epoch=010 val_rmse=0.440403
+[bg] epoch=020 val_rmse=0.428193
+[bg] epoch=030 val_rmse=0.422609
+[bg] epoch=040 val_rmse=0.417084
+[bg] epoch=050 val_rmse=0.409593
+[bg] epoch=060 val_rmse=0.401803
+[bg] epoch=070 val_rmse=0.397119
+[bg] epoch=080 val_rmse=0.392864
+[frozen] epoch=001 val_rmse=0.303286 val_f1=0.0898
+[frozen] epoch=010 val_rmse=0.303078 val_f1=0.0902
+[frozen] epoch=020 val_rmse=0.302914 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.302786 val_f1=0.0903
+[frozen] epoch=040 val_rmse=0.302714 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.302692 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.302674 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.303463 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.300058 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.298668 val_f1=0.0899
+[joint] epoch=030 val_rmse=0.296700 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.294752 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.293138 val_f1=0.0900
+[joint] epoch=060 val_rmse=0.291030 val_f1=0.0900
+[joint] epoch=070 val_rmse=0.289845 val_f1=0.0900
+[joint] epoch=080 val_rmse=0.288807 val_f1=0.0900
+[done] seed=13 rho=0.40 | ml_rmse=0.3813 | frozen_rmse=0.2870 | joint_rmse=0.2870
+--- seed=13 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.669486
+[bg] epoch=010 val_rmse=0.441458
+[bg] epoch=020 val_rmse=0.429343
+[bg] epoch=030 val_rmse=0.422274
+[bg] epoch=040 val_rmse=0.417156
+[bg] epoch=050 val_rmse=0.408811
+[bg] epoch=060 val_rmse=0.402073
+[bg] epoch=070 val_rmse=0.397286
+[bg] epoch=080 val_rmse=0.391978
+[frozen] epoch=001 val_rmse=0.279308 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.278643 val_f1=0.0903
+[frozen] epoch=020 val_rmse=0.278034 val_f1=0.0903
+[frozen] epoch=030 val_rmse=0.277552 val_f1=0.0902
+[frozen] epoch=040 val_rmse=0.277209 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.277055 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.276886 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.277622 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.275928 val_f1=0.0897
+[joint] epoch=020 val_rmse=0.274381 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.272636 val_f1=0.0899
+[joint] epoch=040 val_rmse=0.270466 val_f1=0.0897
+[joint] epoch=050 val_rmse=0.269325 val_f1=0.0898
+[joint] epoch=060 val_rmse=0.268266 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.267709 val_f1=0.0898
+[joint] epoch=080 val_rmse=0.266324 val_f1=0.0897
+[done] seed=13 rho=0.50 | ml_rmse=0.3854 | frozen_rmse=0.2672 | joint_rmse=0.2665
+--- seed=13 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.671405
+[bg] epoch=010 val_rmse=0.440133
+[bg] epoch=020 val_rmse=0.426777
+[bg] epoch=030 val_rmse=0.419597
+[bg] epoch=040 val_rmse=0.413713
+[bg] epoch=050 val_rmse=0.404831
+[bg] epoch=060 val_rmse=0.398604
+[bg] epoch=070 val_rmse=0.394064
+[bg] epoch=080 val_rmse=0.390634
+[frozen] epoch=001 val_rmse=0.255995 val_f1=0.0903
+[frozen] epoch=010 val_rmse=0.254680 val_f1=0.0902
+[frozen] epoch=020 val_rmse=0.253403 val_f1=0.0903
+[frozen] epoch=030 val_rmse=0.252298 val_f1=0.0903
+[frozen] epoch=040 val_rmse=0.251403 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.251002 val_f1=0.0899
+[frozen] epoch=060 val_rmse=0.250577 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.250069 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.248379 val_f1=0.0900
+[joint] epoch=020 val_rmse=0.247208 val_f1=0.0897
+[joint] epoch=030 val_rmse=0.245947 val_f1=0.0899
+[joint] epoch=040 val_rmse=0.244947 val_f1=0.0899
+[joint] epoch=050 val_rmse=0.244547 val_f1=0.0898
+[joint] epoch=060 val_rmse=0.244289 val_f1=0.0897
+[joint] epoch=070 val_rmse=0.243742 val_f1=0.0898
+[joint] epoch=080 val_rmse=0.243049 val_f1=0.0897
+[done] seed=13 rho=0.60 | ml_rmse=0.3821 | frozen_rmse=0.2398 | joint_rmse=0.2377
+--- seed=23 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.650089
+[bg] epoch=010 val_rmse=0.437072
+[bg] epoch=020 val_rmse=0.426037
+[bg] epoch=030 val_rmse=0.419349
+[bg] epoch=040 val_rmse=0.413507
+[bg] epoch=050 val_rmse=0.404627
+[bg] epoch=060 val_rmse=0.398493
+[bg] epoch=070 val_rmse=0.393124
+[bg] epoch=080 val_rmse=0.388415
+[frozen] epoch=001 val_rmse=0.344549 val_f1=0.0898
+[frozen] epoch=010 val_rmse=0.344546 val_f1=0.0896
+[frozen] epoch=020 val_rmse=0.344542 val_f1=0.0894
+[frozen] epoch=030 val_rmse=0.344541 val_f1=0.0894
+[frozen] epoch=040 val_rmse=0.344539 val_f1=0.0895
+[frozen] epoch=050 val_rmse=0.344537 val_f1=0.0895
+[frozen] epoch=060 val_rmse=0.344536 val_f1=0.0895
+[joint] epoch=001 val_rmse=0.344460 val_f1=0.0897
+[joint] epoch=010 val_rmse=0.342331 val_f1=0.0896
+[joint] epoch=020 val_rmse=0.340377 val_f1=0.0899
+[joint] epoch=030 val_rmse=0.338127 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.336372 val_f1=0.0897
+[joint] epoch=050 val_rmse=0.334702 val_f1=0.0901
+[joint] epoch=060 val_rmse=0.333596 val_f1=0.0903
+[joint] epoch=070 val_rmse=0.332974 val_f1=0.0900
+[joint] epoch=080 val_rmse=0.331530 val_f1=0.0901
+[done] seed=23 rho=0.20 | ml_rmse=0.3713 | frozen_rmse=0.3251 | joint_rmse=0.3253
+--- seed=23 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.647828
+[bg] epoch=010 val_rmse=0.437978
+[bg] epoch=020 val_rmse=0.423654
+[bg] epoch=030 val_rmse=0.416826
+[bg] epoch=040 val_rmse=0.410599
+[bg] epoch=050 val_rmse=0.402154
+[bg] epoch=060 val_rmse=0.395429
+[bg] epoch=070 val_rmse=0.391300
+[bg] epoch=080 val_rmse=0.387151
+[frozen] epoch=001 val_rmse=0.322230 val_f1=0.0898
+[frozen] epoch=010 val_rmse=0.322188 val_f1=0.0897
+[frozen] epoch=020 val_rmse=0.322166 val_f1=0.0897
+[frozen] epoch=030 val_rmse=0.322153 val_f1=0.0899
+[frozen] epoch=040 val_rmse=0.322142 val_f1=0.0898
+[frozen] epoch=050 val_rmse=0.322137 val_f1=0.0895
+[frozen] epoch=060 val_rmse=0.322137 val_f1=0.0895
+[joint] epoch=001 val_rmse=0.321254 val_f1=0.0900
+[joint] epoch=010 val_rmse=0.320124 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.319048 val_f1=0.0899
+[joint] epoch=030 val_rmse=0.317524 val_f1=0.0901
+[joint] epoch=040 val_rmse=0.316119 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.315773 val_f1=0.0905
+[joint] epoch=060 val_rmse=0.313555 val_f1=0.0899
+[joint] epoch=070 val_rmse=0.313090 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.312329 val_f1=0.0900
+[done] seed=23 rho=0.30 | ml_rmse=0.3717 | frozen_rmse=0.3033 | joint_rmse=0.3035
+--- seed=23 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.650701
+[bg] epoch=010 val_rmse=0.439240
+[bg] epoch=020 val_rmse=0.425356
+[bg] epoch=030 val_rmse=0.417409
+[bg] epoch=040 val_rmse=0.410860
+[bg] epoch=050 val_rmse=0.401729
+[bg] epoch=060 val_rmse=0.394394
+[bg] epoch=070 val_rmse=0.389138
+[bg] epoch=080 val_rmse=0.384194
+[frozen] epoch=001 val_rmse=0.296519 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.296233 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.295999 val_f1=0.0901
+[frozen] epoch=030 val_rmse=0.295818 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.295697 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.295639 val_f1=0.0899
+[frozen] epoch=060 val_rmse=0.295589 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.295380 val_f1=0.0900
+[joint] epoch=010 val_rmse=0.293555 val_f1=0.0900
+[joint] epoch=020 val_rmse=0.292024 val_f1=0.0900
+[joint] epoch=030 val_rmse=0.290336 val_f1=0.0901
+[joint] epoch=040 val_rmse=0.288685 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.287983 val_f1=0.0900
+[joint] epoch=060 val_rmse=0.286614 val_f1=0.0901
+[joint] epoch=070 val_rmse=0.285819 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.284086 val_f1=0.0898
+[done] seed=23 rho=0.40 | ml_rmse=0.3704 | frozen_rmse=0.2776 | joint_rmse=0.2776
+--- seed=23 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.648540
+[bg] epoch=010 val_rmse=0.437147
+[bg] epoch=020 val_rmse=0.422586
+[bg] epoch=030 val_rmse=0.416085
+[bg] epoch=040 val_rmse=0.411172
+[bg] epoch=050 val_rmse=0.404518
+[bg] epoch=060 val_rmse=0.398367
+[bg] epoch=070 val_rmse=0.393071
+[bg] epoch=080 val_rmse=0.388105
+[frozen] epoch=001 val_rmse=0.274686 val_f1=0.0897
+[frozen] epoch=010 val_rmse=0.274123 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.273617 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.273221 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.272936 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.272807 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.272673 val_f1=0.0901
+[joint] epoch=001 val_rmse=0.272338 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.269949 val_f1=0.0898
+[joint] epoch=020 val_rmse=0.268642 val_f1=0.0899
+[joint] epoch=030 val_rmse=0.267419 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.266172 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.265030 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.264114 val_f1=0.0899
+[joint] epoch=070 val_rmse=0.263313 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.262549 val_f1=0.0899
+[done] seed=23 rho=0.50 | ml_rmse=0.3754 | frozen_rmse=0.2552 | joint_rmse=0.2546
+--- seed=23 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.650487
+[bg] epoch=010 val_rmse=0.436151
+[bg] epoch=020 val_rmse=0.422769
+[bg] epoch=030 val_rmse=0.415608
+[bg] epoch=040 val_rmse=0.408651
+[bg] epoch=050 val_rmse=0.399726
+[bg] epoch=060 val_rmse=0.391468
+[bg] epoch=070 val_rmse=0.385604
+[bg] epoch=080 val_rmse=0.379611
+[frozen] epoch=001 val_rmse=0.246631 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.245340 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.244113 val_f1=0.0901
+[frozen] epoch=030 val_rmse=0.243028 val_f1=0.0898
+[frozen] epoch=040 val_rmse=0.242161 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.241793 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.241392 val_f1=0.0898
+[joint] epoch=001 val_rmse=0.241411 val_f1=0.0900
+[joint] epoch=010 val_rmse=0.239737 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.237968 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.236408 val_f1=0.0899
+[joint] epoch=040 val_rmse=0.234927 val_f1=0.0899
+[joint] epoch=050 val_rmse=0.233506 val_f1=0.0898
+[joint] epoch=060 val_rmse=0.232424 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.231079 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.229993 val_f1=0.0897
+[done] seed=23 rho=0.60 | ml_rmse=0.3736 | frozen_rmse=0.2291 | joint_rmse=0.2271
+--- seed=29 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.662404
+[bg] epoch=010 val_rmse=0.428309
+[bg] epoch=020 val_rmse=0.413702
+[bg] epoch=030 val_rmse=0.404039
+[bg] epoch=040 val_rmse=0.396859
+[bg] epoch=050 val_rmse=0.389925
+[bg] epoch=060 val_rmse=0.384905
+[bg] epoch=070 val_rmse=0.381595
+[bg] epoch=080 val_rmse=0.377069
+[frozen] epoch=001 val_rmse=0.340278 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.340271 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.340266 val_f1=0.0901
+[frozen] epoch=030 val_rmse=0.340263 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.340261 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.340260 val_f1=0.0902
+[frozen] epoch=060 val_rmse=0.340259 val_f1=0.0902
+[joint] epoch=001 val_rmse=0.340386 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.339141 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.338166 val_f1=0.0900
+[joint] epoch=030 val_rmse=0.336571 val_f1=0.0903
+[joint] epoch=040 val_rmse=0.335172 val_f1=0.0905
+[joint] epoch=050 val_rmse=0.334004 val_f1=0.0909
+[joint] epoch=060 val_rmse=0.332433 val_f1=0.0908
+[joint] epoch=070 val_rmse=0.332432 val_f1=0.0911
+[joint] epoch=080 val_rmse=0.329925 val_f1=0.0917
+[done] seed=29 rho=0.20 | ml_rmse=0.3718 | frozen_rmse=0.3301 | joint_rmse=0.3302
+--- seed=29 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.660851
+[bg] epoch=010 val_rmse=0.427573
+[bg] epoch=020 val_rmse=0.413441
+[bg] epoch=030 val_rmse=0.406093
+[bg] epoch=040 val_rmse=0.397686
+[bg] epoch=050 val_rmse=0.389744
+[bg] epoch=060 val_rmse=0.384798
+[bg] epoch=070 val_rmse=0.379841
+[bg] epoch=080 val_rmse=0.375671
+[frozen] epoch=001 val_rmse=0.322540 val_f1=0.0899
+[frozen] epoch=010 val_rmse=0.322476 val_f1=0.0897
+[frozen] epoch=020 val_rmse=0.322436 val_f1=0.0900
+[frozen] epoch=030 val_rmse=0.322403 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.322380 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.322369 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.322366 val_f1=0.0901
+[joint] epoch=001 val_rmse=0.322508 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.320589 val_f1=0.0901
+[joint] epoch=020 val_rmse=0.319447 val_f1=0.0903
+[joint] epoch=030 val_rmse=0.317475 val_f1=0.0903
+[joint] epoch=040 val_rmse=0.315365 val_f1=0.0904
+[joint] epoch=050 val_rmse=0.312966 val_f1=0.0904
+[joint] epoch=060 val_rmse=0.311923 val_f1=0.0902
+[joint] epoch=070 val_rmse=0.310020 val_f1=0.0904
+[joint] epoch=080 val_rmse=0.309135 val_f1=0.0899
+[done] seed=29 rho=0.30 | ml_rmse=0.3726 | frozen_rmse=0.3127 | joint_rmse=0.3128
+--- seed=29 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.663572
+[bg] epoch=010 val_rmse=0.427685
+[bg] epoch=020 val_rmse=0.413439
+[bg] epoch=030 val_rmse=0.405530
+[bg] epoch=040 val_rmse=0.399155
+[bg] epoch=050 val_rmse=0.391095
+[bg] epoch=060 val_rmse=0.384009
+[bg] epoch=070 val_rmse=0.380065
+[bg] epoch=080 val_rmse=0.375805
+[frozen] epoch=001 val_rmse=0.297573 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.297272 val_f1=0.0902
+[frozen] epoch=020 val_rmse=0.297017 val_f1=0.0903
+[frozen] epoch=030 val_rmse=0.296821 val_f1=0.0902
+[frozen] epoch=040 val_rmse=0.296686 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.296623 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.296572 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.296475 val_f1=0.0899
+[joint] epoch=010 val_rmse=0.295008 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.293538 val_f1=0.0897
+[joint] epoch=030 val_rmse=0.292011 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.290300 val_f1=0.0900
+[joint] epoch=050 val_rmse=0.289298 val_f1=0.0898
+[joint] epoch=060 val_rmse=0.288237 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.286016 val_f1=0.0901
+[joint] epoch=080 val_rmse=0.285096 val_f1=0.0901
+[done] seed=29 rho=0.40 | ml_rmse=0.3812 | frozen_rmse=0.2919 | joint_rmse=0.2918
+--- seed=29 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.660327
+[bg] epoch=010 val_rmse=0.427415
+[bg] epoch=020 val_rmse=0.415305
+[bg] epoch=030 val_rmse=0.408235
+[bg] epoch=040 val_rmse=0.400594
+[bg] epoch=050 val_rmse=0.392141
+[bg] epoch=060 val_rmse=0.386366
+[bg] epoch=070 val_rmse=0.382842
+[bg] epoch=080 val_rmse=0.378673
+[frozen] epoch=001 val_rmse=0.277288 val_f1=0.0899
+[frozen] epoch=010 val_rmse=0.276592 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.275927 val_f1=0.0900
+[frozen] epoch=030 val_rmse=0.275389 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.274954 val_f1=0.0899
+[frozen] epoch=050 val_rmse=0.274770 val_f1=0.0898
+[frozen] epoch=060 val_rmse=0.274588 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.275419 val_f1=0.0899
+[joint] epoch=010 val_rmse=0.273135 val_f1=0.0898
+[joint] epoch=020 val_rmse=0.271771 val_f1=0.0900
+[joint] epoch=030 val_rmse=0.269562 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.268157 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.266469 val_f1=0.0898
+[joint] epoch=060 val_rmse=0.265547 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.264206 val_f1=0.0900
+[joint] epoch=080 val_rmse=0.263423 val_f1=0.0899
+[done] seed=29 rho=0.50 | ml_rmse=0.3826 | frozen_rmse=0.2656 | joint_rmse=0.2648
+--- seed=29 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.661061
+[bg] epoch=010 val_rmse=0.428695
+[bg] epoch=020 val_rmse=0.413211
+[bg] epoch=030 val_rmse=0.403414
+[bg] epoch=040 val_rmse=0.394688
+[bg] epoch=050 val_rmse=0.386880
+[bg] epoch=060 val_rmse=0.379782
+[bg] epoch=070 val_rmse=0.373453
+[bg] epoch=080 val_rmse=0.366495
+[frozen] epoch=001 val_rmse=0.245886 val_f1=0.0903
+[frozen] epoch=010 val_rmse=0.244689 val_f1=0.0903
+[frozen] epoch=020 val_rmse=0.243535 val_f1=0.0903
+[frozen] epoch=030 val_rmse=0.242506 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.241646 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.241226 val_f1=0.0902
+[frozen] epoch=060 val_rmse=0.240869 val_f1=0.0901
+[joint] epoch=001 val_rmse=0.240598 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.237644 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.236596 val_f1=0.0900
+[joint] epoch=030 val_rmse=0.234062 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.232921 val_f1=0.0899
+[joint] epoch=050 val_rmse=0.231601 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.230896 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.229774 val_f1=0.0900
+[joint] epoch=080 val_rmse=0.229627 val_f1=0.0899
+[done] seed=29 rho=0.60 | ml_rmse=0.3699 | frozen_rmse=0.2312 | joint_rmse=0.2294
+--- seed=31 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.650327
+[bg] epoch=010 val_rmse=0.431812
+[bg] epoch=020 val_rmse=0.419275
+[bg] epoch=030 val_rmse=0.409958
+[bg] epoch=040 val_rmse=0.402967
+[bg] epoch=050 val_rmse=0.394069
+[bg] epoch=060 val_rmse=0.386057
+[bg] epoch=070 val_rmse=0.380579
+[bg] epoch=080 val_rmse=0.373344
+[frozen] epoch=001 val_rmse=0.335789 val_f1=0.0897
+[frozen] epoch=010 val_rmse=0.335790 val_f1=0.0898
+[joint] epoch=001 val_rmse=0.334548 val_f1=0.0899
+[joint] epoch=010 val_rmse=0.333526 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.330040 val_f1=0.0900
+[joint] epoch=030 val_rmse=0.328857 val_f1=0.0900
+[joint] epoch=040 val_rmse=0.326642 val_f1=0.0902
+[joint] epoch=050 val_rmse=0.326240 val_f1=0.0903
+[joint] epoch=060 val_rmse=0.324069 val_f1=0.0905
+[joint] epoch=070 val_rmse=0.322670 val_f1=0.0909
+[joint] epoch=080 val_rmse=0.321861 val_f1=0.0915
+[done] seed=31 rho=0.20 | ml_rmse=0.3867 | frozen_rmse=0.3420 | joint_rmse=0.3421
+--- seed=31 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.652937
+[bg] epoch=010 val_rmse=0.432355
+[bg] epoch=020 val_rmse=0.419338
+[bg] epoch=030 val_rmse=0.410909
+[bg] epoch=040 val_rmse=0.402124
+[bg] epoch=050 val_rmse=0.390915
+[bg] epoch=060 val_rmse=0.383252
+[bg] epoch=070 val_rmse=0.375650
+[bg] epoch=080 val_rmse=0.368137
+[frozen] epoch=001 val_rmse=0.313352 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.313317 val_f1=0.0900
+[frozen] epoch=020 val_rmse=0.313283 val_f1=0.0901
+[frozen] epoch=030 val_rmse=0.313264 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.313253 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.313247 val_f1=0.0899
+[frozen] epoch=060 val_rmse=0.313244 val_f1=0.0901
+[joint] epoch=001 val_rmse=0.312578 val_f1=0.0900
+[joint] epoch=010 val_rmse=0.309568 val_f1=0.0903
+[joint] epoch=020 val_rmse=0.306238 val_f1=0.0901
+[joint] epoch=030 val_rmse=0.303776 val_f1=0.0903
+[joint] epoch=040 val_rmse=0.301310 val_f1=0.0903
+[joint] epoch=050 val_rmse=0.298890 val_f1=0.0902
+[joint] epoch=060 val_rmse=0.297159 val_f1=0.0902
+[joint] epoch=070 val_rmse=0.295249 val_f1=0.0902
+[joint] epoch=080 val_rmse=0.293505 val_f1=0.0907
+[done] seed=31 rho=0.30 | ml_rmse=0.3780 | frozen_rmse=0.3144 | joint_rmse=0.3144
+--- seed=31 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.649120
+[bg] epoch=010 val_rmse=0.434062
+[bg] epoch=020 val_rmse=0.420871
+[bg] epoch=030 val_rmse=0.412230
+[bg] epoch=040 val_rmse=0.403418
+[bg] epoch=050 val_rmse=0.392336
+[bg] epoch=060 val_rmse=0.385546
+[bg] epoch=070 val_rmse=0.378184
+[bg] epoch=080 val_rmse=0.373292
+[frozen] epoch=001 val_rmse=0.292497 val_f1=0.0902
+[frozen] epoch=010 val_rmse=0.292279 val_f1=0.0903
+[frozen] epoch=020 val_rmse=0.292095 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.291968 val_f1=0.0902
+[frozen] epoch=040 val_rmse=0.291880 val_f1=0.0904
+[frozen] epoch=050 val_rmse=0.291835 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.291792 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.291817 val_f1=0.0900
+[joint] epoch=010 val_rmse=0.289222 val_f1=0.0902
+[joint] epoch=020 val_rmse=0.286994 val_f1=0.0901
+[joint] epoch=030 val_rmse=0.285076 val_f1=0.0900
+[joint] epoch=040 val_rmse=0.283842 val_f1=0.0901
+[joint] epoch=050 val_rmse=0.283081 val_f1=0.0900
+[joint] epoch=060 val_rmse=0.281580 val_f1=0.0902
+[joint] epoch=070 val_rmse=0.280576 val_f1=0.0903
+[joint] epoch=080 val_rmse=0.280002 val_f1=0.0902
+[done] seed=31 rho=0.40 | ml_rmse=0.3901 | frozen_rmse=0.2967 | joint_rmse=0.2968
+--- seed=31 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.653945
+[bg] epoch=010 val_rmse=0.433059
+[bg] epoch=020 val_rmse=0.418977
+[bg] epoch=030 val_rmse=0.411255
+[bg] epoch=040 val_rmse=0.404120
+[bg] epoch=050 val_rmse=0.394540
+[bg] epoch=060 val_rmse=0.385362
+[bg] epoch=070 val_rmse=0.378216
+[bg] epoch=080 val_rmse=0.368829
+[frozen] epoch=001 val_rmse=0.261499 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.260804 val_f1=0.0903
+[frozen] epoch=020 val_rmse=0.260162 val_f1=0.0903
+[frozen] epoch=030 val_rmse=0.259652 val_f1=0.0902
+[frozen] epoch=040 val_rmse=0.259279 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.259105 val_f1=0.0898
+[frozen] epoch=060 val_rmse=0.258919 val_f1=0.0898
+[joint] epoch=001 val_rmse=0.259559 val_f1=0.0900
+[joint] epoch=010 val_rmse=0.256773 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.253968 val_f1=0.0897
+[joint] epoch=030 val_rmse=0.252563 val_f1=0.0899
+[joint] epoch=040 val_rmse=0.250358 val_f1=0.0900
+[joint] epoch=050 val_rmse=0.248998 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.248711 val_f1=0.0899
+[joint] epoch=070 val_rmse=0.247346 val_f1=0.0896
+[joint] epoch=080 val_rmse=0.246371 val_f1=0.0897
+[done] seed=31 rho=0.50 | ml_rmse=0.3896 | frozen_rmse=0.2645 | joint_rmse=0.2638
+--- seed=31 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.652381
+[bg] epoch=010 val_rmse=0.431949
+[bg] epoch=020 val_rmse=0.419778
+[bg] epoch=030 val_rmse=0.411250
+[bg] epoch=040 val_rmse=0.401410
+[bg] epoch=050 val_rmse=0.390461
+[bg] epoch=060 val_rmse=0.381041
+[bg] epoch=070 val_rmse=0.371459
+[bg] epoch=080 val_rmse=0.366751
+[frozen] epoch=001 val_rmse=0.237368 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.236192 val_f1=0.0900
+[frozen] epoch=020 val_rmse=0.235065 val_f1=0.0900
+[frozen] epoch=030 val_rmse=0.234095 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.233335 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.232985 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.232631 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.232694 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.230439 val_f1=0.0900
+[joint] epoch=020 val_rmse=0.227913 val_f1=0.0897
+[joint] epoch=030 val_rmse=0.226253 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.224560 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.223598 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.222305 val_f1=0.0897
+[joint] epoch=070 val_rmse=0.221181 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.220851 val_f1=0.0899
+[done] seed=31 rho=0.60 | ml_rmse=0.3854 | frozen_rmse=0.2357 | joint_rmse=0.2339
+--- seed=37 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.665774
+[bg] epoch=010 val_rmse=0.436415
+[bg] epoch=020 val_rmse=0.420294
+[bg] epoch=030 val_rmse=0.410489
+[bg] epoch=040 val_rmse=0.402677
+[bg] epoch=050 val_rmse=0.394438
+[bg] epoch=060 val_rmse=0.387556
+[bg] epoch=070 val_rmse=0.380087
+[bg] epoch=080 val_rmse=0.373720
+[frozen] epoch=001 val_rmse=0.333013 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.333011 val_f1=0.0900
+[frozen] epoch=020 val_rmse=0.333009 val_f1=0.0900
+[frozen] epoch=030 val_rmse=0.333008 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.333007 val_f1=0.0899
+[frozen] epoch=050 val_rmse=0.333006 val_f1=0.0899
+[frozen] epoch=060 val_rmse=0.333006 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.332848 val_f1=0.0897
+[joint] epoch=010 val_rmse=0.329487 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.326919 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.323790 val_f1=0.0901
+[joint] epoch=040 val_rmse=0.320312 val_f1=0.0909
+[joint] epoch=050 val_rmse=0.317052 val_f1=0.0908
+[joint] epoch=060 val_rmse=0.314462 val_f1=0.0905
+[joint] epoch=070 val_rmse=0.311584 val_f1=0.0907
+[joint] epoch=080 val_rmse=0.308738 val_f1=0.0907
+[done] seed=37 rho=0.20 | ml_rmse=0.3621 | frozen_rmse=0.3169 | joint_rmse=0.3170
+--- seed=37 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.665337
+[bg] epoch=010 val_rmse=0.434623
+[bg] epoch=020 val_rmse=0.419901
+[bg] epoch=030 val_rmse=0.411477
+[bg] epoch=040 val_rmse=0.405259
+[bg] epoch=050 val_rmse=0.398516
+[bg] epoch=060 val_rmse=0.392688
+[bg] epoch=070 val_rmse=0.386144
+[bg] epoch=080 val_rmse=0.378902
+[frozen] epoch=001 val_rmse=0.316630 val_f1=0.0898
+[frozen] epoch=010 val_rmse=0.316557 val_f1=0.0897
+[frozen] epoch=020 val_rmse=0.316495 val_f1=0.0899
+[frozen] epoch=030 val_rmse=0.316453 val_f1=0.0903
+[frozen] epoch=040 val_rmse=0.316429 val_f1=0.0903
+[frozen] epoch=050 val_rmse=0.316408 val_f1=0.0902
+[frozen] epoch=060 val_rmse=0.316391 val_f1=0.0903
+[joint] epoch=001 val_rmse=0.315855 val_f1=0.0900
+[joint] epoch=010 val_rmse=0.314002 val_f1=0.0906
+[joint] epoch=020 val_rmse=0.310809 val_f1=0.0902
+[joint] epoch=030 val_rmse=0.308494 val_f1=0.0901
+[joint] epoch=040 val_rmse=0.305940 val_f1=0.0901
+[joint] epoch=050 val_rmse=0.303807 val_f1=0.0901
+[joint] epoch=060 val_rmse=0.302545 val_f1=0.0901
+[joint] epoch=070 val_rmse=0.300575 val_f1=0.0903
+[joint] epoch=080 val_rmse=0.297839 val_f1=0.0902
+[done] seed=37 rho=0.30 | ml_rmse=0.3765 | frozen_rmse=0.3073 | joint_rmse=0.3076
+--- seed=37 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.664562
+[bg] epoch=010 val_rmse=0.434947
+[bg] epoch=020 val_rmse=0.419355
+[bg] epoch=030 val_rmse=0.410443
+[bg] epoch=040 val_rmse=0.403398
+[bg] epoch=050 val_rmse=0.395634
+[bg] epoch=060 val_rmse=0.389889
+[bg] epoch=070 val_rmse=0.385169
+[bg] epoch=080 val_rmse=0.379634
+[frozen] epoch=001 val_rmse=0.296904 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.296679 val_f1=0.0898
+[frozen] epoch=020 val_rmse=0.296501 val_f1=0.0900
+[frozen] epoch=030 val_rmse=0.296362 val_f1=0.0904
+[frozen] epoch=040 val_rmse=0.296267 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.296222 val_f1=0.0902
+[frozen] epoch=060 val_rmse=0.296175 val_f1=0.0901
+[joint] epoch=001 val_rmse=0.296216 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.293907 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.292666 val_f1=0.0901
+[joint] epoch=030 val_rmse=0.291155 val_f1=0.0903
+[joint] epoch=040 val_rmse=0.289475 val_f1=0.0902
+[joint] epoch=050 val_rmse=0.288511 val_f1=0.0901
+[joint] epoch=060 val_rmse=0.287063 val_f1=0.0902
+[joint] epoch=070 val_rmse=0.285705 val_f1=0.0901
+[joint] epoch=080 val_rmse=0.285049 val_f1=0.0900
+[done] seed=37 rho=0.40 | ml_rmse=0.3890 | frozen_rmse=0.2950 | joint_rmse=0.2948
+--- seed=37 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.664405
+[bg] epoch=010 val_rmse=0.436514
+[bg] epoch=020 val_rmse=0.422817
+[bg] epoch=030 val_rmse=0.412613
+[bg] epoch=040 val_rmse=0.405388
+[bg] epoch=050 val_rmse=0.399154
+[bg] epoch=060 val_rmse=0.395462
+[bg] epoch=070 val_rmse=0.392268
+[bg] epoch=080 val_rmse=0.385320
+[frozen] epoch=001 val_rmse=0.275541 val_f1=0.0902
+[frozen] epoch=010 val_rmse=0.274833 val_f1=0.0903
+[frozen] epoch=020 val_rmse=0.274187 val_f1=0.0904
+[frozen] epoch=030 val_rmse=0.273631 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.273222 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.273033 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.272833 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.272296 val_f1=0.0899
+[joint] epoch=010 val_rmse=0.269743 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.266929 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.264042 val_f1=0.0900
+[joint] epoch=040 val_rmse=0.261488 val_f1=0.0897
+[joint] epoch=050 val_rmse=0.259389 val_f1=0.0901
+[joint] epoch=060 val_rmse=0.256854 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.255226 val_f1=0.0898
+[joint] epoch=080 val_rmse=0.252847 val_f1=0.0899
+[done] seed=37 rho=0.50 | ml_rmse=0.3860 | frozen_rmse=0.2617 | joint_rmse=0.2609
+--- seed=37 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.667869
+[bg] epoch=010 val_rmse=0.434678
+[bg] epoch=020 val_rmse=0.418421
+[bg] epoch=030 val_rmse=0.409303
+[bg] epoch=040 val_rmse=0.402072
+[bg] epoch=050 val_rmse=0.393974
+[bg] epoch=060 val_rmse=0.387214
+[bg] epoch=070 val_rmse=0.380182
+[bg] epoch=080 val_rmse=0.372868
+[frozen] epoch=001 val_rmse=0.244361 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.243102 val_f1=0.0902
+[frozen] epoch=020 val_rmse=0.241863 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.240791 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.239918 val_f1=0.0899
+[frozen] epoch=050 val_rmse=0.239528 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.239122 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.239305 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.236518 val_f1=0.0897
+[joint] epoch=020 val_rmse=0.234760 val_f1=0.0897
+[joint] epoch=030 val_rmse=0.232341 val_f1=0.0899
+[joint] epoch=040 val_rmse=0.230085 val_f1=0.0899
+[joint] epoch=050 val_rmse=0.228448 val_f1=0.0898
+[joint] epoch=060 val_rmse=0.226800 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.224682 val_f1=0.0898
+[joint] epoch=080 val_rmse=0.223556 val_f1=0.0898
+[done] seed=37 rho=0.60 | ml_rmse=0.3760 | frozen_rmse=0.2298 | joint_rmse=0.2280
+--- seed=41 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.666783
+[bg] epoch=010 val_rmse=0.437389
+[bg] epoch=020 val_rmse=0.430277
+[bg] epoch=030 val_rmse=0.424172
+[bg] epoch=040 val_rmse=0.416235
+[bg] epoch=050 val_rmse=0.407899
+[bg] epoch=060 val_rmse=0.401589
+[bg] epoch=070 val_rmse=0.398041
+[bg] epoch=080 val_rmse=0.392425
+[frozen] epoch=001 val_rmse=0.350436 val_f1=0.0902
+[frozen] epoch=010 val_rmse=0.350432 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.350428 val_f1=0.0899
+[frozen] epoch=030 val_rmse=0.350424 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.350421 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.350417 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.350414 val_f1=0.0902
+[joint] epoch=001 val_rmse=0.349613 val_f1=0.0903
+[joint] epoch=010 val_rmse=0.347788 val_f1=0.0902
+[joint] epoch=020 val_rmse=0.345452 val_f1=0.0897
+[joint] epoch=030 val_rmse=0.340599 val_f1=0.0900
+[joint] epoch=040 val_rmse=0.337699 val_f1=0.0899
+[joint] epoch=050 val_rmse=0.335626 val_f1=0.0898
+[joint] epoch=060 val_rmse=0.333668 val_f1=0.0903
+[joint] epoch=070 val_rmse=0.331178 val_f1=0.0915
+[joint] epoch=080 val_rmse=0.328958 val_f1=0.0905
+[done] seed=41 rho=0.20 | ml_rmse=0.3722 | frozen_rmse=0.3247 | joint_rmse=0.3248
+--- seed=41 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.665465
+[bg] epoch=010 val_rmse=0.439674
+[bg] epoch=020 val_rmse=0.427065
+[bg] epoch=030 val_rmse=0.420908
+[bg] epoch=040 val_rmse=0.415587
+[bg] epoch=050 val_rmse=0.407319
+[bg] epoch=060 val_rmse=0.401691
+[bg] epoch=070 val_rmse=0.398668
+[bg] epoch=080 val_rmse=0.396460
+[frozen] epoch=001 val_rmse=0.335183 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.335159 val_f1=0.0904
+[frozen] epoch=020 val_rmse=0.335151 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.335147 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.335143 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.335139 val_f1=0.0902
+[frozen] epoch=060 val_rmse=0.335136 val_f1=0.0902
+[joint] epoch=001 val_rmse=0.336041 val_f1=0.0902
+[joint] epoch=010 val_rmse=0.334520 val_f1=0.0902
+[joint] epoch=020 val_rmse=0.333601 val_f1=0.0904
+[joint] epoch=030 val_rmse=0.331189 val_f1=0.0904
+[joint] epoch=040 val_rmse=0.330452 val_f1=0.0903
+[joint] epoch=050 val_rmse=0.327838 val_f1=0.0911
+[joint] epoch=060 val_rmse=0.327011 val_f1=0.0904
+[joint] epoch=070 val_rmse=0.324607 val_f1=0.0901
+[joint] epoch=080 val_rmse=0.323374 val_f1=0.0901
+[done] seed=41 rho=0.30 | ml_rmse=0.3806 | frozen_rmse=0.3143 | joint_rmse=0.3143
+--- seed=41 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.672413
+[bg] epoch=010 val_rmse=0.439647
+[bg] epoch=020 val_rmse=0.428484
+[bg] epoch=030 val_rmse=0.422052
+[bg] epoch=040 val_rmse=0.414971
+[bg] epoch=050 val_rmse=0.407840
+[bg] epoch=060 val_rmse=0.402938
+[bg] epoch=070 val_rmse=0.399742
+[bg] epoch=080 val_rmse=0.395118
+[frozen] epoch=001 val_rmse=0.311897 val_f1=0.0897
+[frozen] epoch=010 val_rmse=0.311694 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.311530 val_f1=0.0900
+[frozen] epoch=030 val_rmse=0.311407 val_f1=0.0898
+[frozen] epoch=040 val_rmse=0.311335 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.311294 val_f1=0.0899
+[frozen] epoch=060 val_rmse=0.311266 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.312387 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.309907 val_f1=0.0898
+[joint] epoch=020 val_rmse=0.308424 val_f1=0.0899
+[joint] epoch=030 val_rmse=0.304735 val_f1=0.0897
+[joint] epoch=040 val_rmse=0.303635 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.301870 val_f1=0.0898
+[joint] epoch=060 val_rmse=0.299629 val_f1=0.0901
+[joint] epoch=070 val_rmse=0.298702 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.297006 val_f1=0.0899
+[done] seed=41 rho=0.40 | ml_rmse=0.3856 | frozen_rmse=0.2933 | joint_rmse=0.2935
+--- seed=41 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.667881
+[bg] epoch=010 val_rmse=0.437944
+[bg] epoch=020 val_rmse=0.427749
+[bg] epoch=030 val_rmse=0.419672
+[bg] epoch=040 val_rmse=0.412395
+[bg] epoch=050 val_rmse=0.401623
+[bg] epoch=060 val_rmse=0.395796
+[bg] epoch=070 val_rmse=0.389324
+[bg] epoch=080 val_rmse=0.383527
+[frozen] epoch=001 val_rmse=0.282108 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.281514 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.280969 val_f1=0.0903
+[frozen] epoch=030 val_rmse=0.280508 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.280178 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.280018 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.279827 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.280050 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.279339 val_f1=0.0896
+[joint] epoch=020 val_rmse=0.275819 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.272904 val_f1=0.0900
+[joint] epoch=040 val_rmse=0.271687 val_f1=0.0900
+[joint] epoch=050 val_rmse=0.268872 val_f1=0.0897
+[joint] epoch=060 val_rmse=0.267545 val_f1=0.0899
+[joint] epoch=070 val_rmse=0.267177 val_f1=0.0901
+[joint] epoch=080 val_rmse=0.265996 val_f1=0.0898
+[done] seed=41 rho=0.50 | ml_rmse=0.3781 | frozen_rmse=0.2633 | joint_rmse=0.2628
+--- seed=41 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.665903
+[bg] epoch=010 val_rmse=0.437801
+[bg] epoch=020 val_rmse=0.426775
+[bg] epoch=030 val_rmse=0.421049
+[bg] epoch=040 val_rmse=0.413464
+[bg] epoch=050 val_rmse=0.404532
+[bg] epoch=060 val_rmse=0.398980
+[bg] epoch=070 val_rmse=0.394134
+[bg] epoch=080 val_rmse=0.391886
+[frozen] epoch=001 val_rmse=0.259906 val_f1=0.0903
+[frozen] epoch=010 val_rmse=0.258716 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.257572 val_f1=0.0901
+[frozen] epoch=030 val_rmse=0.256582 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.255818 val_f1=0.0899
+[frozen] epoch=050 val_rmse=0.255461 val_f1=0.0899
+[frozen] epoch=060 val_rmse=0.255027 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.255635 val_f1=0.0900
+[joint] epoch=010 val_rmse=0.253853 val_f1=0.0900
+[joint] epoch=020 val_rmse=0.251790 val_f1=0.0900
+[joint] epoch=030 val_rmse=0.249894 val_f1=0.0899
+[joint] epoch=040 val_rmse=0.248579 val_f1=0.0900
+[joint] epoch=050 val_rmse=0.247838 val_f1=0.0900
+[joint] epoch=060 val_rmse=0.247016 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.245053 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.244852 val_f1=0.0898
+[done] seed=41 rho=0.60 | ml_rmse=0.3864 | frozen_rmse=0.2431 | joint_rmse=0.2413
+--- seed=43 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.671417
+[bg] epoch=010 val_rmse=0.436604
+[bg] epoch=020 val_rmse=0.426069
+[bg] epoch=030 val_rmse=0.418060
+[bg] epoch=040 val_rmse=0.409879
+[bg] epoch=050 val_rmse=0.400521
+[bg] epoch=060 val_rmse=0.393621
+[bg] epoch=070 val_rmse=0.387543
+[bg] epoch=080 val_rmse=0.380948
+[frozen] epoch=001 val_rmse=0.343256 val_f1=0.0896
+[frozen] epoch=010 val_rmse=0.343255 val_f1=0.0896
+[frozen] epoch=020 val_rmse=0.343256 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.342911 val_f1=0.0894
+[joint] epoch=010 val_rmse=0.340347 val_f1=0.0895
+[joint] epoch=020 val_rmse=0.339014 val_f1=0.0901
+[joint] epoch=030 val_rmse=0.337586 val_f1=0.0905
+[joint] epoch=040 val_rmse=0.336073 val_f1=0.0910
+[joint] epoch=050 val_rmse=0.334063 val_f1=0.0911
+[joint] epoch=060 val_rmse=0.332893 val_f1=0.0907
+[joint] epoch=070 val_rmse=0.331921 val_f1=0.0916
+[joint] epoch=080 val_rmse=0.330474 val_f1=0.0910
+[done] seed=43 rho=0.20 | ml_rmse=0.3619 | frozen_rmse=0.3219 | joint_rmse=0.3220
+--- seed=43 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.674135
+[bg] epoch=010 val_rmse=0.435939
+[bg] epoch=020 val_rmse=0.424585
+[bg] epoch=030 val_rmse=0.418631
+[bg] epoch=040 val_rmse=0.412002
+[bg] epoch=050 val_rmse=0.404331
+[bg] epoch=060 val_rmse=0.398092
+[bg] epoch=070 val_rmse=0.394875
+[bg] epoch=080 val_rmse=0.388541
+[frozen] epoch=001 val_rmse=0.330751 val_f1=0.0902
+[frozen] epoch=010 val_rmse=0.330710 val_f1=0.0903
+[frozen] epoch=020 val_rmse=0.330691 val_f1=0.0906
+[frozen] epoch=030 val_rmse=0.330681 val_f1=0.0908
+[frozen] epoch=040 val_rmse=0.330676 val_f1=0.0911
+[frozen] epoch=050 val_rmse=0.330671 val_f1=0.0906
+[frozen] epoch=060 val_rmse=0.330672 val_f1=0.0905
+[joint] epoch=001 val_rmse=0.330505 val_f1=0.0913
+[joint] epoch=010 val_rmse=0.328870 val_f1=0.0905
+[joint] epoch=020 val_rmse=0.327497 val_f1=0.0912
+[joint] epoch=030 val_rmse=0.326129 val_f1=0.0918
+[joint] epoch=040 val_rmse=0.324424 val_f1=0.0915
+[joint] epoch=050 val_rmse=0.322936 val_f1=0.0914
+[joint] epoch=060 val_rmse=0.321664 val_f1=0.0918
+[joint] epoch=070 val_rmse=0.320355 val_f1=0.0916
+[joint] epoch=080 val_rmse=0.319650 val_f1=0.0912
+[done] seed=43 rho=0.30 | ml_rmse=0.3686 | frozen_rmse=0.3069 | joint_rmse=0.3070
+--- seed=43 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.674000
+[bg] epoch=010 val_rmse=0.435291
+[bg] epoch=020 val_rmse=0.423932
+[bg] epoch=030 val_rmse=0.418608
+[bg] epoch=040 val_rmse=0.412961
+[bg] epoch=050 val_rmse=0.406780
+[bg] epoch=060 val_rmse=0.401651
+[bg] epoch=070 val_rmse=0.398481
+[bg] epoch=080 val_rmse=0.396272
+[frozen] epoch=001 val_rmse=0.312325 val_f1=0.0902
+[frozen] epoch=010 val_rmse=0.312080 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.311875 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.311743 val_f1=0.0902
+[frozen] epoch=040 val_rmse=0.311664 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.311624 val_f1=0.0902
+[frozen] epoch=060 val_rmse=0.311584 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.311516 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.310986 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.310644 val_f1=0.0897
+[done] seed=43 rho=0.40 | ml_rmse=0.3880 | frozen_rmse=0.3026 | joint_rmse=0.3026
+--- seed=43 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.675173
+[bg] epoch=010 val_rmse=0.437593
+[bg] epoch=020 val_rmse=0.425393
+[bg] epoch=030 val_rmse=0.418584
+[bg] epoch=040 val_rmse=0.410531
+[bg] epoch=050 val_rmse=0.403752
+[bg] epoch=060 val_rmse=0.400111
+[bg] epoch=070 val_rmse=0.397853
+[bg] epoch=080 val_rmse=0.394620
+[frozen] epoch=001 val_rmse=0.287365 val_f1=0.0902
+[frozen] epoch=010 val_rmse=0.286701 val_f1=0.0902
+[frozen] epoch=020 val_rmse=0.286072 val_f1=0.0901
+[frozen] epoch=030 val_rmse=0.285569 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.285199 val_f1=0.0900
+[frozen] epoch=050 val_rmse=0.285037 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.284858 val_f1=0.0898
+[joint] epoch=001 val_rmse=0.284749 val_f1=0.0897
+[joint] epoch=010 val_rmse=0.284359 val_f1=0.0898
+[joint] epoch=020 val_rmse=0.283462 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.282373 val_f1=0.0897
+[joint] epoch=040 val_rmse=0.281687 val_f1=0.0895
+[joint] epoch=050 val_rmse=0.281363 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.280750 val_f1=0.0900
+[joint] epoch=070 val_rmse=0.279821 val_f1=0.0900
+[joint] epoch=080 val_rmse=0.279020 val_f1=0.0898
+[done] seed=43 rho=0.50 | ml_rmse=0.3915 | frozen_rmse=0.2736 | joint_rmse=0.2729
+--- seed=43 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.673365
+[bg] epoch=010 val_rmse=0.436702
+[bg] epoch=020 val_rmse=0.424113
+[bg] epoch=030 val_rmse=0.416789
+[bg] epoch=040 val_rmse=0.409047
+[bg] epoch=050 val_rmse=0.400453
+[bg] epoch=060 val_rmse=0.395416
+[bg] epoch=070 val_rmse=0.391500
+[bg] epoch=080 val_rmse=0.385310
+[frozen] epoch=001 val_rmse=0.261604 val_f1=0.0902
+[frozen] epoch=010 val_rmse=0.260433 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.259266 val_f1=0.0901
+[frozen] epoch=030 val_rmse=0.258224 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.257367 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.257011 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.256595 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.256525 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.253769 val_f1=0.0897
+[joint] epoch=020 val_rmse=0.251097 val_f1=0.0899
+[joint] epoch=030 val_rmse=0.249239 val_f1=0.0897
+[joint] epoch=040 val_rmse=0.246648 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.244625 val_f1=0.0896
+[joint] epoch=060 val_rmse=0.242987 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.241743 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.239997 val_f1=0.0898
+[done] seed=43 rho=0.60 | ml_rmse=0.3721 | frozen_rmse=0.2329 | joint_rmse=0.2308
+--- seed=47 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.679189
+[bg] epoch=010 val_rmse=0.441477
+[bg] epoch=020 val_rmse=0.424313
+[bg] epoch=030 val_rmse=0.413639
+[bg] epoch=040 val_rmse=0.404264
+[bg] epoch=050 val_rmse=0.395870
+[bg] epoch=060 val_rmse=0.391339
+[bg] epoch=070 val_rmse=0.384145
+[bg] epoch=080 val_rmse=0.378371
+[frozen] epoch=001 val_rmse=0.335735 val_f1=0.0896
+[frozen] epoch=010 val_rmse=0.335731 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.335726 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.336514 val_f1=0.0897
+[joint] epoch=010 val_rmse=0.333603 val_f1=0.0898
+[joint] epoch=020 val_rmse=0.330809 val_f1=0.0896
+[joint] epoch=030 val_rmse=0.328065 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.326371 val_f1=0.0902
+[joint] epoch=050 val_rmse=0.324579 val_f1=0.0903
+[joint] epoch=060 val_rmse=0.322740 val_f1=0.0911
+[joint] epoch=070 val_rmse=0.321146 val_f1=0.0900
+[joint] epoch=080 val_rmse=0.319473 val_f1=0.0908
+[done] seed=47 rho=0.20 | ml_rmse=0.3611 | frozen_rmse=0.3171 | joint_rmse=0.3171
+--- seed=47 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.680449
+[bg] epoch=010 val_rmse=0.440887
+[bg] epoch=020 val_rmse=0.427848
+[bg] epoch=030 val_rmse=0.417859
+[bg] epoch=040 val_rmse=0.409765
+[bg] epoch=050 val_rmse=0.400367
+[bg] epoch=060 val_rmse=0.393564
+[bg] epoch=070 val_rmse=0.389180
+[bg] epoch=080 val_rmse=0.380101
+[frozen] epoch=001 val_rmse=0.318180 val_f1=0.0899
+[frozen] epoch=010 val_rmse=0.318121 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.318088 val_f1=0.0898
+[frozen] epoch=030 val_rmse=0.318068 val_f1=0.0899
+[frozen] epoch=040 val_rmse=0.318059 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.318056 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.318053 val_f1=0.0901
+[joint] epoch=001 val_rmse=0.317642 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.315516 val_f1=0.0897
+[joint] epoch=020 val_rmse=0.313273 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.310466 val_f1=0.0902
+[joint] epoch=040 val_rmse=0.307365 val_f1=0.0901
+[joint] epoch=050 val_rmse=0.305749 val_f1=0.0903
+[joint] epoch=060 val_rmse=0.303416 val_f1=0.0900
+[joint] epoch=070 val_rmse=0.300759 val_f1=0.0902
+[joint] epoch=080 val_rmse=0.298599 val_f1=0.0901
+[done] seed=47 rho=0.30 | ml_rmse=0.3669 | frozen_rmse=0.3004 | joint_rmse=0.3004
+--- seed=47 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.679536
+[bg] epoch=010 val_rmse=0.441221
+[bg] epoch=020 val_rmse=0.427756
+[bg] epoch=030 val_rmse=0.417654
+[bg] epoch=040 val_rmse=0.410721
+[bg] epoch=050 val_rmse=0.402460
+[bg] epoch=060 val_rmse=0.394804
+[bg] epoch=070 val_rmse=0.387614
+[bg] epoch=080 val_rmse=0.380648
+[frozen] epoch=001 val_rmse=0.297971 val_f1=0.0901
+[frozen] epoch=010 val_rmse=0.297739 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.297544 val_f1=0.0899
+[frozen] epoch=030 val_rmse=0.297415 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.297331 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.297290 val_f1=0.0898
+[frozen] epoch=060 val_rmse=0.297254 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.296868 val_f1=0.0899
+[joint] epoch=010 val_rmse=0.294077 val_f1=0.0900
+[joint] epoch=020 val_rmse=0.292085 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.289426 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.287325 val_f1=0.0900
+[joint] epoch=050 val_rmse=0.285069 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.282354 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.280786 val_f1=0.0900
+[joint] epoch=080 val_rmse=0.278245 val_f1=0.0902
+[done] seed=47 rho=0.40 | ml_rmse=0.3727 | frozen_rmse=0.2790 | joint_rmse=0.2788
+--- seed=47 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.678603
+[bg] epoch=010 val_rmse=0.441362
+[bg] epoch=020 val_rmse=0.428418
+[bg] epoch=030 val_rmse=0.418845
+[bg] epoch=040 val_rmse=0.410936
+[bg] epoch=050 val_rmse=0.400311
+[bg] epoch=060 val_rmse=0.391579
+[bg] epoch=070 val_rmse=0.387004
+[bg] epoch=080 val_rmse=0.379538
+[frozen] epoch=001 val_rmse=0.275937 val_f1=0.0899
+[frozen] epoch=010 val_rmse=0.275297 val_f1=0.0901
+[frozen] epoch=020 val_rmse=0.274730 val_f1=0.0900
+[frozen] epoch=030 val_rmse=0.274280 val_f1=0.0900
+[frozen] epoch=040 val_rmse=0.273942 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.273791 val_f1=0.0900
+[frozen] epoch=060 val_rmse=0.273642 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.273463 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.271144 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.269983 val_f1=0.0899
+[joint] epoch=030 val_rmse=0.268354 val_f1=0.0897
+[joint] epoch=040 val_rmse=0.266823 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.266223 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.264819 val_f1=0.0899
+[joint] epoch=070 val_rmse=0.263628 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.262148 val_f1=0.0899
+[done] seed=47 rho=0.50 | ml_rmse=0.3789 | frozen_rmse=0.2595 | joint_rmse=0.2588
+--- seed=47 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.680992
+[bg] epoch=010 val_rmse=0.442302
+[bg] epoch=020 val_rmse=0.427914
+[bg] epoch=030 val_rmse=0.417926
+[bg] epoch=040 val_rmse=0.408535
+[bg] epoch=050 val_rmse=0.398001
+[bg] epoch=060 val_rmse=0.390997
+[bg] epoch=070 val_rmse=0.386612
+[bg] epoch=080 val_rmse=0.382264
+[frozen] epoch=001 val_rmse=0.261236 val_f1=0.0904
+[frozen] epoch=010 val_rmse=0.260229 val_f1=0.0904
+[frozen] epoch=020 val_rmse=0.259258 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.258413 val_f1=0.0903
+[frozen] epoch=040 val_rmse=0.257755 val_f1=0.0902
+[frozen] epoch=050 val_rmse=0.257479 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.257137 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.256928 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.255464 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.253571 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.251614 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.250001 val_f1=0.0899
+[joint] epoch=050 val_rmse=0.248828 val_f1=0.0897
+[joint] epoch=060 val_rmse=0.248239 val_f1=0.0898
+[joint] epoch=070 val_rmse=0.246722 val_f1=0.0898
+[joint] epoch=080 val_rmse=0.246146 val_f1=0.0898
+[done] seed=47 rho=0.60 | ml_rmse=0.3831 | frozen_rmse=0.2443 | joint_rmse=0.2427
+--- seed=53 rho=0.20 ---
+[bg] epoch=001 val_rmse=0.665854
+[bg] epoch=010 val_rmse=0.435624
+[bg] epoch=020 val_rmse=0.423609
+[bg] epoch=030 val_rmse=0.416337
+[bg] epoch=040 val_rmse=0.408307
+[bg] epoch=050 val_rmse=0.398563
+[bg] epoch=060 val_rmse=0.392346
+[bg] epoch=070 val_rmse=0.388464
+[bg] epoch=080 val_rmse=0.381340
+[frozen] epoch=001 val_rmse=0.341587 val_f1=0.0899
+[frozen] epoch=010 val_rmse=0.341587 val_f1=0.0900
+[frozen] epoch=020 val_rmse=0.341587 val_f1=0.0901
+[joint] epoch=001 val_rmse=0.339972 val_f1=0.0896
+[joint] epoch=010 val_rmse=0.337905 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.334462 val_f1=0.0903
+[joint] epoch=030 val_rmse=0.331135 val_f1=0.0907
+[joint] epoch=040 val_rmse=0.328769 val_f1=0.0903
+[joint] epoch=050 val_rmse=0.325354 val_f1=0.0906
+[joint] epoch=060 val_rmse=0.322658 val_f1=0.0904
+[joint] epoch=070 val_rmse=0.320291 val_f1=0.0909
+[joint] epoch=080 val_rmse=0.318282 val_f1=0.0909
+[done] seed=53 rho=0.20 | ml_rmse=0.3740 | frozen_rmse=0.3283 | joint_rmse=0.3284
+--- seed=53 rho=0.30 ---
+[bg] epoch=001 val_rmse=0.666033
+[bg] epoch=010 val_rmse=0.435939
+[bg] epoch=020 val_rmse=0.423951
+[bg] epoch=030 val_rmse=0.417901
+[bg] epoch=040 val_rmse=0.413179
+[bg] epoch=050 val_rmse=0.407449
+[bg] epoch=060 val_rmse=0.401413
+[bg] epoch=070 val_rmse=0.395049
+[bg] epoch=080 val_rmse=0.389539
+[frozen] epoch=001 val_rmse=0.331676 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.331639 val_f1=0.0898
+[frozen] epoch=020 val_rmse=0.331616 val_f1=0.0897
+[frozen] epoch=030 val_rmse=0.331601 val_f1=0.0899
+[frozen] epoch=040 val_rmse=0.331593 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.331589 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.331586 val_f1=0.0902
+[joint] epoch=001 val_rmse=0.332543 val_f1=0.0901
+[joint] epoch=010 val_rmse=0.330177 val_f1=0.0896
+[joint] epoch=020 val_rmse=0.327449 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.325007 val_f1=0.0901
+[joint] epoch=040 val_rmse=0.323454 val_f1=0.0902
+[joint] epoch=050 val_rmse=0.321543 val_f1=0.0901
+[joint] epoch=060 val_rmse=0.320481 val_f1=0.0902
+[joint] epoch=070 val_rmse=0.319510 val_f1=0.0899
+[joint] epoch=080 val_rmse=0.319754 val_f1=0.0897
+[done] seed=53 rho=0.30 | ml_rmse=0.3887 | frozen_rmse=0.3231 | joint_rmse=0.3234
+--- seed=53 rho=0.40 ---
+[bg] epoch=001 val_rmse=0.662345
+[bg] epoch=010 val_rmse=0.436939
+[bg] epoch=020 val_rmse=0.423440
+[bg] epoch=030 val_rmse=0.416199
+[bg] epoch=040 val_rmse=0.409016
+[bg] epoch=050 val_rmse=0.400278
+[bg] epoch=060 val_rmse=0.395777
+[bg] epoch=070 val_rmse=0.391855
+[bg] epoch=080 val_rmse=0.387707
+[frozen] epoch=001 val_rmse=0.303987 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.303735 val_f1=0.0900
+[frozen] epoch=020 val_rmse=0.303537 val_f1=0.0901
+[frozen] epoch=030 val_rmse=0.303395 val_f1=0.0905
+[frozen] epoch=040 val_rmse=0.303309 val_f1=0.0903
+[frozen] epoch=050 val_rmse=0.303262 val_f1=0.0902
+[frozen] epoch=060 val_rmse=0.303226 val_f1=0.0902
+[joint] epoch=001 val_rmse=0.303802 val_f1=0.0902
+[joint] epoch=010 val_rmse=0.301669 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.300473 val_f1=0.0901
+[joint] epoch=030 val_rmse=0.299132 val_f1=0.0901
+[joint] epoch=040 val_rmse=0.297812 val_f1=0.0904
+[joint] epoch=050 val_rmse=0.296918 val_f1=0.0897
+[joint] epoch=060 val_rmse=0.295316 val_f1=0.0902
+[joint] epoch=070 val_rmse=0.293968 val_f1=0.0898
+[joint] epoch=080 val_rmse=0.293223 val_f1=0.0902
+[done] seed=53 rho=0.40 | ml_rmse=0.3922 | frozen_rmse=0.2991 | joint_rmse=0.2994
+--- seed=53 rho=0.50 ---
+[bg] epoch=001 val_rmse=0.665552
+[bg] epoch=010 val_rmse=0.436666
+[bg] epoch=020 val_rmse=0.425179
+[bg] epoch=030 val_rmse=0.418031
+[bg] epoch=040 val_rmse=0.411229
+[bg] epoch=050 val_rmse=0.402420
+[bg] epoch=060 val_rmse=0.395525
+[bg] epoch=070 val_rmse=0.388490
+[bg] epoch=080 val_rmse=0.381863
+[frozen] epoch=001 val_rmse=0.271524 val_f1=0.0900
+[frozen] epoch=010 val_rmse=0.270963 val_f1=0.0899
+[frozen] epoch=020 val_rmse=0.270453 val_f1=0.0898
+[frozen] epoch=030 val_rmse=0.270063 val_f1=0.0901
+[frozen] epoch=040 val_rmse=0.269775 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.269643 val_f1=0.0899
+[frozen] epoch=060 val_rmse=0.269518 val_f1=0.0900
+[joint] epoch=001 val_rmse=0.269167 val_f1=0.0898
+[joint] epoch=010 val_rmse=0.267412 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.266113 val_f1=0.0898
+[joint] epoch=030 val_rmse=0.263997 val_f1=0.0901
+[joint] epoch=040 val_rmse=0.262244 val_f1=0.0899
+[joint] epoch=050 val_rmse=0.260742 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.260078 val_f1=0.0900
+[joint] epoch=070 val_rmse=0.258871 val_f1=0.0902
+[joint] epoch=080 val_rmse=0.258277 val_f1=0.0899
+[done] seed=53 rho=0.50 | ml_rmse=0.3868 | frozen_rmse=0.2653 | joint_rmse=0.2651
+--- seed=53 rho=0.60 ---
+[bg] epoch=001 val_rmse=0.664427
+[bg] epoch=010 val_rmse=0.437467
+[bg] epoch=020 val_rmse=0.424620
+[bg] epoch=030 val_rmse=0.417305
+[bg] epoch=040 val_rmse=0.410985
+[bg] epoch=050 val_rmse=0.401887
+[bg] epoch=060 val_rmse=0.394708
+[bg] epoch=070 val_rmse=0.389349
+[bg] epoch=080 val_rmse=0.382431
+[frozen] epoch=001 val_rmse=0.249683 val_f1=0.0903
+[frozen] epoch=010 val_rmse=0.248570 val_f1=0.0903
+[frozen] epoch=020 val_rmse=0.247498 val_f1=0.0902
+[frozen] epoch=030 val_rmse=0.246587 val_f1=0.0902
+[frozen] epoch=040 val_rmse=0.245833 val_f1=0.0901
+[frozen] epoch=050 val_rmse=0.245487 val_f1=0.0901
+[frozen] epoch=060 val_rmse=0.245172 val_f1=0.0899
+[joint] epoch=001 val_rmse=0.244937 val_f1=0.0899
+[joint] epoch=010 val_rmse=0.242726 val_f1=0.0899
+[joint] epoch=020 val_rmse=0.240084 val_f1=0.0900
+[joint] epoch=030 val_rmse=0.238027 val_f1=0.0898
+[joint] epoch=040 val_rmse=0.237023 val_f1=0.0898
+[joint] epoch=050 val_rmse=0.234797 val_f1=0.0899
+[joint] epoch=060 val_rmse=0.234560 val_f1=0.0899
+[joint] epoch=070 val_rmse=0.232979 val_f1=0.0897
+[joint] epoch=080 val_rmse=0.231803 val_f1=0.0897
+[done] seed=53 rho=0.60 | ml_rmse=0.3845 | frozen_rmse=0.2337 | joint_rmse=0.2323

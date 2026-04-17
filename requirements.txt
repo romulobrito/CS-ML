@@ -7,3 +7,6 @@ scikit-learn>=1.0
 # Etapa 1 roadmap: SPGL1 via PyLops (profile solver_comparison)
 pylops>=2.0
 spgl1>=2.0
+
+# Etapa 2 LFISTA lab (sir_cs_lfista.py)
+torch>=2.0
