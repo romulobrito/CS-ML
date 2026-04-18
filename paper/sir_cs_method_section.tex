@@ -1,31 +1,38 @@
 % SIR-CS: Sparse Innovation Regression with Compressed Sensing
-% Standalone snippet: include in your main document with amsmath, amssymb, amsthm,
-% and algorithm packages (e.g., algorithm + algpseudocode, or algorithm2e).
-% All ASCII.
+% Revised standalone snippet.
+% Suggested packages in the preamble:
+% \usepackage{amsmath,amssymb,amsthm}
+% \usepackage{algorithm}
+% \usepackage{algpseudocode}
+% \newtheorem{proposition}{Proposition}
 
 \section{Sparse Innovation Regression with Compressed Sensing (SIR-CS)}
 \label{sec:sir_cs}
 
 \subsection{Problem setup}
-Let $u \in \mathbb{R}^p$ denote inputs and $y \in \mathbb{R}^N$ a high-dimensional target.
-At inference time we observe compressive measurements
+Let $u \in \mathbb{R}^p$ denote the input variables and let
+$y \in \mathbb{R}^N$ be a high-dimensional target.
+At inference time, we observe only compressive measurements
 \begin{equation}
   b = M y + \eta,
 \end{equation}
-where $M \in \mathbb{R}^{m \times N}$ has $m \ll N$ and $\eta$ models measurement noise.
+where $M \in \mathbb{R}^{m \times N}$, with $m \ll N$, is the measurement operator and
+$\eta$ models measurement noise.
 
-We decompose the target into a learned background predictor and a residual:
+We decompose the target into a learned background component and an innovation term:
 \begin{equation}
   y = f_\theta(u) + r,
 \end{equation}
-where $f_\theta$ is a machine learning model and $r$ is the modeling error.
-The structural assumption is that the innovation admits a sparse or compressible representation in a dictionary $\Psi \in \mathbb{R}^{N \times N}$:
+where $f_\theta : \mathbb{R}^p \to \mathbb{R}^N$ is a machine learning predictor and $r$ is the residual.
+The main structural assumption is that the residual admits a sparse or compressible representation in a dictionary
+$\Psi \in \mathbb{R}^{N \times D}$:
 \begin{equation}
   r = \Psi \alpha^\star + \xi,
 \end{equation}
-with $\alpha^\star$ sparse (or compressible) and $\xi$ a small non-sparse mismatch term.
+where $\alpha^\star \in \mathbb{R}^D$ is sparse (or compressible) and $\xi \in \mathbb{R}^N$
+is a small non-sparse mismatch term.
 
-Substituting into the measurement model yields the reduced sensing model for the innovation coefficients:
+Substituting this decomposition into the measurement model yields
 \begin{equation}
   z := b - M f_\theta(u) = A \alpha^\star + \varepsilon,
   \qquad
@@ -33,99 +40,288 @@ Substituting into the measurement model yields the reduced sensing model for the
   \qquad
   \varepsilon := M \xi + \eta.
 \end{equation}
-Thus inference reduces to recovering $\alpha^\star$ from the linear measurements $z$ rather than reconstructing all $N$ coordinates of $y$ directly.
+Hence, inference reduces to recovering the innovation coefficients $\alpha^\star$
+from the reduced measurements $z$, rather than reconstructing all $N$ coordinates of $y$ directly.
 
 \subsection{Inference: recovery of the innovation}
-The basic estimator is the LASSO / BPDN problem
+The basic recovery stage is posed as a penalized sparse regression problem:
 \begin{equation}
-  \hat{\alpha} \in \arg\min_{\alpha \in \mathbb{R}^N}
-  \frac{1}{2} \| A \alpha - z \|_2^2 + \lambda \| \alpha \|_1,
+  \hat{\alpha}
+  \in
+  \arg\min_{\alpha \in \mathbb{R}^D}
+  \frac{1}{2}\|A\alpha - z\|_2^2 + \lambda \|\alpha\|_1.
 \end{equation}
-followed by
+The final estimate is then given by
 \begin{equation}
   \hat{y} = f_\theta(u) + \Psi \hat{\alpha}.
 \end{equation}
 
 \paragraph{Structured variants.}
-When prior support information, spatial regularity, or physics are available, we use
+When support priors, spatial regularity, or domain constraints are available, we consider
 \begin{equation}
-  \hat{\alpha} \in \arg\min_{\alpha}
-  \frac{1}{2} \| A \alpha - z \|_2^2
-  + \lambda_1 \| W \alpha \|_1
-  + \lambda_2 \, \Omega_{\mathrm{str}}(\alpha)
-  + \lambda_3 \, \mathcal{P}(\Psi \alpha),
+  \hat{\alpha}
+  \in
+  \arg\min_{\alpha \in \mathbb{R}^D}
+  \frac{1}{2}\|A\alpha - z\|_2^2
+  + \lambda_1 \|W\alpha\|_1
+  + \lambda_2 \,\Omega_{\mathrm{str}}(\alpha)
+  + \lambda_3 \,\mathcal{P}(\Psi\alpha),
+  \label{eq:sircs_structured}
 \end{equation}
-where $W$ is a diagonal weight matrix (weighted $\ell_1$), $\Omega_{\mathrm{str}}$ encodes structured sparsity (e.g., group/tree penalties), and $\mathcal{P}$ encodes domain constraints (e.g., TV or physics-based penalties).
+where $W \in \mathbb{R}^{D \times D}$ is a diagonal weight matrix,
+$\Omega_{\mathrm{str}}$ encodes structured sparsity
+(e.g., group, block, or tree penalties), and $\mathcal{P}$ encodes
+domain-specific regularity or physical constraints
+(e.g., total variation or physics-based penalties).
+
+The basic estimator is recovered from \eqref{eq:sircs_structured} by taking
+$W = I$, $\lambda_2 = 0$, and $\lambda_3 = 0$.
 
 \subsection{Optional learned support prior}
-Let $g_\phi$ predict support-related scores $\pi(u) \in [0,1]^N$.
-A simple weighting scheme sets, for thresholds $\tau \in (0,1)$ and $0 < \omega_{\mathrm{low}} < 1$,
+Let $g_\phi : \mathbb{R}^p \to [0,1]^D$ predict support-related scores
+\[
+  \pi(u) = (\pi_1(u),\dots,\pi_D(u))^\top,
+\]
+where $\pi_i(u)$ measures the confidence that the $i$th coefficient belongs to the support of $\alpha^\star$.
+A simple weighting scheme is
 \begin{equation}
   w_i =
   \begin{cases}
     \omega_{\mathrm{low}}, & \pi_i(u) \ge \tau, \\
     1, & \text{otherwise},
   \end{cases}
+  \qquad
+  0 < \omega_{\mathrm{low}} < 1,
+  \quad
+  \tau \in (0,1),
 \end{equation}
-and solves weighted $\ell_1$ with $\| W \alpha \|_1 = \sum_i w_i |\alpha_i|$.
+so that
+\[
+  \|W\alpha\|_1 = \sum_{i=1}^D w_i |\alpha_i|.
+\]
+This choice penalizes less heavily those coefficients that are deemed more likely to belong to the innovation support.
 
-\subsection{Training objectives (two regimes)}
+\subsection{Training objectives}
 \paragraph{Supervised training with sparse residual encouragement.}
-When full $y$ is available during training, one may train $\theta$ with
+When full targets $y$ are available during training, one may estimate $\theta$ by minimizing
 \begin{equation}
   \mathcal{L}_{\mathrm{train}}
   =
-  \| f_\theta(u) - y \|_2^2
-  + \beta \| \Psi^\top (y - f_\theta(u)) \|_1
-  + \gamma \, \Omega_{\mathrm{str}}\!\left(\Psi^\top (y - f_\theta(u))\right),
+  \|f_\theta(u) - y\|_2^2
+  + \beta \,\|\Psi^\top (y - f_\theta(u))\|_1
+  + \gamma \,\Omega_{\mathrm{str}}\!\bigl(\Psi^\top (y - f_\theta(u))\bigr),
 \end{equation}
-when $\Psi$ is orthonormal and analysis coefficients are appropriate; more generally, replace $\Psi^\top r$ by the analysis representation consistent with the chosen dictionary.
+when $\Psi$ is orthonormal and an analysis representation is appropriate.
+More generally, $\Psi^\top r$ should be replaced by the analysis operator or latent representation
+associated with the chosen dictionary.
 
 \paragraph{Task-aware training with simulated compression.}
-Simulate $b = M y + \eta$ during training and minimize end-to-end error after recovery,
+Alternatively, one may simulate compressive observations
+\[
+  b = My + \eta
+\]
+during training and minimize the post-recovery prediction error
 \begin{equation}
-  \mathcal{L}_{\mathrm{task}} = \| \hat{y}(u,b) - y \|_2^2,
+  \mathcal{L}_{\mathrm{task}}
+  =
+  \|\hat{y}(u,b) - y\|_2^2,
 \end{equation}
-using unrolled proximal methods or implicit differentiation if differentiability is required.
+possibly using unrolled proximal solvers or implicit differentiation when end-to-end differentiability is required.
 
 \subsection{Informal stability statement (recovery stage only)}
 \begin{proposition}[Informal]
-Assume $A = M\Psi$ satisfies a restricted isometry property of sufficient order for $k$-sparse vectors, and $\alpha^\star$ is $k$-compressible.
-Let $\hat{\alpha}$ be a BPDN/LASSO solution for noise level $\|\varepsilon\|_2$.
-Then typical stable recovery bounds imply
+Assume that $A = M\Psi$ satisfies a restricted isometry property of sufficient order
+for $k$-sparse vectors and that $\alpha^\star$ is $k$-compressible.
+Let $\hat{\alpha}$ be a solution of the penalized recovery problem with effective noise level $\|\varepsilon\|_2$.
+Then standard stable recovery results imply a bound of the form
 \begin{equation}
-  \| \hat{\alpha} - \alpha^\star \|_2
+  \|\hat{\alpha} - \alpha^\star\|_2
   \le
-  C_1 \| \varepsilon \|_2
-  + C_2 \frac{\sigma_k(\alpha^\star)_1}{\sqrt{k}},
+  C_1 \|\varepsilon\|_2
+  +
+  C_2 \frac{\sigma_k(\alpha^\star)_1}{\sqrt{k}},
 \end{equation}
-and consequently
+where $\sigma_k(\alpha^\star)_1$ denotes the best $k$-term approximation error of $\alpha^\star$ in $\ell_1$.
+Consequently,
 \begin{equation}
-  \| \hat{y} - y \|_2
+  \|\hat{y} - y\|_2
   \le
-  \| \Psi \|_{2 \to 2} \, \| \hat{\alpha} - \alpha^\star \|_2 + \| \xi \|_2.
+  \|\Psi\|_{2 \to 2}\,\|\hat{\alpha} - \alpha^\star\|_2 + \|\xi\|_2.
 \end{equation}
 \end{proposition}
 
 \subsection{Algorithm}
 \begin{algorithm}
-\caption{SIR-CS (inference)}
+\caption{SIR-CS inference}
 \label{alg:sir_cs}
 \begin{algorithmic}[1]
-\Require Measurements $b$, operator $M$, model $f_\theta$, dictionary $\Psi$, weights $W$ (optional), penalties $\Omega_{\mathrm{str}},\mathcal{P}$ (optional)
+\Require Input $u$, measurements $b$, measurement operator $M$, predictor $f_\theta$, dictionary $\Psi$
+\Require Optional support-prior model $g_\phi$
+\Require Optional weights $W$, structured penalty $\Omega_{\mathrm{str}}$, and domain penalty $\mathcal{P}$
 \State $\hat{y}_{\mathrm{bg}} \gets f_\theta(u)$
-\State $z \gets b - M \hat{y}_{\mathrm{bg}}$
-\If{support prior available}
-  \State $\pi \gets g_\phi(u)$; build $W(\pi)$
+\State $z \gets b - M\hat{y}_{\mathrm{bg}}$
+\If{a learned support prior is available}
+  \State $\pi \gets g_\phi(u)$
+  \State Build the diagonal matrix $W = W(\pi)$
+\Else
+  \State $W \gets I$
 \EndIf
-\State $\hat{\alpha} \gets \arg\min_{\alpha} \frac{1}{2}\|M\Psi \alpha - z\|_2^2 + \lambda_1 \|W\alpha\|_1 + \lambda_2 \Omega_{\mathrm{str}}(\alpha) + \lambda_3 \mathcal{P}(\Psi \alpha)$
+\State Solve
+\[
+  \hat{\alpha}
+  \in
+  \arg\min_{\alpha \in \mathbb{R}^D}
+  \frac{1}{2}\|M\Psi\alpha - z\|_2^2
+  + \lambda_1 \|W\alpha\|_1
+  + \lambda_2 \Omega_{\mathrm{str}}(\alpha)
+  + \lambda_3 \mathcal{P}(\Psi\alpha)
+\]
 \State $\hat{y} \gets \hat{y}_{\mathrm{bg}} + \Psi \hat{\alpha}$
 \Ensure $\hat{y}$
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Method variants (abbreviations)}
-\textbf{V1 (SIR-CS):} basic $\ell_1$ on $\alpha$.
-\textbf{V2 (WSIR-CS):} weighted $\ell_1$ using $W$.
-\textbf{V3 (TSIR-CS):} temporal smoothing on $\alpha_t$ (e.g., $\|\alpha_t-\hat{\alpha}_{t-1}\|_2^2$).
-\textbf{V4 (Joint-SIR-CS):} shared $\alpha_c$ and channel-specific $\alpha_j$ across multiple outputs/sensors.
+\subsection{Method variants}
+\textbf{V1 (SIR-CS):} basic sparse recovery with $\ell_1$ regularization on $\alpha$.
+
+\textbf{V2 (WSIR-CS):} weighted sparse recovery using a diagonal matrix $W$ induced by support priors.
+
+\textbf{V3 (TSIR-CS):} temporal regularization on $\alpha_t$, for example through a term such as
+$\|\alpha_t - \hat{\alpha}_{t-1}\|_2^2$.
+
+\textbf{V4 (Joint-SIR-CS):} joint recovery with a shared component $\alpha_c$ and channel-specific innovations $\alpha_j$
+across multiple outputs or sensing channels.
+
+\subsection{Task-aware unrolled proximal refinement (LFISTA)}
+\label{subsec:lfista_method}
+
+The classical recovery step in Section~\ref{sec:sir_cs} uses a generic first-order sparse solver (e.g., FISTA) with fixed iteration schedule and hand-tuned $\lambda$.
+An alternative is to \emph{unroll} a fixed number $K$ of proximal-gradient steps on the innovation subproblem
+\(
+  \min_{\alpha}\tfrac{1}{2}\|A\alpha-z\|_2^2 + \lambda\|\alpha\|_1
+\)
+with $A=M\Psi$ and $z=b-M f_\theta(u)$, and to treat step sizes and soft-threshold levels as \emph{learnable} per layer.
+We denote this block LFISTA (learned FISTA): it maps $z$ to $\hat{\alpha}^{(K)}$ and yields $\hat{y}=f_\theta(u)+\Psi\hat{\alpha}^{(K)}$.
+The background $f_\theta$ is a multi-layer perceptron in PyTorch (not identical to the sklearn MLP used for \texttt{ml\_only} in the pipeline).
+
+\paragraph{Training stages (implementation).}
+\textbf{(i) Background:} train $f_\theta$ by minimizing $\|f_\theta(u)-y\|_2^2$ on the training set.
+\textbf{(ii) Frozen LFISTA:} fix $f_\theta$, train only the unrolled proximal parameters to minimize $\|\hat{y}-y\|_2^2$.
+\textbf{(iii) Joint:} fine-tune $f_\theta$ and the LFISTA block together with a smaller learning rate.
+This mirrors task-aware objectives in Section~\ref{sec:sir_cs} but replaces the inner convex solver by a differentiable unrolled map.
+
+\subsection{Empirical comparison: LFISTA versus classical hybrid on synthetic data}
+\label{subsec:lfista_exp}
+
+We report a controlled benchmark that keeps the Phase~0 data-generating process and the same ten seeds
+$\{7,13,23,29,31,37,41,43,47,53\}$ and measurement ratios $\rho\in\{0.20,0.30,0.40,0.50,0.60\}$ as in the main synthetic section.
+The pipeline enables \emph{simultaneously}: (a) classical SIR-CS with FISTA on the residual, exposed as \texttt{hybrid\_fista}, with SPGL1 and CS-only variants for context (same dual-solver protocol as Step~1); (b) the PyTorch branch \texttt{ml\_only\_torch}, \texttt{hybrid\_lfista\_frozen}, \texttt{hybrid\_lfista\_joint}.
+Thus \texttt{hybrid\_fista} and the LFISTA variants share the same $M$, $\Psi$, splits, and noise model per job; only the estimator class differs.
+Figures below are taken from the folder \texttt{figures/lfista\_vs\_classical/} (generated by \texttt{sir\_cs\_pipeline\_optimized.py} with profile \texttt{lfista\_vs\_classical}).
+
+\begin{table}[t]
+  \centering
+  \caption{Test RMSE (mean $\pm$ std across ten seeds) for the classical FISTA hybrid versus LFISTA and PyTorch baselines, versus $\rho=m/N$.
+  Best RMSE in each row among \texttt{hybrid\_fista}, \texttt{hybrid\_lfista\_frozen}, and \texttt{hybrid\_lfista\_joint} in bold.}
+  \label{tab:lfista_vs_fista_rmse}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    $\rho$ & \texttt{hybrid\_fista} & \texttt{hybrid\_lfista\_frozen} & \texttt{hybrid\_lfista\_joint} \\
+    \midrule
+    $0.20$ & $0.336 \pm 0.011$ & $\mathbf{0.317} \pm 0.010$ & $0.317 \pm 0.010$ \\
+    $0.30$ & $0.319 \pm 0.011$ & $\mathbf{0.299} \pm 0.007$ & $\mathbf{0.299} \pm 0.007$ \\
+    $0.40$ & $0.296 \pm 0.011$ & $0.273 \pm 0.008$ & $\mathbf{0.273} \pm 0.008$ \\
+    $0.50$ & $0.272 \pm 0.010$ & $0.254 \pm 0.008$ & $\mathbf{0.253} \pm 0.009$ \\
+    $0.60$ & $0.245 \pm 0.010$ & $0.230 \pm 0.009$ & $\mathbf{0.228} \pm 0.009$ \\
+    \midrule
+    \multicolumn{4}{@{}p{0.92\linewidth}@{}}{\emph{Reference baselines (same run):} sklearn \texttt{ml\_only} RMSE $\approx 0.369$ (flat in $\rho$); \texttt{ml\_only\_torch} RMSE ranges from $0.362$ (low $\rho$) to $0.374$ (high $\rho$).} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Reading Table~\ref{tab:lfista_vs_fista_rmse}.}
+Both LFISTA variants achieve lower RMSE than \texttt{hybrid\_fista} at every $\rho$, with relative reductions of roughly $5$--$8\%$ versus \texttt{hybrid\_fista} depending on $\rho$.
+Frozen and joint estimates are nearly tied at low $\rho$; joint becomes slightly better at $\rho\ge 0.5$, consistent with end-to-end adaptation of $f_\theta$ when measurements are more informative.
+Uncertainty (std across seeds) for LFISTA is comparable to or smaller than for \texttt{hybrid\_fista}, so the gap is not explained by higher seed variance.
+The PyTorch-only baseline \texttt{ml\_only\_torch} remains above \texttt{hybrid\_fista}, confirming that residual CS (classical or learned) is critical in this regime.
+
+\subsubsection{Error curves and gains}
+\label{subsec:lfista_fig_curves}
+
+Figure~\ref{fig:lfista_rmse_mae_rel} shows RMSE, MAE, and relative $\ell_2$ error versus $\rho$ for all methods in the run (including SPGL1 hybrids and CS-only baselines).
+The ordering of the central estimators matches Table~\ref{tab:lfista_vs_fista_rmse}: LFISTA curves lie below \texttt{hybrid\_fista}; \texttt{ml\_only\_torch} tracks between sklearn \texttt{ml\_only} and the hybrid methods.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.32\linewidth]{figures/lfista_vs_classical/01_rmse_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{figures/lfista_vs_classical/02_mae_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{figures/lfista_vs_classical/03_relative_l2_vs_measurement_ratio.png}
+  \caption{Test error versus $\rho$ for the \texttt{lfista\_vs\_classical} run: classical and learned hybrids, SPGL1 variants, CS-only, and ML baselines. Bars: std across ten seeds.}
+  \label{fig:lfista_rmse_mae_rel}
+\end{figure}
+
+Figure~\ref{fig:lfista_support_bars} (left) reports support F1 where defined; Figure~\ref{fig:lfista_support_bars} (right) shows grouped RMSE by $\rho$.
+Support F1 stays in a narrow band, so discrimination is driven primarily by reconstruction error rather than support overlap.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/lfista_vs_classical/04_support_f1_vs_measurement_ratio.png}
+  \includegraphics[width=0.48\linewidth]{figures/lfista_vs_classical/05_rmse_grouped_bars_by_ratio.png}
+  \caption{Left: support F1 versus $\rho$. Right: grouped RMSE by $\rho$ (\texttt{lfista\_vs\_classical}).}
+  \label{fig:lfista_support_bars}
+\end{figure}
+
+Figure~\ref{fig:lfista_gains_ml} summarizes gains over sklearn \texttt{ml\_only} (RMSE and MAE); all hybrid estimators remain positive, with LFISTA and \texttt{hybrid\_fista} largest.
+Figure~\ref{fig:lfista_gains_torch} shows the analogous gains over \texttt{ml\_only\_torch}: LFISTA variants and \texttt{hybrid\_fista} remain positive, quantifying improvement over the PyTorch background alone.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/lfista_vs_classical/06_gain_rmse_over_ml_only.png}
+  \includegraphics[width=0.48\linewidth]{figures/lfista_vs_classical/07_gain_mae_over_ml_only.png}
+  \caption{Gain over \texttt{ml\_only} (positive is better): \texttt{lfista\_vs\_classical} run.}
+  \label{fig:lfista_gains_ml}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/lfista_vs_classical/11_gain_rmse_over_ml_only_torch.png}
+  \includegraphics[width=0.48\linewidth]{figures/lfista_vs_classical/12_gain_mae_over_ml_only_torch.png}
+  \caption{Gain over \texttt{ml\_only\_torch} (positive is better). Classical and LFISTA hybrids improve over the PyTorch MLP baseline.}
+  \label{fig:lfista_gains_torch}
+\end{figure}
+
+\subsubsection{Parity plots, residuals, and example traces}
+\label{subsec:lfista_fig_qual}
+
+Figure~\ref{fig:lfista_parity} pools predictions across test samples, seeds, and $\rho$.
+Figure~\ref{fig:lfista_residuals} shows residual histograms; Figure~\ref{fig:lfista_examples} shows example output-index traces.
+The learned hybrids track the identity line tightly; CS-only and pure ML baselines show the same qualitative gaps as in Phase~0.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/lfista_vs_classical/09_parity_ground_truth_vs_prediction.png}
+  \caption{Parity plots (\texttt{lfista\_vs\_classical}): ground truth versus prediction.}
+  \label{fig:lfista_parity}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/lfista_vs_classical/10_residual_distributions_gt_vs_models.png}
+  \caption{Residual histograms $\hat{y}-y$ (\texttt{lfista\_vs\_classical}).}
+  \label{fig:lfista_residuals}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/lfista_vs_classical/08_example_ground_truth_vs_models.png}
+  \caption{Example reconstructions along the output index (\texttt{lfista\_vs\_classical}).}
+  \label{fig:lfista_examples}
+\end{figure}
+
+\paragraph{Discussion.}
+The synthetic evidence supports two statements aligned with the roadmap: (i) LFISTA improves over a PyTorch background without CS (Figure~\ref{fig:lfista_gains_torch}); (ii) under this protocol, unrolled proximal training can \emph{lower} test RMSE relative to a strong classical FISTA hybrid on the same residual (Table~\ref{tab:lfista_vs_fista_rmse}).
+This does not imply superiority on all datasets or measurement models: the comparison omits, for example, identical-$z$ evaluation of classical FISTA against the PyTorch forward (a finer diagnostic left for future work), and computational cost of training is substantially higher than for classical solvers.
+
+\paragraph{Reproducibility.}
+The run is produced by \texttt{python sir\_cs\_pipeline\_optimized.py --profile lfista\_vs\_classical}; artefacts include \texttt{summary.csv}, \texttt{summary\_focus\_ml\_hybrid\_fista\_lfista.csv}, and per-run logs under \texttt{outputs/lfista\_vs\_classical/runs/}.
+PNG exports for this draft are mirrored under \texttt{paper/figures/lfista\_vs\_classical/}.

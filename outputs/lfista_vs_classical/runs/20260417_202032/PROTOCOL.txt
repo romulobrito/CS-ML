@@ -1,0 +1,16 @@
+lfista_vs_classical protocol: Phase 0 seeds/rho + dual_cs_solver + LFISTA branch.
+Methods: ml_only, hybrid_fista, hybrid_spgl1, cs_only_fista, cs_only_spgl1,
+ml_only_torch, hybrid_lfista_frozen, hybrid_lfista_joint.
+Requires: torch, pylops, spgl1 (pip install -r requirements.txt).
+
+run_id: 20260417_202032
+save_dir (relative): outputs/lfista_vs_classical/runs/20260417_202032
+plots_subdir (relative to save_dir): ../../../../paper/figures/lfista_vs_classical/runs/20260417_202032
+
+seeds: [7]
+measurement_ratios: [0.3, 0.5]
+dual_cs_solver: True | run_lfista: True
+Focus CSVs: summary_focus_ml_hybrid_fista_lfista.csv, summary_by_seed_focus_*.csv
+
+Figures (repo): paper/figures/lfista_vs_classical/runs/20260417_202032/
+Symlink: outputs/lfista_vs_classical/LATEST -> this run

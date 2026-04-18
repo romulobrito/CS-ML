@@ -61,8 +61,14 @@ O pipeline implementa:
 - `explore`: menos dados e grade curta via `apply_config_profile` (iteracao rapida).
 - `phase0_baseline`: **Fase 0 do roadmap** (`paper/roadmap_proximos_passos.md`) — 10 seeds, `measurement_ratio` em `{0.2,0.3,0.4,0.5,0.6}`, mesma grade de `lambda` que o paper, saidas em `outputs/phase0_baseline/`, figuras em `paper/figures/phase0_baseline/`, mais `PROTOCOL.txt` no diretorio de saida.
 - `solver_comparison`: **Etapa 1 do roadmap** — mesmo protocolo numerico que a Fase 0, mas com `dual_cs_solver=True`: metodos `hybrid_fista`, `hybrid_spgl1`, `cs_only_fista`, `cs_only_spgl1` mais `ml_only`. Requer **PyLops** e o pacote **spgl1** (`pip install pylops spgl1` ou `pip install -r requirements.txt`) para o ramo SPGL1. Cada execucao cria `outputs/solver_comparison/runs/<YYYYMMDD_HHMMSS>/` (CSVs, `config.json`, `PROTOCOL.txt`, `README_RUN.txt`, `run_console.log`) e `paper/figures/solver_comparison/runs/<mesmo_id>/` (PNG). Symlink `outputs/solver_comparison/LATEST` aponta para a ultima corrida.
+- `lfista_integrated`: **integracao Etapa 2 no pipeline principal** (`docs/plano_integracao_lfista_pipeline.md`): mesmo protocolo que `phase0_baseline` (10 seeds, mesmos `measurement_ratio`, mesma grade de `lambda` para os metodos classicos), mais ramo PyTorch com `ml_only_torch`, `hybrid_lfista_frozen`, `hybrid_lfista_joint`. Activado por `run_lfista=True` no perfil; artefactos em `outputs/lfista_integrated/runs/<run_id>/` e figuras em `paper/figures/lfista_integrated/runs/<run_id>/`. Requer **PyTorch** (`torch` em `requirements.txt`). Tempo: ordem de **horas** em GPU para a corrida completa (10 seeds x 5 razoes x treino LFISTA); use `lfista_integrated_explore` para smoke rapido (minutos).
+- `lfista_integrated_explore`: como `explore` (1 seed, poucos `measurement_ratio`, menos epocas LFISTA no codigo), mas com o mesmo ramo LFISTA e pastas `outputs/lfista_integrated/`.
+- `lfista_vs_classical`: **comparacao Etapa 2 vs hibrido FISTA classico** no mesmo protocolo Phase 0 (10 seeds, mesmos `measurement_ratio`, mesmo gerador). Ativa `dual_cs_solver=True` (metodos `hybrid_fista`, `hybrid_spgl1`, `cs_only_*`) e `run_lfista=True` (`ml_only_torch`, `hybrid_lfista_*`). Saida: `outputs/lfista_vs_classical/runs/<run_id>/`, figuras em `paper/figures/lfista_vs_classical/runs/<run_id>/`. Artefactos extra: `summary_focus_ml_hybrid_fista_lfista.csv`, `summary_by_seed_focus_ml_hybrid_fista_lfista.csv`, `FOCUS_COMPARISON.txt` (subset para `ml_only`, `ml_only_torch`, `hybrid_fista`, `hybrid_lfista_frozen`, `hybrid_lfista_joint`). Requer **torch**, **pylops**, **spgl1**. Corrida completa: muito pesada (FISTA+SPGL1 por job + treino LFISTA); use `lfista_vs_classical_explore` para validar o pipeline em poucos minutos.
+- `lfista_vs_classical_explore`: mesmo desenho que `lfista_vs_classical`, com hiperparametros tipo `explore` e pastas `outputs/lfista_vs_classical/`.
 
 Opcional: `reset_warm_start_each_lambda=True` zera warm-start a cada novo `lambda` na selecao (mais limpo, mais lento).
+
+**Nota:** os perfis sem LFISTA (`paper`, `explore`, `phase0_baseline`, `solver_comparison`) nao precisam de `torch` instalado para correr apenas o pipeline classico; `pip install -r requirements.txt` instala tudo, inclusive `torch`, para suportar LFISTA e o script `sir_cs_lfista.py`.
 
 ### Cuidado experimental
 
@@ -92,9 +98,13 @@ python sir_cs_pipeline_optimized.py
 python sir_cs_pipeline_optimized.py --profile phase0_baseline
 python sir_cs_pipeline_optimized.py --profile explore
 python sir_cs_pipeline_optimized.py --profile solver_comparison
+python sir_cs_pipeline_optimized.py --profile lfista_integrated
+python sir_cs_pipeline_optimized.py --profile lfista_integrated_explore
+python sir_cs_pipeline_optimized.py --profile lfista_vs_classical
+python sir_cs_pipeline_optimized.py --profile lfista_vs_classical_explore
 ```
 
-Dependencia extra (perfil `solver_comparison`): pacotes `pylops` e `spgl1` (ver `requirements.txt` na raiz do repositorio).
+Dependencias extra: perfil `solver_comparison` precisa de `pylops` e `spgl1`; perfis `lfista_integrated*` e o laboratorio `sir_cs_lfista.py` precisam de `torch`; perfis `lfista_vs_classical*` precisam de `torch` + `pylops` + `spgl1` (ver `requirements.txt`).
 
 Saidas esperadas (perfil `paper`):
 - `outputs/detailed_results.csv`
@@ -109,6 +119,10 @@ Saidas esperadas (perfil `paper`):
   - `08_example_ground_truth_vs_models.png` — curvas por indice de saida
   - `09_parity_ground_truth_vs_prediction.png` — dispersao GT vs pred (linha identidade)
   - `10_residual_distributions_gt_vs_models.png` — histogramas de `y_hat - y`
+
+Com `lfista_integrated` / `lfista_integrated_explore`, o mesmo conjunto base mais `11_gain_rmse_over_ml_only_torch.png` e `12_gain_mae_over_ml_only_torch.png` (ganhos face a `ml_only_torch`), quando esses metodos estao no `summary`.
+
+Laboratorio standalone Etapa 2 (sem orquestrador): `python sir_cs_lfista.py` (perfis `phase2_lfista`, `explore`); nucleo reutilizavel em `lfista_module.py`.
 
 ---
 

@@ -55,7 +55,7 @@ import os
 import sys
 import time
 from dataclasses import asdict, dataclass, field
-from typing import Dict, List, Literal, Optional, Tuple, cast
+from typing import Callable, Dict, List, Literal, Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -148,7 +148,18 @@ class Config:
 
     # "paper": defaults above; "explore": fast iteration; "phase0_baseline": roadmap Fase 0;
     # "solver_comparison": Etapa 1 roadmap — hybrid e cs_only com FISTA e SPGL1 (sem weighted).
-    config_profile: Literal["paper", "explore", "phase0_baseline", "solver_comparison"] = "paper"
+    # "lfista_integrated*": mesmo protocolo sintetico + ramo PyTorch LFISTA (artefactos dedicados).
+    # "lfista_vs_classical*": Phase 0 + dual_cs_solver (hybrid_fista, ...) + LFISTA; comparacao directa.
+    config_profile: Literal[
+        "paper",
+        "explore",
+        "phase0_baseline",
+        "solver_comparison",
+        "lfista_integrated",
+        "lfista_integrated_explore",
+        "lfista_vs_classical",
+        "lfista_vs_classical_explore",
+    ] = "paper"
     # se True, zera warm-start a cada novo lambda na grade (mais limpo, mais lento)
     reset_warm_start_each_lambda: bool = False
 
@@ -166,6 +177,29 @@ class Config:
         default_factory=lambda: [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2, 0.1]
     )
 
+    # LFISTA (PyTorch): so actived when run_lfista=True; default off preserves classic runs.
+    run_lfista: bool = False
+    lfista_device: str = ""
+    lfista_bg_hidden: Tuple[int, int] = (128, 128)
+    lfista_bg_dropout: float = 0.0
+    lfista_steps: int = 8
+    lfista_learn_step_sizes: bool = True
+    lfista_learn_thresholds: bool = True
+    lfista_init_step_scale: float = 1.0
+    lfista_init_threshold: float = 1e-2
+    lfista_use_momentum: bool = True
+    lfista_batch_size: int = 128
+    lfista_num_epochs_bg: int = 80
+    lfista_num_epochs_frozen: int = 60
+    lfista_num_epochs_joint: int = 80
+    lfista_lr_bg: float = 1e-3
+    lfista_lr_frozen: float = 1e-3
+    lfista_lr_joint: float = 5e-4
+    lfista_weight_decay: float = 1e-5
+    lfista_patience: int = 12
+    lfista_loss_alpha_weight: float = 0.0
+    lfista_loss_l1_alpha_weight: float = 0.0
+
 
 # ============================================================
 # 2) Utilidades matemáticas
@@ -174,6 +208,65 @@ class Config:
 
 def apply_config_profile(cfg: Config) -> None:
     """Adjust hyperparameters per profile (paper = defaults in Config dataclass)."""
+    if cfg.config_profile == "lfista_integrated":
+        cfg.seeds = [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.save_dir = "outputs/lfista_integrated"
+        cfg.plots_subdir = "../paper/figures/lfista_integrated"
+        cfg.run_lfista = True
+        return
+    if cfg.config_profile == "lfista_integrated_explore":
+        cfg.seeds = [7]
+        cfg.measurement_ratios = [0.3, 0.5]
+        cfg.n_train = 600
+        cfg.n_val = 80
+        cfg.n_test = 100
+        cfg.fista_max_iter = 150
+        cfg.l1_lambda_grid = [1e-3, 1e-2, 1e-1]
+        cfg.lambda_selection_max_samples = 80
+        cfg.power_iteration_n_iter = 80
+        cfg.save_dir = "outputs/lfista_integrated"
+        cfg.plots_subdir = "../paper/figures/lfista_integrated"
+        cfg.run_lfista = True
+        cfg.lfista_num_epochs_bg = 25
+        cfg.lfista_num_epochs_frozen = 20
+        cfg.lfista_num_epochs_joint = 25
+        cfg.lfista_steps = 5
+        return
+    if cfg.config_profile == "lfista_vs_classical":
+        # Etapa 2 vs hibrido classico: mesmo protocolo Phase 0 + hybrid_fista (FISTA) + LFISTA PyTorch.
+        cfg.seeds = [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.save_dir = "outputs/lfista_vs_classical"
+        cfg.plots_subdir = "../paper/figures/lfista_vs_classical"
+        cfg.dual_cs_solver = True
+        cfg.run_weighted_hybrid = False
+        cfg.run_cs_only = True
+        cfg.run_lfista = True
+        return
+    if cfg.config_profile == "lfista_vs_classical_explore":
+        cfg.seeds = [7]
+        cfg.measurement_ratios = [0.3, 0.5]
+        cfg.n_train = 600
+        cfg.n_val = 80
+        cfg.n_test = 100
+        cfg.fista_max_iter = 150
+        cfg.l1_lambda_grid = [1e-3, 1e-2, 1e-1]
+        cfg.lambda_selection_max_samples = 80
+        cfg.power_iteration_n_iter = 80
+        cfg.save_dir = "outputs/lfista_vs_classical"
+        cfg.plots_subdir = "../paper/figures/lfista_vs_classical"
+        cfg.dual_cs_solver = True
+        cfg.run_weighted_hybrid = False
+        cfg.run_cs_only = True
+        cfg.run_lfista = True
+        cfg.lfista_num_epochs_bg = 25
+        cfg.lfista_num_epochs_frozen = 20
+        cfg.lfista_num_epochs_joint = 25
+        cfg.lfista_steps = 5
+        return
     if cfg.config_profile == "phase0_baseline":
         # Roadmap Fase 0: frozen baseline, 10 seeds, rho up to 0.6, separate output dir.
         cfg.seeds = [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
@@ -260,6 +353,100 @@ def layout_solver_comparison_run(cfg: Config, run_id: str) -> None:
     ]
     with open(readme, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
+
+
+def layout_lfista_integrated_run(cfg: Config, run_id: str) -> None:
+    """
+    Artefactos em outputs/lfista_integrated/runs/<run_id>/ e figuras em
+    paper/figures/lfista_integrated/runs/<run_id>/.
+    """
+    base_save = cfg.save_dir
+    cfg.save_dir = os.path.join(base_save, "runs", run_id)
+    cwd = os.getcwd()
+    fig_abs = os.path.abspath(
+        os.path.join(cwd, "paper", "figures", "lfista_integrated", "runs", run_id)
+    )
+    save_abs = os.path.abspath(os.path.join(cwd, cfg.save_dir))
+    cfg.plots_subdir = os.path.relpath(fig_abs, save_abs)
+    os.makedirs(fig_abs, exist_ok=True)
+    os.makedirs(save_abs, exist_ok=True)
+
+    latest = os.path.join(cwd, base_save, "LATEST")
+    try:
+        os.remove(latest)
+    except FileNotFoundError:
+        pass
+    os.symlink(os.path.join("runs", run_id), latest, target_is_directory=False)
+
+    readme = os.path.join(save_abs, "README_RUN.txt")
+    started = time.strftime("%Y-%m-%dT%H:%M:%S")
+    lines = [
+        "SIR-CS lfista_integrated run (PyTorch LFISTA + classic pipeline).",
+        "run_id: " + run_id,
+        "started_local: " + started,
+        "cwd: " + cwd,
+        "argv: " + json.dumps(sys.argv),
+        "",
+        "Artifacts (this folder):",
+        "  detailed_results.csv, summary_by_seed.csv, summary.csv",
+        "  config.json, PROTOCOL.txt, run_console.log, README_RUN.txt",
+        "",
+        "Figures (repo): paper/figures/lfista_integrated/runs/" + run_id + "/",
+        "",
+        "Symlink: outputs/lfista_integrated/LATEST -> runs/" + run_id,
+        "",
+    ]
+    with open(readme, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+
+
+def layout_lfista_vs_classical_run(cfg: Config, run_id: str) -> None:
+    """
+    Artefactos em outputs/lfista_vs_classical/runs/<run_id>/ e figuras em
+    paper/figures/lfista_vs_classical/runs/<run_id>/.
+    Comparacao: hybrid_fista (FISTA classico no residual) vs LFISTA + ml_only / ml_only_torch.
+    """
+    base_save = cfg.save_dir
+    cfg.save_dir = os.path.join(base_save, "runs", run_id)
+    cwd = os.getcwd()
+    fig_abs = os.path.abspath(
+        os.path.join(cwd, "paper", "figures", "lfista_vs_classical", "runs", run_id)
+    )
+    save_abs = os.path.abspath(os.path.join(cwd, cfg.save_dir))
+    cfg.plots_subdir = os.path.relpath(fig_abs, save_abs)
+    os.makedirs(fig_abs, exist_ok=True)
+    os.makedirs(save_abs, exist_ok=True)
+
+    latest = os.path.join(cwd, base_save, "LATEST")
+    try:
+        os.remove(latest)
+    except FileNotFoundError:
+        pass
+    os.symlink(os.path.join("runs", run_id), latest, target_is_directory=False)
+
+    readme = os.path.join(save_abs, "README_RUN.txt")
+    started = time.strftime("%Y-%m-%dT%H:%M:%S")
+    lines = [
+        "SIR-CS lfista_vs_classical run (hybrid_fista + LFISTA + SPGL1 baselines, same protocol).",
+        "run_id: " + run_id,
+        "started_local: " + started,
+        "cwd: " + cwd,
+        "argv: " + json.dumps(sys.argv),
+        "",
+        "Artifacts (this folder):",
+        "  detailed_results.csv, summary_by_seed.csv, summary.csv",
+        "  summary_focus_*.csv (subset for ml_only, ml_only_torch, hybrid_fista, LFISTA)",
+        "  FOCUS_COMPARISON.txt",
+        "  config.json, PROTOCOL.txt, run_console.log, README_RUN.txt",
+        "",
+        "Figures (repo): paper/figures/lfista_vs_classical/runs/" + run_id + "/",
+        "",
+        "Symlink: outputs/lfista_vs_classical/LATEST -> runs/" + run_id,
+        "",
+    ]
+    with open(readme, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+
 
 def orthonormal_dct_matrix(n: int) -> np.ndarray:
     """
@@ -820,6 +1007,55 @@ def select_lambda_for_method(
     )
 
 
+def lfista_train_config_from_pipeline(cfg: Config) -> "LFISTATrainConfig":
+    import torch
+
+    from lfista_module import LFISTATrainConfig
+
+    dev = cfg.lfista_device.strip() if cfg.lfista_device else (
+        "cuda" if torch.cuda.is_available() else "cpu"
+    )
+    return LFISTATrainConfig(
+        device=dev,
+        p_input=cfg.p_input,
+        n_output=cfg.n_output,
+        bg_hidden=cfg.lfista_bg_hidden,
+        bg_dropout=cfg.lfista_bg_dropout,
+        lfista_steps=cfg.lfista_steps,
+        learn_step_sizes=cfg.lfista_learn_step_sizes,
+        learn_thresholds=cfg.lfista_learn_thresholds,
+        init_step_scale=cfg.lfista_init_step_scale,
+        init_threshold=cfg.lfista_init_threshold,
+        use_momentum=cfg.lfista_use_momentum,
+        batch_size=cfg.lfista_batch_size,
+        num_epochs_bg=cfg.lfista_num_epochs_bg,
+        num_epochs_frozen=cfg.lfista_num_epochs_frozen,
+        num_epochs_joint=cfg.lfista_num_epochs_joint,
+        lr_bg=cfg.lfista_lr_bg,
+        lr_frozen=cfg.lfista_lr_frozen,
+        lr_joint=cfg.lfista_lr_joint,
+        weight_decay=cfg.lfista_weight_decay,
+        patience=cfg.lfista_patience,
+        loss_alpha_weight=cfg.lfista_loss_alpha_weight,
+        loss_l1_alpha_weight=cfg.lfista_loss_l1_alpha_weight,
+        measurement_noise_std=cfg.measurement_noise_std,
+    )
+
+
+def run_lfista_branch(
+    cfg: Config,
+    seed: int,
+    measurement_ratio: float,
+    data: Dict[str, np.ndarray],
+    M_np: np.ndarray,
+    log_fn: Callable[[str], None],
+) -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
+    from lfista_module import run_lfista_experiment_dataframe
+
+    tcfg = lfista_train_config_from_pipeline(cfg)
+    return run_lfista_experiment_dataframe(tcfg, seed, measurement_ratio, data, M_np, log_fn)
+
+
 # ============================================================
 # 7) Avaliação
 # ============================================================
@@ -1276,6 +1512,23 @@ def run_single_setting(
         if len(flat_cs) == len(flat_true):
             gt_pred_bundle["cs_only"] = np.concatenate(flat_cs)
 
+    if cfg.run_lfista:
+
+        def _lf_log(msg: str) -> None:
+            log_line(cfg, msg)
+
+        lf_df, lf_gt = run_lfista_branch(
+            cfg,
+            seed,
+            measurement_ratio,
+            data,
+            M,
+            _lf_log,
+        )
+        df = pd.concat([df, lf_df], ignore_index=True)
+        for k, v in lf_gt.items():
+            gt_pred_bundle[k] = v
+
     return df, stored_examples, gt_pred_bundle
 
 
@@ -1350,6 +1603,9 @@ METHOD_COLORS: Dict[str, str] = {
     "hybrid_spgl1": "#bcbd22",
     "cs_only_fista": "#d62728",
     "cs_only_spgl1": "#9467bd",
+    "ml_only_torch": "#17becf",
+    "hybrid_lfista_frozen": "#e377c2",
+    "hybrid_lfista_joint": "#2ca02c",
 }
 METHOD_ORDER_DEFAULT = ["ml_only", "hybrid", "weighted_hybrid", "cs_only"]
 METHOD_ORDER_SOLVER_CMP = [
@@ -1359,9 +1615,77 @@ METHOD_ORDER_SOLVER_CMP = [
     "cs_only_fista",
     "cs_only_spgl1",
 ]
+METHOD_ORDER_LFISTA_TAIL = [
+    "ml_only_torch",
+    "hybrid_lfista_frozen",
+    "hybrid_lfista_joint",
+]
+# Legend order when dual_cs_solver and run_lfista: central comparison first, then SPGL1/cs_only.
+METHOD_ORDER_LFISTA_VS_CLASSICAL = [
+    "ml_only",
+    "ml_only_torch",
+    "hybrid_fista",
+    "hybrid_lfista_frozen",
+    "hybrid_lfista_joint",
+    "hybrid_spgl1",
+    "cs_only_fista",
+    "cs_only_spgl1",
+]
+
+LFISTA_VS_CLASSICAL_FOCUS_METHODS = [
+    "ml_only",
+    "ml_only_torch",
+    "hybrid_fista",
+    "hybrid_lfista_frozen",
+    "hybrid_lfista_joint",
+]
+
+
+def is_lfista_vs_classical_profile(cfg: Config) -> bool:
+    return cfg.config_profile in ("lfista_vs_classical", "lfista_vs_classical_explore")
+
+
+def save_lfista_vs_classical_focus_tables(
+    cfg: Config,
+    summary: pd.DataFrame,
+    per_seed: pd.DataFrame,
+) -> List[str]:
+    """
+    Escreve CSVs filtrados para os metodos centrais da Etapa 2 vs hybrid_fista classico.
+    """
+    if not is_lfista_vs_classical_profile(cfg):
+        return []
+    focus = LFISTA_VS_CLASSICAL_FOCUS_METHODS
+    sub_s = summary[summary["method"].isin(focus)].sort_values(["measurement_ratio", "method"])
+    sub_p = per_seed[per_seed["method"].isin(focus)].sort_values(
+        ["seed", "measurement_ratio", "method"]
+    )
+    p1 = os.path.join(cfg.save_dir, "summary_focus_ml_hybrid_fista_lfista.csv")
+    p2 = os.path.join(cfg.save_dir, "summary_by_seed_focus_ml_hybrid_fista_lfista.csv")
+    sub_s.to_csv(p1, index=False)
+    sub_p.to_csv(p2, index=False)
+    focus_txt = os.path.join(cfg.save_dir, "FOCUS_COMPARISON.txt")
+    lines = [
+        "Etapa 2 focus comparison (same synthetic protocol as full run).",
+        "Methods in focus files:",
+        "  ml_only (sklearn MLP), ml_only_torch (PyTorch MLP),",
+        "  hybrid_fista (FISTA on residual, classical),",
+        "  hybrid_lfista_frozen, hybrid_lfista_joint (PyTorch + LFISTA).",
+        "Full summary.csv still includes hybrid_spgl1, cs_only_* for Etapa 1 context.",
+        "",
+    ]
+    with open(focus_txt, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    return [p1, p2, focus_txt]
 
 
 def method_order_for_cfg(cfg: Config) -> List[str]:
+    if cfg.run_lfista and cfg.dual_cs_solver:
+        return list(METHOD_ORDER_LFISTA_VS_CLASSICAL)
+    if cfg.run_lfista:
+        base = list(METHOD_ORDER_DEFAULT)
+        out = base + [m for m in METHOD_ORDER_LFISTA_TAIL if m not in base]
+        return out
     if cfg.dual_cs_solver:
         return list(METHOD_ORDER_SOLVER_CMP)
     return list(METHOD_ORDER_DEFAULT)
@@ -1497,12 +1821,13 @@ def plot_gain_vs_ml_only(
     metric_name: str,
     save_path: str,
     cfg: Config,
+    baseline_method: str = "ml_only",
 ) -> None:
     if len(gain_summary) == 0:
         return
     plt.figure(figsize=(9, 5))
     order = method_order_for_cfg(cfg)
-    methods = [m for m in order if m in set(gain_summary["method"].unique()) and m != "ml_only"]
+    methods = [m for m in order if m in set(gain_summary["method"].unique()) and m != baseline_method]
     for method in methods:
         sdf = gain_summary[gain_summary["method"] == method].sort_values("measurement_ratio")
         x = sdf["measurement_ratio"].values
@@ -1513,7 +1838,7 @@ def plot_gain_vs_ml_only(
     plt.axhline(0.0, color="gray", linestyle="--", linewidth=1)
     plt.xlabel("Measurement ratio m / N")
     plt.ylabel(f"Gain ({metric_name}): baseline - method (positive is better)")
-    plt.title(f"Improvement over {metric_name} vs ml_only (seed uncertainty)")
+    plt.title(f"Improvement over {metric_name} vs {baseline_method} (seed uncertainty)")
     plt.grid(True, alpha=0.3)
     plt.legend(loc="best")
     plt.tight_layout()
@@ -1596,6 +1921,28 @@ def save_all_comparison_plots(
     if len(g_mae) > 0:
         gsum_m = summarize_gain_across_seeds(g_mae)
         plot_gain_vs_ml_only(gsum_m, "MAE", _save("07_gain_mae_over_ml_only.png"), cfg)
+
+    if cfg.run_lfista and "ml_only_torch" in set(per_seed["method"].values):
+        g_rmse_t = build_gain_vs_baseline(per_seed, "ml_only_torch", "rmse_mean")
+        if len(g_rmse_t) > 0:
+            gsum_rt = summarize_gain_across_seeds(g_rmse_t)
+            plot_gain_vs_ml_only(
+                gsum_rt,
+                "RMSE",
+                _save("11_gain_rmse_over_ml_only_torch.png"),
+                cfg,
+                baseline_method="ml_only_torch",
+            )
+        g_mae_t = build_gain_vs_baseline(per_seed, "ml_only_torch", "mae_mean")
+        if len(g_mae_t) > 0:
+            gsum_mt = summarize_gain_across_seeds(g_mae_t)
+            plot_gain_vs_ml_only(
+                gsum_mt,
+                "MAE",
+                _save("12_gain_mae_over_ml_only_torch.png"),
+                cfg,
+                baseline_method="ml_only_torch",
+            )
 
     return paths
 
@@ -1804,8 +2151,17 @@ def parse_cli_args() -> argparse.Namespace:
         "--profile",
         type=str,
         default="paper",
-        choices=["paper", "explore", "phase0_baseline", "solver_comparison"],
-        help="Config profile: paper, explore, phase0_baseline, solver_comparison (FISTA vs SPGL1).",
+        choices=[
+            "paper",
+            "explore",
+            "phase0_baseline",
+            "solver_comparison",
+            "lfista_integrated",
+            "lfista_integrated_explore",
+            "lfista_vs_classical",
+            "lfista_vs_classical_explore",
+        ],
+        help="Profiles: paper/explore/phase0; solver_comparison; lfista_integrated; lfista_vs_classical (FISTA+LFISTA).",
     )
     return parser.parse_args()
 
@@ -1814,7 +2170,16 @@ def main() -> None:
     args = parse_cli_args()
     cfg = Config()
     cfg.config_profile = cast(
-        Literal["paper", "explore", "phase0_baseline", "solver_comparison"],
+        Literal[
+            "paper",
+            "explore",
+            "phase0_baseline",
+            "solver_comparison",
+            "lfista_integrated",
+            "lfista_integrated_explore",
+            "lfista_vs_classical",
+            "lfista_vs_classical_explore",
+        ],
         args.profile,
     )
     apply_config_profile(cfg)
@@ -1822,6 +2187,14 @@ def main() -> None:
     if cfg.config_profile == "solver_comparison":
         run_artifact_id = time.strftime("%Y%m%d_%H%M%S")
         layout_solver_comparison_run(cfg, run_artifact_id)
+        cfg.artifact_log_path = os.path.join(cfg.save_dir, "run_console.log")
+    elif cfg.config_profile in ("lfista_integrated", "lfista_integrated_explore"):
+        run_artifact_id = time.strftime("%Y%m%d_%H%M%S")
+        layout_lfista_integrated_run(cfg, run_artifact_id)
+        cfg.artifact_log_path = os.path.join(cfg.save_dir, "run_console.log")
+    elif cfg.config_profile in ("lfista_vs_classical", "lfista_vs_classical_explore"):
+        run_artifact_id = time.strftime("%Y%m%d_%H%M%S")
+        layout_lfista_vs_classical_run(cfg, run_artifact_id)
         cfg.artifact_log_path = os.path.join(cfg.save_dir, "run_console.log")
     else:
         os.makedirs(cfg.save_dir, exist_ok=True)
@@ -1844,6 +2217,52 @@ def main() -> None:
                 "",
                 "Figures (repo): paper/figures/solver_comparison/runs/" + run_artifact_id + "/",
                 "Symlink: outputs/solver_comparison/LATEST -> this run",
+            ]
+        )
+        with open(os.path.join(cfg.save_dir, "PROTOCOL.txt"), "w", encoding="utf-8") as f:
+            f.write(protocol + "\n")
+
+    if cfg.config_profile in ("lfista_integrated", "lfista_integrated_explore"):
+        protocol = "\n".join(
+            [
+                "lfista_integrated protocol: classic pipeline + optional PyTorch LFISTA branch.",
+                "run_lfista=True appends ml_only_torch, hybrid_lfista_frozen, hybrid_lfista_joint.",
+                "Requires: torch (pip install torch).",
+                "",
+                "run_id: " + run_artifact_id,
+                "save_dir (relative): " + cfg.save_dir,
+                "plots_subdir (relative to save_dir): " + cfg.plots_subdir,
+                "",
+                "seeds: " + str(cfg.seeds),
+                "measurement_ratios: " + str(cfg.measurement_ratios),
+                "lfista_steps (K): " + str(cfg.lfista_steps),
+                "",
+                "Figures (repo): paper/figures/lfista_integrated/runs/" + run_artifact_id + "/",
+                "Symlink: outputs/lfista_integrated/LATEST -> this run",
+            ]
+        )
+        with open(os.path.join(cfg.save_dir, "PROTOCOL.txt"), "w", encoding="utf-8") as f:
+            f.write(protocol + "\n")
+
+    if cfg.config_profile in ("lfista_vs_classical", "lfista_vs_classical_explore"):
+        protocol = "\n".join(
+            [
+                "lfista_vs_classical protocol: Phase 0 seeds/rho + dual_cs_solver + LFISTA branch.",
+                "Methods: ml_only, hybrid_fista, hybrid_spgl1, cs_only_fista, cs_only_spgl1,",
+                "ml_only_torch, hybrid_lfista_frozen, hybrid_lfista_joint.",
+                "Requires: torch, pylops, spgl1 (pip install -r requirements.txt).",
+                "",
+                "run_id: " + run_artifact_id,
+                "save_dir (relative): " + cfg.save_dir,
+                "plots_subdir (relative to save_dir): " + cfg.plots_subdir,
+                "",
+                "seeds: " + str(cfg.seeds),
+                "measurement_ratios: " + str(cfg.measurement_ratios),
+                "dual_cs_solver: True | run_lfista: True",
+                "Focus CSVs: summary_focus_ml_hybrid_fista_lfista.csv, summary_by_seed_focus_*.csv",
+                "",
+                "Figures (repo): paper/figures/lfista_vs_classical/runs/" + run_artifact_id + "/",
+                "Symlink: outputs/lfista_vs_classical/LATEST -> this run",
             ]
         )
         with open(os.path.join(cfg.save_dir, "PROTOCOL.txt"), "w", encoding="utf-8") as f:
@@ -1910,6 +2329,10 @@ def main() -> None:
     per_seed.to_csv(per_seed_path, index=False)
     summary.to_csv(summary_path, index=False)
 
+    focus_paths = save_lfista_vs_classical_focus_tables(cfg, summary, per_seed)
+    if focus_paths and cfg.log_progress:
+        log_line(cfg, "  [artifacts] focus tables: " + ", ".join(os.path.basename(p) for p in focus_paths))
+
     plot_paths = save_all_comparison_plots(cfg, summary, per_seed)
 
     if first_examples is not None:
@@ -1926,14 +2349,20 @@ def main() -> None:
     if run_artifact_id:
         readme_p = os.path.join(cfg.save_dir, "README_RUN.txt")
         finished = time.strftime("%Y-%m-%dT%H:%M:%S")
+        if cfg.config_profile == "solver_comparison":
+            fig_run_hint = "paper/figures/solver_comparison/runs/" + run_artifact_id + "/"
+        elif cfg.config_profile in ("lfista_integrated", "lfista_integrated_explore"):
+            fig_run_hint = "paper/figures/lfista_integrated/runs/" + run_artifact_id + "/"
+        elif cfg.config_profile in ("lfista_vs_classical", "lfista_vs_classical_explore"):
+            fig_run_hint = "paper/figures/lfista_vs_classical/runs/" + run_artifact_id + "/"
+        else:
+            fig_run_hint = ""
         extra = [
             "",
             "finished_local: " + finished,
             "elapsed_seconds: {:.1f}".format(elapsed),
             "",
-            "CSV and logs in this directory; figures under paper/figures/solver_comparison/runs/"
-            + run_artifact_id
-            + "/",
+            "CSV and logs in this directory; figures under " + fig_run_hint,
             "",
             "Plot files:",
         ]

@@ -1,0 +1,6 @@
+Etapa 2 focus comparison (same synthetic protocol as full run).
+Methods in focus files:
+  ml_only (sklearn MLP), ml_only_torch (PyTorch MLP),
+  hybrid_fista (FISTA on residual, classical),
+  hybrid_lfista_frozen, hybrid_lfista_joint (PyTorch + LFISTA).
+Full summary.csv still includes hybrid_spgl1, cs_only_* for Etapa 1 context.

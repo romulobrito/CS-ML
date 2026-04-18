@@ -75,5 +75,29 @@
     0.01,
     0.03,
     0.1
-  ]
+  ],
+  "run_lfista": false,
+  "lfista_device": "",
+  "lfista_bg_hidden": [
+    128,
+    128
+  ],
+  "lfista_bg_dropout": 0.0,
+  "lfista_steps": 8,
+  "lfista_learn_step_sizes": true,
+  "lfista_learn_thresholds": true,
+  "lfista_init_step_scale": 1.0,
+  "lfista_init_threshold": 0.01,
+  "lfista_use_momentum": true,
+  "lfista_batch_size": 128,
+  "lfista_num_epochs_bg": 80,
+  "lfista_num_epochs_frozen": 60,
+  "lfista_num_epochs_joint": 80,
+  "lfista_lr_bg": 0.001,
+  "lfista_lr_frozen": 0.001,
+  "lfista_lr_joint": 0.0005,
+  "lfista_weight_decay": 1e-05,
+  "lfista_patience": 12,
+  "lfista_loss_alpha_weight": 0.0,
+  "lfista_loss_l1_alpha_weight": 0.0
 }

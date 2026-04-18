@@ -8,5 +8,5 @@ scikit-learn>=1.0
 pylops>=2.0
 spgl1>=2.0
 
-# Etapa 2 LFISTA lab (sir_cs_lfista.py)
+# Etapa 2 LFISTA: sir_cs_lfista.py and pipeline profiles lfista_integrated* (skip if you only run classic profiles)
 torch>=2.0

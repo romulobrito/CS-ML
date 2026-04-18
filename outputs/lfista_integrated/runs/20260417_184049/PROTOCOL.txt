@@ -1,0 +1,14 @@
+lfista_integrated protocol: classic pipeline + optional PyTorch LFISTA branch.
+run_lfista=True appends ml_only_torch, hybrid_lfista_frozen, hybrid_lfista_joint.
+Requires: torch (pip install torch).
+
+run_id: 20260417_184049
+save_dir (relative): outputs/lfista_integrated/runs/20260417_184049
+plots_subdir (relative to save_dir): ../../../../paper/figures/lfista_integrated/runs/20260417_184049
+
+seeds: [7]
+measurement_ratios: [0.3, 0.5]
+lfista_steps (K): 5
+
+Figures (repo): paper/figures/lfista_integrated/runs/20260417_184049/
+Symlink: outputs/lfista_integrated/LATEST -> this run
