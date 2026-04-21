@@ -26,3 +26,12 @@ nohup.out
 
 # Duplicate figure tree if pipeline wrote under outputs/
 outputs/paper/
+
+# Robustness Phase 3 sweep outputs (large; regenerate with run_robustness_phase3_sweep.py)
+outputs/robustness_phase3/
+
+# Generated robustness PNG tree under paper/ (large; copy from outputs after runs)
+paper/figures/robustness_phase3/
+
+# Local chat notes
+passos_chatgpt

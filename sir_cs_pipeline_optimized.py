@@ -159,7 +159,12 @@ class Config:
         "lfista_integrated_explore",
         "lfista_vs_classical",
         "lfista_vs_classical_explore",
+        "robustness_phase3",
+        "robustness_phase3_explore",
     ] = "paper"
+    # Filled when profile is robustness_phase3* (CLI --robustness-axis / --robustness-value).
+    robustness_axis: str = ""
+    robustness_value_raw: str = ""
     # se True, zera warm-start a cada novo lambda na grade (mais limpo, mais lento)
     reset_warm_start_each_lambda: bool = False
 
@@ -297,6 +302,127 @@ def apply_config_profile(cfg: Config) -> None:
         cfg.lambda_selection_max_samples = 80
         cfg.power_iteration_n_iter = 80
         return
+    if cfg.config_profile == "robustness_phase3":
+        # Roadmap Etapa 3A: same protocol as lfista_vs_classical; save_dir set in main() per axis/value.
+        cfg.seeds = [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.dual_cs_solver = True
+        cfg.run_weighted_hybrid = False
+        cfg.run_cs_only = True
+        cfg.run_lfista = True
+        return
+    if cfg.config_profile == "robustness_phase3_explore":
+        cfg.seeds = [7]
+        cfg.measurement_ratios = [0.3, 0.5]
+        cfg.n_train = 600
+        cfg.n_val = 80
+        cfg.n_test = 100
+        cfg.fista_max_iter = 150
+        cfg.l1_lambda_grid = [1e-3, 1e-2, 1e-1]
+        cfg.lambda_selection_max_samples = 80
+        cfg.power_iteration_n_iter = 80
+        cfg.dual_cs_solver = True
+        cfg.run_weighted_hybrid = False
+        cfg.run_cs_only = True
+        cfg.run_lfista = True
+        cfg.lfista_num_epochs_bg = 25
+        cfg.lfista_num_epochs_frozen = 20
+        cfg.lfista_num_epochs_joint = 25
+        cfg.lfista_steps = 5
+        return
+
+
+def robustness_value_slug(raw: str) -> str:
+    """Filesystem-safe token from user value string (e.g. 0.02 -> 0p02)."""
+    t = raw.strip()
+    return t.replace(".", "p").replace("-", "m")
+
+
+def apply_robustness_param_override(cfg: Config, axis: str, val_str: str) -> None:
+    """Set one synthetic knob; other fields stay at baseline profile defaults."""
+    key = axis.strip()
+    if key == "residual_k":
+        cfg.residual_k = int(round(float(val_str)))
+        return
+    if key == "measurement_noise_std":
+        cfg.measurement_noise_std = float(val_str)
+        return
+    if key == "residual_amplitude":
+        cfg.residual_amplitude = float(val_str)
+        return
+    if key == "output_noise_std":
+        cfg.output_noise_std = float(val_str)
+        return
+    if key == "measurement_ratio":
+        rho = float(val_str)
+        cfg.measurement_ratios = [rho]
+        return
+    raise ValueError(
+        "Unknown robustness axis: "
+        + key
+        + " (expected residual_k, measurement_noise_std, residual_amplitude, "
+        + "output_noise_std, measurement_ratio)"
+    )
+
+
+def layout_robustness_phase3_run(cfg: Config, run_id: str, axis: str, value_slug: str) -> None:
+    """
+    outputs/robustness_phase3/<axis>/v_<slug>/runs/<run_id>/
+    paper/figures/robustness_phase3/<axis>/v_<slug>/runs/<run_id>/
+    Symlink outputs/robustness_phase3/<axis>/LATEST -> v_<slug>/runs/<run_id>
+    """
+    axis_safe = axis.replace(os.sep, "").replace(".", "")
+    if ".." in axis_safe or axis_safe == "":
+        raise ValueError("Invalid robustness axis")
+    slug_safe = value_slug.replace(os.sep, "").replace("..", "")
+    value_dir = "v_" + slug_safe
+    base_axis = os.path.join("outputs", "robustness_phase3", axis_safe)
+    base_save = os.path.join(base_axis, value_dir)
+    cfg.save_dir = os.path.join(base_save, "runs", run_id)
+    cwd = os.getcwd()
+    fig_abs = os.path.abspath(
+        os.path.join(
+            cwd, "paper", "figures", "robustness_phase3", axis_safe, value_dir, "runs", run_id
+        )
+    )
+    save_abs = os.path.abspath(os.path.join(cwd, cfg.save_dir))
+    cfg.plots_subdir = os.path.relpath(fig_abs, save_abs)
+    os.makedirs(fig_abs, exist_ok=True)
+    os.makedirs(save_abs, exist_ok=True)
+    latest = os.path.join(cwd, base_axis, "LATEST")
+    try:
+        os.remove(latest)
+    except FileNotFoundError:
+        pass
+    rel_target = os.path.join(value_dir, "runs", run_id)
+    os.symlink(rel_target, latest, target_is_directory=False)
+
+    readme = os.path.join(save_abs, "README_RUN.txt")
+    started = time.strftime("%Y-%m-%dT%H:%M:%S")
+    lines = [
+        "SIR-CS robustness_phase3 (Etapa 3 roadmap): one axis value per run.",
+        "run_id: " + run_id,
+        "robustness_axis: " + axis_safe,
+        "value_slug: " + slug_safe,
+        "started_local: " + started,
+        "cwd: " + cwd,
+        "argv: " + json.dumps(sys.argv),
+        "",
+        "Artifacts: detailed_results.csv, summary*.csv, config.json, PROTOCOL.txt, run_console.log",
+        "Figures (repo): paper/figures/robustness_phase3/"
+        + axis_safe
+        + "/"
+        + value_dir
+        + "/runs/"
+        + run_id
+        + "/",
+        "",
+        "Symlink: outputs/robustness_phase3/" + axis_safe + "/LATEST -> " + rel_target,
+        "",
+    ]
+    with open(readme, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def log_line(cfg: Config, msg: str) -> None:
@@ -1642,7 +1768,12 @@ LFISTA_VS_CLASSICAL_FOCUS_METHODS = [
 
 
 def is_lfista_vs_classical_profile(cfg: Config) -> bool:
-    return cfg.config_profile in ("lfista_vs_classical", "lfista_vs_classical_explore")
+    return cfg.config_profile in (
+        "lfista_vs_classical",
+        "lfista_vs_classical_explore",
+        "robustness_phase3",
+        "robustness_phase3_explore",
+    )
 
 
 def save_lfista_vs_classical_focus_tables(
@@ -2160,8 +2291,25 @@ def parse_cli_args() -> argparse.Namespace:
             "lfista_integrated_explore",
             "lfista_vs_classical",
             "lfista_vs_classical_explore",
+            "robustness_phase3",
+            "robustness_phase3_explore",
         ],
-        help="Profiles: paper/explore/phase0; solver_comparison; lfista_integrated; lfista_vs_classical (FISTA+LFISTA).",
+        help="Profiles: paper/explore/phase0; solver_comparison; lfista_integrated; lfista_vs_classical; "
+        "robustness_phase3 (Etapa 3 roadmap, one axis via --robustness-*).",
+    )
+    parser.add_argument(
+        "--robustness-axis",
+        type=str,
+        default="",
+        metavar="NAME",
+        help="Etapa 3: residual_k | measurement_noise_std | residual_amplitude | output_noise_std | measurement_ratio",
+    )
+    parser.add_argument(
+        "--robustness-value",
+        type=str,
+        default="",
+        metavar="VAL",
+        help="Single value for that axis (e.g. 6 or 0.02). Required for robustness_phase3* profiles.",
     )
     return parser.parse_args()
 
@@ -2179,6 +2327,8 @@ def main() -> None:
             "lfista_integrated_explore",
             "lfista_vs_classical",
             "lfista_vs_classical_explore",
+            "robustness_phase3",
+            "robustness_phase3_explore",
         ],
         args.profile,
     )
@@ -2195,6 +2345,21 @@ def main() -> None:
     elif cfg.config_profile in ("lfista_vs_classical", "lfista_vs_classical_explore"):
         run_artifact_id = time.strftime("%Y%m%d_%H%M%S")
         layout_lfista_vs_classical_run(cfg, run_artifact_id)
+        cfg.artifact_log_path = os.path.join(cfg.save_dir, "run_console.log")
+    elif cfg.config_profile in ("robustness_phase3", "robustness_phase3_explore"):
+        if not args.robustness_axis.strip() or not args.robustness_value.strip():
+            print(
+                "ERROR: robustness_phase3* requires --robustness-axis and --robustness-value",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        apply_robustness_param_override(cfg, args.robustness_axis.strip(), args.robustness_value.strip())
+        cfg.robustness_axis = args.robustness_axis.strip()
+        cfg.robustness_value_raw = args.robustness_value.strip()
+        run_artifact_id = time.strftime("%Y%m%d_%H%M%S")
+        layout_robustness_phase3_run(
+            cfg, run_artifact_id, cfg.robustness_axis, robustness_value_slug(cfg.robustness_value_raw)
+        )
         cfg.artifact_log_path = os.path.join(cfg.save_dir, "run_console.log")
     else:
         os.makedirs(cfg.save_dir, exist_ok=True)
@@ -2288,6 +2453,37 @@ def main() -> None:
         with open(os.path.join(cfg.save_dir, "PROTOCOL.txt"), "w", encoding="utf-8") as f:
             f.write(protocol + "\n")
 
+    if cfg.config_profile in ("robustness_phase3", "robustness_phase3_explore"):
+        protocol = "\n".join(
+            [
+                "robustness_phase3 protocol (roadmap Etapa 3): vary one synthetic knob; rest matches profile baseline.",
+                "Methods: same as lfista_vs_classical (dual_cs_solver + run_lfista).",
+                "Requires: torch, pylops, spgl1.",
+                "",
+                "robustness_axis: " + cfg.robustness_axis,
+                "robustness_value: " + cfg.robustness_value_raw,
+                "run_id: " + run_artifact_id,
+                "save_dir (relative): " + cfg.save_dir,
+                "plots_subdir (relative to save_dir): " + cfg.plots_subdir,
+                "",
+                "seeds: " + str(cfg.seeds),
+                "measurement_ratios: " + str(cfg.measurement_ratios),
+                "residual_k: "
+                + str(cfg.residual_k)
+                + " | measurement_noise_std: "
+                + str(cfg.measurement_noise_std)
+                + " | output_noise_std: "
+                + str(cfg.output_noise_std)
+                + " | residual_amplitude: "
+                + str(cfg.residual_amplitude),
+                "",
+                "Figures: paper/figures/robustness_phase3/<axis>/v_<slug>/runs/<run_id>/",
+                "Symlink: outputs/robustness_phase3/<axis>/LATEST -> v_<slug>/runs/<run_id>",
+            ]
+        )
+        with open(os.path.join(cfg.save_dir, "PROTOCOL.txt"), "w", encoding="utf-8") as f:
+            f.write(protocol + "\n")
+
     with open(os.path.join(cfg.save_dir, "config.json"), "w", encoding="utf-8") as f:
         json.dump(asdict(cfg), f, indent=2)
 
@@ -2355,6 +2551,17 @@ def main() -> None:
             fig_run_hint = "paper/figures/lfista_integrated/runs/" + run_artifact_id + "/"
         elif cfg.config_profile in ("lfista_vs_classical", "lfista_vs_classical_explore"):
             fig_run_hint = "paper/figures/lfista_vs_classical/runs/" + run_artifact_id + "/"
+        elif cfg.config_profile in ("robustness_phase3", "robustness_phase3_explore"):
+            vdir = "v_" + robustness_value_slug(cfg.robustness_value_raw)
+            fig_run_hint = (
+                "paper/figures/robustness_phase3/"
+                + cfg.robustness_axis
+                + "/"
+                + vdir
+                + "/runs/"
+                + run_artifact_id
+                + "/"
+            )
         else:
             fig_run_hint = ""
         extra = [

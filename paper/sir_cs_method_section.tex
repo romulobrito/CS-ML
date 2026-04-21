@@ -128,27 +128,39 @@ during training and minimize the post-recovery prediction error
 \end{equation}
 possibly using unrolled proximal solvers or implicit differentiation when end-to-end differentiability is required.
 
-\subsection{Informal stability statement (recovery stage only)}
-\begin{proposition}[Informal]
-Assume that $A = M\Psi$ satisfies a restricted isometry property of sufficient order
-for $k$-sparse vectors and that $\alpha^\star$ is $k$-compressible.
-Let $\hat{\alpha}$ be a solution of the penalized recovery problem with effective noise level $\|\varepsilon\|_2$.
-Then standard stable recovery results imply a bound of the form
+\subsection{Stability of the recovery stage (consequence of RIP)}
+\begin{proposition}[Coefficient and reconstruction stability]
+\label{prop:method_recovery_stability}
+Let $z=A\alpha^\star+\varepsilon$ with $A=M\Psi$ and $\|\varepsilon\|_2\le \varepsilon_{\mathrm{res}}$.
+Let $\widehat{\alpha}$ be any minimizer of $\|\alpha\|_1$ subject to $\|A\alpha-z\|_2\le \varepsilon_{\mathrm{res}}$ (equivalently, a BPDN solution at noise radius $\varepsilon_{\mathrm{res}}$).
+Assume $A$ satisfies Assumption~\ref{ass:rip} from Section~\ref{subsec:theory_hybrid_sircs_perspective} (equivalently, \eqref{eq:rip_crt_condition}).
+Let $\alpha^\star_k$ be the best $k$-sparse approximation to $\alpha^\star$ obtained by retaining the $k$ largest magnitudes.
+Then there exist constants $C_0,C_1>0$ depending only on $(\delta_{3k},\delta_{4k})$ such that
 \begin{equation}
-  \|\hat{\alpha} - \alpha^\star\|_2
+  \|\widehat{\alpha}-\alpha^\star\|_2
   \le
-  C_1 \|\varepsilon\|_2
+  C_0\,\frac{\|\alpha^\star-\alpha^\star_k\|_1}{\sqrt{k}}
   +
-  C_2 \frac{\sigma_k(\alpha^\star)_1}{\sqrt{k}},
+  C_1\,\varepsilon_{\mathrm{res}}.
 \end{equation}
-where $\sigma_k(\alpha^\star)_1$ denotes the best $k$-term approximation error of $\alpha^\star$ in $\ell_1$.
-Consequently,
+If $\widehat{y}=f_\theta(u)+\Psi\widehat{\alpha}$ and $y=f^\star(u)+\Psi\alpha^\star+\xi$ with $f^\star$ the unknown background map, then
 \begin{equation}
-  \|\hat{y} - y\|_2
+  \|\widehat{y}-y\|_2
   \le
-  \|\Psi\|_{2 \to 2}\,\|\hat{\alpha} - \alpha^\star\|_2 + \|\xi\|_2.
+  \|f_\theta(u)-f^\star(u)\|_2 + \|\Psi\|_{2\to 2}\,\|\widehat{\alpha}-\alpha^\star\|_2 + \|\xi\|_2.
 \end{equation}
 \end{proposition}
+
+\begin{proof}
+The coefficient bound is Theorem~\ref{thm:stable_sparse_hybrid_residual} applied with $w=\varepsilon$ in \eqref{eq:effective_sparse_problem}; Appendix~\ref{sec:appendix_bpdn_rip_proof} gives the full proof under Assumption~\ref{ass:rip}.
+For the reconstruction bound, write
+\[
+  \widehat{y}-y
+  =
+  \bigl(f_\theta(u)-f^\star(u)\bigr) + \Psi(\widehat{\alpha}-\alpha^\star) - \xi,
+\]
+then apply the triangle inequality and the operator norm bound $\|\Psi v\|_2\le \|\Psi\|_{2\to 2}\|v\|_2$.
+\end{proof}
 
 \subsection{Algorithm}
 \begin{algorithm}
@@ -209,6 +221,8 @@ The background $f_\theta$ is a multi-layer perceptron in PyTorch (not identical 
 \textbf{(ii) Frozen LFISTA:} fix $f_\theta$, train only the unrolled proximal parameters to minimize $\|\hat{y}-y\|_2^2$.
 \textbf{(iii) Joint:} fine-tune $f_\theta$ and the LFISTA block together with a smaller learning rate.
 This mirrors task-aware objectives in Section~\ref{sec:sir_cs} but replaces the inner convex solver by a differentiable unrolled map.
+
+\input{theory_hybrid_sircs_perspective.tex}
 
 \subsection{Empirical comparison: LFISTA versus classical hybrid on synthetic data}
 \label{subsec:lfista_exp}

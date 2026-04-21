@@ -1,0 +1,47 @@
+% Phase 3A: one-factor synthetic robustness (profile robustness_phase3).
+% Figures: representative RMSE vs rho curves at baseline-like knob values.
+% Main table: robustness_tables_fragment_measurement_ratio.tex.
+% Appendix: robustness_tables_fragment_rho060.tex (regenerate via build_robustness_tables.py).
+
+\section{Robustness: synthetic one-factor ablations (Phase~3A)}
+\label{sec:exp_robustness}
+
+We stress the hybrid estimators along single axes of the synthetic generator while keeping all other Phase~0 settings fixed.
+Each row in the appendix tables aggregates ten seeds; the main text shows a compact \emph{curve} view at representative knob values and the full $\rho$ sweep for the measurement-ratio axis (where each run fixes one $\rho$).
+
+\paragraph{Protocol.}
+Runs are produced by \texttt{python sir\_cs\_pipeline\_optimized.py --profile robustness\_phase3} with \texttt{--robustness-axis} and \texttt{--robustness-value}; the sweep manifest is \texttt{outputs/robustness\_phase3/sweep\_manifest.csv}.
+
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/robustness_phase3/residual_k/v_6/runs/20260418_190205/01_rmse_vs_measurement_ratio.png}\\[-0.5em]
+    {\small (a) Varying $k$ at $k=6$ (baseline match).}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/robustness_phase3/measurement_noise_std/v_0p02/runs/20260419_082615/01_rmse_vs_measurement_ratio.png}\\[-0.5em]
+    {\small (b) Varying $\sigma_\eta$ at $\sigma_\eta=0.02$ (baseline).}
+  \end{minipage}\\[0.8em]
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/robustness_phase3/residual_amplitude/v_1p2/runs/20260419_210918/01_rmse_vs_measurement_ratio.png}\\[-0.5em]
+    {\small (c) Varying innovation amplitude at $1.2$ (baseline).}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/robustness_phase3/output_noise_std/v_0p01/runs/20260420_083135/01_rmse_vs_measurement_ratio.png}\\[-0.5em]
+    {\small (d) Varying output noise std at $0.01$ (baseline).}
+  \end{minipage}
+  \caption{Representative RMSE versus $\rho=m/N$ curves under one-factor robustness sweeps. Methods include classical and LFISTA hybrids plus baselines from the same protocol.}
+  \label{fig:robust_rmse_panel}
+\end{figure}
+
+Figure~\ref{fig:robust_rmse_panel} supports the same ordering seen in the dedicated LFISTA comparison: LFISTA hybrids track below \texttt{hybrid\_fista} across $\rho$ in these representative regimes.
+
+\input{robustness_tables_fragment_measurement_ratio.tex}
+
+\paragraph{Discussion.}
+The measurement-ratio sweep in Table~\ref{tab:robust_measurementratio} isolates very high sampling ratios; at $\rho=0.80$ the classical FISTA hybrid slightly improves over the joint LFISTA model, whereas LFISTA remains clearly better than \texttt{ml\_only}.
+Appendix~\ref{sec:appendix_robust_tables} reports analogous RMSE summaries at $\rho=0.60$ for $k$, measurement noise, innovation amplitude, and output noise.

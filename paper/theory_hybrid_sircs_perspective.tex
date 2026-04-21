@@ -1,0 +1,401 @@
+% Theoretical perspective for hybrid SIR-CS (included from sir_cs_method_section.tex)
+% Requires: amsmath, amsthm; proposition, theorem, assumption, corollary, remark.
+
+\subsection{Theoretical perspective}
+\label{subsec:theory_hybrid_sircs_perspective}
+
+We work with a synthesis dictionary $\Psi\in\mathbb{R}^{N\times N}$ that is orthonormal, i.e.\ $\Psi^\top\Psi=I$.
+This is the standard setting in much of the compressed sensing literature and covers common choices such as the identity basis, orthonormal DCT, or unitary DFT models under the usual normalizations.
+The specialization $\Psi=I$ is the familiar coordinate representation.
+Elsewhere in this draft the implementation exposition often writes $\Psi\in\mathbb{R}^{N\times D}$; here we take $D=N$ so that $\alpha^\star\in\mathbb{R}^N$.
+
+\subsubsection{Structured model and measurements}
+
+Let
+\begin{equation}
+  y = f^\star(u) + \Psi \alpha^\star + \xi,
+  \label{eq:model_y}
+\end{equation}
+where:
+\begin{itemize}
+  \item $y\in\mathbb{R}^N$ is the target signal;
+  \item $u$ denotes the contextual covariates;
+  \item $f^\star(u)$ is the unknown background (global) component;
+  \item $\Psi\in\mathbb{R}^{N\times N}$ is orthonormal;
+  \item $\alpha^\star\in\mathbb{R}^N$ is a sparse or compressible innovation coefficient vector;
+  \item $\xi\in\mathbb{R}^N$ is output noise or model mismatch.
+\end{itemize}
+Compressed observations are
+\begin{equation}
+  b = M y + \eta,
+  \label{eq:measurement_model}
+\end{equation}
+where $M\in\mathbb{R}^{m\times N}$ is the measurement operator and $\eta\in\mathbb{R}^m$ is measurement noise.
+
+The hybrid predictor estimates a background $f_\theta(u)$ and forms the measurement-space residual
+\begin{equation}
+  z := b - M f_\theta(u).
+  \label{eq:def_z}
+\end{equation}
+
+\subsubsection{Residual reduction identity}
+
+Define the background approximation error
+\begin{equation}
+  e_{\mathrm{bg}}(u) := f^\star(u) - f_\theta(u).
+  \label{eq:bg_error}
+\end{equation}
+
+\begin{proposition}[Residual reduction under an orthonormal dictionary]
+\label{prop:residual_reduction_identity}
+Under \eqref{eq:model_y}--\eqref{eq:def_z}, the measurement-space residual satisfies
+\begin{equation}
+  z = A\alpha^\star + w,
+  \qquad
+  A := M\Psi,
+  \qquad
+  w := M e_{\mathrm{bg}}(u) + M\xi + \eta.
+  \label{eq:effective_sparse_problem}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+By \eqref{eq:measurement_model} and \eqref{eq:model_y},
+\[
+  b = M\bigl(f^\star(u) + \Psi\alpha^\star + \xi\bigr) + \eta.
+\]
+Subtracting $M f_\theta(u)$ and using \eqref{eq:def_z},
+\begin{align*}
+  z
+  &= b - M f_\theta(u) \\
+  &= M\bigl(f^\star(u) + \Psi\alpha^\star + \xi\bigr) + \eta - M f_\theta(u) \\
+  &= M\Psi\alpha^\star + M\bigl(f^\star(u)-f_\theta(u)\bigr) + M\xi + \eta.
+\end{align*}
+Using \eqref{eq:bg_error} gives \eqref{eq:effective_sparse_problem}.
+\end{proof}
+
+\paragraph{Interpretation.}
+Equation~\eqref{eq:effective_sparse_problem} is the key algebraic reduction of the hybrid construction: the sparse stage no longer attempts to recover the whole signal $y$, but only the innovation coefficients $\alpha^\star$ through a noisy inverse problem with sensing matrix $A=M\Psi$.
+If $\|e_{\mathrm{bg}}(u)\|_2$ is small and $M$ does not amplify it too strongly, then $\|w\|_2$ is small (other terms fixed), which improves the conditioning of the residual problem relative to naive reconstruction of $y$.
+
+\subsubsection{Deterministic decomposition of the final reconstruction error}
+
+Let $\widehat{\alpha}$ be any estimate of $\alpha^\star$, and define
+\begin{equation}
+  \widehat{y} := f_\theta(u) + \Psi \widehat{\alpha}.
+  \label{eq:hybrid_reconstruction}
+\end{equation}
+
+\begin{proposition}[Deterministic decomposition of the final error]
+\label{prop:deterministic_decomp_hybrid}
+Under \eqref{eq:model_y} and \eqref{eq:hybrid_reconstruction},
+\begin{equation}
+  \widehat{y} - y
+  =
+  - e_{\mathrm{bg}}(u) + \Psi(\widehat{\alpha}-\alpha^\star) - \xi.
+  \label{eq:deterministic_error_identity}
+\end{equation}
+Consequently,
+\begin{equation}
+  \|\widehat{y}-y\|_2
+  \le
+  \|e_{\mathrm{bg}}(u)\|_2
+  +
+  \|\Psi(\widehat{\alpha}-\alpha^\star)\|_2
+  +
+  \|\xi\|_2.
+  \label{eq:deterministic_error_bound_general}
+\end{equation}
+Since $\Psi$ is orthonormal,
+\begin{equation}
+  \|\widehat{y}-y\|_2
+  \le
+  \|e_{\mathrm{bg}}(u)\|_2
+  +
+  \|\widehat{\alpha}-\alpha^\star\|_2
+  +
+  \|\xi\|_2.
+  \label{eq:deterministic_error_bound_orthonormal}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The identity \eqref{eq:deterministic_error_identity} follows by direct substitution of \eqref{eq:model_y} and \eqref{eq:hybrid_reconstruction}, together with $e_{\mathrm{bg}}(u)=f^\star(u)-f_\theta(u)$.
+Inequality \eqref{eq:deterministic_error_bound_general} is the triangle inequality, and \eqref{eq:deterministic_error_bound_orthonormal} uses $\|\Psi v\|_2=\|v\|_2$ for all $v$ when $\Psi$ is orthonormal.
+\end{proof}
+
+\paragraph{Remark on the two roles of the background error.}
+The background error appears in two distinct ways:
+\begin{itemize}
+  \item as $\|e_{\mathrm{bg}}(u)\|_2$ in the signal-domain reconstruction error;
+  \item through $\|M e_{\mathrm{bg}}(u)\|_2$ inside the effective perturbation of the residual inverse problem (embedded in $w$ in \eqref{eq:effective_sparse_problem}).
+\end{itemize}
+These are not redundant: the first measures mismatch in the target space, whereas the second measures how that mismatch is seen through the measurement operator.
+
+\subsubsection{Stable sparse recovery for the hybrid residual problem (classical estimator)}
+
+We analyze the sparse stage with a standard convex estimator.
+Consider constrained BPDN,
+\begin{equation}
+  \widehat{\alpha}
+  \in
+  \arg\min_{\alpha\in\mathbb{R}^N} \|\alpha\|_1
+  \quad
+  \text{subject to}
+  \quad
+  \|A\alpha-z\|_2 \le \varepsilon,
+  \label{eq:bpdn}
+\end{equation}
+with $A=M\Psi$.
+Assume the effective noise bound
+\begin{equation}
+  \|w\|_2 \le \varepsilon,
+  \label{eq:noise_bound}
+\end{equation}
+for $w$ from \eqref{eq:effective_sparse_problem}.
+
+\begin{assumption}[Restricted isometry]
+\label{ass:rip}
+The matrix $A=M\Psi$ satisfies the restricted isometry property up to order $4k$ with constants $(\delta_s)_{s\le 4k}$ such that
+\begin{equation}
+  \delta_{3k} + 3\delta_{4k} < 2,
+  \label{eq:rip_crt_condition}
+\end{equation}
+as in Cand\`es, Romberg, and Tao (2005, Theorem~2).
+In particular, \eqref{eq:rip_crt_condition} holds whenever $\delta_{4k}\le 1/5$.
+\end{assumption}
+
+\paragraph{Comment on plausibility.}
+In the synthetic protocol of this draft, $M$ is Gaussian and the baseline innovation basis is orthonormal (identity or DCT).
+In such regimes, \eqref{eq:rip_crt_condition} is a standard sufficient hypothesis with high probability for $m$ large enough relative to $k$ and $N$; we do not verify RIP numerically for each realization.
+
+Under Assumption~\ref{ass:rip}, one obtains the following stability guarantee for the \emph{classical} hybrid residual stage \eqref{eq:bpdn}.
+
+\begin{theorem}[Stable sparse recovery for the hybrid residual problem]
+\label{thm:stable_sparse_hybrid_residual}
+Let $\alpha^\star\in\mathbb{R}^N$ be arbitrary and let $\alpha^\star_k$ denote its best $k$-sparse approximation obtained by retaining the $k$ largest magnitudes.
+Suppose Assumption~\ref{ass:rip} holds and let $\widehat{\alpha}$ solve \eqref{eq:bpdn} with $\varepsilon$ satisfying \eqref{eq:noise_bound}.
+Then there exist constants $C_0,C_1>0$, depending only on $(\delta_{3k},\delta_{4k})$, such that
+\begin{equation}
+  \|\widehat{\alpha}-\alpha^\star\|_2
+  \le
+  C_0 \frac{\|\alpha^\star-\alpha^\star_k\|_1}{\sqrt{k}}
+  +
+  C_1 \varepsilon.
+  \label{eq:alpha_recovery_bound}
+\end{equation}
+Using \eqref{eq:effective_sparse_problem}, one may take
+\begin{equation}
+  \varepsilon
+  =
+  \|M e_{\mathrm{bg}}(u) + M\xi + \eta\|_2.
+  \label{eq:effective_noise_eps}
+\end{equation}
+Therefore,
+\begin{equation}
+  \|\widehat{\alpha}-\alpha^\star\|_2
+  \le
+  C_0 \frac{\|\alpha^\star-\alpha^\star_k\|_1}{\sqrt{k}}
+  +
+  C_1 \|M e_{\mathrm{bg}}(u) + M\xi + \eta\|_2.
+  \label{eq:alpha_recovery_bound_expanded}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By Proposition~\ref{prop:residual_reduction_identity},
+\[
+  z=A\alpha^\star+w,
+  \qquad
+  A=M\Psi,
+  \qquad
+  w=M e_{\mathrm{bg}}(u)+M\xi+\eta.
+\]
+Under \eqref{eq:noise_bound}, the vector $\alpha^\star$ is feasible for \eqref{eq:bpdn} because $\|A\alpha^\star-z\|_2=\|w\|_2\le \varepsilon$.
+The remainder of the argument is the standard compressible-signal stability analysis for BPDN under RIP: under \eqref{eq:rip_crt_condition}, classical compressed sensing theory yields constants $C_0,C_1>0$ depending only on $(\delta_{3k},\delta_{4k})$ such that \eqref{eq:alpha_recovery_bound} holds for every minimizer $\widehat{\alpha}$ of \eqref{eq:bpdn}.
+Appendix~\ref{sec:appendix_bpdn_rip_proof} records a self-contained proof specialized to the hybrid residual model (Cand\`es--Romberg--Tao, Section~2.2).
+Identifying $\varepsilon$ with $\|w\|_2$ yields \eqref{eq:effective_noise_eps}--\eqref{eq:alpha_recovery_bound_expanded}.
+\end{proof}
+
+\subsubsection{Final reconstruction bound for the hybrid estimator}
+
+\begin{corollary}[Hybrid reconstruction bound under an orthonormal dictionary]
+\label{cor:hybrid_reconstruction_bound}
+Under the assumptions of Theorem~\ref{thm:stable_sparse_hybrid_residual}, the hybrid reconstruction $\widehat{y}=f_\theta(u)+\Psi\widehat{\alpha}$ satisfies
+\begin{equation}
+  \|\widehat{y}-y\|_2
+  \le
+  \|e_{\mathrm{bg}}(u)\|_2
+  +
+  C_0 \frac{\|\alpha^\star-\alpha^\star_k\|_1}{\sqrt{k}}
+  +
+  C_1 \|M e_{\mathrm{bg}}(u) + M\xi + \eta\|_2
+  +
+  \|\xi\|_2.
+  \label{eq:final_hybrid_bound}
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+By \eqref{eq:deterministic_error_bound_orthonormal},
+\[
+  \|\widehat{y}-y\|_2
+  \le
+  \|e_{\mathrm{bg}}(u)\|_2 + \|\widehat{\alpha}-\alpha^\star\|_2 + \|\xi\|_2.
+\]
+Apply \eqref{eq:alpha_recovery_bound_expanded} to $\|\widehat{\alpha}-\alpha^\star\|_2$ to obtain \eqref{eq:final_hybrid_bound}.
+\end{proof}
+
+\paragraph{Interpretation.}
+The bound \eqref{eq:final_hybrid_bound} shows that the total error is controlled by four contributions:
+\begin{enumerate}
+  \item the background prediction error $\|e_{\mathrm{bg}}(u)\|_2$;
+  \item the compressibility defect $\|\alpha^\star-\alpha^\star_k\|_1/\sqrt{k}$;
+  \item the effective perturbation in the residual inverse problem, $\|M e_{\mathrm{bg}}(u)+M\xi+\eta\|_2$;
+  \item the direct output mismatch $\|\xi\|_2$.
+\end{enumerate}
+Thus the hybrid strategy is theoretically favorable when the contextual predictor explains a substantial fraction of the signal energy and the remaining innovation is sparse or compressible in the chosen orthonormal basis.
+
+\subsubsection{Particular case: identity basis}
+
+\begin{corollary}[Identity basis as a particular case]
+\label{cor:identity_case}
+Assume $\Psi=I$.
+Then \eqref{eq:model_y} becomes
+\begin{equation}
+  y = f^\star(u) + \alpha^\star + \xi,
+  \label{eq:model_identity_case}
+\end{equation}
+the effective sensing matrix is $A=M$, and \eqref{eq:effective_sparse_problem} reads
+\begin{equation}
+  z = M\alpha^\star + M e_{\mathrm{bg}}(u) + M\xi + \eta.
+  \label{eq:residual_identity_case}
+\end{equation}
+Moreover, the specialization of \eqref{eq:final_hybrid_bound} reads explicitly as
+\begin{equation}
+  \|\widehat{y}-y\|_2
+  \le
+  \|e_{\mathrm{bg}}(u)\|_2
+  +
+  C_0 \frac{\|\alpha^\star-\alpha^\star_k\|_1}{\sqrt{k}}
+  +
+  C_1 \|M e_{\mathrm{bg}}(u)+M\xi+\eta\|_2
+  +
+  \|\xi\|_2.
+  \label{eq:final_bound_identity_case}
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Set $\Psi=I$ in \eqref{eq:model_y}, \eqref{eq:effective_sparse_problem}, and \eqref{eq:final_hybrid_bound}.
+Since $I$ is orthonormal, all intermediate results apply directly.
+\end{proof}
+
+\paragraph{Examples covered by the orthonormal case.}
+The orthonormal template directly covers $\Psi=I$ (canonical coefficients), orthonormal DCT bases, and unitary DFT synthesis models under standard normalizations.
+Therefore the same theoretical picture applies whenever the innovation is sparse or compressible in one of these orthonormal transform domains.
+
+\subsubsection{A comparison with pure compressed sensing}
+
+If one ignores the contextual term and treats $y$ itself as sparse in some basis, the coefficient vector must simultaneously explain background and innovation.
+The hybrid formulation isolates the innovation in \eqref{eq:effective_sparse_problem}, which is better matched to structured signals whenever the background is not sparse in the same basis.
+
+\subsubsection{Structural statements for the joint LFISTA model}
+
+The joint LFISTA predictor takes the form
+\begin{equation}
+  \widehat{y}_{\mathrm{joint}}(u,b)
+  =
+  f_\theta(u)
+  +
+  \Psi\,\Phi_\phi(M\Psi,\; b-Mf_\theta(u)),
+  \label{eq:joint_lfista_model}
+\end{equation}
+where $\Phi_\phi$ is a $K$-layer unrolled proximal map.
+
+For $x\in\mathbb{R}^N$ and $\tau\ge 0$, let $\mathcal{S}_\tau:\mathbb{R}^N\to\mathbb{R}^N$ denote coordinatewise soft-thresholding,
+$(\mathcal{S}_\tau(x))_i=\operatorname{sign}(x_i)\max(|x_i|-\tau,0)$.
+A typical layer is
+\begin{equation}
+  \alpha^{t+1}
+  =
+  \mathcal{S}_{\tau_t}
+  \Bigl(
+  v^t - \eta_t A^\top(A v^t - z)
+  \Bigr),
+  \qquad
+  A=M\Psi,
+  \label{eq:lfista_layer}
+\end{equation}
+possibly with FISTA-style momentum in $v^t$.
+
+For this learned model, the strongest fully rigorous statements are \emph{structural}, not uniform performance guarantees relative to a tuned convex solver.
+
+\begin{remark}[Joint versus frozen training]
+\label{rem:joint_vs_frozen}
+\label{prop:joint_frozen_opt}
+Let $\mathcal{L}(\theta,\phi)$ denote the training objective of the joint LFISTA model, where $\theta$ indexes the background network and $\phi$ indexes the unrolled sparse block.
+Let $\Theta$ and $\Phi$ be the admissible parameter sets.
+The frozen problem minimizes $\mathcal{L}$ over $\{\theta_0\}\times\Phi$, whereas the joint problem minimizes over $\Theta\times\Phi$.
+Since $\{\theta_0\}\times\Phi\subseteq\Theta\times\Phi$, taking infima yields
+\begin{equation}
+  \inf_{\theta,\phi} \mathcal{L}(\theta,\phi)
+  \le
+  \inf_{\phi} \mathcal{L}(\theta_0,\phi).
+  \label{eq:joint_vs_frozen_inf}
+\end{equation}
+This is a statement about \emph{feasible model class} only; it does not assert that gradient-based training reaches a better minimum in practice.
+\end{remark}
+
+\subsubsection{Finite-depth LFISTA: a triangle decomposition}
+
+Let $\alpha^\infty(z)$ denote an ideal iterative limit associated with the residual inverse problem, and let $\alpha_\phi^K(z)$ denote the output of a $K$-layer unrolled map.
+By the triangle inequality,
+\begin{equation}
+  \|\alpha_\phi^K(z)-\alpha^\star\|_2
+  \le
+  \|\alpha_\phi^K(z)-\alpha^\infty(z)\|_2
+  +
+  \|\alpha^\infty(z)-\alpha^\star\|_2,
+  \label{eq:truncation_decomposition}
+\end{equation}
+which separates a finite-depth approximation term from the inverse-problem error of the ideal limit.
+
+\paragraph{Consequence for the LFISTA reconstruction.}
+Let $\widehat{y}_{\mathrm{LF}}:=f_\theta(u)+\Psi\alpha_\phi^K(z)$ with $z$ from \eqref{eq:def_z}.
+If $\Psi$ is orthonormal, combining \eqref{eq:deterministic_error_bound_orthonormal} with \eqref{eq:truncation_decomposition} gives
+\begin{equation}
+  \|\widehat{y}_{\mathrm{LF}}-y\|_2
+  \le
+  \|e_{\mathrm{bg}}(u)\|_2
+  +
+  \|\alpha_\phi^K(z)-\alpha^\infty(z)\|_2
+  +
+  \|\alpha^\infty(z)-\alpha^\star\|_2
+  +
+  \|\xi\|_2.
+  \label{eq:lfista_total_bound_det}
+\end{equation}
+This is a purely deterministic bookkeeping inequality; it is not a statistical performance guarantee for the learned map $\Phi_\phi$.
+
+\paragraph{Scope.}
+Inequality \eqref{eq:lfista_total_bound_det} separates (i) background error, (ii) finite-depth truncation, (iii) error of the ideal limit, and (iv) output noise.
+It does \emph{not} imply global optimality of training, uniform superiority over convex solvers, preservation of exact RIP-type guarantees after learning, or optimal generalization.
+
+\subsubsection{Summary of the theoretical picture}
+
+The strongest rigorous guarantees in this subsection apply to the \textbf{classical hybrid} residual formulation with a standard sparse estimator under Assumption~\ref{ass:rip}:
+Proposition~\ref{prop:residual_reduction_identity}, Proposition~\ref{prop:deterministic_decomp_hybrid}, and Theorem~\ref{thm:stable_sparse_hybrid_residual} together control the reconstruction error in terms of background mismatch in \emph{both} the signal domain and the measurement domain (via $w$), compressibility of $\alpha^\star$, and noise.
+
+For \textbf{joint LFISTA}, the rigorous statements are structural and deterministic: Remark~\ref{rem:joint_vs_frozen}, the triangle decomposition \eqref{eq:truncation_decomposition}, and the bookkeeping inequality \eqref{eq:lfista_total_bound_det}.
+They justify residual reduction, the larger feasible class of joint training relative to frozen training, and a decomposition of the learned error into truncation and inverse-problem terms.
+
+\paragraph{What cannot be claimed without further assumptions.}
+One generally cannot assert that the learned joint LFISTA model:
+\begin{itemize}
+  \item reaches a global optimum during training;
+  \item uniformly outperforms classical convex sparse solvers;
+  \item preserves exact sparse recovery guarantees after learning;
+  \item generalizes optimally outside the training distribution.
+\end{itemize}
+Empirical gains therefore require hypotheses beyond this deterministic skeleton.
