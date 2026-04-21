@@ -1,0 +1,102 @@
+% External Step~1: sklearn Lasso (S1/S2) and OMP (oracle k) vs pipeline hybrid FISTA.
+% Frozen run: outputs/external_benchmark_stage1/runs/20260421_132940/
+% Script: sir_cs_benchmark_stage1.py
+% Figures copied under paper/figures/external_benchmark_stage1/runs/20260421_132940/
+% All ASCII.
+
+\section{Experiments: external \texttt{sklearn} baselines (Step~1b)}
+\label{sec:exp_external_sklearn}
+
+This section adds \emph{library} sparse baselines on the \textbf{same} synthetic split and measurement draw per $(\mathrm{seed},\rho)$ as the hybrid pipeline: multilayer-perceptron background, validation-based selection of regularization, and test metrics aggregated over ten seeds.
+The goal is to document whether off-the-shelf coordinate-descent Lasso and orthogonal matching pursuit (OMP) match the in-house FISTA block when posed on identical $(A,b)$ linear systems.
+
+\subsection{Protocol and methods}
+\label{sec:external_protocol}
+
+We run \texttt{sir\_cs\_benchmark\_stage1.py} with profile \texttt{external\_benchmark\_stage1}: seeds $\{7,13,\ldots,53\}$, $\rho\in\{0.20,0.30,0.40,0.50,0.60\}$, $N=128$, Gaussian $M$, identity $\Psi$, and the Phase~0 noise levels.
+For each $(\mathrm{seed},\rho)$ job, all methods share the same training/validation/test tensors, the same $M$ and $A=M\Psi$, and the same validation draws used to pick Lasso $\alpha$ (mapped from the FISTA grid as $\alpha=\lambda/m$) and FISTA $\lambda$.
+
+\paragraph{Methods.}
+\texttt{ml\_only}: sklearn MLP on inputs (no CS at prediction).
+\texttt{hybrid\_fista}: pipeline FISTA on the residual measurement $z=b-My_{\mathrm{ML}}$.
+\texttt{ext\_sklearn\_lasso\_S1\_hybrid}: \texttt{sklearn.linear\_model.Lasso} on $z$, reconstruction $y=y_{\mathrm{ML}}+\Psi\hat\alpha$.
+\texttt{ext\_sklearn\_lasso\_S2\_cs\_only}: Lasso on $b$ with $y=\Psi\hat\alpha$ (no ML background in the CS step).
+\texttt{ext\_sklearn\_omp\_S3\_hybrid\_oracle\_k}: OMP on $z$ with \texttt{n\_nonzero\_coefs}${}=k$ (oracle sparsity level matching \texttt{residual\_k}).
+
+\subsection{RMSE summary}
+\label{sec:external_table}
+
+Table~\ref{tab:external_rmse} reports test RMSE (mean $\pm$ std across seeds).
+The best row among hybrid-style methods at each $\rho$ is in bold (excluding \texttt{ml\_only} and pure CS-only Lasso).
+
+\begin{table}[t]
+  \centering
+  \caption{Test RMSE (mean $\pm$ std across ten seeds) versus $\rho=m/N$ for external Step~1b.
+  Frozen run \texttt{20260421\_132940}. Lowest RMSE among hybrid sparse methods at each $\rho$ in bold.}
+  \label{tab:external_rmse}
+  \small
+  \begin{tabular}{@{}lccccc@{}}
+    \toprule
+    $\rho$ & \texttt{ml\_only} & \texttt{hybrid\_fista} & \texttt{Lasso\_S1} & \texttt{Lasso\_S2} & \texttt{OMP\_S3} \\
+    \midrule
+    $0.20$ & $0.369 \pm 0.011$ & $\mathbf{0.336 \pm 0.011}$ & $0.367 \pm 0.013$ & $0.691 \pm 0.015$ & $0.454 \pm 0.016$ \\
+    $0.30$ & $0.369 \pm 0.011$ & $\mathbf{0.319 \pm 0.011}$ & $0.346 \pm 0.013$ & $0.658 \pm 0.015$ & $0.423 \pm 0.014$ \\
+    $0.40$ & $0.369 \pm 0.011$ & $\mathbf{0.296 \pm 0.011}$ & $0.318 \pm 0.013$ & $0.614 \pm 0.014$ & $0.397 \pm 0.013$ \\
+    $0.50$ & $0.369 \pm 0.011$ & $\mathbf{0.272 \pm 0.011}$ & $0.290 \pm 0.012$ & $0.564 \pm 0.014$ & $0.381 \pm 0.015$ \\
+    $0.60$ & $0.369 \pm 0.011$ & $\mathbf{0.245 \pm 0.010}$ & $0.258 \pm 0.011$ & $0.505 \pm 0.015$ & $0.368 \pm 0.014$ \\
+    \bottomrule
+  \end{tabular}
+  \\[0.4em]
+  {\footnotesize \texttt{Lasso\_S1}${}=${}\texttt{ext\_sklearn\_lasso\_S1\_hybrid};
+  \texttt{Lasso\_S2}${}=${}\texttt{ext\_sklearn\_lasso\_S2\_cs\_only};
+  \texttt{OMP\_S3}${}=${}\texttt{ext\_sklearn\_omp\_S3\_hybrid\_oracle\_k}.}
+\end{table}
+
+\paragraph{Reading Table~\ref{tab:external_rmse}.}
+\texttt{ml\_only} is flat in $\rho$ because test predictions do not use compressed measurements.
+\texttt{hybrid\_fista} improves monotonically with $\rho$ and dominates all other rows.
+Sklearn Lasso on the hybrid residual (\texttt{Lasso\_S1}) is marginally better than \texttt{ml\_only} at low $\rho$ and approaches \texttt{hybrid\_fista} only at $\rho=0.60$, but remains worse at every ratio.
+CS-only Lasso (\texttt{Lasso\_S2}) is strongly degraded (RMSE ${\approx}0.5$--$0.7$), consistent with ignoring the learned background.
+OMP with oracle $k$ (\texttt{OMP\_S3}) achieves RMSE comparable to \texttt{ml\_only} at high $\rho$ but does not match FISTA; its support-F1 curve (Figure~\ref{fig:external_support_gain}) rises with $\rho$, indicating better support overlap without translating into best end-to-end signal error under this generator.
+
+\subsection{Figures}
+\label{sec:external_figures}
+
+PNG assets for this run are stored under \texttt{paper/figures/external\_benchmark\_stage1/runs/20260421\_132940/} with the same dashboard numbering as Phase~0 (curves, grouped bars, gains).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.32\linewidth]{figures/external_benchmark_stage1/runs/20260421_132940/01_rmse_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{figures/external_benchmark_stage1/runs/20260421_132940/02_mae_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{figures/external_benchmark_stage1/runs/20260421_132940/03_relative_l2_vs_measurement_ratio.png}
+  \caption{External baselines: RMSE, MAE, and relative $\ell_2$ versus $\rho$. Error bars: std across seeds. \texttt{ml\_only} is flat in $\rho$; \texttt{Lasso\_S2} tracks near relative error one at low $\rho$.}
+  \label{fig:external_rmse_mae_rel}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/external_benchmark_stage1/runs/20260421_132940/04_support_f1_vs_measurement_ratio.png}
+  \includegraphics[width=0.48\linewidth]{figures/external_benchmark_stage1/runs/20260421_132940/05_rmse_grouped_bars_by_ratio.png}
+  \caption{Support F1 (left) and grouped RMSE bars (right). OMP benefits from the oracle sparsity budget in F1; FISTA still leads in RMSE.}
+  \label{fig:external_support_gain}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/external_benchmark_stage1/runs/20260421_132940/06_gain_rmse_over_ml_only.png}
+  \includegraphics[width=0.48\linewidth]{figures/external_benchmark_stage1/runs/20260421_132940/07_gain_mae_over_ml_only.png}
+  \caption{Gain over \texttt{ml\_only} (positive is better): RMSE (left) and MAE (right).}
+  \label{fig:external_gains}
+\end{figure}
+
+\subsection{Discussion and conclusions}
+\label{sec:external_discussion}
+
+\paragraph{Fair comparison.}
+All rows in Table~\ref{tab:external_rmse} refer to the same Monte Carlo protocol per $(\mathrm{seed},\rho)$; differences are due to the sparse recovery operator and its hyperparameter search, not to dataset splits.
+
+\paragraph{Takeaway.}
+Under this frozen synthetic benchmark, \textbf{the in-house FISTA hybrid remains strictly better than sklearn Lasso posed on the same $(A,b)$ systems}, despite comparable validation logic.
+CS-only Lasso confirms that removing the ML background from the measurement model is inadequate for this task.
+OMP with oracle $k$ is a useful \emph{diagnostic} for support overlap but is not a drop-in substitute for the tuned $\ell_1$ hybrid in terms of RMSE.
+These results support reporting FISTA as the primary classical sparse block in the paper while citing sklearn baselines as reproducible external controls.

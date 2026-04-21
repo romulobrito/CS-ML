@@ -18,7 +18,7 @@
 % Prefer repo-local figures; fallback supports legacy output path.
 % Step~1 solver figures use explicit paths in experiments_solver_etapa1.tex (same basenames as Phase~0).
 % Phase~0 synthetic; LFISTA vs classical hybrid (profile lfista_vs_classical, figures copied under figures/lfista_vs_classical/)
-\graphicspath{{figures/phase0_baseline/}{figures/lfista_vs_classical/}{figures/robustness_phase3/}{../outputs/paper/figures/phase0_baseline/}}
+\graphicspath{{figures/phase0_baseline/}{figures/lfista_vs_classical/}{figures/robustness_phase3/}{figures/external_benchmark_stage1/}{../outputs/paper/figures/phase0_baseline/}}
 
 \title{Sparse Innovation Regression with Compressed Sensing (SIR-CS)\\Draft: Method and Synthetic Experiments}
 \author{}
@@ -30,13 +30,14 @@
 \begin{abstract}
 We summarize a hybrid estimator that predicts a global component with machine learning and recovers a sparse innovation by compressed sensing under linear measurements.
 We then document a reproducible \emph{Phase~0} synthetic baseline: ten independent seeds, measurement ratios up to $\rho=0.6$, a refined $\ell_1$ penalty grid for validation-based model selection, and standard diagnostics (curves versus $\rho$, gains over ml-only, parity plots, residual histograms, and example traces).
-A subsequent \emph{Step~1} section compares FISTA versus SPGL1 on the same protocol.
+A subsequent \emph{Step~1} section compares FISTA versus SPGL1 on the same protocol; a \emph{Step~1b} section adds \texttt{sklearn} Lasso and OMP baselines on identical $(\mathrm{seed},\rho)$ draws with tables and figures from a frozen run.
 Real-data evaluation is outlined as future work.
 \end{abstract}
 
 \input{sir_cs_method_section.tex}
 \input{experiments_synthetic.tex}
 \input{experiments_solver_etapa1.tex}
+\input{experiments_external_benchmark_stage1.tex}
 \input{experiments_robustness_phase3.tex}
 
 \appendix

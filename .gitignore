@@ -27,6 +27,9 @@ nohup.out
 # Duplicate figure tree if pipeline wrote under outputs/
 outputs/paper/
 
+# External benchmark Stage 1 runs (large CSVs/PNGs; regenerate with sir_cs_benchmark_stage1.py)
+outputs/external_benchmark_stage1/runs/
+
 # Robustness Phase 3 sweep outputs (large; regenerate with run_robustness_phase3_sweep.py)
 outputs/robustness_phase3/
 
