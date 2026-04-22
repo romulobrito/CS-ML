@@ -59,6 +59,26 @@ Sklearn Lasso on the hybrid residual (\texttt{Lasso\_S1}) is marginally better t
 CS-only Lasso (\texttt{Lasso\_S2}) is strongly degraded (RMSE ${\approx}0.5$--$0.7$), consistent with ignoring the learned background.
 OMP with oracle $k$ (\texttt{OMP\_S3}) achieves RMSE comparable to \texttt{ml\_only} at high $\rho$ but does not match FISTA; its support-F1 curve (Figure~\ref{fig:external_support_gain}) rises with $\rho$, indicating better support overlap without translating into best end-to-end signal error under this generator.
 
+\subsection{Hybrid \texttt{FISTA} versus external sparse baselines}
+\label{sec:external_vs_hybrid}
+
+This subsection states the \emph{head-to-head} comparison between the pipeline hybrid (\texttt{hybrid\_fista}) and the external methods in Table~\ref{tab:external_rmse}.
+
+\paragraph{Same linear problem as Lasso~S1.}
+Both \texttt{hybrid\_fista} and \texttt{Lasso\_S1} solve a penalized $\ell_1$ problem on the \textbf{same} residual measurement $z=b-My_{\mathrm{ML}}$ with the same $A=M\Psi$, the same validation fold, and grid-based selection of the penalty (Section~\ref{sec:external_protocol}).
+Numerically, \texttt{hybrid\_fista} is strictly better at every $\rho$: for example, at $\rho=0.20$ the gap is $0.367-0.336\approx 0.031$ RMSE ($\approx 8.5\%$ relative to \texttt{hybrid\_fista}); at $\rho=0.60$ the gap is $0.258-0.245\approx 0.013$ ($\approx 5.0\%$ relative).
+Thus \textbf{the difference is not the data protocol} but the optimizer and objective normalization: \texttt{sklearn} coordinate-descent Lasso uses the library default scaling $(1/(2m))\|A\alpha-z\|_2^2+\alpha_{\mathrm{sk}}\|\alpha\|_1$ with $\alpha_{\mathrm{sk}}\approx\lambda/m$, whereas FISTA minimizes $0.5\|A\alpha-z\|_2^2+\lambda\|\alpha\|_1$ with the pipeline's warm-started grid search.
+Under this benchmark, the in-house FISTA implementation delivers lower test RMSE than the mapped \texttt{sklearn} Lasso.
+
+\paragraph{Relation to Step~1 (FISTA vs SPGL1).}
+The \texttt{hybrid\_fista} column in Table~\ref{tab:external_rmse} matches Table~\ref{tab:solver_rmse} entry-wise (same seeds, $\rho$ grid, and frozen synthetic generator), because both tables report the same hybrid-FISTA estimator.
+Section~\ref{sec:exp_solver_etapa1} isolates \emph{alternative classical solvers inside the pipeline} (SPGL1); Section~\ref{sec:exp_external_sklearn} isolates \emph{library optimizers on identical $(A,b)$}.
+Together, they support the narrative that the hybrid gain is realized by FISTA-class $\ell_1$ recovery, not by every third-party LASSO instantiation.
+
+\paragraph{Lasso~S2 and OMP~S3 relative to the hybrid.}
+\texttt{Lasso\_S2} is not a fair competitor to \texttt{hybrid\_fista}: it omits $y_{\mathrm{ML}}$ in the CS step, so large RMSE is expected; it mainly documents failure mode of ``pure CS on $b$'' under this generative model.
+\texttt{OMP\_S3} uses the same $z$ as the hybrid but a greedy solver with fixed support size $k$; it can improve support-F1 (Figure~\ref{fig:external_support_gain}) yet remains behind \texttt{hybrid\_fista} in RMSE, which measures full signal error rather than support overlap alone.
+
 \subsection{Figures}
 \label{sec:external_figures}
 
@@ -95,8 +115,14 @@ PNG assets for this run are stored under \texttt{paper/figures/external\_benchma
 \paragraph{Fair comparison.}
 All rows in Table~\ref{tab:external_rmse} refer to the same Monte Carlo protocol per $(\mathrm{seed},\rho)$; differences are due to the sparse recovery operator and its hyperparameter search, not to dataset splits.
 
+\paragraph{Synthesis: hybrid versus benchmarks.}
+The comparison in Section~\ref{sec:external_vs_hybrid} is the main quantitative answer to ``how does our hybrid FISTA compare to standard \texttt{sklearn} sparse baselines?''
+\textbf{(i)} Against Lasso on the hybrid residual (S1), FISTA wins at every $\rho$ with gaps on the order of $5$--$9\%$ relative RMSE, after aligning penalty scales via the validation grids.
+\textbf{(ii)} Against CS-only Lasso (S2), the hybrid is vastly better, confirming that the ML background is essential in the measurement model.
+\textbf{(iii)} Against oracle-$k$ OMP on the residual (S3), FISTA still achieves lower RMSE despite OMP's stronger support-F1 at large $\rho$, showing that end-to-end reconstruction favors the tuned convex $\ell_1$ path here.
+
 \paragraph{Takeaway.}
-Under this frozen synthetic benchmark, \textbf{the in-house FISTA hybrid remains strictly better than sklearn Lasso posed on the same $(A,b)$ systems}, despite comparable validation logic.
+Under this frozen synthetic benchmark, \textbf{the in-house FISTA hybrid remains strictly better than sklearn Lasso posed on the same $(A,b)$ systems}, despite comparable validation logic (Section~\ref{sec:external_vs_hybrid}).
 CS-only Lasso confirms that removing the ML background from the measurement model is inadequate for this task.
 OMP with oracle $k$ is a useful \emph{diagnostic} for support overlap but is not a drop-in substitute for the tuned $\ell_1$ hybrid in terms of RMSE.
-These results support reporting FISTA as the primary classical sparse block in the paper while citing sklearn baselines as reproducible external controls.
+Together with Section~\ref{sec:exp_solver_etapa1}, these results support reporting FISTA as the primary classical sparse block in the paper while citing \texttt{sklearn} baselines as reproducible external controls on identical splits.

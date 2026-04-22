@@ -326,7 +326,7 @@ def plot_gain_over_ml(summary: pd.DataFrame, metric: str, save_path: str) -> Non
     ml = summary[summary["method"] == "ml_only_torch"][["measurement_ratio", col_mean]].rename(
         columns={col_mean: "ml_val"}
     )
-    colors = {"hybrid_lfista_frozen": "#ff7f0e", "hybrid_lfista_joint": "#2ca02c"}
+    colors = {"hybrid_lfista_frozen": "#ff7f0e", "hybrid_lfista_joint": "#e6550d"}
     plt.figure(figsize=(8.5, 5))
     for method in ["hybrid_lfista_frozen", "hybrid_lfista_joint"]:
         sdf = summary[summary["method"] == method].merge(ml, on="measurement_ratio", how="inner")
@@ -355,7 +355,7 @@ def plot_metric(summary: pd.DataFrame, metric: str, save_path: str) -> None:
     colors = {
         "ml_only_torch": "#1f77b4",
         "hybrid_lfista_frozen": "#ff7f0e",
-        "hybrid_lfista_joint": "#2ca02c",
+        "hybrid_lfista_joint": "#e6550d",
     }
     plt.figure(figsize=(8.5, 5))
     for method in ["ml_only_torch", "hybrid_lfista_frozen", "hybrid_lfista_joint"]:

@@ -30,6 +30,9 @@ outputs/paper/
 # External benchmark Stage 1 runs (large CSVs/PNGs; regenerate with sir_cs_benchmark_stage1.py)
 outputs/external_benchmark_stage1/runs/
 
+# Direct [u,b] benchmark runs (sir_cs_benchmark_direct_ub.py)
+outputs/direct_ub_benchmark/runs/
+
 # Robustness Phase 3 sweep outputs (large; regenerate with run_robustness_phase3_sweep.py)
 outputs/robustness_phase3/
 

@@ -163,6 +163,10 @@ class Config:
         "robustness_phase3_explore",
         "external_benchmark_stage1",
         "external_benchmark_stage1_explore",
+        "direct_ub_benchmark",
+        "direct_ub_benchmark_explore",
+        "direct_ub_lfista_joint_only",
+        "direct_ub_lfista_joint_only_explore",
     ] = "paper"
     # Filled when profile is robustness_phase3* (CLI --robustness-axis / --robustness-value).
     robustness_axis: str = ""
@@ -349,6 +353,50 @@ def apply_config_profile(cfg: Config) -> None:
         cfg.l1_lambda_grid = [1e-3, 1e-2, 1e-1]
         cfg.lambda_selection_max_samples = 80
         cfg.power_iteration_n_iter = 80
+        cfg.plots_subdir = "figures"
+        return
+    if cfg.config_profile == "direct_ub_benchmark":
+        cfg.seeds = [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.plots_subdir = "figures"
+        return
+    if cfg.config_profile == "direct_ub_benchmark_explore":
+        cfg.seeds = [7]
+        cfg.measurement_ratios = [0.3, 0.5]
+        cfg.n_train = 600
+        cfg.n_val = 80
+        cfg.n_test = 100
+        cfg.fista_max_iter = 150
+        cfg.l1_lambda_grid = [1e-3, 1e-2, 1e-1]
+        cfg.lambda_selection_max_samples = 80
+        cfg.power_iteration_n_iter = 80
+        cfg.lfista_num_epochs_bg = 25
+        cfg.lfista_num_epochs_frozen = 20
+        cfg.lfista_num_epochs_joint = 25
+        cfg.lfista_steps = 5
+        cfg.plots_subdir = "figures"
+        return
+    if cfg.config_profile == "direct_ub_lfista_joint_only":
+        cfg.seeds = [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.plots_subdir = "figures"
+        return
+    if cfg.config_profile == "direct_ub_lfista_joint_only_explore":
+        cfg.seeds = [7]
+        cfg.measurement_ratios = [0.3, 0.5]
+        cfg.n_train = 600
+        cfg.n_val = 80
+        cfg.n_test = 100
+        cfg.fista_max_iter = 150
+        cfg.l1_lambda_grid = [1e-3, 1e-2, 1e-1]
+        cfg.lambda_selection_max_samples = 80
+        cfg.power_iteration_n_iter = 80
+        cfg.lfista_num_epochs_bg = 25
+        cfg.lfista_num_epochs_frozen = 20
+        cfg.lfista_num_epochs_joint = 25
+        cfg.lfista_steps = 5
         cfg.plots_subdir = "figures"
         return
 
@@ -1751,11 +1799,31 @@ METHOD_COLORS: Dict[str, str] = {
     "cs_only_spgl1": "#9467bd",
     "ml_only_torch": "#17becf",
     "hybrid_lfista_frozen": "#e377c2",
-    "hybrid_lfista_joint": "#2ca02c",
+    "hybrid_lfista_joint": "#e6550d",
     "ext_sklearn_lasso_S1_hybrid": "#8c564b",
     "ext_sklearn_lasso_S2_cs_only": "#bc82bd",
     "ext_sklearn_omp_S3_hybrid_oracle_k": "#7f7f7f",
+    "mlp_concat_ub": "#2ca02c",
+    "pca_regression_ub": "#9467bd",
+    "ae_regression_ub": "#17becf",
 }
+METHOD_ORDER_DIRECT_UB = [
+    "ml_only",
+    "ml_only_torch",
+    "mlp_concat_ub",
+    "pca_regression_ub",
+    "ae_regression_ub",
+    "hybrid_fista",
+    "hybrid_lfista_frozen",
+    "hybrid_lfista_joint",
+]
+METHOD_ORDER_DIRECT_UB_JOINT_FOCUS = [
+    "ml_only",
+    "mlp_concat_ub",
+    "pca_regression_ub",
+    "ae_regression_ub",
+    "hybrid_lfista_joint",
+]
 METHOD_ORDER_STAGE1_EXTERNAL = [
     "ml_only",
     "ext_sklearn_lasso_S1_hybrid",
@@ -1841,6 +1909,10 @@ def save_lfista_vs_classical_focus_tables(
 
 
 def method_order_for_cfg(cfg: Config) -> List[str]:
+    if cfg.config_profile in ("direct_ub_lfista_joint_only", "direct_ub_lfista_joint_only_explore"):
+        return list(METHOD_ORDER_DIRECT_UB_JOINT_FOCUS)
+    if cfg.config_profile in ("direct_ub_benchmark", "direct_ub_benchmark_explore"):
+        return list(METHOD_ORDER_DIRECT_UB)
     if cfg.config_profile in ("external_benchmark_stage1", "external_benchmark_stage1_explore"):
         return list(METHOD_ORDER_STAGE1_EXTERNAL)
     if cfg.run_lfista and cfg.dual_cs_solver:
@@ -2327,6 +2399,10 @@ def parse_cli_args() -> argparse.Namespace:
             "robustness_phase3_explore",
             "external_benchmark_stage1",
             "external_benchmark_stage1_explore",
+            "direct_ub_benchmark",
+            "direct_ub_benchmark_explore",
+            "direct_ub_lfista_joint_only",
+            "direct_ub_lfista_joint_only_explore",
         ],
         help="Profiles: paper/explore/phase0; solver_comparison; lfista_integrated; lfista_vs_classical; "
         "robustness_phase3 (Etapa 3 roadmap, one axis via --robustness-*); "
@@ -2366,6 +2442,10 @@ def main() -> None:
             "robustness_phase3_explore",
             "external_benchmark_stage1",
             "external_benchmark_stage1_explore",
+            "direct_ub_benchmark",
+            "direct_ub_benchmark_explore",
+            "direct_ub_lfista_joint_only",
+            "direct_ub_lfista_joint_only_explore",
         ],
         args.profile,
     )
