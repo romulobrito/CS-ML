@@ -1,0 +1,138 @@
+% Direct [u,b] -> y baselines vs hybrid_lfista_joint (same DGP as Phase~0).
+% Identity run: outputs/direct_ub_benchmark/runs/20260422_102236/
+% DCT Psi run:   outputs/direct_ub_psi_ablation/dct/runs/20260422_175210/
+% Script: sir_cs_benchmark_direct_ub.py --joint-only [--residual-basis dct]
+% Figures: paper/figures/direct_ub_benchmark/ and paper/figures/direct_ub_psi_dct/ (explicit paths).
+% All ASCII.
+
+\section{Experiments: direct $[u,b]\to y$ baselines versus joint LFISTA}
+\label{sec:exp_direct_ub}
+
+This section complements Phase~0 (Section~\ref{sec:exp_synthetic}) with an \emph{end-to-end} comparison on the \textbf{same} synthetic generator and $(\mathrm{seed},\rho)$ protocol: several regressors predict $y$ directly from standardized $[u,b]$ with $b=My+\eta$, versus the PyTorch joint LFISTA map (\texttt{hybrid\_lfista\_joint}) trained in the LFISTA branch of the pipeline.
+The goal is to document whether a strong direct nonlinear map from compressed measurements can outperform the structured hybrid path under the current Phase~0 knobs ($\Psi=I$, Gaussian $M$).
+
+\subsection{Protocol}
+\label{sec:direct_ub_protocol}
+
+We run \texttt{sir\_cs\_benchmark\_direct\_ub.py} with profile \texttt{direct\_ub\_lfista\_joint\_only}: seeds $\{7,13,\ldots,53\}$, $\rho\in\{0.20,0.30,0.40,0.50,0.60\}$, identical \texttt{make\_dataset} splits and measurement draws as the hybrid evaluation for each job.
+Features are $[u,b]$ with independent Gaussian noise on $b$ at train/val/test; \texttt{StandardScaler} is fit on train $[u,b]$ only.
+
+\paragraph{Methods.}
+\texttt{ml\_only}: sklearn MLP on $u$ only (reference; flat in $\rho$).
+\texttt{mlp\_concat\_ub}: MLP on scaled $[u,b]$ (same hidden layers and regularization defaults as the pipeline MLP baseline).
+\texttt{pca\_regression\_ub}: PCA on $Y_{\mathrm{train}}$ only; latent dimension selected by validation; MLP maps $[u,b]$ to PCA scores then inverse-transforms to $y$.
+\texttt{ae\_regression\_ub}: PyTorch autoencoder on standardized $Y_{\mathrm{train}}$; MLP maps $[u,b]$ to latent then decodes to $y$.
+\texttt{hybrid\_lfista\_joint}: joint LFISTA training (\texttt{run\_lfista\_branch}); this run omits \texttt{hybrid\_fista}, \texttt{ml\_only\_torch}, and \texttt{hybrid\_lfista\_frozen}.
+
+\subsection{RMSE summary}
+\label{sec:direct_ub_table}
+
+Table~\ref{tab:direct_ub_rmse} reports test RMSE (mean $\pm$ std across ten seeds).
+The lowest RMSE in each row is in bold.
+
+\begin{table}[t]
+  \centering
+  \caption{Test RMSE (mean $\pm$ std across ten seeds) for direct $[u,b]\to y$ baselines versus \texttt{hybrid\_lfista\_joint}.
+  Frozen run \texttt{20260422\_102236}.}
+  \label{tab:direct_ub_rmse}
+  \small
+  \begin{tabular}{@{}lccccc@{}}
+    \toprule
+    $\rho$ & \texttt{ml\_only} & \texttt{mlp\_concat\_ub} & \texttt{pca\_regression\_ub} & \texttt{ae\_regression\_ub} & \texttt{hybrid\_lfista\_joint} \\
+    \midrule
+    $0.20$ & $0.369 \pm 0.011$ & $0.283 \pm 0.007$ & $\mathbf{0.282 \pm 0.006}$ & $0.290 \pm 0.007$ & $0.317 \pm 0.008$ \\
+    $0.30$ & $0.369 \pm 0.011$ & $0.255 \pm 0.005$ & $\mathbf{0.255 \pm 0.005}$ & $0.266 \pm 0.005$ & $0.299 \pm 0.008$ \\
+    $0.40$ & $0.369 \pm 0.011$ & $\mathbf{0.228 \pm 0.005}$ & $0.232 \pm 0.004$ & $0.250 \pm 0.005$ & $0.276 \pm 0.007$ \\
+    $0.50$ & $0.369 \pm 0.011$ & $\mathbf{0.208 \pm 0.003}$ & $0.212 \pm 0.004$ & $0.239 \pm 0.005$ & $0.253 \pm 0.006$ \\
+    $0.60$ & $0.369 \pm 0.011$ & $\mathbf{0.190 \pm 0.004}$ & $0.196 \pm 0.004$ & $0.231 \pm 0.004$ & $0.228 \pm 0.006$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Reading Table~\ref{tab:direct_ub_rmse}.}
+Under the Phase~0 generator with identity $\Psi$ and Gaussian $M$, the direct regressors \texttt{mlp\_concat\_ub} and \texttt{pca\_regression\_ub} achieve the best RMSE at every $\rho$ in this table; \texttt{hybrid\_lfista\_joint} improves monotonically with $\rho$ and nearly matches \texttt{ae\_regression\_ub} at $\rho=0.60$, but does not beat the best direct map in this window.
+\texttt{ml\_only} remains flat in $\rho$ by construction (no $b$ at test time).
+These numbers support treating the current synthetic instance primarily as a regime where global regression from $[u,b]$ is strong, and motivate alternative protocols (for example structured $\Psi$ and subsampled $M$) if the goal is to exhibit a larger advantage for the structured SIR-CS estimator.
+
+\subsection{Psi-axis pilot: identity $\Psi$ versus DCT $\Psi$}
+\label{sec:direct_ub_psi_ablation}
+
+\paragraph{Protocol (isolated $\Psi$ axis).}
+We re-run the same \texttt{direct\_ub\_lfista\_joint\_only} job tree with \texttt{--residual-basis dct} instead of the default \texttt{identity}:
+same seeds, $\rho$ grid, Gaussian $M$, noise stds, splits, and the \emph{same} rule in code for drawing $\alpha^\star$; only $\Psi=\texttt{get\_basis}(N,\texttt{residual\_basis})$ changes, so that $y_{\mathrm{res}}=\Psi\alpha^\star$ lives in a different subspace of $\mathbb{R}^N$.
+The identity reference is frozen run \texttt{20260422\_102236} ($\Psi=I$); the DCT run is \texttt{20260422\_175210} ($\Psi=\mathrm{DCT}$), produced by the same script version and stored under \texttt{outputs/direct\_ub\_psi\_ablation/dct/}.
+The \texttt{ml\_only} row is not a fair head-to-head across $\Psi$ (the marginal distribution of $y$ shifts), so we focus on the gap between \texttt{hybrid\_lfista\_joint} and a strong direct map, \texttt{mlp\_concat\_ub}.
+
+\paragraph{RMSE and $\mathrm{gap}=\mathrm{RMSE}_{\mathrm{joint}}-\mathrm{RMSE}_{\texttt{mlp\_concat\_ub}}$.}
+Table~\ref{tab:direct_ub_psi_rmse_gap} reports \emph{means} over the ten test folds (no $\pm$ std) for readability; full $\pm$ std is in the corresponding \texttt{summary.csv} of each run.
+
+\begin{table}[t]
+  \centering
+  \caption{Test RMSE (mean over ten seeds) for \texttt{hybrid\_lfista\_joint} and \texttt{mlp\_concat\_ub} when $\Psi=I$ (run \texttt{20260422\_102236}) versus $\Psi=\mathrm{DCT}$ (run \texttt{20260422\_175210}).
+  Last two columns: $\mathrm{gap}=\mathrm{RMSE}_{\mathrm{joint}}-\mathrm{RMSE}_{\texttt{mlp}}$. Lower gap means the joint map is closer to the best direct MLP in RMSE.}
+  \label{tab:direct_ub_psi_rmse_gap}
+  \small
+  \begin{tabular}{@{}lcccccc@{}}
+    \toprule
+    $\rho$ & joint$_{I}$ & joint$_{D}$ & mlp$_{I}$ & mlp$_{D}$ & gap$_{I}$ & gap$_{D}$ \\
+    \midrule
+    $0.20$ & $0.317$ & $0.314$ & $0.283$ & $0.282$ & $0.034$ & $0.032$ \\
+    $0.30$ & $0.299$ & $0.293$ & $0.255$ & $0.253$ & $0.044$ & $0.040$ \\
+    $0.40$ & $0.276$ & $0.265$ & $0.228$ & $0.228$ & $0.048$ & $0.037$ \\
+    $0.50$ & $0.253$ & $0.238$ & $0.208$ & $0.208$ & $0.045$ & $0.030$ \\
+    $0.60$ & $0.228$ & $0.212$ & $0.190$ & $0.189$ & $0.038$ & $0.023$ \\
+    \bottomrule
+  \end{tabular}
+  \\[0.35em]
+  {\footnotesize Subscripts $I$ and $D$ denote $\Psi=I$ and $\Psi=\mathrm{DCT}$. Joint and MLP both improve in absolute RMSE for $\Psi=\mathrm{DCT}$ at all $\rho$; the \emph{gap} shrinks most clearly at $\rho\in\{0.50,0.60\}$.}
+\end{table}
+
+\paragraph{Reading Table~\ref{tab:direct_ub_psi_rmse_gap}.}
+Switching to a DCT residual basis lowers RMSE for \texttt{hybrid\_lfista\_joint} at every $\rho$ in this table; \texttt{mlp\_concat\_ub} improves as well, but the joint-versus-MLP gap (last two columns) narrows especially at the highest measurement ratios, from $0.038$ to $0.023$ at $\rho=0.60$.
+This does not yet make \texttt{hybrid\_lfista\_joint} the best row at any $\rho$ in this DGP, but it shows that the \emph{choice of $\Psi$} materially affects competitiveness of the hybrid estimator on par with a ``same protocol'' direct baseline---consistent with a pilot where only the $\Psi$ axis is moved.
+If a larger shift toward the structured estimator is desired, further axes (e.g., subsampled $M$, revised $\alpha^\star$ sampling) remain to be tested; see \texttt{docs/direct\_ub\_psi\_ablation.txt} in the repository.
+Support-F1 for the joint method stays near $0.09$ in both runs, so the RMSE effect is not explained by a large F1 shift alone.
+
+\subsection{Figures}
+\label{sec:direct_ub_figures}
+
+Figure~\ref{fig:direct_ub_curves} mirrors the Phase~0 dashboard: RMSE, MAE, and relative $\ell_2$ versus $\rho$.
+Figure~\ref{fig:direct_ub_support_bars} shows support F1 (where defined) and grouped RMSE.
+Figure~\ref{fig:direct_ub_gains} shows gains over \texttt{ml\_only}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.32\linewidth]{figures/direct_ub_benchmark/01_rmse_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{figures/direct_ub_benchmark/02_mae_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{figures/direct_ub_benchmark/03_relative_l2_vs_measurement_ratio.png}
+  \caption{Direct $[u,b]$ benchmark (frozen run \texttt{20260422\_102236}): test error versus $\rho$. Error bars: std across ten seeds.}
+  \label{fig:direct_ub_curves}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/direct_ub_benchmark/04_support_f1_vs_measurement_ratio.png}
+  \includegraphics[width=0.48\linewidth]{figures/direct_ub_benchmark/05_rmse_grouped_bars_by_ratio.png}
+  \caption{Left: support F1 for \texttt{hybrid\_lfista\_joint}. Right: grouped RMSE by $\rho$.}
+  \label{fig:direct_ub_support_bars}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/direct_ub_benchmark/06_gain_rmse_over_ml_only.png}
+  \includegraphics[width=0.48\linewidth]{figures/direct_ub_benchmark/07_gain_mae_over_ml_only.png}
+  \caption{Gain over \texttt{ml\_only} (positive is better). Direct methods that use $b$ improve with $\rho$; \texttt{hybrid\_lfista\_joint} is included for comparison.}
+  \label{fig:direct_ub_gains}
+\end{figure}
+
+\paragraph{Dashboard under $\Psi=\mathrm{DCT}$ (Psi-axis run).}
+Figure~\ref{fig:direct_ub_dct_curves} shows the same three panels for run \texttt{20260422\_175210} ($\Psi=\mathrm{DCT}$), so curves can be compared qualitatively to Figure~\ref{fig:direct_ub_curves}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.31\linewidth]{figures/direct_ub_psi_dct/01_rmse_vs_measurement_ratio.png}
+  \includegraphics[width=0.31\linewidth]{figures/direct_ub_psi_dct/02_mae_vs_measurement_ratio.png}
+  \includegraphics[width=0.31\linewidth]{figures/direct_ub_psi_dct/03_relative_l2_vs_measurement_ratio.png}
+  \caption{Direct $[u,b]$ joint-only benchmark with $\Psi=\mathrm{DCT}$ (frozen run \texttt{20260422\_175210}): test error versus $\rho$. Same layout as Figure~\ref{fig:direct_ub_curves}.}
+  \label{fig:direct_ub_dct_curves}
+\end{figure}

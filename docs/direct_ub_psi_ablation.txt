@@ -1,0 +1,58 @@
+Direct [u,b] benchmark: Psi-axis pilot (identity vs DCT)
+==========================================================
+
+Goal
+----
+Isolate the effect of the residual operator Psi only:
+  - Same measurement_kind (Gaussian M), same noise stds, same seeds/rho grid,
+    same rule for generating alpha support and amplitudes (make_dataset).
+  - Change only cfg.residual_basis: identity -> dct.
+
+Hypothesis
+----------
+If the hybrid LFISTA path benefits from alignment between sparse innovation
+and Psi, RMSE gaps versus direct [u,b] regressors may shrink or reverse at
+some rho. If not, conclude that Psi alone is insufficient in this DGP (not
+that SIR-CS is universally rejected).
+
+Artifact layout (recommended)
+-----------------------------
+Use two base directories so runs never overwrite each other:
+
+  outputs/direct_ub_psi_ablation/identity/runs/<run_id>/
+  outputs/direct_ub_psi_ablation/dct/runs/<run_id>/
+
+Each run contains: tables/*.csv, figures/*.png, PROTOCOL.txt (states
+residual_basis), config.json, RUN_MANIFEST.txt, logs/run_console.log.
+
+Commands (full joint-only profile, 50 jobs each)
+------------------------------------------------
+From repo root:
+
+  python sir_cs_benchmark_direct_ub.py --joint-only \
+    --residual-basis identity \
+    --base-dir outputs/direct_ub_psi_ablation/identity
+
+  python sir_cs_benchmark_direct_ub.py --joint-only \
+    --residual-basis dct \
+    --base-dir outputs/direct_ub_psi_ablation/dct
+
+Optional explicit run_id:
+
+  ... --run-id identity_20260422_full
+  ... --run-id dct_20260422_full
+
+Pilot (fast explore profile, 2 jobs per axis)
+---------------------------------------------
+  bash scripts/run_direct_ub_psi_pilot.sh
+
+Merge summaries for a quick table
+---------------------------------
+After two runs, pass both summary.csv paths:
+
+  python scripts/merge_direct_ub_psi_ablation.py \
+    --identity-summary outputs/direct_ub_psi_ablation/identity/runs/<id>/tables/summary.csv \
+    --dct-summary outputs/direct_ub_psi_ablation/dct/runs/<id>/tables/summary.csv \
+    --out outputs/direct_ub_psi_ablation/merged_summary_long.csv
+
+The merged file adds column residual_basis and concatenates rows (long format).

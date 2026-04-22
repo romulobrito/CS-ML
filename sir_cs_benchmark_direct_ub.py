@@ -16,6 +16,10 @@ Artifacts per run:
         config.json
         RUN_MANIFEST.txt
 
+Psi ablation (pilot): use --residual-basis identity|dct; same alpha rule, only Psi changes.
+Organize with separate --base-dir per axis, e.g. outputs/direct_ub_psi_ablation/identity vs .../dct.
+See docs/direct_ub_psi_ablation.txt.
+
 ASCII-only source.
 """
 
@@ -329,9 +333,12 @@ def save_focus_tables(
     return [p1, p2]
 
 
-def write_protocol(run_root: str, joint_only: bool) -> str:
+def write_protocol(run_root: str, joint_only: bool, residual_basis: str) -> str:
     common = [
         "Direct [u,b] -> y benchmark (methodological protocol)",
+        "",
+        f"0) residual_basis={residual_basis} (Psi = get_basis(N, residual_basis); y_res = Psi @ alpha per row).",
+        "   Alpha support/amplitudes use the same generator rule as identity runs; only Psi differs in Psi-axis studies.",
         "",
         "1) Same synthetic generator and splits as sir_cs_pipeline_optimized (make_dataset).",
         "2) Same M, noise on b, per (seed, measurement_ratio) as hybrid CS evaluation.",
@@ -369,6 +376,7 @@ def write_run_manifest(
     plot_paths: List[str],
     focus_paths: List[str],
     joint_only: bool,
+    residual_basis: str,
 ) -> str:
     title = (
         "Direct [u,b] benchmark: hybrid_lfista_joint vs mlp_concat / PCA / AE (joint-only mode)."
@@ -379,6 +387,7 @@ def write_run_manifest(
         title,
         f"run_id: {run_id}",
         f"elapsed_seconds: {elapsed_s:.1f}",
+        f"residual_basis: {residual_basis}",
         "",
         "tables/",
         "  detailed_results.csv",
@@ -444,6 +453,16 @@ def parse_args() -> argparse.Namespace:
             "omit hybrid_fista, ml_only_torch, hybrid_lfista_frozen. Implies LFISTA on."
         ),
     )
+    p.add_argument(
+        "--residual-basis",
+        type=str,
+        default="identity",
+        choices=("identity", "dct"),
+        help=(
+            "Residual operator Psi for make_dataset and CS (identity vs DCT). "
+            "Default identity. For Psi-axis pilot, run twice with separate --base-dir (see docs/direct_ub_psi_ablation.txt)."
+        ),
+    )
     return p.parse_args()
 
 
@@ -466,6 +485,11 @@ def main() -> None:
     else:
         cfg.config_profile = "direct_ub_benchmark"
     apply_config_profile(cfg)
+    rb = str(args.residual_basis).strip().lower()
+    if rb not in ("identity", "dct"):
+        print("--residual-basis must be identity or dct.", file=sys.stderr)
+        sys.exit(2)
+    cfg.residual_basis = rb  # type: ignore[assignment]
 
     include_lfista = joint_only or (not bool(args.no_lfista))
     if include_lfista:
@@ -501,7 +525,8 @@ def main() -> None:
         _log(
             tee,
             f"Profile: {cfg.config_profile} | jobs: {total} | joint_only: {joint_only} | "
-            f"hybrid_fista: {include_hf} | ae: {run_ae} | lfista: {include_lfista}",
+            f"hybrid_fista: {include_hf} | ae: {run_ae} | lfista: {include_lfista} | "
+            f"residual_basis: {cfg.residual_basis}",
         )
         for seed in cfg.seeds:
             for mr in cfg.measurement_ratios:
@@ -523,7 +548,7 @@ def main() -> None:
         focus_paths = save_focus_tables(
             run_root, summary, per_seed, include_hf, run_ae, include_lfista, joint_only
         )
-        proto_path = write_protocol(run_root, joint_only)
+        proto_path = write_protocol(run_root, joint_only, str(cfg.residual_basis))
 
         plot_paths: List[str] = []
         if not args.no_plots:
@@ -539,6 +564,7 @@ def main() -> None:
             "include_hybrid_fista": include_hf,
             "include_lfista": include_lfista,
             "include_ae": run_ae,
+            "residual_basis": str(cfg.residual_basis),
             "dub_cfg": dub_dump,
             "protocol_txt": proto_path,
             "tables_dir": tables_dir,
@@ -549,7 +575,13 @@ def main() -> None:
 
         elapsed = time.time() - t0
         manifest_path = write_run_manifest(
-            run_root, run_id, elapsed, plot_paths, focus_paths + [proto_path], joint_only
+            run_root,
+            run_id,
+            elapsed,
+            plot_paths,
+            focus_paths + [proto_path],
+            joint_only,
+            str(cfg.residual_basis),
         )
         _log(tee, f"Done in {elapsed:.1f}s | manifest: {manifest_path}")
     finally:

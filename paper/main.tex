@@ -31,11 +31,14 @@
 We summarize a hybrid estimator that predicts a global component with machine learning and recovers a sparse innovation by compressed sensing under linear measurements.
 We then document a reproducible \emph{Phase~0} synthetic baseline: ten independent seeds, measurement ratios up to $\rho=0.6$, a refined $\ell_1$ penalty grid for validation-based model selection, and standard diagnostics (curves versus $\rho$, gains over ml-only, parity plots, residual histograms, and example traces).
 A subsequent \emph{Step~1} section compares FISTA versus SPGL1 on the same protocol; a \emph{Step~1b} section adds \texttt{sklearn} Lasso and OMP baselines on identical $(\mathrm{seed},\rho)$ draws with tables and figures from a frozen run.
+We also report a direct-regression benchmark that maps standardized $[u,b]$ to $y$ (MLP, PCA+MLP, AE) against \texttt{hybrid\_lfista\_joint} on the same Phase~0 draws (frozen run \texttt{20260422\_102236}): under identity $\Psi$ and Gaussian $M$, the best direct maps achieve lower RMSE than joint LFISTA at most $\rho$, motivating regime-specific protocol extensions.
+A \emph{Psi-axis} pilot (same protocol, only $\Psi$ set to the DCT basis; run \texttt{20260422\_175210}) shows lower RMSE for both joint and MLP; the joint-versus-MLP gap tightens at high $\rho$ but the best MLP still leads in this DGP.
 Real-data evaluation is outlined as future work.
 \end{abstract}
 
 \input{sir_cs_method_section.tex}
 \input{experiments_synthetic.tex}
+\input{experiments_direct_ub_benchmark.tex}
 \input{experiments_solver_etapa1.tex}
 \input{experiments_external_benchmark_stage1.tex}
 \input{experiments_robustness_phase3.tex}
