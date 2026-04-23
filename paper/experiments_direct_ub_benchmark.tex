@@ -279,7 +279,7 @@ Under the final protocol, the decomposition used by SIR-CS appears better aligne
 
 \paragraph{Scope and limitations.}
 The benchmark with identity $\Psi$ and Gaussian $M$ (Table~\ref{tab:direct_ub_rmse}) illustrates a regime where direct maps win; the DCT$+$Gaussian ablation (Table~\ref{tab:direct_ub_psi_rmse_gap}) shows a controlled improvement from changing $\Psi$ only; the DCT$+$subsample protocol above identifies a \emph{structured} regime where \texttt{hybrid\_lfista\_joint} is superior on MAE over most of the $\rho$ grid and leads on RMSE/relative $\ell_2$ at the largest $\rho$ tested. This is evidence of a \textbf{regime of validity} for the SIR-CS joint estimator, not a claim of dominance on all generators or all measurement models.
-A complementary \emph{pilot} sweep varies only the standard deviation of Gaussian noise $\eta$ in $b=My+\eta$ (fixed $\Psi=\mathrm{DCT}$, subsample $M$, same $\rho$ grid); reproduction and directory layout are in \texttt{docs/direct\_ub\_robustness\_measurement\_noise.txt}. The merged long-format table is \texttt{outputs/direct\_ub\_robustness/dct\_subsample/merged\_measurement\_noise\_long.csv}.
+Complementary \emph{pilot} sweeps vary (i) only the standard deviation of Gaussian noise $\eta$ in $b=My+\eta$ and (ii) only residual sparsity $k$; both fix $\Psi=\mathrm{DCT}$, subsample $M$, the same $\rho$ grid, and the three-seed profile. Reproduction for (i) is in \texttt{docs/direct\_ub\_robustness\_measurement\_noise.txt} (merged: \texttt{merged\_measurement\_noise\_long.csv}); for (ii) in \texttt{docs/direct\_ub\_robustness\_residual\_k.txt} (merged: \texttt{merged\_residual\_k\_long.csv}).
 Frozen pilot arms with parity export: \texttt{noise\_0p01\_20260423\_140024} ($\mathrm{std}(\eta)=0.01$), \texttt{noise\_0p02\_20260423\_143832} ($0.02$), \texttt{noise\_0p04\_20260423\_150923} ($0.04$).
 
 \begin{figure}[t]
@@ -316,6 +316,62 @@ Frozen pilot arms with parity export: \texttt{noise\_0p01\_20260423\_140024} ($\
   \label{fig:direct_ub_noise_pilot_parity}
 \end{figure}
 
+\paragraph{Residual sparsity $k$ (compressibility of the innovation).}
+Complementing the noise-on-$b$ pilot, we vary only the \texttt{residual\_k} knob in the synthetic generator (and matching CS prior), holding $\Psi=\mathrm{DCT}$, subsample $M$, $\mathrm{std}(\eta)=0.02$, the same $\rho$ grid, and the three-seed \texttt{--robustness-lite} profile. Arms are
+\texttt{residual\_k\_2\_20260423\_161809} ($k=2$), \texttt{residual\_k\_4\_20260423\_165348} ($k=4$), \texttt{residual\_k\_6\_20260423\_172235} ($k=6$), \texttt{residual\_k\_8\_20260423\_175347} ($k=8$), \texttt{residual\_k\_12\_20260423\_181547} ($k=12$), and \texttt{residual\_k\_16\_20260423\_183507} ($k=16$); per-arm dashboards and \texttt{parity\_pooled.npz} are under \texttt{outputs/direct\_ub\_robustness/dct\_subsample/residual\_k/}, with reproduction notes in \texttt{docs/direct\_ub\_robustness\_residual\_k.txt}. The long-format merge is \texttt{outputs/direct\_ub\_robustness/dct\_subsample/merged\_residual\_k\_long.csv}. Copies of each arm's parity figure and \texttt{npz} for the paper tree are in \texttt{paper/figures/direct\_ub\_robustness\_residual\_k/} (filenames \texttt{09\_parity\_k*}, \texttt{parity\_pooled\_k*}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/direct_ub_robustness_residual_k/01_rmse_joint_vs_rho_by_k.png}
+  \includegraphics[width=0.48\linewidth]{figures/direct_ub_robustness_residual_k/02_rmse_vs_k_rho0p6.png}
+  \caption{Residual-$k$ robustness. Left: \texttt{hybrid\_lfista\_joint} test RMSE (mean over seeds) vs.\ $\rho$ for $k\in\{2,4,6,8,12,16\}$. Right: test RMSE vs.\ $k$ at $\rho=0.60$ for \texttt{hybrid\_lfista\_joint}, \texttt{mlp\_concat\_ub}, and \texttt{pca\_regression\_ub} (error bars: std across seeds). Source: \texttt{merged\_residual\_k\_long.csv}.}
+  \label{fig:direct_ub_residual_k}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \caption{Residual-$k$ pilot: test RMSE (mean over three seeds) at $\rho=0.60$ for the three main head-to-head methods. Lower is better. Source: \texttt{merged\_residual\_k\_long.csv}. Bold indicates the lowest RMSE in each row for these three methods.}
+  \label{tab:direct_ub_residual_k_rmse}
+  \small
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    $k$ & \texttt{mlp\_concat\_ub} & \texttt{pca\_regression\_ub} & \texttt{hybrid\_lfista\_joint} \\
+    \midrule
+    $2$  & $\mathbf{0.131}$ & $0.134$ & $0.158$ \\
+    $4$  & $\mathbf{0.162}$ & $0.168$ & $0.167$ \\
+    $6$  & $0.189$ & $0.193$ & $\mathbf{0.175}$ \\
+    $8$  & $0.207$ & $0.216$ & $\mathbf{0.186}$ \\
+    $12$ & $0.246$ & $0.259$ & $\mathbf{0.206}$ \\
+    $16$ & $0.275$ & $0.292$ & $\mathbf{0.224}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[t]
+  \centering
+  \caption{Same arms as Table~\ref{tab:direct_ub_residual_k_rmse}, but \textbf{MAE} (mean over three seeds) at $\rho=0.60$. The joint can lead on MAE at small $k$ even when it trails on RMSE (see $k=2$).}
+  \label{tab:direct_ub_residual_k_mae}
+  \small
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    $k$ & \texttt{mlp\_concat\_ub} & \texttt{pca\_regression\_ub} & \texttt{hybrid\_lfista\_joint} \\
+    \midrule
+    $2$  & $0.102$ & $0.105$ & $\mathbf{0.090}$ \\
+    $4$  & $0.125$ & $0.131$ & $\mathbf{0.095}$ \\
+    $6$  & $0.146$ & $0.150$ & $\mathbf{0.099}$ \\
+    $8$  & $0.158$ & $0.168$ & $\mathbf{0.105}$ \\
+    $12$ & $0.186$ & $0.201$ & $\mathbf{0.115}$ \\
+    $16$ & $0.206$ & $0.227$ & $\mathbf{0.125}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Reading the residual-$k$ tables and Figure~\ref{fig:direct_ub_residual_k}.}
+When the true innovation is \emph{very} sparse ($k=2$), a strong direct map from $[u,b]$ achieves the best \textbf{RMSE} in this table ($0.131$ vs.\ $0.158$ for the joint, Table~\ref{tab:direct_ub_residual_k_rmse}): a purely nonlinear $[u,b]\to y$ regressor is hard to beat when the generative prior is well matched to simple regression.
+At $k=4$ the MLP and joint RMSEs nearly coincide ($0.162$ vs.\ $0.167$) within a margin that three seeds do not over-interpret, while from $k\ge 6$ onward the joint is the \textbf{lowest RMSE} among the three methods and its margin over \texttt{mlp\_concat\_ub} and \texttt{pca\_regression\_ub} \emph{widens} with $k$ in this window. Intuitively, a less compressible (larger $k$) innovation stresses the need for a structured recovery map; the end-to-end baselines then degrade faster in absolute RMSE than the joint, which is what Figure~\ref{fig:direct_ub_residual_k} (right) makes explicit.
+The \textbf{MAE} story (Table~\ref{tab:direct_ub_residual_k_mae}) is different: at $\rho=0.60$ the joint has the \textbf{lowest MAE for every} $k$ in the table, including $k=2$. Thus RMSE and MAE need not rank the same two methods: occasional large errors (penalized by RMSE) can make \texttt{mlp\_concat\_ub} look better in RMSE at small $k$, while the joint is already stronger on the coordinate-wise MAE signal documented for the DCT$+$subsample run (Section~\ref{sec:direct_ub_dct_subsample}).
+Together, the $k$ sweep does \textbf{not} refute the high-$\rho$ value of the joint under partial measurements; it adds a \textbf{scope condition}: the joint's RMSE leadership in this DCT$+$subsample family is clearest for moderate-to-large $k$, while at very small $k$ direct $[u,b]$ maps are extremely competitive, with MAE still often favoring the joint.
+
 \subsubsection{Integrated reading: dashboards, gains, noise pilot, and conclusions}
 
 \paragraph{Qualitative shift relative to earlier direct-$[u,b]$ regimes.}
@@ -336,11 +392,14 @@ Support F1 for the joint stays in a narrow band near $0.09$--$0.10$ with mild no
 \paragraph{Noise-on-$b$ pilot (Figure~\ref{fig:direct_ub_noise_robust}, Table~\ref{tab:direct_ub_noise_pilot_joint}, and Figure~\ref{fig:direct_ub_noise_pilot_parity}).}
 The pilot uses \texttt{--robustness-lite} (three seeds; not the same Monte Carlo budget as run \texttt{20260422\_205913}) and three noise levels $\{0.01,0.02,0.04\}$ on $b$ with identical $\Psi$, subsample $M$, and $\rho$ grid. Table~\ref{tab:direct_ub_noise_pilot_joint} shows that both RMSE and MAE for \texttt{hybrid\_lfista\_joint} shift upward as $\mathrm{std}(\eta)$ increases at fixed $\rho$, while the decrease with $\rho$ at fixed noise remains monotone in this window. At $\rho=0.60$, RMSE moves from $0.174$ to $0.179$ across the noise arms---a small absolute change relative to the gap vs.\ direct baselines in the merged file. The qualitative ordering ``joint vs.\ \texttt{mlp\_concat\_ub} at high $\rho$'' is preserved across noise arms in that pilot. Figure~\ref{fig:direct_ub_noise_robust} plots RMSE vs.\ $\rho$ (joint only, one curve per noise std). Figure~\ref{fig:direct_ub_noise_pilot_parity} gives a pooled parity view at $\mathrm{std}(\eta)=0.02$: \texttt{mlp\_concat\_ub} and \texttt{pca\_regression\_ub} track the identity line tightly; \texttt{hybrid\_lfista\_joint} is competitive globally on this scatter while the \emph{regime story} (who leads by $\rho$) is still best read from Tables~\ref{tab:direct_ub_dct_subsample_rmse} and~\ref{tab:direct_ub_noise_pilot_joint}. Full five-method dashboards and \texttt{parity\_pooled.npz} per arm remain under \texttt{outputs/direct\_ub\_robustness/.../runs/} per \texttt{docs/direct\_ub\_robustness\_measurement\_noise.txt}.
 
+\paragraph{Residual-sparsity $k$ (Figure~\ref{fig:direct_ub_residual_k} and Tables~\ref{tab:direct_ub_residual_k_rmse}--\ref{tab:direct_ub_residual_k_mae}).}
+This one-dimensional stress test (same protocol as the noise pilot; six values of $k$) is informative because it moves the compressibility of the \emph{ground-truth} innovation, which is the structural object behind SIR-CS, without changing the subsampling mechanism for $M$. The left panel of Figure~\ref{fig:direct_ub_residual_k} shows that, for the joint, RMSE vs.\ $\rho$ is ordered by $k$ in the expected way (higher $k$ yields higher curves). The right panel, at fixed $\rho=0.60$, makes the \emph{relative} ordering explicit: the joint lags the best direct method in RMSE for $k=2$ (and nearly ties for $k=4$) but is best among the three from $k\ge 6$ with an increasing margin as $k$ grows. The MAE table shows that, at the \emph{same} $\rho$, the joint can still be best on average absolute error for every $k$ tested, including the smallest, which is consistent with a RMSE/MAE split where tail errors matter. Parity scatters are provided per $k$ in \texttt{paper/figures/direct\_ub\_robustness\_residual\_k/} for a qualitative check alongside the head-to-head tables; a single merged parity figure is not necessary because the scientific story is already the $\rho$--$k$ interaction in RMSE/MAE.
+
 \paragraph{Conclusions for the paper's claim.}
-The correct scientific statement is \textbf{conditional}: the proposed joint estimator can \textbf{lead} strong $[u,b]$ baselines on MAE over most of the $\rho$ grid tested and on RMSE/relative $\ell_2$ at the largest $\rho$, \emph{in this} DCT$+$subsample synthetic reference, while earlier rows of the experimental roadmap still document regimes where direct maps win. That is a \textbf{regime-of-validity} narrative, not a universal superiority claim; it is strengthened by (i) explicit ablations on $\Psi$ and $M$, (ii) aligned error metrics, and (iii) a small noise robustness pilot showing stable high-$\rho$ ordering under a bandwidth of $\eta$.
+The correct scientific statement is \textbf{conditional}: the proposed joint estimator can \textbf{lead} strong $[u,b]$ baselines on MAE over most of the $\rho$ grid tested and on RMSE/relative $\ell_2$ at the largest $\rho$, \emph{in this} DCT$+$subsample synthetic reference, while earlier rows of the experimental roadmap still document regimes where direct maps win. That is a \textbf{regime-of-validity} narrative, not a universal superiority claim; it is strengthened by (i) explicit ablations on $\Psi$ and $M$, (ii) aligned error metrics, (iii) a noise-on-$b$ pilot (stable high-$\rho$ ordering in this $\mathrm{std}(\eta)$ window), and (iv) a residual-$k$ pilot that clarifies that RMSE leadership at high $\rho$ is most pronounced for moderate-to-large $k$ while \textbf{very} small $k$ can favor direct maps on RMSE even if MAE still often favors the joint (Tables~\ref{tab:direct_ub_residual_k_rmse}--\ref{tab:direct_ub_residual_k_mae}).
 
 \paragraph{Optional extensions.}
-A single follow-up axis (for example residual $k$ only, or an additional noise level) would further stress-test whether high-$\rho$ leadership is fragile to a one-dimensional synthetic knob; we leave that as optional work beyond the pilot above.
+Additional single-axis pilots (e.g., one or two more noise stds, or a finer grid near $k=4$ to tighten the MLP--joint near-tie) could narrow confidence statements; the repository already includes scripts and documentation for the noise and $k$ sweeps above.
 
 See \texttt{docs/direct\_ub\_m\_ablation.txt} for the exact shell protocol of the main M-axis comparison.
 
@@ -350,4 +409,5 @@ See \texttt{docs/direct\_ub\_m\_ablation.txt} for the exact shell protocol of th
   \item The advantage is \textbf{not universal}: the Phase~0 identity benchmark and the DCT$+$Gaussian row still show regimes where direct maps lead; the contribution is an explicit \textbf{map of regimes} rather than a single winner everywhere.
   \item The experimental step from dense Gaussian $M$ to subsampled $M$ at fixed DCT $\Psi$ was \textbf{decisive} for competitiveness (Table~\ref{tab:joint_rmse_dct_gauss_vs_sub}), motivating this structured configuration as the primary ``SIR-CS-aligned'' synthetic reference going forward.
   \item A pooled parity view at $\mathrm{std}(\eta)=0.02$ on the pilot arm (Figure~\ref{fig:direct_ub_noise_pilot_parity}) complements Tables~\ref{tab:direct_ub_noise_pilot_joint}--\ref{tab:direct_ub_dct_subsample_rmse}: direct $[u,b]$ maps track identity tightly in the aggregate cloud, while the joint remains well calibrated without substituting for the $\rho$-by-$\rho$ head-to-head tables.
+  \item The residual-sparsity $k$ pilot (Figure~\ref{fig:direct_ub_residual_k}, Tables~\ref{tab:direct_ub_residual_k_rmse}--\ref{tab:direct_ub_residual_k_mae}) refines the regime map: at $\rho=0.60$ the best RMSE among the three main methods is a direct MLP for $k\in\{2,4\}$, the joint is best (or nearly tied) from $k\ge 6$ with a larger margin as $k$ increases, and MAE at the same $\rho$ favors the joint for every $k$ in the grid. Very sparse $k$ is a regime where plain $[u,b]\to y$ is extremely strong on RMSE, without invalidating the structured method's advantage when the innovation is less compressible.
 \end{enumerate}

@@ -1,0 +1,66 @@
+Direct [u,b] benchmark: residual sparsity k (robustness, DCT + subsample M)
+=========================================================================
+
+Question
+--------
+Under the structured protocol (Psi = DCT, M = subsample, fixed measurement noise
+on b) where hybrid_lfista_joint is competitive, how sensitive are test errors to
+the residual sparsity level k in the synthetic generator (and matching CS prior)?
+
+Design (controlled axis)
+------------------------
+- Fixed: residual_basis dct, measurement_kind subsample, cfg.measurement_noise_std
+  at profile default (0.02 unless you override with a future CLI flag), same
+  measurement_ratio grid {0.20, 0.30, 0.40, 0.50, 0.60}, same script version.
+- Varied only: cfg.residual_k via --residual-k (CLI override after profile load).
+- Seeds: --robustness-lite uses three seeds {7, 23, 41} and full rho grid
+  (15 jobs per k value).
+
+Artifact layout
+---------------
+  outputs/direct_ub_robustness/dct_subsample/residual_k/v_<k>/runs/<run_id>/
+
+Each run contains tables/*.csv, figures/*.png, PROTOCOL.txt (includes 0a line for
+residual_k), config.json, RUN_MANIFEST.txt, logs/run_console.log.
+
+Merged table and paper figures
+------------------------------
+After all arms finish:
+
+  python scripts/merge_direct_ub_residual_k_robustness.py \
+    --arm 2  <path/to/v_2/.../tables/summary.csv> \
+    --arm 4  <path> \
+    ... \
+    --out outputs/direct_ub_robustness/dct_subsample/merged_residual_k_long.csv
+
+  python scripts/plot_direct_ub_residual_k_robustness.py \
+    --merged outputs/direct_ub_robustness/dct_subsample/merged_residual_k_long.csv \
+    --out paper/figures/direct_ub_robustness_residual_k/01_rmse_joint_vs_rho_by_k.png \
+    --at-rho 0.6 \
+    --out-at-rho paper/figures/direct_ub_robustness_residual_k/02_rmse_vs_k_rho0p6.png
+
+The second panel plots hybrid_lfista_joint, mlp_concat_ub, and pca_regression_ub
+versus k at measurement_ratio = 0.6 (edit --methods-at-rho if needed).
+
+Automated driver (sequential six arms)
+--------------------------------------
+  bash scripts/run_direct_ub_dct_subsample_residual_k_robustness.sh
+
+Long run with master log (bash messages; Python progress is teed per arm):
+
+  nohup env LOG_FILE=outputs/direct_ub_robustness_residual_k_sweep.log \
+    bash scripts/run_direct_ub_dct_subsample_residual_k_robustness.sh &
+
+Follow progress: tail -f outputs/direct_ub_robustness/dct_subsample/residual_k/v_<k>/runs/<run_id>/logs/run_console.log
+
+After each arm, the shell copies parity PNG and parity_pooled.npz into
+paper/figures/direct_ub_robustness_residual_k/ (09_parity_k*.png, parity_pooled_k*.npz).
+
+Default k grid in the shell script: 2, 4, 6, 8, 12, 16.
+
+Relation to measurement-noise pilot
+-----------------------------------
+That pilot varied eta in b = M y + eta; this sweep varies the compressibility of
+the residual innovation in the ground-truth generator. Both use the same
+--joint-only --robustness-lite driver and outputs under outputs/direct_ub_robustness/
+(ignored by git; regenerate from docs + scripts).

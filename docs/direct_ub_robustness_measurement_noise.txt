@@ -53,3 +53,6 @@ Full ten-seed subsample run 20260422_205913 uses measurement_noise_std = 0.02
 (default Config). Robustness arms at 0.02 with --robustness-lite use fewer seeds
 and are not numerically identical to that run; interpret as same noise level,
 different Monte Carlo budget.
+
+Related axis (residual sparsity k, same DCT + subsample protocol): see
+docs/direct_ub_robustness_residual_k.txt.

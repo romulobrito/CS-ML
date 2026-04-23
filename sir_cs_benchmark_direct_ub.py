@@ -26,6 +26,9 @@ Reference Gaussian + DCT run: see docs/direct_ub_m_ablation.txt.
 Measurement-noise robustness (DCT + subsample, joint-only): see docs/direct_ub_robustness_measurement_noise.txt.
 Use --measurement-noise-std FLOAT and optional --robustness-lite (three seeds, full rho grid).
 
+Residual-k robustness (same protocol, vary generator / CS sparsity level k): see docs/direct_ub_robustness_residual_k.txt.
+Use --residual-k INT (override cfg.residual_k after profile load).
+
 ASCII-only source.
 """
 
@@ -402,11 +405,13 @@ def write_protocol(
     residual_basis: str,
     measurement_kind: str,
     measurement_noise_std: float,
+    residual_k: int,
 ) -> str:
     common = [
         "Direct [u,b] -> y benchmark (methodological protocol)",
         "",
         f"0) residual_basis={residual_basis} (Psi = get_basis(N, residual_basis); y_res = Psi @ alpha per row).",
+        f"0a) residual_k={residual_k} (synthetic innovation sparsity level in make_dataset; OMP oracle k in hybrid CS when used).",
         "   Alpha support/amplitudes use the same generator rule as identity runs; only Psi differs in Psi-axis studies.",
         f"0b) measurement_kind={measurement_kind} (M = build_measurement_matrix: gaussian = i.i.d. N(0,1/sqrt(m)) rows;",
         "    subsample = m distinct coordinate indicators, one per row). M-axis studies change only this, keeping other knobs fixed when configured.",
@@ -451,6 +456,7 @@ def write_run_manifest(
     residual_basis: str,
     measurement_kind: str,
     measurement_noise_std: float,
+    residual_k: int,
 ) -> str:
     title = (
         "Direct [u,b] benchmark: hybrid_lfista_joint vs mlp_concat / PCA / AE (joint-only mode)."
@@ -464,6 +470,7 @@ def write_run_manifest(
         f"residual_basis: {residual_basis}",
         f"measurement_kind: {measurement_kind}",
         f"measurement_noise_std: {measurement_noise_std}",
+        f"residual_k: {residual_k}",
         "",
         "tables/",
         "  detailed_results.csv",
@@ -561,6 +568,12 @@ def parse_args() -> argparse.Namespace:
         help="Override cfg.measurement_noise_std after profile load (default: keep profile value, usually 0.02).",
     )
     p.add_argument(
+        "--residual-k",
+        type=int,
+        default=None,
+        help="Override cfg.residual_k after profile load (synthetic residual sparsity / CS k; default: profile value, often 6).",
+    )
+    p.add_argument(
         "--robustness-lite",
         action="store_true",
         help=(
@@ -600,6 +613,12 @@ def main() -> None:
     apply_config_profile(cfg)
     if args.measurement_noise_std is not None:
         cfg.measurement_noise_std = float(args.measurement_noise_std)
+    if args.residual_k is not None:
+        k_override = int(args.residual_k)
+        if k_override < 1:
+            print("--residual-k must be >= 1.", file=sys.stderr)
+            sys.exit(2)
+        cfg.residual_k = k_override
     rb = str(args.residual_basis).strip().lower()
     if rb not in ("identity", "dct"):
         print("--residual-basis must be identity or dct.", file=sys.stderr)
@@ -648,7 +667,7 @@ def main() -> None:
             f"Profile: {cfg.config_profile} | jobs: {total} | joint_only: {joint_only} | "
             f"hybrid_fista: {include_hf} | ae: {run_ae} | lfista: {include_lfista} | "
             f"residual_basis: {cfg.residual_basis} | measurement_kind: {cfg.measurement_kind} | "
-            f"measurement_noise_std: {cfg.measurement_noise_std}",
+            f"measurement_noise_std: {cfg.measurement_noise_std} | residual_k: {cfg.residual_k}",
         )
         for seed in cfg.seeds:
             for mr in cfg.measurement_ratios:
@@ -677,6 +696,7 @@ def main() -> None:
             str(cfg.residual_basis),
             str(cfg.measurement_kind),
             float(cfg.measurement_noise_std),
+            int(cfg.residual_k),
         )
 
         plot_paths: List[str] = []
@@ -723,6 +743,7 @@ def main() -> None:
             str(cfg.residual_basis),
             str(cfg.measurement_kind),
             float(cfg.measurement_noise_std),
+            int(cfg.residual_k),
         )
         _log(tee, f"Done in {elapsed:.1f}s | manifest: {manifest_path}")
     finally:
