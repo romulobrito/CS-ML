@@ -12,6 +12,23 @@
 This section complements Phase~0 (Section~\ref{sec:exp_synthetic}) with an \emph{end-to-end} comparison on the \textbf{same} synthetic generator and $(\mathrm{seed},\rho)$ protocol: several regressors predict $y$ directly from standardized $[u,b]$ with $b=My+\eta$, versus the PyTorch joint LFISTA map (\texttt{hybrid\_lfista\_joint}) trained in the LFISTA branch of the pipeline.
 We first document the Phase~0-style regime ($\Psi=I$, Gaussian $M$), then two controlled ablations ($\Psi$ axis, then $M$ axis at DCT $\Psi$), ending with a structured DCT$+$subsample protocol (Section~\ref{sec:direct_ub_dct_subsample}) where the joint estimator becomes strongly competitive.
 The initial goal is to show when a strong direct nonlinear map can outperform the structured path; the later subsections show when the opposite holds under a more SIR-CS-aligned measurement model.
+Table~\ref{tab:direct_ub_run_card} lists the three frozen run identifiers used below (same script and $(\mathrm{seed},\rho)$ protocol unless noted).
+
+\begin{table}[t]
+  \centering
+  \caption{Frozen runs for this section: residual basis $\Psi$, measurement operator kind for $M$, and figure subfolder under \texttt{paper/figures/}.}
+  \label{tab:direct_ub_run_card}
+  \small
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    \texttt{run\_id} & $\Psi$ & $M$ & subfolder of \texttt{paper/figures/} \\
+    \midrule
+    \texttt{20260422\_102236} & identity & Gaussian & \texttt{direct\_ub\_benchmark/} \\
+    \texttt{20260422\_175210} & DCT & Gaussian & \texttt{direct\_ub\_psi\_dct/} \\
+    \texttt{20260422\_205913} & DCT & subsample & \texttt{direct\_ub\_dct\_subsample/} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \subsection{Protocol}
 \label{sec:direct_ub_protocol}
@@ -222,11 +239,8 @@ This matches the interpretation that RMSE is more sensitive to occasional large 
 The relative $\ell_2$ curves echo RMSE: the joint is slightly above the best direct maps at low $\rho$, closes the gap by $\rho=0.50$, and is clearly lowest at $\rho=0.60$.
 Together with RMSE and MAE, the three panels show a coherent transition from ``competitive but not leading'' to ``leading at high $\rho$'' under DCT$+$subsample.
 
-\paragraph{Support F1 (Figure~\ref{fig:direct_ub_sub_support}, left).}
-Support F1 for the joint method stays in a narrow band (roughly $0.09$--$0.10$ with mild non-monotone variation). The discrimination between methods in this run is therefore driven primarily by reconstruction errors (RMSE, MAE, relative $\ell_2$), not by a large F1 swing alone.
-
-\paragraph{Support F1 and end-to-end error.}
-Figure~\ref{fig:direct_ub_sub_support} (left) shows support F1 for \texttt{hybrid\_lfista\_joint} in a narrow band (roughly $0.09$--$0.10$ with mild variation), so ordering by RMSE/MAE is not driven by a spurious F1 spike alone.
+\paragraph{Support F1 and grouped RMSE (Figure~\ref{fig:direct_ub_sub_support}).}
+Figure~\ref{fig:direct_ub_sub_support} (left) shows support F1 for \texttt{hybrid\_lfista\_joint} in a narrow band (roughly $0.09$--$0.10$ with mild non-monotone variation), so ordering by RMSE/MAE is driven primarily by reconstruction errors (RMSE, MAE, relative $\ell_2$), not by a large F1 swing alone.
 The grouped RMSE bar panel (right) matches Table~\ref{tab:direct_ub_dct_subsample_rmse}: at $\rho=0.60$ the joint bar is the lowest.
 
 \begin{figure}[t]
