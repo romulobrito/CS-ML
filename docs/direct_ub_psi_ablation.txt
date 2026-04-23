@@ -56,3 +56,7 @@ After two runs, pass both summary.csv paths:
     --out outputs/direct_ub_psi_ablation/merged_summary_long.csv
 
 The merged file adds column residual_basis and concatenates rows (long format).
+
+Next axis (M: gaussian vs subsample, usually with Psi=DCT)
+----------------------------------------------------------
+See docs/direct_ub_m_ablation.txt and --measurement-kind in sir_cs_benchmark_direct_ub.py.

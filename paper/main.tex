@@ -32,7 +32,8 @@ We summarize a hybrid estimator that predicts a global component with machine le
 We then document a reproducible \emph{Phase~0} synthetic baseline: ten independent seeds, measurement ratios up to $\rho=0.6$, a refined $\ell_1$ penalty grid for validation-based model selection, and standard diagnostics (curves versus $\rho$, gains over ml-only, parity plots, residual histograms, and example traces).
 A subsequent \emph{Step~1} section compares FISTA versus SPGL1 on the same protocol; a \emph{Step~1b} section adds \texttt{sklearn} Lasso and OMP baselines on identical $(\mathrm{seed},\rho)$ draws with tables and figures from a frozen run.
 We also report a direct-regression benchmark that maps standardized $[u,b]$ to $y$ (MLP, PCA+MLP, AE) against \texttt{hybrid\_lfista\_joint} on the same Phase~0 draws (frozen run \texttt{20260422\_102236}): under identity $\Psi$ and Gaussian $M$, the best direct maps achieve lower RMSE than joint LFISTA at most $\rho$, motivating regime-specific protocol extensions.
-A \emph{Psi-axis} pilot (same protocol, only $\Psi$ set to the DCT basis; run \texttt{20260422\_175210}) shows lower RMSE for both joint and MLP; the joint-versus-MLP gap tightens at high $\rho$ but the best MLP still leads in this DGP.
+A \emph{Psi-axis} pilot (DCT $\Psi$ with Gaussian $M$; run \texttt{20260422\_175210}) tightens the joint-versus-MLP RMSE gap at high $\rho$ but the best direct map still leads.
+A further \emph{structured} direct benchmark with DCT $\Psi$ and \emph{subsampled} $M$ (run \texttt{20260422\_205913}) shows \texttt{hybrid\_lfista\_joint} achieving the best test MAE from $\rho=0.30$ upward and the best RMSE/relative $\ell_2$ at the largest $\rho$ against the same $[u,b]$ baselines, illustrating a competitive regime for the SIR-CS joint map when the protocol matches background--innovation--partial measurement structure.
 Real-data evaluation is outlined as future work.
 \end{abstract}
 

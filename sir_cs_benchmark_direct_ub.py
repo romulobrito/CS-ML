@@ -20,6 +20,9 @@ Psi ablation (pilot): use --residual-basis identity|dct; same alpha rule, only P
 Organize with separate --base-dir per axis, e.g. outputs/direct_ub_psi_ablation/identity vs .../dct.
 See docs/direct_ub_psi_ablation.txt.
 
+M-axis (with Psi fixed, usually dct): use --measurement-kind gaussian|subsample.
+Reference Gaussian + DCT run: see docs/direct_ub_m_ablation.txt.
+
 ASCII-only source.
 """
 
@@ -333,12 +336,16 @@ def save_focus_tables(
     return [p1, p2]
 
 
-def write_protocol(run_root: str, joint_only: bool, residual_basis: str) -> str:
+def write_protocol(
+    run_root: str, joint_only: bool, residual_basis: str, measurement_kind: str
+) -> str:
     common = [
         "Direct [u,b] -> y benchmark (methodological protocol)",
         "",
         f"0) residual_basis={residual_basis} (Psi = get_basis(N, residual_basis); y_res = Psi @ alpha per row).",
         "   Alpha support/amplitudes use the same generator rule as identity runs; only Psi differs in Psi-axis studies.",
+        f"0b) measurement_kind={measurement_kind} (M = build_measurement_matrix: gaussian = i.i.d. N(0,1/sqrt(m)) rows;",
+        "    subsample = m distinct coordinate indicators, one per row). M-axis studies change only this, keeping other knobs fixed when configured.",
         "",
         "1) Same synthetic generator and splits as sir_cs_pipeline_optimized (make_dataset).",
         "2) Same M, noise on b, per (seed, measurement_ratio) as hybrid CS evaluation.",
@@ -377,6 +384,7 @@ def write_run_manifest(
     focus_paths: List[str],
     joint_only: bool,
     residual_basis: str,
+    measurement_kind: str,
 ) -> str:
     title = (
         "Direct [u,b] benchmark: hybrid_lfista_joint vs mlp_concat / PCA / AE (joint-only mode)."
@@ -388,6 +396,7 @@ def write_run_manifest(
         f"run_id: {run_id}",
         f"elapsed_seconds: {elapsed_s:.1f}",
         f"residual_basis: {residual_basis}",
+        f"measurement_kind: {measurement_kind}",
         "",
         "tables/",
         "  detailed_results.csv",
@@ -463,6 +472,16 @@ def parse_args() -> argparse.Namespace:
             "Default identity. For Psi-axis pilot, run twice with separate --base-dir (see docs/direct_ub_psi_ablation.txt)."
         ),
     )
+    p.add_argument(
+        "--measurement-kind",
+        type=str,
+        default="gaussian",
+        choices=("gaussian", "subsample"),
+        help=(
+            "How M is built: gaussian (dense) vs subsample (coordinate selection). "
+            "Default gaussian. For M-axis with DCT Psi, see docs/direct_ub_m_ablation.txt."
+        ),
+    )
     return p.parse_args()
 
 
@@ -490,6 +509,11 @@ def main() -> None:
         print("--residual-basis must be identity or dct.", file=sys.stderr)
         sys.exit(2)
     cfg.residual_basis = rb  # type: ignore[assignment]
+    mk = str(args.measurement_kind).strip().lower()
+    if mk not in ("gaussian", "subsample"):
+        print("--measurement-kind must be gaussian or subsample.", file=sys.stderr)
+        sys.exit(2)
+    cfg.measurement_kind = mk  # type: ignore[assignment]
 
     include_lfista = joint_only or (not bool(args.no_lfista))
     if include_lfista:
@@ -526,7 +550,7 @@ def main() -> None:
             tee,
             f"Profile: {cfg.config_profile} | jobs: {total} | joint_only: {joint_only} | "
             f"hybrid_fista: {include_hf} | ae: {run_ae} | lfista: {include_lfista} | "
-            f"residual_basis: {cfg.residual_basis}",
+            f"residual_basis: {cfg.residual_basis} | measurement_kind: {cfg.measurement_kind}",
         )
         for seed in cfg.seeds:
             for mr in cfg.measurement_ratios:
@@ -548,7 +572,9 @@ def main() -> None:
         focus_paths = save_focus_tables(
             run_root, summary, per_seed, include_hf, run_ae, include_lfista, joint_only
         )
-        proto_path = write_protocol(run_root, joint_only, str(cfg.residual_basis))
+        proto_path = write_protocol(
+            run_root, joint_only, str(cfg.residual_basis), str(cfg.measurement_kind)
+        )
 
         plot_paths: List[str] = []
         if not args.no_plots:
@@ -565,6 +591,7 @@ def main() -> None:
             "include_lfista": include_lfista,
             "include_ae": run_ae,
             "residual_basis": str(cfg.residual_basis),
+            "measurement_kind": str(cfg.measurement_kind),
             "dub_cfg": dub_dump,
             "protocol_txt": proto_path,
             "tables_dir": tables_dir,
@@ -582,6 +609,7 @@ def main() -> None:
             focus_paths + [proto_path],
             joint_only,
             str(cfg.residual_basis),
+            str(cfg.measurement_kind),
         )
         _log(tee, f"Done in {elapsed:.1f}s | manifest: {manifest_path}")
     finally:

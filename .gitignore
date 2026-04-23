@@ -36,6 +36,9 @@ outputs/direct_ub_benchmark/runs/
 # Psi-axis pilot (identity vs dct), sir_cs_benchmark_direct_ub.py + scripts/run_direct_ub_psi_pilot.sh
 outputs/direct_ub_psi_ablation/
 
+# M-axis pilot (gaussian vs subsample M, often with dct), scripts/run_direct_ub_dct_m_pilot.sh
+outputs/direct_ub_dct_m_ablation/
+
 # Robustness Phase 3 sweep outputs (large; regenerate with run_robustness_phase3_sweep.py)
 outputs/robustness_phase3/
 

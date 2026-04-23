@@ -1,0 +1,62 @@
+Direct [u,b] benchmark: M-axis pilot (Gaussian vs subsample), Psi usually DCT
+============================================================================
+
+Goal
+----
+Isolate the effect of the measurement operator M only:
+  - Fix residual_basis (recommended: dct after Psi-axis pilot).
+  - Fix seeds, rho grid, noise stds, splits, alpha rule.
+  - Change only cfg.measurement_kind: gaussian -> subsample.
+
+Reference for "Gaussian + DCT"
+------------------------------
+Frozen joint-only run with --residual-basis dct and default --measurement-kind gaussian:
+  outputs/direct_ub_psi_ablation/dct/runs/20260422_175210/
+(regenerate if needed; not committed to git).
+
+Next run (informative case)
+---------------------------
+  Psi = DCT,  M = subsample (coordinate measurements).
+
+Recommended artifact layout
+---------------------------
+  outputs/direct_ub_dct_m_ablation/subsample/runs/<run_id>/
+
+Each run: tables/*.csv, figures/*.png, PROTOCOL.txt (residual_basis + measurement_kind),
+config.json, RUN_MANIFEST.txt, logs/run_console.log.
+
+Full joint-only run (50 jobs)
+-----------------------------
+From repo root:
+
+  python sir_cs_benchmark_direct_ub.py --joint-only \
+    --residual-basis dct \
+    --measurement-kind subsample \
+    --base-dir outputs/direct_ub_dct_m_ablation/subsample
+
+Optional: --run-id dct_subsample_full
+
+Pilot (explore profile, 2 jobs)
+-------------------------------
+  bash scripts/run_direct_ub_dct_m_pilot.sh
+
+Merge Gaussian+DCT vs subsample+DCT summaries
+---------------------------------------------
+After both summary.csv exist (Gaussian reference path + new subsample run):
+
+  python scripts/merge_direct_ub_m_ablation.py \
+    --gaussian-dct-summary <path/to/.../psi_ablation/dct/.../tables/summary.csv> \
+    --subsample-dct-summary outputs/direct_ub_dct_m_ablation/subsample/runs/<id>/tables/summary.csv \
+    --out outputs/direct_ub_dct_m_ablation/merged_subsample_vs_gaussian_dct_long.csv
+
+The merged file adds column measurement_kind (gaussian vs subsample) in long format.
+
+What to compare
+---------------
+- RMSE gap hybrid_lfista_joint vs mlp_concat_ub and vs pca_regression_ub by rho.
+- Whether joint gains more at low or mid rho than in the Gaussian+DCT run.
+
+Optional later
+----------------
+Psi=I with subsample is possible but less informative if DCT is the main structural choice;
+run only after the DCT+subsample result is understood.
