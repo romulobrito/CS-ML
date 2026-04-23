@@ -1,0 +1,55 @@
+Direct [u,b] benchmark: measurement noise on b (robustness, DCT + subsample M)
+=============================================================================
+
+Question
+--------
+Under the structured protocol (Psi = DCT, M = subsample) where hybrid_lfista_joint
+is competitive, how sensitive are test errors to the standard deviation of
+Gaussian noise eta in b = M y + eta?
+
+Design (controlled axis)
+------------------------
+- Fixed: residual_basis dct, measurement_kind subsample, same make_dataset rule,
+  same measurement_ratio grid {0.20, 0.30, 0.40, 0.50, 0.60}, same script version.
+- Varied only: cfg.measurement_noise_std via --measurement-noise-std (CLI override).
+- Seeds: use --robustness-lite for a three-seed subset {7, 23, 41} and full rho
+  grid (15 jobs per noise level). This is a lighter sweep than the ten-seed paper
+  runs; upgrade to full joint-only profile for publication-grade error bars.
+
+Artifact layout
+---------------
+  outputs/direct_ub_robustness/dct_subsample/measurement_noise_std/v_<slug>/runs/<run_id>/
+
+Slug examples: 0.01 -> v_0p01 (dots replaced by p, see robustness_value_slug in
+sir_cs_pipeline_optimized.py for consistency with other sweeps).
+
+Each run contains tables/*.csv, figures/*.png, PROTOCOL.txt (includes 0c line for
+noise std), config.json, RUN_MANIFEST.txt, logs/run_console.log.
+
+Merged table and paper figure
+-----------------------------
+After all arms finish:
+
+  python scripts/merge_direct_ub_noise_robustness.py \
+    --arm 0.01 <path/to/v_0p01/.../tables/summary.csv> \
+    --arm 0.02 <path/to/v_0p02/.../tables/summary.csv> \
+    --arm 0.04 <path/to/v_0p04/.../tables/summary.csv> \
+    --out outputs/direct_ub_robustness/dct_subsample/merged_measurement_noise_long.csv
+
+  python scripts/plot_direct_ub_noise_robustness.py \
+    --merged outputs/direct_ub_robustness/dct_subsample/merged_measurement_noise_long.csv \
+    --out paper/figures/direct_ub_robustness_measurement_noise/01_rmse_joint_vs_rho_by_noise.png
+
+Automated driver (sequential three arms)
+----------------------------------------
+  bash scripts/run_direct_ub_dct_subsample_noise_robustness.sh
+
+Default noise levels in the shell script: 0.01, 0.02, 0.04 (baseline pipeline
+default is 0.02).
+
+Relation to frozen paper run
+-----------------------------
+Full ten-seed subsample run 20260422_205913 uses measurement_noise_std = 0.02
+(default Config). Robustness arms at 0.02 with --robustness-lite use fewer seeds
+and are not numerically identical to that run; interpret as same noise level,
+different Monte Carlo budget.

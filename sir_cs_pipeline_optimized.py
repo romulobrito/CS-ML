@@ -399,6 +399,13 @@ def apply_config_profile(cfg: Config) -> None:
         cfg.lfista_steps = 5
         cfg.plots_subdir = "figures"
         return
+    # Subset of seeds, full rho grid: faster robustness sweeps vs full ten-seed paper runs.
+    if cfg.config_profile == "direct_ub_lfista_joint_robustness_lite":
+        cfg.seeds = [7, 23, 41]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.plots_subdir = "figures"
+        return
 
 
 def robustness_value_slug(raw: str) -> str:
@@ -1909,7 +1916,11 @@ def save_lfista_vs_classical_focus_tables(
 
 
 def method_order_for_cfg(cfg: Config) -> List[str]:
-    if cfg.config_profile in ("direct_ub_lfista_joint_only", "direct_ub_lfista_joint_only_explore"):
+    if cfg.config_profile in (
+        "direct_ub_lfista_joint_only",
+        "direct_ub_lfista_joint_only_explore",
+        "direct_ub_lfista_joint_robustness_lite",
+    ):
         return list(METHOD_ORDER_DIRECT_UB_JOINT_FOCUS)
     if cfg.config_profile in ("direct_ub_benchmark", "direct_ub_benchmark_explore"):
         return list(METHOD_ORDER_DIRECT_UB)

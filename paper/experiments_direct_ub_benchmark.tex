@@ -278,12 +278,76 @@ The progression identity$\Psi+$Gaussian $M$ $\to$ DCT$\Psi+$Gaussian $M$ $\to$ D
 Under the final protocol, the decomposition used by SIR-CS appears better aligned with the data-generating process than a single black-box $[u,b]\to y$ map, which is why \texttt{hybrid\_lfista\_joint} can lead strong baselines on key metrics at sufficiently high $\rho$ without abandoning the earlier benchmarks that document the opposite regime.
 
 \paragraph{Scope and limitations.}
-The benchmark with identity $\Psi$ and Gaussian $M$ (Table~\ref{tab:direct_ub_rmse}) illustrates a regime where direct maps win; the DCT$+$Gaussian ablation (Table~\ref{tab:direct_ub_psi_rmse_gap}) shows a controlled improvement from changing $\Psi$ only; the DCT$+$subsample protocol above identifies a \emph{structured} regime where \texttt{hybrid\_lfista\_joint} is superior on MAE over most of the $\rho$ grid and leads on RMSE/relative $\ell_2$ at the largest $\rho$ tested. This is evidence of a \textbf{regime of validity} for the SIR-CS joint estimator, not a claim of dominance on all generators or all measurement models. Small robustness sweeps (noise, $k$) are natural follow-ups.
-See \texttt{docs/direct\_ub\_m\_ablation.txt} for the exact shell protocol.
+The benchmark with identity $\Psi$ and Gaussian $M$ (Table~\ref{tab:direct_ub_rmse}) illustrates a regime where direct maps win; the DCT$+$Gaussian ablation (Table~\ref{tab:direct_ub_psi_rmse_gap}) shows a controlled improvement from changing $\Psi$ only; the DCT$+$subsample protocol above identifies a \emph{structured} regime where \texttt{hybrid\_lfista\_joint} is superior on MAE over most of the $\rho$ grid and leads on RMSE/relative $\ell_2$ at the largest $\rho$ tested. This is evidence of a \textbf{regime of validity} for the SIR-CS joint estimator, not a claim of dominance on all generators or all measurement models.
+A complementary \emph{pilot} sweep varies only the standard deviation of Gaussian noise $\eta$ in $b=My+\eta$ (fixed $\Psi=\mathrm{DCT}$, subsample $M$, same $\rho$ grid); reproduction and directory layout are in \texttt{docs/direct\_ub\_robustness\_measurement\_noise.txt}. The merged long-format table is \texttt{outputs/direct\_ub\_robustness/dct\_subsample/merged\_measurement\_noise\_long.csv}.
+Frozen pilot arms with parity export: \texttt{noise\_0p01\_20260423\_140024} ($\mathrm{std}(\eta)=0.01$), \texttt{noise\_0p02\_20260423\_143832} ($0.02$), \texttt{noise\_0p04\_20260423\_150923} ($0.04$).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.62\linewidth]{figures/direct_ub_robustness_measurement_noise/01_rmse_joint_vs_rho_by_noise.png}
+  \caption{Pilot robustness: test RMSE (mean across seeds) for \texttt{hybrid\_lfista\_joint} vs.\ $\rho$ at three values of measurement noise std on $b$; DCT $\Psi$, subsample $M$, three-seed profile (\texttt{--robustness-lite}). Curves shift upward with larger noise as expected; ordering across $\rho$ is stable in this window.}
+  \label{fig:direct_ub_noise_robust}
+\end{figure}
+
+\begin{table}[t]
+  \centering
+  \caption{Pilot sweep (measurement noise on $b$): test RMSE and MAE for \texttt{hybrid\_lfista\_joint} only. Means over three seeds (\texttt{--robustness-lite}); $\Psi=\mathrm{DCT}$, subsample $M$. Source: \texttt{outputs/direct\_ub\_robustness/dct\_subsample/merged\_measurement\_noise\_long.csv}.}
+  \label{tab:direct_ub_noise_pilot_joint}
+  \footnotesize
+  \begin{tabular}{@{}lcccccc@{}}
+    \toprule
+    $\rho$ & \multicolumn{2}{c}{$\mathrm{std}(\eta)=0.01$} & \multicolumn{2}{c}{$0.02$} & \multicolumn{2}{c@{}}{$0.04$} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(l){6-7}
+    & RMSE & MAE & RMSE & MAE & RMSE & MAE \\
+    \midrule
+    $0.20$ & $0.303$ & $0.218$ & $0.303$ & $0.220$ & $0.306$ & $0.225$ \\
+    $0.30$ & $0.269$ & $0.185$ & $0.269$ & $0.187$ & $0.272$ & $0.192$ \\
+    $0.40$ & $0.238$ & $0.154$ & $0.238$ & $0.155$ & $0.240$ & $0.161$ \\
+    $0.50$ & $0.203$ & $0.122$ & $0.204$ & $0.125$ & $0.206$ & $0.132$ \\
+    $0.60$ & $0.174$ & $0.095$ & $0.175$ & $0.099$ & $0.179$ & $0.109$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/direct_ub_robustness_measurement_noise/02_parity_pilot_std0p02.png}
+  \caption{Pilot parity (pooled over all test output coordinates and all $(\mathrm{seed},\rho)$ jobs in the arm): ground truth versus prediction for each method. Arm \texttt{noise\_0p02\_20260423\_143832} with $\mathrm{std}(\eta)=0.02$ (same default scale as Config), DCT $\Psi$, subsample $M$, \texttt{--robustness-lite}. Correlation values are those printed by the benchmark script.}
+  \label{fig:direct_ub_noise_pilot_parity}
+\end{figure}
+
+\subsubsection{Integrated reading: dashboards, gains, noise pilot, and conclusions}
+
+\paragraph{Qualitative shift relative to earlier direct-$[u,b]$ regimes.}
+Phase~0-style identity$\Psi+$Gaussian $M$ (Table~\ref{tab:direct_ub_rmse}) is a setting where strong global regressors from $[u,b]$ are difficult to beat. The DCT$+$subsample configuration changes the problem geometry enough that \texttt{hybrid\_lfista\_joint} is no longer only ``close'' to the best direct maps: on the ten-seed frozen run \texttt{20260422\_205913}, the error panels (Figure~\ref{fig:direct_ub_sub_curves}) show a coherent pattern---\textbf{MAE} separates earliest, \textbf{RMSE} and \textbf{relative $\ell_2$} cross later---consistent with a map $y\approx f(u)+\Psi\alpha$ being actively useful when $M$ is sparse and $\Psi$ compresses residuals.
+
+\paragraph{MAE: strongest and earliest signal.}
+Table~\ref{tab:direct_ub_dct_subsample_mae} makes the MAE story quantitative: at $\rho=0.20$, \texttt{hybrid\_lfista\_joint} ($0.221$) is within $0.004$ of the best PCA row and already below \texttt{mlp\_concat\_ub} and \texttt{ae\_regression\_ub}; from $\rho=0.30$ through $\rho=0.60$ it is the unique best method, with the end-point MAE ($0.102$ at $\rho=0.60$) well below the best direct rows ($0.145$--$0.152$). MAE is hard to ``hide behind'' because it weights all coordinates evenly; here it is the cleanest headline for structured recovery under partial linear measurements.
+
+\paragraph{RMSE and relative $\ell_2$: crossover and scaling with $\rho$.}
+RMSE is more conservative (Table~\ref{tab:direct_ub_dct_subsample_rmse}): \texttt{mlp\_concat\_ub} / \texttt{pca\_regression\_ub} lead at $\rho\in\{0.20,0.30,0.40\}$, the joint is tied near $\rho=0.50$, and it becomes the best RMSE at $\rho=0.60$ ($0.180$ vs.\ $0.188$ for \texttt{mlp\_concat\_ub}). Relative $\ell_2$ (Figure~\ref{fig:direct_ub_sub_curves}, right) tracks the same story: the joint is not best at the lowest $\rho$, closes the gap by $\rho\approx 0.50$, and is lowest at $\rho=0.60$. The interpretation is not that the joint ignores heavy tails, but that \emph{it benefits more from additional coordinate measurements} once the structured path is aligned with the DGP---RMSE rewards occasional large errors, so leadership appears only when enough of $b$ is informative.
+
+\paragraph{Gain panels vs.\ \texttt{ml\_only} (Figure~\ref{fig:direct_ub_sub_gains}).}
+The gain plots (baseline $-$ method, positive is better) isolate how much each method improves over a $u$-only MLP. \texttt{hybrid\_lfista\_joint} achieves the largest MAE gain at every $\rho$, and its RMSE gain rises fastest with $\rho$, ending highest at $\rho=0.60$. Direct $[u,b]$ maps also improve over \texttt{ml\_only}, but the joint's curve is the one whose \emph{slope} vs.\ $\rho$ is steepest, which is the empirical signature we want for ``using $b$ well'' under this protocol.
+
+\paragraph{Support F1 (Figure~\ref{fig:direct_ub_sub_support}, left).}
+Support F1 for the joint stays in a narrow band near $0.09$--$0.10$ with mild non-monotone variation. The ordering in Tables~\ref{tab:direct_ub_dct_subsample_rmse} and~\ref{tab:direct_ub_dct_subsample_mae} is therefore driven primarily by reconstruction errors, not by a spurious spike in support recovery. We treat support F1 as a \textbf{secondary} diagnostic here, not the headline metric.
+
+\paragraph{Noise-on-$b$ pilot (Figure~\ref{fig:direct_ub_noise_robust}, Table~\ref{tab:direct_ub_noise_pilot_joint}, and Figure~\ref{fig:direct_ub_noise_pilot_parity}).}
+The pilot uses \texttt{--robustness-lite} (three seeds; not the same Monte Carlo budget as run \texttt{20260422\_205913}) and three noise levels $\{0.01,0.02,0.04\}$ on $b$ with identical $\Psi$, subsample $M$, and $\rho$ grid. Table~\ref{tab:direct_ub_noise_pilot_joint} shows that both RMSE and MAE for \texttt{hybrid\_lfista\_joint} shift upward as $\mathrm{std}(\eta)$ increases at fixed $\rho$, while the decrease with $\rho$ at fixed noise remains monotone in this window. At $\rho=0.60$, RMSE moves from $0.174$ to $0.179$ across the noise arms---a small absolute change relative to the gap vs.\ direct baselines in the merged file. The qualitative ordering ``joint vs.\ \texttt{mlp\_concat\_ub} at high $\rho$'' is preserved across noise arms in that pilot. Figure~\ref{fig:direct_ub_noise_robust} plots RMSE vs.\ $\rho$ (joint only, one curve per noise std). Figure~\ref{fig:direct_ub_noise_pilot_parity} gives a pooled parity view at $\mathrm{std}(\eta)=0.02$: \texttt{mlp\_concat\_ub} and \texttt{pca\_regression\_ub} track the identity line tightly; \texttt{hybrid\_lfista\_joint} is competitive globally on this scatter while the \emph{regime story} (who leads by $\rho$) is still best read from Tables~\ref{tab:direct_ub_dct_subsample_rmse} and~\ref{tab:direct_ub_noise_pilot_joint}. Full five-method dashboards and \texttt{parity\_pooled.npz} per arm remain under \texttt{outputs/direct\_ub\_robustness/.../runs/} per \texttt{docs/direct\_ub\_robustness\_measurement\_noise.txt}.
+
+\paragraph{Conclusions for the paper's claim.}
+The correct scientific statement is \textbf{conditional}: the proposed joint estimator can \textbf{lead} strong $[u,b]$ baselines on MAE over most of the $\rho$ grid tested and on RMSE/relative $\ell_2$ at the largest $\rho$, \emph{in this} DCT$+$subsample synthetic reference, while earlier rows of the experimental roadmap still document regimes where direct maps win. That is a \textbf{regime-of-validity} narrative, not a universal superiority claim; it is strengthened by (i) explicit ablations on $\Psi$ and $M$, (ii) aligned error metrics, and (iii) a small noise robustness pilot showing stable high-$\rho$ ordering under a bandwidth of $\eta$.
+
+\paragraph{Optional extensions.}
+A single follow-up axis (for example residual $k$ only, or an additional noise level) would further stress-test whether high-$\rho$ leadership is fragile to a one-dimensional synthetic knob; we leave that as optional work beyond the pilot above.
+
+See \texttt{docs/direct\_ub\_m\_ablation.txt} for the exact shell protocol of the main M-axis comparison.
 
 \subsubsection*{Takeaways}
 \begin{enumerate}
   \item Under DCT$+$subsample, \texttt{hybrid\_lfista\_joint} \textbf{beats} the best direct $[u,b]$ baselines on \textbf{MAE} from $\rho=0.30$ upward and on \textbf{RMSE} and \textbf{relative $\ell_2$} at the \textbf{largest} $\rho$ tested, while remaining competitive at $\rho=0.20$.
   \item The advantage is \textbf{not universal}: the Phase~0 identity benchmark and the DCT$+$Gaussian row still show regimes where direct maps lead; the contribution is an explicit \textbf{map of regimes} rather than a single winner everywhere.
   \item The experimental step from dense Gaussian $M$ to subsampled $M$ at fixed DCT $\Psi$ was \textbf{decisive} for competitiveness (Table~\ref{tab:joint_rmse_dct_gauss_vs_sub}), motivating this structured configuration as the primary ``SIR-CS-aligned'' synthetic reference going forward.
+  \item A pooled parity view at $\mathrm{std}(\eta)=0.02$ on the pilot arm (Figure~\ref{fig:direct_ub_noise_pilot_parity}) complements Tables~\ref{tab:direct_ub_noise_pilot_joint}--\ref{tab:direct_ub_dct_subsample_rmse}: direct $[u,b]$ maps track identity tightly in the aggregate cloud, while the joint remains well calibrated without substituting for the $\rho$-by-$\rho$ head-to-head tables.
 \end{enumerate}

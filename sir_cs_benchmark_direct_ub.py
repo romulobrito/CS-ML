@@ -9,8 +9,8 @@ on the same synthetic protocol as sir_cs_pipeline_optimized.py.
 
 Artifacts per run:
     <base_dir>/runs/<run_id>/
-        tables/           CSVs + summary_focus_direct_ub.csv
-        figures/          01--07 PNGs (same dashboard as other benchmarks)
+        tables/           CSVs + summary_focus_direct_ub.csv + parity_pooled.npz (pooled y vs y_hat)
+        figures/          01--07 PNGs (same dashboard as other benchmarks) + 09_parity_ground_truth_vs_prediction.png
         logs/run_console.log
         PROTOCOL.txt
         config.json
@@ -22,6 +22,9 @@ See docs/direct_ub_psi_ablation.txt.
 
 M-axis (with Psi fixed, usually dct): use --measurement-kind gaussian|subsample.
 Reference Gaussian + DCT run: see docs/direct_ub_m_ablation.txt.
+
+Measurement-noise robustness (DCT + subsample, joint-only): see docs/direct_ub_robustness_measurement_noise.txt.
+Use --measurement-noise-std FLOAT and optional --robustness-lite (three seeds, full rho grid).
 
 ASCII-only source.
 """
@@ -35,7 +38,7 @@ import sys
 import time
 import warnings
 from dataclasses import asdict
-from typing import List, Optional, TextIO
+from typing import Dict, List, Optional, TextIO, Tuple
 
 from sklearn.exceptions import ConvergenceWarning
 
@@ -53,6 +56,8 @@ from sir_cs_pipeline_optimized import (
     build_lambda_selection_arrays,
     build_measurement_matrix,
     make_dataset,
+    merge_gt_pred_bundles,
+    plot_parity_ground_truth_vs_predictions,
     power_iteration_lipschitz,
     run_lfista_branch,
     save_all_comparison_plots,
@@ -95,6 +100,39 @@ def _log(tee: Optional[_Tee], msg: str) -> None:
         print(msg, flush=True)
 
 
+def build_direct_ub_parity_fragment(
+    Y_test: np.ndarray,
+    Ybg_test: np.ndarray,
+    pred_test_mlp: np.ndarray,
+    pred_test_pca: np.ndarray,
+    pred_test_ae: Optional[np.ndarray],
+    run_ae: bool,
+    y_hf_stack: Optional[np.ndarray],
+    lf_gt: Optional[Dict[str, np.ndarray]],
+    joint_only: bool,
+) -> Dict[str, np.ndarray]:
+    """Flatten test tensors for parity scatter (pooled over samples and output coordinates)."""
+    out: Dict[str, np.ndarray] = {
+        "y_true": np.asarray(Y_test, dtype=np.float64).ravel(),
+        "ml_only": np.asarray(Ybg_test, dtype=np.float64).ravel(),
+        "mlp_concat_ub": np.asarray(pred_test_mlp, dtype=np.float64).ravel(),
+        "pca_regression_ub": np.asarray(pred_test_pca, dtype=np.float64).ravel(),
+    }
+    if run_ae and pred_test_ae is not None:
+        out["ae_regression_ub"] = np.asarray(pred_test_ae, dtype=np.float64).ravel()
+    if y_hf_stack is not None and y_hf_stack.size > 0:
+        out["hybrid_fista"] = np.asarray(y_hf_stack, dtype=np.float64).ravel()
+    if lf_gt:
+        if joint_only:
+            k = "hybrid_lfista_joint"
+            if k in lf_gt:
+                out[k] = np.asarray(lf_gt[k], dtype=np.float64).ravel()
+        else:
+            for k, v in lf_gt.items():
+                out[str(k)] = np.asarray(v, dtype=np.float64).ravel()
+    return out
+
+
 def run_direct_ub_single_setting(
     cfg: Config,
     dub_cfg: dub.DirectUBTrainConfig,
@@ -104,7 +142,7 @@ def run_direct_ub_single_setting(
     run_ae: bool,
     include_lfista: bool,
     joint_only: bool,
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
     rng = np.random.default_rng(seed)
     data = make_dataset(cfg, seed=seed)
     X_train = data["X_train"]
@@ -174,6 +212,7 @@ def run_direct_ub_single_setting(
     pred_val_pca, pred_test_pca, best_r = dub.fit_predict_pca_regression_ub(
         cfg, seed, dub_cfg, Xb_train, Y_train, Xb_val, Y_val, Xb_test, ub_scaler
     )
+    pred_test_ae: Optional[np.ndarray] = None
     if run_ae:
         pred_val_ae, pred_test_ae = dub.fit_predict_ae_regression_ub(
             cfg, seed, dub_cfg, Xb_train, Y_train, Xb_val, Y_val, Xb_test, ub_scaler
@@ -183,6 +222,7 @@ def run_direct_ub_single_setting(
     nan_f = float("nan")
     rows: List[dict[str, float | int | str]] = []
     n_test = len(X_test)
+    y_hf_rows: List[np.ndarray] = []
 
     for i in range(n_test):
         noise = cfg.measurement_noise_std * rng.normal(size=m)
@@ -259,6 +299,7 @@ def run_direct_ub_single_setting(
             ah_hf, y_hf = extb.hybrid_fista_predict_one(
                 cfg, A, Psi, y_ml, z_i, lam_hf, L_A
             )
+            y_hf_rows.append(np.asarray(y_hf, dtype=np.float64))
             rows.append(
                 extb.per_sample_metrics_row(
                     seed,
@@ -276,12 +317,19 @@ def run_direct_ub_single_setting(
             )
 
     df = pd.DataFrame(rows)
+    y_hf_stack: Optional[np.ndarray]
+    if y_hf_rows:
+        y_hf_stack = np.stack(y_hf_rows, axis=0)
+    else:
+        y_hf_stack = None
+
+    lf_gt: Optional[Dict[str, np.ndarray]] = None
     if include_lfista:
 
         def _lf_log(_msg: str) -> None:
             return None
 
-        lf_df, _lf_gt = run_lfista_branch(
+        lf_df, lf_gt = run_lfista_branch(
             cfg,
             seed,
             measurement_ratio,
@@ -292,7 +340,19 @@ def run_direct_ub_single_setting(
         if joint_only:
             lf_df = lf_df[lf_df["method"] == "hybrid_lfista_joint"].copy()
         df = pd.concat([df, lf_df], ignore_index=True)
-    return df
+
+    parity_fragment = build_direct_ub_parity_fragment(
+        Y_test,
+        Ybg_test,
+        pred_test_mlp,
+        pred_test_pca,
+        pred_test_ae,
+        run_ae,
+        y_hf_stack,
+        lf_gt,
+        joint_only,
+    )
+    return df, parity_fragment
 
 
 def save_focus_tables(
@@ -337,7 +397,11 @@ def save_focus_tables(
 
 
 def write_protocol(
-    run_root: str, joint_only: bool, residual_basis: str, measurement_kind: str
+    run_root: str,
+    joint_only: bool,
+    residual_basis: str,
+    measurement_kind: str,
+    measurement_noise_std: float,
 ) -> str:
     common = [
         "Direct [u,b] -> y benchmark (methodological protocol)",
@@ -346,6 +410,7 @@ def write_protocol(
         "   Alpha support/amplitudes use the same generator rule as identity runs; only Psi differs in Psi-axis studies.",
         f"0b) measurement_kind={measurement_kind} (M = build_measurement_matrix: gaussian = i.i.d. N(0,1/sqrt(m)) rows;",
         "    subsample = m distinct coordinate indicators, one per row). M-axis studies change only this, keeping other knobs fixed when configured.",
+        f"0c) measurement_noise_std={measurement_noise_std} (eta in b = M y + eta on train/val/test and per-sample test rows).",
         "",
         "1) Same synthetic generator and splits as sir_cs_pipeline_optimized (make_dataset).",
         "2) Same M, noise on b, per (seed, measurement_ratio) as hybrid CS evaluation.",
@@ -385,6 +450,7 @@ def write_run_manifest(
     joint_only: bool,
     residual_basis: str,
     measurement_kind: str,
+    measurement_noise_std: float,
 ) -> str:
     title = (
         "Direct [u,b] benchmark: hybrid_lfista_joint vs mlp_concat / PCA / AE (joint-only mode)."
@@ -397,6 +463,7 @@ def write_run_manifest(
         f"elapsed_seconds: {elapsed_s:.1f}",
         f"residual_basis: {residual_basis}",
         f"measurement_kind: {measurement_kind}",
+        f"measurement_noise_std: {measurement_noise_std}",
         "",
         "tables/",
         "  detailed_results.csv",
@@ -450,6 +517,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--no-ae", action="store_true", help="Skip AE baseline (faster).")
     p.add_argument("--no-plots", action="store_true", help="Skip figure generation.")
     p.add_argument(
+        "--no-parity",
+        action="store_true",
+        help="Skip parity scatter (09_parity_...) and tables/parity_pooled.npz export.",
+    )
+    p.add_argument(
         "--no-lfista",
         action="store_true",
         help="Skip PyTorch LFISTA branch (ml_only_torch, hybrid_lfista_frozen, hybrid_lfista_joint).",
@@ -482,6 +554,20 @@ def parse_args() -> argparse.Namespace:
             "Default gaussian. For M-axis with DCT Psi, see docs/direct_ub_m_ablation.txt."
         ),
     )
+    p.add_argument(
+        "--measurement-noise-std",
+        type=float,
+        default=None,
+        help="Override cfg.measurement_noise_std after profile load (default: keep profile value, usually 0.02).",
+    )
+    p.add_argument(
+        "--robustness-lite",
+        action="store_true",
+        help=(
+            "Joint-only profile with three seeds and full rho grid (direct_ub_lfista_joint_robustness_lite). "
+            "Mutually exclusive with --explore; requires --joint-only."
+        ),
+    )
     return p.parse_args()
 
 
@@ -490,12 +576,20 @@ def main() -> None:
     if bool(args.joint_only) and bool(args.no_lfista):
         print("--joint-only requires LFISTA; remove --no-lfista.", file=sys.stderr)
         sys.exit(2)
+    if bool(args.explore) and bool(args.robustness_lite):
+        print("Use only one of --explore or --robustness-lite.", file=sys.stderr)
+        sys.exit(2)
+    if bool(args.robustness_lite) and not bool(args.joint_only):
+        print("--robustness-lite requires --joint-only.", file=sys.stderr)
+        sys.exit(2)
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     cfg = Config()
     cfg.log_progress = False
     joint_only = bool(args.joint_only)
     if joint_only:
-        if args.explore:
+        if bool(args.robustness_lite):
+            cfg.config_profile = "direct_ub_lfista_joint_robustness_lite"
+        elif args.explore:
             cfg.config_profile = "direct_ub_lfista_joint_only_explore"
         else:
             cfg.config_profile = "direct_ub_lfista_joint_only"
@@ -504,6 +598,8 @@ def main() -> None:
     else:
         cfg.config_profile = "direct_ub_benchmark"
     apply_config_profile(cfg)
+    if args.measurement_noise_std is not None:
+        cfg.measurement_noise_std = float(args.measurement_noise_std)
     rb = str(args.residual_basis).strip().lower()
     if rb not in ("identity", "dct"):
         print("--residual-basis must be identity or dct.", file=sys.stderr)
@@ -541,6 +637,7 @@ def main() -> None:
 
     run_ae = not bool(args.no_ae)
     all_dfs: List[pd.DataFrame] = []
+    parity_bundles: List[Dict[str, np.ndarray]] = []
     t0 = time.time()
     job_idx = 0
     total = len(cfg.seeds) * len(cfg.measurement_ratios)
@@ -550,16 +647,18 @@ def main() -> None:
             tee,
             f"Profile: {cfg.config_profile} | jobs: {total} | joint_only: {joint_only} | "
             f"hybrid_fista: {include_hf} | ae: {run_ae} | lfista: {include_lfista} | "
-            f"residual_basis: {cfg.residual_basis} | measurement_kind: {cfg.measurement_kind}",
+            f"residual_basis: {cfg.residual_basis} | measurement_kind: {cfg.measurement_kind} | "
+            f"measurement_noise_std: {cfg.measurement_noise_std}",
         )
         for seed in cfg.seeds:
             for mr in cfg.measurement_ratios:
                 job_idx += 1
                 _log(tee, f"--- job {job_idx}/{total} seed={seed} measurement_ratio={mr:.2f} ---")
-                df = run_direct_ub_single_setting(
+                df, pfrag = run_direct_ub_single_setting(
                     cfg, dub_cfg, seed, mr, include_hf, run_ae, include_lfista, joint_only
                 )
                 all_dfs.append(df)
+                parity_bundles.append(pfrag)
 
         detailed = pd.concat(all_dfs, ignore_index=True)
         per_seed = summarize_results_per_seed(detailed)
@@ -573,13 +672,26 @@ def main() -> None:
             run_root, summary, per_seed, include_hf, run_ae, include_lfista, joint_only
         )
         proto_path = write_protocol(
-            run_root, joint_only, str(cfg.residual_basis), str(cfg.measurement_kind)
+            run_root,
+            joint_only,
+            str(cfg.residual_basis),
+            str(cfg.measurement_kind),
+            float(cfg.measurement_noise_std),
         )
 
         plot_paths: List[str] = []
         if not args.no_plots:
             plot_paths = save_all_comparison_plots(cfg, summary, per_seed)
             _log(tee, f"Figures: {len(plot_paths)} files under {os.path.join(run_root, 'figures')}")
+        if not bool(args.no_plots) and not bool(args.no_parity) and parity_bundles:
+            merged_parity = merge_gt_pred_bundles(parity_bundles)
+            npz_path = os.path.join(tables_dir, "parity_pooled.npz")
+            np.savez_compressed(npz_path, **merged_parity)
+            parity_png = os.path.join(run_root, cfg.plots_subdir, "09_parity_ground_truth_vs_prediction.png")
+            plot_parity_ground_truth_vs_predictions(cfg, merged_parity, parity_png)
+            plot_paths.append(npz_path)
+            plot_paths.append(parity_png)
+            _log(tee, f"Parity: {parity_png} | arrays: {npz_path}")
 
         cfg_dump = asdict(cfg)
         dub_dump = asdict(dub_cfg)
@@ -610,6 +722,7 @@ def main() -> None:
             joint_only,
             str(cfg.residual_basis),
             str(cfg.measurement_kind),
+            float(cfg.measurement_noise_std),
         )
         _log(tee, f"Done in {elapsed:.1f}s | manifest: {manifest_path}")
     finally:
