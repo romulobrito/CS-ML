@@ -1,0 +1,122 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Problem setup}
+\label{subsec:problem_setup}
+
+Let \(y\in\mathbb{R}^{N}\) denote a target-property window, such as clay volume
+or porosity, and let \(u\in\mathbb{R}^{p}\) denote the corresponding dense log
+window. Sparse core measurements are modeled as
+\begin{equation}
+  b = M y + \eta,
+  \label{eq:measurement_model}
+\end{equation}
+where \(M\in\mathbb{R}^{m\times N}\) is a known subsampling matrix, \(m<N\), and
+\(\eta\) is measurement noise. The objective is to estimate \(y\) in a target
+well using both \(u\) and \(b\).
+
+\begin{assumption}[Windowed generative structure]
+\label{ass:generator}
+Target-property windows are well approximated by the range of a decoder
+\(G:\mathbb{R}^{k}\to\mathbb{R}^{N}\), trained on target windows from training
+wells, with \(k<N\).
+\end{assumption}
+
+\begin{assumption}[Log-conditioned latent predictability]
+\label{ass:latent_prior}
+The dense log window \(u\) contains enough information to predict a useful
+latent prior \(z_0=h(u)\), where \(h\) is fitted on encoded training windows.
+\end{assumption}
+
+\subsection{Generative prior}
+\label{subsec:generative_prior}
+
+We train an autoencoder on standardized target windows. Its encoder maps
+\(y\) to a latent code \(E(y)\), and its decoder maps a code back to a target
+window, \(G(z)\). After training, only \(G\) is used in the inverse problem.
+This separates the signal prior from the sparse measurement operator: the
+decoder defines the admissible set of plausible property windows, whereas
+\(M\) specifies which depths are observed in the target well.
+
+\subsection{Conditional latent prior}
+\label{subsec:conditional_prior}
+
+The conditional prior is a ridge regression model
+\begin{equation}
+  z_0 = h(u),
+  \label{eq:latent_prior}
+\end{equation}
+trained to map log windows to encoded target latents. Ridge regression was
+chosen because it is stable in low-data regimes and regularizes correlated log
+features \citep{hoerl1970ridge}. The method is not tied to ridge regression:
+other predictors can be substituted for \(h\), but the reported paper-facing
+variant is CLP-CSGM Ridge.
+
+\subsection{Test-time latent refinement}
+\label{subsec:latent_refinement}
+
+At validation and test time, the latent code is refined by
+\begin{equation}
+  \hat z =
+  \arg\min_z
+  \underbrace{\|M G(z)-b\|_2^2}_{\text{sparse measurement consistency}}
+  +
+  \lambda
+  \underbrace{\|z-z_0(u)\|_2^2}_{\text{conditional latent prior}},
+  \qquad
+  \hat y = G(\hat z).
+  \label{eq:clp_csgm_objective}
+\end{equation}
+The regularization parameter \(\lambda\) is selected on validation windows for
+each measurement ratio and random seed.
+
+\begin{proposition}[MAP and Tikhonov interpretation]
+\label{prop:map}
+Assume \(b\mid z\sim\mathcal{N}(M G(z),\sigma_b^2 I)\) and
+\(z\mid u\sim\mathcal{N}(z_0(u),\sigma_z^2 I)\). Then the maximum a posteriori
+estimate of \(z\) minimizes Eq.~\eqref{eq:clp_csgm_objective} with
+\(\lambda=\sigma_b^2/\sigma_z^2\), up to a positive multiplicative constant.
+\end{proposition}
+
+\begin{proof}
+The negative log posterior is, up to constants independent of \(z\),
+\[
+  \frac{1}{2\sigma_b^2}\|M G(z)-b\|_2^2
+  +
+  \frac{1}{2\sigma_z^2}\|z-z_0(u)\|_2^2.
+\]
+Multiplying by \(2\sigma_b^2\) gives Eq.~\eqref{eq:clp_csgm_objective}.
+\end{proof}
+
+\begin{proposition}[Relation to classical CSGM]
+\label{prop:csgm_relation}
+If \(\lambda=0\), CLP-CSGM reduces to the standard CSGM measurement-consistency
+problem \(\min_z \|M G(z)-b\|_2^2\). If \(\lambda\to\infty\), the solution is
+forced toward the direct latent prediction \(z_0(u)\), and the method approaches
+the decoder-only estimate \(G(z_0(u))\).
+\end{proposition}
+
+\begin{remark}[Role of \(\lambda\)]
+Small \(\lambda\) trusts sparse measurements more and can overfit noisy or very
+sparse observations. Large \(\lambda\) trusts the log-conditioned prior more and
+can underuse available core measurements. The validation grid implements this
+trade-off empirically.
+\end{remark}
+
+\begin{remark}[Theoretical scope]
+CSGM theory provides recovery results when the measurement operator satisfies
+conditions such as S-REC over the generator range \citep{bora2017compressed}.
+Our subsampling operators and learned autoencoder are practical choices for
+well-log windows, not a setting in which those guarantees are proven directly.
+The theory is used here to motivate the generative-prior formulation; empirical
+validation establishes performance for the studied petrophysical tasks.
+\end{remark}
+
+\subsection{Limitations}
+\label{subsec:method_limitations}
+
+The method inherits representation error from the decoder: if a target profile
+is outside the learned range, no latent optimization can recover it exactly.
+The optimization problem is nonconvex, so restarts and validation are important.
+Finally, the method is computationally heavier than direct regression because it
+solves a latent inverse problem for each validation and test window.

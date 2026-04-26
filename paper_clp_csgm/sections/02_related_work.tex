@@ -1,0 +1,51 @@
+\section{Related work}
+\label{sec:related_work}
+
+\paragraph{Petrophysical prediction from logs.}
+Well logs provide indirect but dense measurements of rock and fluid properties,
+and core-calibrated interpretation is a standard component of petrophysical
+analysis \citep{ellis2007well,asquith2004basic}. Data-driven models are now
+widely used to map logs to porosity, permeability, saturation, or shale-related
+properties \citep{ahmadi2019comparison,wood2020predicting}. These models are
+effective when the training distribution is representative and labels are
+sufficient, but their usual prediction form is purely supervised. Sparse
+measurements in the target well are commonly used as additional features or for
+post-hoc calibration, not as explicit constraints in a forward measurement
+model.
+
+\paragraph{Sparse compressed sensing.}
+Classical compressed sensing reconstructs signals from incomplete linear
+measurements by assuming sparsity or compressibility in a known representation
+\citep{donoho2006compressed,candes2006robust,candes2006stable}. This view is
+appealing for sparse core assimilation because the measurement operator is
+known: a row of \(M\) selects the depths where the target was observed. Its
+limitation is the structural prior. A fixed basis can be too restrictive for
+cross-well petrophysical windows, where changes in depositional setting,
+diagenesis, and log-response calibration may create variability that is not
+sparse in a universal transform.
+
+\paragraph{Generative priors for inverse problems.}
+CSGM replaces the sparse basis with the range of a trained generator
+\citep{bora2017compressed}. The unknown signal is represented as \(G(z)\), and
+reconstruction searches over \(z\) to minimize measurement mismatch.
+\citet{bora2017compressed} established recovery guarantees under set-restricted
+eigenvalue conditions and showed that generative priors can require fewer
+measurements than sparsity priors in image experiments. Subsequent work studied
+the power and limitations of generative compressed sensing
+\citep{kamath2020power}, invertible generative priors for inverse problems
+\citep{asim2020invertible}, and untrained architectural priors
+\citep{ulyanov2018deep}. These works support the central idea that an inverse
+problem can be solved by searching a structured generative representation rather
+than a fixed sparse basis.
+
+\paragraph{Position of this work.}
+Our contribution is not a new generic theory of CSGM. Instead, we specialize the
+generative compressed sensing idea to petrophysical property windows with two
+information sources: dense logs and sparse direct measurements. The novelty is
+the conditional latent prior \(z_0=h(u)\), learned from logs, combined with
+test-time measurement consistency. In contrast with direct \([u,b]\to y\)
+baselines, sparse core measurements are not merely concatenated to the input;
+they define the data-fidelity term of a latent inverse problem. In contrast
+with classical CSGM, the latent search is guided by target-well logs through
+\(\|z-z_0(u)\|_2^2\), making the method conditional on local geological
+context.

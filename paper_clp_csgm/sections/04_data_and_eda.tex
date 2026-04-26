@@ -1,0 +1,104 @@
+\section{Data and exploratory analysis}
+\label{sec:data_eda}
+
+We use two related but distinct evaluation settings. The first is a cross-well
+clay-volume benchmark using noisy 30 dB logs, where the training wells are
+F02-1, F03-2, and F06-1 and the held-out test well is F03-4. The second is a
+single-well F03-4 porosity benchmark using only gamma ray as the dense input
+channel. Table~\ref{tab:eda_dataset_summary} and
+Fig.~\ref{fig:eda_target_summary} summarize the target distributions used by
+both settings.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Dataset summary used to motivate the two experimental settings.}
+  \label{tab:eda_dataset_summary}
+  \small
+  \resizebox{\linewidth}{!}{\input{tables/eda_dataset_summary.tex}}
+\end{table}
+
+The cross-well split is intentionally difficult. The held-out F03-4 Vc target
+has a lower mean than the training wells, indicating a distribution shift that
+direct supervised regressors must extrapolate across. This motivates a
+generative constraint on plausible target windows rather than relying only on a
+pointwise mapping from logs to targets. The low-data axis further increases this
+difficulty by increasing the sliding-window step and reducing the number of
+training windows.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.86\linewidth]{eda_target_summary.png}
+  \caption{Summary of target distributions used in the CLP-CSGM experiments.
+  The held-out cross-well Vc target has a lower mean than the training wells,
+  while the F03 porosity case has a narrower target range.}
+  \label{fig:eda_target_summary}
+\end{figure}
+
+Figure~\ref{fig:eda_crosswell_distribution} shows the full Vc distributions for
+the cross-well experiment. The held-out F03-4 distribution is shifted toward
+lower Vc values relative to the training wells. This shift is important for the
+article narrative: the method is not only interpolating within one well, but
+using sparse target-well measurements to adapt a learned latent prior under a
+visible distribution mismatch.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\linewidth]{eda_crosswell_vc_distribution.png}
+  \caption{Cross-well Vc target distributions for training wells and held-out
+  F03-4. The held-out test distribution is shifted toward lower Vc, motivating a
+  measurement-consistent method rather than a purely supervised predictor.}
+  \label{fig:eda_crosswell_distribution}
+\end{figure}
+
+Table~\ref{tab:eda_correlations} reports simple Pearson correlations between
+input channels and targets. Gamma ray is strongly correlated with Vc in both
+cross-well train and test splits, whereas the real F03 porosity experiment uses
+gamma ray only despite a weak linear correlation with porosity. This GR-only
+choice is deliberate: it weakens the dense-input predictor and tests whether
+sparse target-well measurements can improve a log-conditioned generative prior.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Channel-target Pearson correlations. These values are descriptive
+  only and are not used as model inputs.}
+  \label{tab:eda_correlations}
+  \small
+  \input{tables/eda_channel_target_correlations.tex}
+\end{table}
+
+Figure~\ref{fig:eda_correlations} visualizes the same channel-target
+correlations. In the cross-well Vc task, GR is the dominant linear correlate in
+both train and held-out wells, which explains why direct log-based baselines are
+not trivial competitors. In the F03 porosity task, however, GR is weakly and
+negatively correlated with porosity, whereas AC is almost perfectly correlated.
+Using GR only therefore creates a deliberately harder dense-input setting where
+the sparse measurements and the latent prior have a clear role.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.88\linewidth]{eda_channel_target_correlations.png}
+  \caption{Channel-target Pearson correlations for the cross-well Vc and F03
+  porosity data. GR is highly informative for Vc but weak for F03 porosity,
+  motivating the GR-only porosity benchmark as a difficult target-well test.}
+  \label{fig:eda_correlations}
+\end{figure}
+
+Figure~\ref{fig:eda_f03_profile} complements the correlation table by showing
+the real F03-4 GR and porosity profiles along depth. The GR-only experiment is
+therefore a deliberately weakened dense-input setting: porosity varies smoothly
+over the interval, while GR alone is not a near-deterministic porosity proxy.
+This makes the sparse porosity observations central to the reconstruction task.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.82\linewidth]{eda_f03_gr_porosity_depth.png}
+  \caption{Real F03-4 depth profiles used in the GR-only porosity benchmark.
+  Gamma ray is the only dense input, while porosity is the target profile to be
+  reconstructed from sparse observations and the conditional latent prior.}
+  \label{fig:eda_f03_profile}
+\end{figure}
+
+The EDA therefore supports the experimental design. Cross-well Vc evaluates
+low-data transfer under sparse target measurements, while the F03 GR-only case
+tests whether CLP-CSGM can recover useful porosity structure when the dense
+input alone is intentionally limited.

@@ -1,0 +1,69 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Petrophysical property estimation is a central task in reservoir
+characterization. Wireline logs are dense along depth and can be acquired in
+most wells, but properties such as porosity, clay volume, or shale volume are
+usually calibrated by core or laboratory measurements that are sparse and
+expensive \citep{ellis2007well,asquith2004basic}. This mismatch creates a
+recurring inverse problem: a model must infer a continuous target-property
+profile from dense indirect logs while honoring a small number of direct
+measurements in the target well.
+
+Machine-learning regressors are attractive in this setting because they can
+learn nonlinear relations between logs and target properties from previously
+interpreted wells \citep{bishop2006pattern}. However, a direct map from logs to
+targets may underuse sparse core observations available in the target well. A
+common direct workaround is to concatenate the sparse measurement vector with
+the logs and train a supervised model from \([u,b]\) to \(y\). Although this can
+be competitive, it treats the sparse measurements as features rather than as
+hard evidence about the reconstructed signal.
+
+Compressed sensing (CS) offers the complementary perspective: measurements
+should constrain the reconstruction through a forward model
+\citep{donoho2006compressed,candes2006robust,candes2006stable}. Classical CS
+usually assumes sparsity in a fixed basis, such as wavelets or discrete cosine
+atoms. In cross-well petrophysical prediction, this assumption can be too
+restrictive. Geological variability is not necessarily sparse in a universal
+basis, and fixed-basis residual correction may fail to outperform strong
+supervised baselines.
+
+Compressed sensing with generative models (CSGM) replaces fixed-basis sparsity
+with a learned generative range \citep{bora2017compressed}. Instead of seeking
+a sparse coefficient vector, one searches for a latent code \(z\) such that the
+generated signal \(G(z)\) matches the measurements. This is well aligned with
+petrophysical windows: the decoder can represent plausible target profiles,
+while sparse core observations can select the profile that is consistent with
+the target-well evidence.
+
+This paper proposes Conditional Latent-Prior CSGM (CLP-CSGM) for
+petrophysical property estimation from dense logs and sparse core measurements.
+The method trains an autoencoder decoder \(G\) on target-property windows and a
+ridge prior \(h\) that maps the dense log window \(u\) to an initial latent
+code \(z_0=h(u)\). At test time, the final latent code is obtained by solving a
+measurement-consistent inverse problem,
+\begin{equation}
+  \hat z =
+  \arg\min_z
+  \|M G(z)-b\|_2^2
+  + \lambda \|z-z_0(u)\|_2^2,
+  \qquad
+  \hat y = G(\hat z).
+  \label{eq:intro_clp_csgm}
+\end{equation}
+The first term enforces sparse core consistency; the second term keeps the
+solution close to the log-conditioned latent prior.
+
+The contributions are:
+\begin{itemize}
+  \item We formulate CLP-CSGM, a conditional generative compressed sensing
+  method for petrophysical property windows.
+  \item We provide a theoretical interpretation of the objective as a
+  Tikhonov/MAP latent inverse problem and relate it to standard CSGM guarantees.
+  \item We evaluate the method in low-data cross-well clay-volume prediction
+  and in a real-well F03-4 porosity benchmark using gamma ray only as dense
+  input.
+  \item We show that CLP-CSGM Ridge improves over strong direct baselines in
+  sparse-measurement regimes and discuss when direct autoencoder regression
+  remains competitive.
+\end{itemize}

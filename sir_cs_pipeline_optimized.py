@@ -55,11 +55,14 @@ import os
 import sys
 import time
 from dataclasses import asdict, dataclass, field
-from typing import Callable, Dict, List, Literal, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Callable, Dict, List, Literal, Optional, Tuple, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+if TYPE_CHECKING:
+    from lfista_module import LFISTATrainConfig
 from sklearn.metrics import mean_absolute_error
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
@@ -167,6 +170,9 @@ class Config:
         "direct_ub_benchmark_explore",
         "direct_ub_lfista_joint_only",
         "direct_ub_lfista_joint_only_explore",
+        "direct_ub_lfista_joint_robustness_lite",
+        "real_well_f03_direct_ub",
+        "cross_well_vc_direct_ub",
     ] = "paper"
     # Filled when profile is robustness_phase3* (CLI --robustness-axis / --robustness-value).
     robustness_axis: str = ""
@@ -193,6 +199,10 @@ class Config:
     lfista_device: str = ""
     lfista_bg_hidden: Tuple[int, int] = (128, 128)
     lfista_bg_dropout: float = 0.0
+    # Background regressor architecture family used inside LFISTA.
+    # Supported: "mlp2" (default, two hidden layers), "shallow" (one hidden),
+    # "linear" (single Linear). Lower capacity preserves residual sparsity.
+    lfista_bg_type: str = "mlp2"
     lfista_steps: int = 8
     lfista_learn_step_sizes: bool = True
     lfista_learn_thresholds: bool = True
@@ -210,6 +220,29 @@ class Config:
     lfista_patience: int = 12
     lfista_loss_alpha_weight: float = 0.0
     lfista_loss_l1_alpha_weight: float = 0.0
+
+    # CSGM M2 (conditional generative-prior CS): optional direct-UB branch.
+    run_csgm_m2: bool = False
+    csgm_device: str = ""
+    csgm_prior_type: str = "ridge"  # "ridge" or "mlp"
+    csgm_latent_dim: int = 16
+    csgm_hidden_dim: int = 128
+    csgm_ae_epochs: int = 200
+    csgm_batch_size: int = 64
+    csgm_ae_lr: float = 1e-3
+    csgm_weight_decay: float = 1e-5
+    csgm_iters: int = 400
+    csgm_opt_lr: float = 0.05
+    csgm_restarts: int = 3
+    csgm_lambda_grid: List[float] = field(
+        default_factory=lambda: [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2, 1e-1]
+    )
+    csgm_ridge_alpha: float = 1.0
+    csgm_prior_hidden: Tuple[int, int] = (128, 128)
+    csgm_prior_max_iter: int = 500
+    csgm_prior_learning_rate_init: float = 1e-3
+    csgm_prior_alpha: float = 1e-4
+    csgm_prior_early_stopping: bool = True
 
 
 # ============================================================
@@ -405,6 +438,30 @@ def apply_config_profile(cfg: Config) -> None:
         cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
         cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
         cfg.plots_subdir = "figures"
+        return
+    if cfg.config_profile == "real_well_f03_direct_ub":
+        cfg.seeds = [7, 23, 41]
+        cfg.measurement_ratios = [0.2, 0.3, 0.4, 0.5, 0.6]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.lfista_num_epochs_bg = 25
+        cfg.lfista_num_epochs_frozen = 20
+        cfg.lfista_num_epochs_joint = 25
+        cfg.lfista_steps = 5
+        cfg.log_progress = False
+        cfg.plots_subdir = "figures"
+        cfg.run_lfista = True
+        return
+    if cfg.config_profile == "cross_well_vc_direct_ub":
+        cfg.seeds = [7, 23, 41]
+        cfg.measurement_ratios = [0.05, 0.1, 0.15, 0.2, 0.3]
+        cfg.l1_lambda_grid = [1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2]
+        cfg.lfista_num_epochs_bg = 150
+        cfg.lfista_num_epochs_frozen = 40
+        cfg.lfista_num_epochs_joint = 50
+        cfg.lfista_steps = 6
+        cfg.log_progress = False
+        cfg.plots_subdir = "figures"
+        cfg.run_lfista = True
         return
 
 
@@ -667,10 +724,26 @@ def orthonormal_dct_matrix(n: int) -> np.ndarray:
 
 
 def get_basis(n: int, basis_name: str) -> np.ndarray:
-    if basis_name == "identity":
+    """
+    Orthonormal basis Psi such that y = Psi @ alpha, alpha = Psi.T @ y.
+
+    Supported: identity, dct, haar, db4, sym4, fd1.
+    Wavelet bases (haar, db4, sym4) require n = power of 2 and use pywt
+    periodization. fd1 is a QR-orthogonalized DC+forward-difference basis.
+    """
+    key = basis_name.strip().lower()
+    if key == "identity":
         return np.eye(n)
-    if basis_name == "dct":
+    if key == "dct":
         return orthonormal_dct_matrix(n)
+    if key in ("haar", "db4", "sym4"):
+        from bases_extra import build_wavelet_basis
+
+        return build_wavelet_basis(n, key)
+    if key == "fd1":
+        from bases_extra import build_fd1_basis
+
+        return build_fd1_basis(n)
     raise ValueError(f"Base desconhecida: {basis_name}")
 
 
@@ -1222,6 +1295,7 @@ def lfista_train_config_from_pipeline(cfg: Config) -> "LFISTATrainConfig":
         n_output=cfg.n_output,
         bg_hidden=cfg.lfista_bg_hidden,
         bg_dropout=cfg.lfista_bg_dropout,
+        bg_type=cfg.lfista_bg_type,
         lfista_steps=cfg.lfista_steps,
         learn_step_sizes=cfg.lfista_learn_step_sizes,
         learn_thresholds=cfg.lfista_learn_thresholds,
@@ -1813,13 +1887,42 @@ METHOD_COLORS: Dict[str, str] = {
     "mlp_concat_ub": "#2ca02c",
     "pca_regression_ub": "#9467bd",
     "ae_regression_ub": "#17becf",
+    "ridge_prior_csgm": "#d62728",
+    "mlp_prior_csgm": "#8c564b",
 }
+METHOD_DISPLAY_NAMES: Dict[str, str] = {
+    "ml_only": "ML only",
+    "ml_only_torch": "ML only torch",
+    "mlp_concat_ub": "MLP [u,b]",
+    "pca_regression_ub": "PCA [u,b]",
+    "ae_regression_ub": "AE [u,b]",
+    "ridge_prior_csgm": "CLP-CSGM Ridge",
+    "mlp_prior_csgm": "CLP-CSGM MLP",
+    "hybrid_fista": "Hybrid FISTA",
+    "hybrid_spgl1": "Hybrid SPGL1",
+    "cs_only_fista": "CS only FISTA",
+    "cs_only_spgl1": "CS only SPGL1",
+    "hybrid_lfista_frozen": "Hybrid LFISTA frozen",
+    "hybrid_lfista_joint": "Hybrid LFISTA joint",
+    "hybrid": "Hybrid FISTA",
+    "weighted_hybrid": "Weighted hybrid",
+    "cs_only": "CS only",
+}
+
+
+def method_display_name(method: str) -> str:
+    """Return the paper-facing method label while preserving raw method ids in tables."""
+    return METHOD_DISPLAY_NAMES.get(method, method)
+
+
 METHOD_ORDER_DIRECT_UB = [
     "ml_only",
     "ml_only_torch",
     "mlp_concat_ub",
     "pca_regression_ub",
     "ae_regression_ub",
+    "ridge_prior_csgm",
+    "mlp_prior_csgm",
     "hybrid_fista",
     "hybrid_lfista_frozen",
     "hybrid_lfista_joint",
@@ -1829,6 +1932,8 @@ METHOD_ORDER_DIRECT_UB_JOINT_FOCUS = [
     "mlp_concat_ub",
     "pca_regression_ub",
     "ae_regression_ub",
+    "ridge_prior_csgm",
+    "mlp_prior_csgm",
     "hybrid_lfista_joint",
 ]
 METHOD_ORDER_STAGE1_EXTERNAL = [
@@ -1920,6 +2025,8 @@ def method_order_for_cfg(cfg: Config) -> List[str]:
         "direct_ub_lfista_joint_only",
         "direct_ub_lfista_joint_only_explore",
         "direct_ub_lfista_joint_robustness_lite",
+        "real_well_f03_direct_ub",
+        "cross_well_vc_direct_ub",
     ):
         return list(METHOD_ORDER_DIRECT_UB_JOINT_FOCUS)
     if cfg.config_profile in ("direct_ub_benchmark", "direct_ub_benchmark_explore"):
@@ -1962,7 +2069,14 @@ def plot_metric_vs_measurement_ratio(
         yerr = sdf[std_col].fillna(0.0).values
         color = METHOD_COLORS.get(method, None)
         plt.errorbar(
-            x, y, yerr=yerr, marker="o", capsize=4, label=method, color=color, linewidth=1.8
+            x,
+            y,
+            yerr=yerr,
+            marker="o",
+            capsize=4,
+            label=method_display_name(method),
+            color=color,
+            linewidth=1.8,
         )
     plt.xlabel("Measurement ratio m / N")
     plt.ylabel(ylabel)
@@ -2002,7 +2116,7 @@ def plot_grouped_bars_metric(
             x + offset,
             heights,
             width,
-            label=method,
+            label=method_display_name(method),
             color=METHOD_COLORS.get(method),
             edgecolor="white",
             linewidth=0.5,
@@ -2080,11 +2194,24 @@ def plot_gain_vs_ml_only(
         y = sdf["gain_mean"].values
         yerr = sdf["gain_std_across_seeds"].fillna(0.0).values
         color = METHOD_COLORS.get(method, None)
-        plt.errorbar(x, y, yerr=yerr, marker="s", capsize=4, label=method, color=color, linewidth=1.8)
+        plt.errorbar(
+            x,
+            y,
+            yerr=yerr,
+            marker="s",
+            capsize=4,
+            label=method_display_name(method),
+            color=color,
+            linewidth=1.8,
+        )
     plt.axhline(0.0, color="gray", linestyle="--", linewidth=1)
     plt.xlabel("Measurement ratio m / N")
     plt.ylabel(f"Gain ({metric_name}): baseline - method (positive is better)")
-    plt.title(f"Improvement over {metric_name} vs {baseline_method} (seed uncertainty)")
+    plt.title(
+        "Improvement over {} vs {} (seed uncertainty)".format(
+            metric_name, method_display_name(baseline_method)
+        )
+    )
     plt.grid(True, alpha=0.3)
     plt.legend(loc="best")
     plt.tight_layout()
@@ -2254,9 +2381,9 @@ def plot_parity_ground_truth_vs_predictions(
         ax.plot([lo, hi], [lo, hi], "k--", linewidth=1.0, label="identity")
         if len(yt) > 2:
             cc = float(np.corrcoef(yt, yp)[0, 1])
-            ax.set_title(f"{method} (corr={cc:.4f})")
+            ax.set_title("{} (corr={:.4f})".format(method_display_name(method), cc))
         else:
-            ax.set_title(method)
+            ax.set_title(method_display_name(method))
         ax.set_xlabel("Ground truth y")
         ax.set_ylabel("Prediction y_hat")
         ax.set_aspect("equal", adjustable="box")
@@ -2296,7 +2423,7 @@ def plot_residual_distributions_gt_vs_models(
         res = y_p - y_t
         ax.hist(res, bins=60, color=METHOD_COLORS.get(method, "#888888"), alpha=0.85, edgecolor="white")
         ax.axvline(0.0, color="black", linestyle="--", linewidth=1)
-        ax.set_title(f"{method} residual (y_hat - y_true)")
+        ax.set_title("{} residual (y_hat - y_true)".format(method_display_name(method)))
         ax.set_xlabel("Residual")
         ax.set_ylabel("Count")
         ax.grid(True, axis="y", alpha=0.3)
@@ -2365,6 +2492,153 @@ def plot_examples(cfg: Config, examples: Dict[str, np.ndarray], save_path: str) 
     plt.tight_layout()
     plt.savefig(save_path, dpi=180)
     plt.close()
+
+
+def plot_direct_ub_ground_truth_vs_models(
+    examples: Dict[str, np.ndarray],
+    save_path: str,
+) -> None:
+    """
+    Line plot per test example: y(L) vs output index for direct [u,b] benchmark methods.
+    Keys in examples: Y_true (required), plus any of ml_only, mlp_concat_ub, pca_regression_ub,
+    ae_regression_ub, hybrid_fista, hybrid_lfista_frozen, hybrid_lfista_joint.
+    """
+    import matplotlib.pyplot as plt
+
+    y_key = "Y_true"
+    if y_key not in examples or examples[y_key] is None or len(examples[y_key]) == 0:
+        return
+    y_true = np.asarray(examples[y_key], dtype=np.float64)
+    n_examples = int(y_true.shape[0])
+    order = [
+        ("Y_true", "ground_truth"),
+        ("ml_only", "ml_only"),
+        ("mlp_concat_ub", "mlp_concat_ub"),
+        ("pca_regression_ub", "pca_regression_ub"),
+        ("ae_regression_ub", "ae_regression_ub"),
+        ("ridge_prior_csgm", "CLP-CSGM Ridge"),
+        ("mlp_prior_csgm", "CLP-CSGM MLP"),
+        ("hybrid_fista", "hybrid_fista"),
+        ("hybrid_lfista_frozen", "hybrid_lfista_frozen"),
+        ("hybrid_lfista_joint", "hybrid_lfista_joint"),
+    ]
+    color_gt = "#1f77b4"
+    fig, axes = plt.subplots(n_examples, 1, figsize=(10, 3 * n_examples), squeeze=False)
+    for i in range(n_examples):
+        ax = axes[i, 0]
+        ax.plot(y_true[i], color=color_gt, label="ground_truth", linewidth=1.4)
+        for data_key, leg in order[1:]:
+            if data_key not in examples:
+                continue
+            arr = np.asarray(examples[data_key], dtype=np.float64)
+            if arr.shape[0] <= i:
+                continue
+            col = METHOD_COLORS.get(data_key, "#7f7f7f")
+            ax.plot(arr[i], color=col, label=leg, linewidth=1.1, alpha=0.9)
+        ax.set_title("Example {}".format(i))
+        ax.set_xlabel("output index")
+        ax.set_ylabel("value")
+        ax.grid(True, alpha=0.3)
+        ax.legend(loc="best", fontsize=8)
+    fig.suptitle("Ground truth vs models (output index)", fontsize=12, y=1.0)
+    for ax_row in axes:
+        ax_row[0].margins(x=0.01)
+    pdir = os.path.dirname(os.path.abspath(save_path))
+    if pdir:
+        os.makedirs(pdir, exist_ok=True)
+    plt.tight_layout()
+    fig.savefig(save_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_real_well_depth_profile(
+    depth_axis: np.ndarray,
+    profiles: Dict[str, np.ndarray],
+    save_path: str,
+    train_test_boundary: Optional[float] = None,
+    title: str = "F03-4 porosity profile (test block reconstruction)",
+    methods_to_plot: Optional[List[str]] = None,
+) -> None:
+    """
+    Depth profile: porosity (x-axis) vs depth (y-axis, increasing downward), matching
+    the external-report convention. profiles must contain key 'observed' (required);
+    any other keys are treated as model predictions (point-wise, aligned with
+    depth_axis via overlapping-window averaging). NaN-safe: NaNs are left as gaps.
+    """
+    import matplotlib.pyplot as plt
+
+    d = np.asarray(depth_axis, dtype=np.float64).ravel()
+    if d.size == 0 or "observed" not in profiles:
+        return
+    obs = np.asarray(profiles["observed"], dtype=np.float64).ravel()
+    if obs.shape[0] != d.shape[0]:
+        raise ValueError("depth_axis and observed must have equal length.")
+
+    mask_obs = np.isfinite(obs)
+    if not bool(np.any(mask_obs)):
+        return
+
+    default_order = [
+        "ml_only",
+        "mlp_concat_ub",
+        "pca_regression_ub",
+        "ae_regression_ub",
+        "ridge_prior_csgm",
+        "mlp_prior_csgm",
+        "hybrid_fista",
+        "hybrid_lfista_frozen",
+        "hybrid_lfista_joint",
+    ]
+    keys = methods_to_plot if methods_to_plot else default_order
+    present = [k for k in keys if k in profiles]
+    n_models = len(present)
+
+    fig_w = 5.0
+    fig_h = 7.5
+    n_cols = max(1, 1 + n_models)
+    fig, axes = plt.subplots(1, n_cols, figsize=(fig_w * n_cols * 0.6 + 2.5, fig_h), sharey=True)
+    if n_cols == 1:
+        axes = np.array([axes])
+    obs_color = "#404040"
+
+    ax0 = axes[0]
+    ax0.plot(obs[mask_obs], d[mask_obs], color=obs_color, linewidth=1.1, label="observed")
+    if train_test_boundary is not None and np.isfinite(float(train_test_boundary)):
+        ax0.axhline(float(train_test_boundary), color="#d62728", linestyle="--", linewidth=1.0,
+                    label="train/test limit")
+    ax0.set_xlabel("porosity")
+    ax0.set_ylabel("depth (m)")
+    ax0.grid(True, alpha=0.3)
+    ax0.legend(loc="best", fontsize=8)
+    ax0.set_title("observed")
+
+    for ax_i, k in enumerate(present, start=1):
+        ax = axes[ax_i]
+        pr = np.asarray(profiles[k], dtype=np.float64).ravel()
+        if pr.shape[0] != d.shape[0]:
+            continue
+        m_pr = np.isfinite(pr) & mask_obs
+        col = METHOD_COLORS.get(k, "#7f7f7f")
+        ax.plot(obs[mask_obs], d[mask_obs], color=obs_color, linewidth=0.9, alpha=0.8, label="observed")
+        label = method_display_name(k)
+        ax.plot(pr[m_pr], d[m_pr], color=col, linewidth=1.2, label=label)
+        if train_test_boundary is not None and np.isfinite(float(train_test_boundary)):
+            ax.axhline(float(train_test_boundary), color="#d62728", linestyle="--", linewidth=1.0)
+        ax.set_xlabel("porosity")
+        ax.grid(True, alpha=0.3)
+        ax.legend(loc="best", fontsize=8)
+        ax.set_title(label)
+
+    for ax in axes:
+        ax.invert_yaxis()
+
+    fig.suptitle(title, fontsize=12, y=1.0)
+    pdir = os.path.dirname(os.path.abspath(save_path))
+    if pdir:
+        os.makedirs(pdir, exist_ok=True)
+    plt.tight_layout()
+    fig.savefig(save_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
 
 
 # ============================================================

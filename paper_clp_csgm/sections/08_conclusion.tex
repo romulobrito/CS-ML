@@ -1,0 +1,20 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We introduced CLP-CSGM Ridge, a conditional generative compressed sensing method
+for petrophysical property estimation from dense logs and sparse core
+measurements. The method learns a target-property decoder, predicts a
+log-conditioned latent prior with ridge regression, and refines the latent code
+at test time by enforcing sparse measurement consistency.
+
+In cross-well low-data Vc prediction, CLP-CSGM Ridge outperformed the strongest
+direct \([u,b]\) autoencoder baseline in all tested training-size and
+measurement-ratio cells. In the real-well F03 GR-only porosity case, it
+achieved the best average RMSE, with its clearest advantage in the sparsest
+measurement regimes. These results indicate that conditional latent generative
+priors are a promising alternative to fixed-basis sparse residual recovery for
+petrophysical sparse-measurement assimilation.
+
+Future work should evaluate the method on additional fields, compare richer
+conditional priors, investigate uncertainty quantification in latent space, and
+study measurement designs beyond coordinate subsampling.

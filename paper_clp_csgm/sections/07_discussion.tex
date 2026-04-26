@@ -1,0 +1,40 @@
+\section{Discussion}
+\label{sec:discussion}
+
+The results support the central hypothesis: sparse target-well measurements are
+more useful when they are enforced through a measurement-consistency term over a
+learned latent manifold than when they are used only as additional supervised
+features. In the cross-well Vc benchmark, the training set is small and the
+held-out well has a shifted target distribution. Direct baselines must learn a
+complete \([u,b]\to y\) map from few windows. CLP-CSGM Ridge decomposes the task
+into two simpler components: learn a plausible target manifold from training
+windows, then select a nearby latent code that is consistent with sparse
+measurements in the target well.
+
+The ridge prior is important in this decomposition. It provides a stable
+log-conditioned center \(z_0(u)\) in regimes where a more flexible predictor
+could overfit. The sparse measurements then act as a local correction rather
+than as the only source of information. This explains why the method performs
+especially well in low-data and low-\(\rho\) settings.
+
+The real-well F03 experiment gives a more nuanced result. CLP-CSGM Ridge is the
+best method on average and is strongest when \(\rho\) is small. However, AE
+\([u,b]\) slightly outperforms it at larger \(\rho\). This loss is not
+inconsistent with the method objective. CLP-CSGM is designed for sparse
+assimilation under a generative prior; when many target samples are available,
+a direct model can exploit them without paying the cost or bias of staying near
+the learned latent manifold.
+
+Several limitations remain. First, the autoencoder is intentionally small, so
+representation error may limit reconstruction of unusual geological patterns.
+Second, the theoretical guarantees of CSGM rely on assumptions such as suitable
+measurement operators and generator ranges; our coordinate subsampling and
+field data do not directly satisfy a proven guarantee. Third, latent
+optimization is nonconvex and more expensive than direct regression. Finally,
+the experiments use a limited number of wells, so broader geological validation
+is needed before claiming field-wide generality.
+
+These limitations also clarify the contribution. CLP-CSGM Ridge is not a
+replacement for all direct petrophysical regressors. It is a targeted method
+for regimes where dense logs provide a useful but incomplete prior and sparse
+core measurements should be honored as physical evidence in the target well.

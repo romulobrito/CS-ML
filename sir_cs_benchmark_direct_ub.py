@@ -10,11 +10,14 @@ on the same synthetic protocol as sir_cs_pipeline_optimized.py.
 Artifacts per run:
     <base_dir>/runs/<run_id>/
         tables/           CSVs + summary_focus_direct_ub.csv + parity_pooled.npz (pooled y vs y_hat)
-        figures/          01--07 PNGs (same dashboard as other benchmarks) + 09_parity_ground_truth_vs_prediction.png
+        figures/          01--07 PNGs + 08_example_ground_truth_vs_models.png + 09_parity_ground_truth_vs_prediction.png
         logs/run_console.log
         PROTOCOL.txt
         config.json
         RUN_MANIFEST.txt
+
+External tensors (no make_dataset): run_direct_ub_from_data with data dict
+(X_train, Y_train, Alpha_train, Psi, ...); see sir_cs_benchmark_real_well_direct_ub.py (F03-4).
 
 Psi ablation (pilot): use --residual-basis identity|dct; same alpha rule, only Psi changes.
 Organize with separate --base-dir per axis, e.g. outputs/direct_ub_psi_ablation/identity vs .../dct.
@@ -48,6 +51,7 @@ from sklearn.exceptions import ConvergenceWarning
 import numpy as np
 import pandas as pd
 
+import csgm_m2_module as csgm
 import direct_ub_baselines as dub
 import external_benchmarks as extb
 from sir_cs_pipeline_optimized import (
@@ -60,6 +64,8 @@ from sir_cs_pipeline_optimized import (
     build_measurement_matrix,
     make_dataset,
     merge_gt_pred_bundles,
+    method_display_name,
+    plot_direct_ub_ground_truth_vs_models,
     plot_parity_ground_truth_vs_predictions,
     power_iteration_lipschitz,
     run_lfista_branch,
@@ -103,6 +109,17 @@ def _log(tee: Optional[_Tee], msg: str) -> None:
         print(msg, flush=True)
 
 
+def _parse_float_list(s: str) -> List[float]:
+    out: List[float] = []
+    for p in str(s).split(","):
+        q = p.strip()
+        if q:
+            out.append(float(q))
+    if not out:
+        raise ValueError("empty float list")
+    return out
+
+
 def build_direct_ub_parity_fragment(
     Y_test: np.ndarray,
     Ybg_test: np.ndarray,
@@ -111,6 +128,7 @@ def build_direct_ub_parity_fragment(
     pred_test_ae: Optional[np.ndarray],
     run_ae: bool,
     y_hf_stack: Optional[np.ndarray],
+    csgm_pred: Optional[Dict[str, np.ndarray]],
     lf_gt: Optional[Dict[str, np.ndarray]],
     joint_only: bool,
 ) -> Dict[str, np.ndarray]:
@@ -125,6 +143,9 @@ def build_direct_ub_parity_fragment(
         out["ae_regression_ub"] = np.asarray(pred_test_ae, dtype=np.float64).ravel()
     if y_hf_stack is not None and y_hf_stack.size > 0:
         out["hybrid_fista"] = np.asarray(y_hf_stack, dtype=np.float64).ravel()
+    if csgm_pred:
+        for k, v in csgm_pred.items():
+            out[str(k)] = np.asarray(v, dtype=np.float64).ravel()
     if lf_gt:
         if joint_only:
             k = "hybrid_lfista_joint"
@@ -136,18 +157,24 @@ def build_direct_ub_parity_fragment(
     return out
 
 
-def run_direct_ub_single_setting(
+def run_direct_ub_from_data(
     cfg: Config,
     dub_cfg: dub.DirectUBTrainConfig,
+    data: Dict[str, np.ndarray],
     seed: int,
     measurement_ratio: float,
     include_hybrid_fista: bool,
     run_ae: bool,
     include_lfista: bool,
     joint_only: bool,
-) -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
+) -> Tuple[pd.DataFrame, Dict[str, np.ndarray], Optional[Dict[str, np.ndarray]]]:
+    """
+    Same as run_direct_ub_single_setting but with a pre-built data dict (synthetic or real).
+    Required keys: X_train, X_val, X_test, Y_train, Y_val, Y_test, Alpha_train, Alpha_val,
+    Alpha_test, Psi. Shapes must match cfg.n_train, cfg.n_val, cfg.n_test, cfg.p_input, cfg.n_output.
+    Third return: optional dict of (n_ex, L) arrays for 08_example_ground_truth_vs_models.png.
+    """
     rng = np.random.default_rng(seed)
-    data = make_dataset(cfg, seed=seed)
     X_train = data["X_train"]
     X_val = data["X_val"]
     X_test = data["X_test"]
@@ -326,6 +353,28 @@ def run_direct_ub_single_setting(
     else:
         y_hf_stack = None
 
+    csgm_pred: Optional[Dict[str, np.ndarray]] = None
+    csgm_result: Optional[csgm.CSGMM2Result] = None
+    if bool(getattr(cfg, "run_csgm_m2", False)):
+        csgm_result = csgm.run_csgm_m2_experiment_dataframe(
+            cfg=cfg,
+            seed=seed,
+            measurement_ratio=measurement_ratio,
+            X_train=X_train,
+            X_val=X_val,
+            X_test=X_test,
+            Y_train=Y_train,
+            Y_val=Y_val,
+            Y_test=Y_test,
+            Alpha_test=Alpha_test,
+            M=M,
+            B_val=B_val,
+            B_test=B_test,
+        )
+        df = pd.concat([df, csgm_result.df], ignore_index=True)
+        csgm_method = "{}_prior_csgm".format(str(cfg.csgm_prior_type).strip().lower())
+        csgm_pred = {csgm_method: csgm_result.predictions}
+
     lf_gt: Optional[Dict[str, np.ndarray]] = None
     if include_lfista:
 
@@ -352,10 +401,61 @@ def run_direct_ub_single_setting(
         pred_test_ae,
         run_ae,
         y_hf_stack,
+        csgm_pred,
         lf_gt,
         joint_only,
     )
-    return df, parity_fragment
+    line_examples: Optional[Dict[str, np.ndarray]] = None
+    if int(cfg.n_example_plots) > 0 and n_test > 0:
+        n_ex = min(int(cfg.n_example_plots), n_test)
+        line_examples = {
+            "Y_true": np.asarray(Y_test[:n_ex], dtype=np.float64),
+            "ml_only": np.asarray(Ybg_test[:n_ex], dtype=np.float64),
+            "mlp_concat_ub": np.asarray(pred_test_mlp[:n_ex], dtype=np.float64),
+            "pca_regression_ub": np.asarray(pred_test_pca[:n_ex], dtype=np.float64),
+        }
+        if run_ae and pred_test_ae is not None:
+            line_examples["ae_regression_ub"] = np.asarray(pred_test_ae[:n_ex], dtype=np.float64)
+        if y_hf_stack is not None and include_hybrid_fista:
+            line_examples["hybrid_fista"] = np.asarray(y_hf_stack[:n_ex], dtype=np.float64)
+        if csgm_pred:
+            for k, v in csgm_pred.items():
+                line_examples[str(k)] = np.asarray(v[:n_ex], dtype=np.float64)
+        if lf_gt is not None and include_lfista:
+            n_out = int(cfg.n_output)
+            n_el = n_test * n_out
+            for k in ("hybrid_lfista_joint", "hybrid_lfista_frozen"):
+                if k in lf_gt:
+                    v = np.asarray(lf_gt[k], dtype=np.float64).ravel()
+                    if v.size == n_el:
+                        yh = v.reshape(n_test, n_out)
+                        line_examples[k] = yh[:n_ex].copy()
+    return df, parity_fragment, line_examples
+
+
+def run_direct_ub_single_setting(
+    cfg: Config,
+    dub_cfg: dub.DirectUBTrainConfig,
+    seed: int,
+    measurement_ratio: float,
+    include_hybrid_fista: bool,
+    run_ae: bool,
+    include_lfista: bool,
+    joint_only: bool,
+) -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
+    data = make_dataset(cfg, seed=seed)
+    df, pfrag, _ = run_direct_ub_from_data(
+        cfg,
+        dub_cfg,
+        data,
+        seed,
+        measurement_ratio,
+        include_hybrid_fista,
+        run_ae,
+        include_lfista,
+        joint_only,
+    )
+    return df, pfrag
 
 
 def save_focus_tables(
@@ -366,11 +466,14 @@ def save_focus_tables(
     run_ae: bool,
     include_lfista: bool,
     joint_only: bool,
+    include_csgm_m2: bool,
 ) -> List[str]:
     if joint_only:
         focus = list(METHOD_ORDER_DIRECT_UB_JOINT_FOCUS)
         if not run_ae:
             focus = [x for x in focus if x != "ae_regression_ub"]
+        if not include_lfista:
+            focus = [x for x in focus if x != "hybrid_lfista_joint"]
     else:
         focus = list(METHOD_ORDER_DIRECT_UB)
         if not include_hybrid_fista:
@@ -389,8 +492,12 @@ def save_focus_tables(
     )
     tables = os.path.join(run_root, "tables")
     if joint_only:
-        p1 = os.path.join(tables, "summary_focus_lfista_joint_vs_ub.csv")
-        p2 = os.path.join(tables, "summary_by_seed_focus_lfista_joint_vs_ub.csv")
+        if include_csgm_m2 and not include_lfista:
+            p1 = os.path.join(tables, "summary_focus_clp_csgm_vs_ub.csv")
+            p2 = os.path.join(tables, "summary_by_seed_focus_clp_csgm_vs_ub.csv")
+        else:
+            p1 = os.path.join(tables, "summary_focus_lfista_joint_vs_ub.csv")
+            p2 = os.path.join(tables, "summary_by_seed_focus_lfista_joint_vs_ub.csv")
     else:
         p1 = os.path.join(tables, "summary_focus_direct_ub.csv")
         p2 = os.path.join(tables, "summary_by_seed_focus_direct_ub.csv")
@@ -406,6 +513,8 @@ def write_protocol(
     measurement_kind: str,
     measurement_noise_std: float,
     residual_k: int,
+    include_csgm_m2: bool = False,
+    include_lfista: bool = True,
 ) -> str:
     common = [
         "Direct [u,b] -> y benchmark (methodological protocol)",
@@ -427,10 +536,16 @@ def write_protocol(
         "7) ae_regression_ub: PyTorch AE on standardized Y_train; MLP maps [u,b] to latent; decode.",
         "8) ml_only: sklearn MLP on u only (reference).",
     ]
-    if joint_only:
+    if joint_only and include_lfista:
         extra = [
             "9) Proposed method only: hybrid_lfista_joint (run_lfista_branch, keep joint rows only).",
             "   No hybrid_fista, ml_only_torch, or hybrid_lfista_frozen in this run.",
+            "",
+        ]
+    elif joint_only:
+        extra = [
+            "9) CSGM-focused run: hybrid_lfista_joint was intentionally excluded.",
+            "   Focus methods are ml_only, mlp_concat_ub, pca_regression_ub, ae_regression_ub, and CLP-CSGM.",
             "",
         ]
     else:
@@ -439,6 +554,18 @@ def write_protocol(
             "9) LFISTA branch optional: ml_only_torch, hybrid_lfista_frozen, hybrid_lfista_joint from run_lfista_branch.",
             "",
         ]
+    if include_csgm_m2:
+        extra.extend(
+            [
+                "10) Conditional Latent-Prior CSGM (CLP-CSGM) branch: ridge_prior_csgm or mlp_prior_csgm.",
+                "    AE decoder G(z) is trained on standardized Y_train only.",
+                "    Prior h(u) maps context u to z0.",
+                "    For validation/test rows, solve:",
+                "      z_hat = argmin_z ||M G(z) - b||_2^2 + lambda ||z - z0(u)||_2^2.",
+                "    Lambda is selected on validation for the same seed and measurement_ratio.",
+                "",
+            ]
+        )
     text = "\n".join(common + extra)
     path = os.path.join(run_root, "PROTOCOL.txt")
     with open(path, "w", encoding="utf-8") as f:
@@ -457,12 +584,15 @@ def write_run_manifest(
     measurement_kind: str,
     measurement_noise_std: float,
     residual_k: int,
+    include_csgm_m2: bool = False,
+    include_lfista: bool = True,
 ) -> str:
-    title = (
-        "Direct [u,b] benchmark: hybrid_lfista_joint vs mlp_concat / PCA / AE (joint-only mode)."
-        if joint_only
-        else "Direct [u,b] benchmark (+ optional full LFISTA branch)."
-    )
+    if joint_only and include_csgm_m2 and not include_lfista:
+        title = "Direct [u,b] benchmark: CLP-CSGM vs direct UB baselines."
+    elif joint_only:
+        title = "Direct [u,b] benchmark: hybrid_lfista_joint vs mlp_concat / PCA / AE (joint-only mode)."
+    else:
+        title = "Direct [u,b] benchmark (+ optional full LFISTA branch)."
     lines = [
         title,
         f"run_id: {run_id}",
@@ -477,13 +607,22 @@ def write_run_manifest(
         "  summary_by_seed.csv",
         "  summary.csv",
     ]
-    if joint_only:
+    if joint_only and include_csgm_m2 and not include_lfista:
+        lines.extend(
+            [
+                "  summary_focus_clp_csgm_vs_ub.csv",
+                "  summary_by_seed_focus_clp_csgm_vs_ub.csv",
+            ]
+        )
+    elif joint_only:
         lines.extend(
             [
                 "  summary_focus_lfista_joint_vs_ub.csv",
                 "  summary_by_seed_focus_lfista_joint_vs_ub.csv",
             ]
         )
+    if include_csgm_m2:
+        lines.append("  includes CLP-CSGM rows (ridge_prior_csgm/mlp_prior_csgm when enabled)")
     else:
         lines.extend(
             [
@@ -532,6 +671,29 @@ def parse_args() -> argparse.Namespace:
         "--no-lfista",
         action="store_true",
         help="Skip PyTorch LFISTA branch (ml_only_torch, hybrid_lfista_frozen, hybrid_lfista_joint).",
+    )
+    p.add_argument(
+        "--run-csgm-m2",
+        action="store_true",
+        help="Enable optional conditional CSGM M2 branch (ridge/MLP prior in AE latent space).",
+    )
+    p.add_argument(
+        "--csgm-prior-type",
+        type=str,
+        default="ridge",
+        choices=("ridge", "mlp"),
+        help="CSGM M2 prior h(u)->z0.",
+    )
+    p.add_argument("--csgm-latent-dim", type=int, default=16)
+    p.add_argument("--csgm-ae-epochs", type=int, default=200)
+    p.add_argument("--csgm-iters", type=int, default=400)
+    p.add_argument("--csgm-restarts", type=int, default=3)
+    p.add_argument("--csgm-opt-lr", type=float, default=0.05)
+    p.add_argument(
+        "--csgm-lambda-grid",
+        type=str,
+        default="0.0001,0.0003,0.001,0.003,0.01,0.03,0.1",
+        help="Comma-separated lambda grid for validation selection.",
     )
     p.add_argument(
         "--joint-only",
@@ -633,6 +795,14 @@ def main() -> None:
     include_lfista = joint_only or (not bool(args.no_lfista))
     if include_lfista:
         cfg.run_lfista = True
+    cfg.run_csgm_m2 = bool(args.run_csgm_m2)
+    cfg.csgm_prior_type = str(args.csgm_prior_type).strip().lower()
+    cfg.csgm_latent_dim = int(args.csgm_latent_dim)
+    cfg.csgm_ae_epochs = int(args.csgm_ae_epochs)
+    cfg.csgm_iters = int(args.csgm_iters)
+    cfg.csgm_restarts = int(args.csgm_restarts)
+    cfg.csgm_opt_lr = float(args.csgm_opt_lr)
+    cfg.csgm_lambda_grid = _parse_float_list(str(args.csgm_lambda_grid))
 
     include_hf = False if joint_only else (not bool(args.no_hybrid_fista))
 
@@ -657,6 +827,7 @@ def main() -> None:
     run_ae = not bool(args.no_ae)
     all_dfs: List[pd.DataFrame] = []
     parity_bundles: List[Dict[str, np.ndarray]] = []
+    first_line_examples: Optional[Dict[str, np.ndarray]] = None
     t0 = time.time()
     job_idx = 0
     total = len(cfg.seeds) * len(cfg.measurement_ratios)
@@ -666,6 +837,7 @@ def main() -> None:
             tee,
             f"Profile: {cfg.config_profile} | jobs: {total} | joint_only: {joint_only} | "
             f"hybrid_fista: {include_hf} | ae: {run_ae} | lfista: {include_lfista} | "
+            f"csgm_m2: {cfg.run_csgm_m2} | csgm_prior: {cfg.csgm_prior_type} | "
             f"residual_basis: {cfg.residual_basis} | measurement_kind: {cfg.measurement_kind} | "
             f"measurement_noise_std: {cfg.measurement_noise_std} | residual_k: {cfg.residual_k}",
         )
@@ -673,22 +845,43 @@ def main() -> None:
             for mr in cfg.measurement_ratios:
                 job_idx += 1
                 _log(tee, f"--- job {job_idx}/{total} seed={seed} measurement_ratio={mr:.2f} ---")
-                df, pfrag = run_direct_ub_single_setting(
-                    cfg, dub_cfg, seed, mr, include_hf, run_ae, include_lfista, joint_only
+                data_job = make_dataset(cfg, seed=seed)
+                df, pfrag, line_ex = run_direct_ub_from_data(
+                    cfg,
+                    dub_cfg,
+                    data_job,
+                    seed,
+                    float(mr),
+                    include_hf,
+                    run_ae,
+                    include_lfista,
+                    joint_only,
                 )
                 all_dfs.append(df)
                 parity_bundles.append(pfrag)
+                if first_line_examples is None and line_ex is not None:
+                    first_line_examples = line_ex
 
         detailed = pd.concat(all_dfs, ignore_index=True)
         per_seed = summarize_results_per_seed(detailed)
         summary = summarize_results_across_seeds(per_seed)
+        detailed["method_label"] = detailed["method"].map(method_display_name)
+        per_seed["method_label"] = per_seed["method"].map(method_display_name)
+        summary["method_label"] = summary["method"].map(method_display_name)
 
         detailed.to_csv(os.path.join(tables_dir, "detailed_results.csv"), index=False)
         per_seed.to_csv(os.path.join(tables_dir, "summary_by_seed.csv"), index=False)
         summary.to_csv(os.path.join(tables_dir, "summary.csv"), index=False)
 
         focus_paths = save_focus_tables(
-            run_root, summary, per_seed, include_hf, run_ae, include_lfista, joint_only
+            run_root,
+            summary,
+            per_seed,
+            include_hf,
+            run_ae,
+            include_lfista,
+            joint_only,
+            bool(cfg.run_csgm_m2),
         )
         proto_path = write_protocol(
             run_root,
@@ -697,12 +890,19 @@ def main() -> None:
             str(cfg.measurement_kind),
             float(cfg.measurement_noise_std),
             int(cfg.residual_k),
+            bool(cfg.run_csgm_m2),
+            include_lfista,
         )
 
         plot_paths: List[str] = []
         if not args.no_plots:
             plot_paths = save_all_comparison_plots(cfg, summary, per_seed)
             _log(tee, f"Figures: {len(plot_paths)} files under {os.path.join(run_root, 'figures')}")
+        if (not bool(args.no_plots)) and first_line_examples is not None:
+            p08 = os.path.join(run_root, cfg.plots_subdir, "08_example_ground_truth_vs_models.png")
+            plot_direct_ub_ground_truth_vs_models(first_line_examples, p08)
+            plot_paths.append(p08)
+            _log(tee, "Figure: " + p08)
         if not bool(args.no_plots) and not bool(args.no_parity) and parity_bundles:
             merged_parity = merge_gt_pred_bundles(parity_bundles)
             npz_path = os.path.join(tables_dir, "parity_pooled.npz")
@@ -722,6 +922,7 @@ def main() -> None:
             "include_hybrid_fista": include_hf,
             "include_lfista": include_lfista,
             "include_ae": run_ae,
+            "include_csgm_m2": bool(cfg.run_csgm_m2),
             "residual_basis": str(cfg.residual_basis),
             "measurement_kind": str(cfg.measurement_kind),
             "dub_cfg": dub_dump,
@@ -744,6 +945,8 @@ def main() -> None:
             str(cfg.measurement_kind),
             float(cfg.measurement_noise_std),
             int(cfg.residual_k),
+            bool(cfg.run_csgm_m2),
+            include_lfista,
         )
         _log(tee, f"Done in {elapsed:.1f}s | manifest: {manifest_path}")
     finally:

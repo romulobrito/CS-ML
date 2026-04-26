@@ -1,0 +1,13 @@
+dataset,channel,target,pearson_r
+cross_train,sonic,vc,-0.16416842533203335
+cross_train,rhob,vc,0.08072255364292986
+cross_train,gr,vc,0.9732648781772304
+cross_train,ai,vc,0.1671596607461573
+cross_train,vp,vc,0.18190751680450504
+cross_test,sonic,vc,-0.16059602772444992
+cross_test,rhob,vc,-0.006115135681326147
+cross_test,gr,vc,0.9772228342822642
+cross_test,ai,vc,0.13295827791200052
+cross_test,vp,vc,0.10766199699537211
+real_f03,ac,porosity,0.9996104414248609
+real_f03,gr,porosity,-0.17587965911354309
