@@ -1,0 +1,48 @@
+{
+  "run_id": "m2_grid",
+  "method": "ridge_prior_csgm",
+  "target": "vc",
+  "channels": [
+    "sonic",
+    "rhob",
+    "gr",
+    "ai",
+    "vp"
+  ],
+  "window_len": 64,
+  "steps": [
+    8,
+    16,
+    32
+  ],
+  "measurement_ratios": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "seeds": [
+    7,
+    23,
+    41
+  ],
+  "measurement_kind": "subsample",
+  "measurement_noise_std": 0.005,
+  "ae_latent_dim": 16,
+  "ae_hidden": 128,
+  "ae_epochs": 200,
+  "csgm_iters": 400,
+  "csgm_lr": 0.05,
+  "csgm_restarts": 3,
+  "lambda_grid": [
+    0.0001,
+    0.0003,
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1
+  ],
+  "tables_dir": "/home/romulo/Documentos/cs-regressor/outputs/cross_well_vc/csgm/m2_grid/tables",
+  "figures_dir": "/home/romulo/Documentos/cs-regressor/outputs/cross_well_vc/csgm/m2_grid/figures",
+  "paper_figures_dir": "/home/romulo/Documentos/cs-regressor/paper/figures/csgm_m2_grid"
+}

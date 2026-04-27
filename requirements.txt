@@ -10,3 +10,6 @@ spgl1>=2.0
 
 # Etapa 2 LFISTA: sir_cs_lfista.py and pipeline profiles lfista_integrated* (skip if you only run classic profiles)
 torch>=2.0
+
+# Extra orthonormal bases for residual sparsification (haar, db4, sym4) in real-well benchmark
+PyWavelets>=1.4

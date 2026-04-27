@@ -122,6 +122,46 @@ to appendix, and what argument each artifact supports.
 - Status: at least parity and depth profile should remain in main paper; example
   windows can move to appendix if page budget is tight.
 
+### Ablation figures
+
+- Files:
+  - `figures/ablation_crosswell_rmse.png`
+  - `figures/ablation_f03_rmse.png`
+  - `figures/ablation_prior_class_ridge_vs_mlp.png`
+- Argument: isolates the two structural components of CLP-CSGM Ridge. The
+  prior-only variant tests whether `b` adds value beyond `G(h(u))`; the
+  measurement-only variant tests whether the conditional prior is necessary.
+  The prior-class figure tests whether a more flexible MLP prior changes the
+  conclusion.
+- Status: main paper, because these figures directly support the method claim.
+
+## Ablation Tables
+
+### Cross-well ablation table
+
+- File: `tables/ablation_crosswell_wide.tex`
+- Argument: CLP-CSGM Ridge improves over prior-only and measurement-only CSGM in
+  all nine cross-well low-data cells.
+- Status: main paper or appendix depending on page budget. If moved to appendix,
+  keep the figure in the main paper.
+
+### F03 ablation table
+
+- File: `tables/ablation_f03_wide.tex`
+- Argument: the full method beats both structural ablations across all F03
+  measurement ratios, while the AE comparison remains regime-dependent.
+- Status: main paper or appendix depending on page budget.
+
+### Prior-class sensitivity tables
+
+- Files:
+  - `tables/ablation_prior_class_crosswell_wide.tex`
+  - `tables/ablation_prior_class_f03_wide.tex`
+- Argument: Ridge is consistently better than the MLP prior on the same
+  experimental grids, supporting the reported CLP-CSGM Ridge variant.
+- Status: main paper or appendix depending on page budget. Keep at least a
+  concise textual summary in the main paper.
+
 ## Recommended Main-Paper Figure Set
 
 If the paper becomes too long, keep:
@@ -131,8 +171,11 @@ If the paper becomes too long, keep:
 3. `results_crosswell_rmse_vs_rho.png`
 4. `01_rmse_vs_measurement_ratio.png`
 5. `06_gain_rmse_over_ml_only.png`
-6. `09_parity_ground_truth_vs_prediction.png`
-7. `10_depth_profile_porosity.png`
+6. `ablation_crosswell_rmse.png`
+7. `ablation_f03_rmse.png`
+8. `ablation_prior_class_ridge_vs_mlp.png`
+9. `09_parity_ground_truth_vs_prediction.png`
+10. `10_depth_profile_porosity.png`
 
 Move all other figures to appendix.
 

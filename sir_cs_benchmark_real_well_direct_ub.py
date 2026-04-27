@@ -200,6 +200,11 @@ def parse_args() -> argparse.Namespace:
         help="Enable optional conditional CSGM M2 branch.",
     )
     p.add_argument(
+        "--run-csgm-ablations",
+        action="store_true",
+        help="Also report prior-only and measurement-only CSGM ablations.",
+    )
+    p.add_argument(
         "--csgm-prior-type",
         type=str,
         default="ridge",
@@ -277,6 +282,7 @@ def main() -> None:
     cfg.measurement_ratios = _parse_float_list(rhos_str)
     cfg.run_lfista = not bool(args.no_lfista)
     cfg.run_csgm_m2 = bool(args.run_csgm_m2)
+    cfg.run_csgm_ablations = bool(args.run_csgm_ablations)
     cfg.csgm_prior_type = str(args.csgm_prior_type).strip().lower()
     cfg.csgm_latent_dim = int(args.csgm_latent_dim)
     cfg.csgm_ae_epochs = int(args.csgm_ae_epochs)
@@ -350,6 +356,7 @@ def main() -> None:
             "seeds=" + str(cfg.seeds) + " rhos=" + str(cfg.measurement_ratios)
             + " k=" + str(cfg.residual_k) + " noise=" + str(cfg.measurement_noise_std)
             + " csgm_m2=" + str(cfg.run_csgm_m2)
+            + " csgm_ablations=" + str(cfg.run_csgm_ablations)
             + " csgm_prior=" + str(cfg.csgm_prior_type),
         )
         for seed in cfg.seeds:

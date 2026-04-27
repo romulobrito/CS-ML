@@ -8,7 +8,10 @@ strongest direct baseline, AE \([u,b]\), for every low-data and sparse
 measurement cell. CLP-CSGM Ridge wins in all nine cells. The relative RMSE gap
 is modest at step 8 and \(\rho=0.05\), but becomes large as the low-data regime
 becomes more severe, reaching improvements above 38\% for step 32 at
-\(\rho=0.10\) and \(\rho=0.20\).
+\(\rho=0.10\) and \(\rho=0.20\). Figure~\ref{fig:crosswell_clp_vs_ae}
+visualizes the same pairwise comparison and shows that the advantage is not
+confined to a single measurement ratio: within each training-size panel, the
+CLP-CSGM curve remains below the AE curve across the sparse-measurement grid.
 
 \begin{table}[htbp]
   \centering
@@ -30,10 +33,13 @@ becomes more severe, reaching improvements above 38\% for step 32 at
 
 Figure~\ref{fig:crosswell_all_methods} places this pairwise comparison in the
 full benchmark context. The direct MLP and PCA baselines become unstable in the
-low-data cells, while ML only remains more stable but less accurate. The main
-competitor is AE \([u,b]\), and CLP-CSGM Ridge consistently stays below it
-across the measurement ratios. This supports the claim that the gain is not an
-artifact of comparing against weak baselines; it is visible against the
+low-data cells, with errors far above the ML-only and AE baselines. This
+behavior is informative but not the main evidence for the proposed method,
+because these direct models are clearly fragile in this regime. The main
+competitor is AE \([u,b]\), which uses the same autoencoder representation
+family as a direct supervised latent regressor. CLP-CSGM Ridge consistently
+stays below AE \([u,b]\) across the measurement ratios, so the gain is not an
+artifact of comparing only against weak baselines; it is visible against the
 strongest direct representation-learning baseline.
 
 \begin{figure}[htbp]
@@ -65,6 +71,10 @@ CLP-CSGM Ridge has the best mean RMSE across measurement ratios, 0.01360 versus
 0.01398 for AE \([u,b]\). The gain is concentrated in the sparse-measurement
 regime: CLP-CSGM Ridge is clearly better at \(\rho=0.20\) and \(\rho=0.30\).
 At higher measurement ratios, AE \([u,b]\) becomes slightly better.
+Figure~\ref{fig:f03_gr_only_rmse} makes this crossover explicit: the proposed
+method is most useful when target-well measurements are scarce, whereas the
+direct AE baseline benefits once more entries of \(b\) are available as input
+features.
 
 \begin{table}[htbp]
   \centering
@@ -81,21 +91,6 @@ At higher measurement ratios, AE \([u,b]\) becomes slightly better.
   Ridge is strongest at the sparsest ratios, while AE \([u,b]\) becomes
   competitive as more target measurements are available.}
   \label{fig:f03_gr_only_rmse}
-\end{figure}
-
-Figure~\ref{fig:f03_all_methods} shows the same F03 result with all main
-benchmarks. CLP-CSGM Ridge dominates the sparse regime, while AE \([u,b]\)
-overtakes it at higher measurement ratios. The crossover is informative rather
-than problematic: it marks the regime where enough target-well samples are
-available for a direct feature-based model to be competitive.
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.92\linewidth]{05_rmse_grouped_bars_by_ratio.png}
-  \caption{Real-well F03-4 GR-only RMSE for all main benchmarks. CLP-CSGM Ridge
-  has its strongest advantage at low measurement ratios, whereas AE \([u,b]\)
-  becomes slightly better when more sparse target measurements are available.}
-  \label{fig:f03_all_methods}
 \end{figure}
 
 The MAE and relative-\(\ell_2\) curves in
@@ -124,13 +119,13 @@ proposed method uses \(b\) only through the physical measurement residual.
   \label{fig:f03_rell2}
 \end{figure}
 
-Figures~\ref{fig:f03_gain_rmse}--\ref{fig:f03_gain_mae} express the same
-results as gain over the ML-only baseline. Positive values indicate improvement
-over using GR alone. CLP-CSGM Ridge and AE \([u,b]\) are the only methods with
-large positive gains across all ratios, but CLP-CSGM Ridge has the stronger gain
-when measurements are sparse. The direct MLP \([u,b]\) curve is negative,
-reinforcing that sparse measurements should be incorporated through a
-measurement model rather than only as raw input features.
+Figure~\ref{fig:f03_gain_rmse} expresses the same result as RMSE gain over the
+ML-only baseline. Positive values indicate improvement over using GR alone.
+CLP-CSGM Ridge and AE \([u,b]\) are the only methods with large positive gains
+across all ratios, but CLP-CSGM Ridge has the stronger gain when measurements
+are sparse. The direct MLP \([u,b]\) curve is negative, reinforcing that sparse
+measurements should be incorporated through a measurement model rather than only
+as raw input features.
 
 \begin{figure}[htbp]
   \centering
@@ -141,21 +136,14 @@ measurement model rather than only as raw input features.
   \label{fig:f03_gain_rmse}
 \end{figure}
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.92\linewidth]{07_gain_mae_over_ml_only.png}
-  \caption{MAE gain over the ML-only baseline on F03-4. The gain pattern mirrors
-  the RMSE gain, supporting the robustness of the comparison across metrics.}
-  \label{fig:f03_gain_mae}
-\end{figure}
-
-The qualitative diagnostics in Figs.~\ref{fig:f03_examples}--\ref{fig:f03_depth}
-show how these aggregate gains appear in reconstructed profiles. The example
-windows show that MLP \([u,b]\) can produce oscillatory outputs, while PCA and
-AE are smoother. CLP-CSGM Ridge is also smooth but reacts to sparse constraints
-through the latent optimization. The parity plot shows the highest pooled
-correlation among the displayed models, and the depth profile indicates that
-CLP-CSGM tracks the observed porosity trend without the high-frequency
+The qualitative diagnostics show how these aggregate gains appear in
+reconstructed profiles. Figure~\ref{fig:f03_examples} shows representative test
+windows: MLP \([u,b]\) can produce oscillatory outputs, while PCA, AE, and
+CLP-CSGM Ridge are smoother. Figure~\ref{fig:f03_parity} evaluates pooled
+pointwise agreement and shows the highest displayed correlation for CLP-CSGM
+Ridge, indicating better ordering of low and high porosity values. Finally,
+Fig.~\ref{fig:f03_depth} reconstructs the test interval along depth and shows
+that CLP-CSGM tracks the observed porosity trend without the high-frequency
 instability of the direct MLP baseline.
 
 \begin{figure}[htbp]
@@ -191,3 +179,101 @@ fitting arbitrary sparse observations, while the measurement-consistency term
 corrects the weak GR-only prior. When measurements become denser, a direct AE
 baseline can use the \([u,b]\) feature vector effectively and the extra latent
 optimization may offer less advantage.
+
+\subsection{Ablation analysis}
+
+The ablation study isolates the two structural components of CLP-CSGM Ridge:
+the conditional latent prior and the sparse-measurement refinement. The
+prior-only variant uses \(\hat y=G(h(u))\), without \(b\). The measurement-only
+variant solves the CSGM objective with \(\lambda=0\), removing the
+log-conditioned anchor. Table~\ref{tab:ablation_crosswell} and
+Fig.~\ref{fig:ablation_crosswell} show that the full method improves over both
+ablations in every cross-well low-data cell. The gain over prior-only ranges
+from 6.4\% to 24.8\%, while the gain over measurement-only ranges from 39.4\%
+to 61.3\%. This confirms that the cross-well result is not explained solely by
+the decoder or solely by sparse measurements; the advantage comes from their
+combination.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Cross-well Vc ablation results. Gains are RMSE reductions of
+  CLP-CSGM Ridge relative to the corresponding ablation.}
+  \label{tab:ablation_crosswell}
+  \small
+  \resizebox{\linewidth}{!}{\input{tables/ablation_crosswell_wide.tex}}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{ablation_crosswell_rmse.png}
+  \caption{Cross-well Vc ablation RMSE. CLP-CSGM Ridge consistently improves
+  over the prior-only decoder and measurement-only CSGM across the low-data
+  grid.}
+  \label{fig:ablation_crosswell}
+\end{figure}
+
+The real-well F03 GR-only ablation in Table~\ref{tab:ablation_f03} and
+Fig.~\ref{fig:ablation_f03} shows the same decomposition under a weak dense
+context. CLP-CSGM Ridge improves over prior-only by 18.9\% at \(\rho=0.20\) and
+by 38.9\% at \(\rho=0.60\), showing that sparse porosity observations add
+information beyond \(G(h(u))\). It also improves over measurement-only CSGM at
+all ratios, with the largest gains in the sparse regime. The comparison with
+AE \([u,b]\) remains regime-dependent: CLP-CSGM is better at \(\rho=0.20\) and
+\(\rho=0.30\), while AE is slightly better at higher ratios.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Real-well F03-4 GR-only ablation results. Gains are RMSE reductions
+  of CLP-CSGM Ridge relative to the corresponding ablation.}
+  \label{tab:ablation_f03}
+  \small
+  \resizebox{\linewidth}{!}{\input{tables/ablation_f03_wide.tex}}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.88\linewidth]{ablation_f03_rmse.png}
+  \caption{Real-well F03-4 GR-only ablation RMSE. The full method is better than
+  both structural ablations across all measurement ratios, while its comparison
+  with AE \([u,b]\) depends on the sparse-measurement regime.}
+  \label{fig:ablation_f03}
+\end{figure}
+
+Finally, we compare the Ridge latent prior against a more flexible MLP prior
+using the same experimental grids, without repeating the structural ablations.
+This is a prior-class sensitivity check rather than an architecture search.
+Table~\ref{tab:prior_class_crosswell} shows that Ridge outperforms the MLP prior
+in all nine cross-well cells, with RMSE reductions from 8.4\% to 33.9\%.
+Table~\ref{tab:prior_class_f03} shows the same pattern on F03-4: Ridge is better
+at every measurement ratio, with the largest gains in the sparse regime. These
+results support the use of the low-capacity Ridge prior as the paper-facing
+variant in the studied low-data settings. Figure~\ref{fig:prior_class_ridge_mlp}
+summarizes this comparison visually: the Ridge curves remain below the MLP
+curves on both datasets, indicating that the more flexible prior does not
+improve the latent anchor under the available training data.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Cross-well Vc prior-class sensitivity. Ridge gain is the RMSE
+  reduction of CLP-CSGM Ridge relative to CLP-CSGM MLP.}
+  \label{tab:prior_class_crosswell}
+  \small
+  \resizebox{\linewidth}{!}{\input{tables/ablation_prior_class_crosswell_wide.tex}}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Real-well F03-4 GR-only prior-class sensitivity. Ridge gain is the
+  RMSE reduction of CLP-CSGM Ridge relative to CLP-CSGM MLP.}
+  \label{tab:prior_class_f03}
+  \small
+  \input{tables/ablation_prior_class_f03_wide.tex}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{ablation_prior_class_ridge_vs_mlp.png}
+  \caption{Prior-class sensitivity for CLP-CSGM. The Ridge prior is consistently
+  better than the MLP prior on both the cross-well and F03 GR-only grids.}
+  \label{fig:prior_class_ridge_mlp}
+\end{figure}

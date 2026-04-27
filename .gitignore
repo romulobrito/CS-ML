@@ -51,5 +51,8 @@ paper/figures/robustness_phase3/
 # Residual-k robustness: parity npz copies are large; keep PNGs in git, regenerate npz from runs
 paper/figures/direct_ub_robustness_residual_k/parity_pooled_k*.npz
 
+# Real well F03 benchmark runs (sir_cs_benchmark_real_well_direct_ub.py)
+outputs/real_well_f03/
+
 # Local chat notes
 passos_chatgpt

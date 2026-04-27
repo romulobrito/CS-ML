@@ -1,0 +1,119 @@
+\begin{thebibliography}{17}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Ahmadi and Chen(2019)]{ahmadi2019comparison}
+Mohammad~Ali Ahmadi and Zhangxin Chen.
+\newblock Comparison of machine learning methods for estimating permeability
+  and porosity of oil reservoirs via petro-physical logs.
+\newblock \emph{Petroleum}, 5\penalty0 (3):\penalty0 271--284, 2019.
+
+\bibitem[Asim et~al.(2020)Asim, Daniels, Leong, Ahmed, and
+  Hand]{asim2020invertible}
+Muhammad Asim, Mara Daniels, Oscar Leong, Ali Ahmed, and Paul Hand.
+\newblock Invertible generative models for inverse problems: Mitigating
+  representation error and dataset bias.
+\newblock In \emph{Proceedings of the 37th International Conference on Machine
+  Learning}, volume 119 of \emph{Proceedings of Machine Learning Research},
+  pages 399--409. PMLR, 2020.
+
+\bibitem[Asquith and Krygowski(2004)]{asquith2004basic}
+George Asquith and Daniel Krygowski.
+\newblock \emph{Basic Well Log Analysis}.
+\newblock American Association of Petroleum Geologists, 2 edition, 2004.
+
+\bibitem[Bishop(2006)]{bishop2006pattern}
+Christopher~M. Bishop.
+\newblock \emph{Pattern Recognition and Machine Learning}.
+\newblock Springer, 2006.
+
+\bibitem[Bora et~al.(2017)Bora, Jalal, Price, and Dimakis]{bora2017compressed}
+Ashish Bora, Ajil Jalal, Eric Price, and Alexandros~G. Dimakis.
+\newblock Compressed sensing using generative models.
+\newblock In \emph{Proceedings of the 34th International Conference on Machine
+  Learning}, volume~70 of \emph{Proceedings of Machine Learning Research},
+  pages 537--546. PMLR, 2017.
+
+\bibitem[Candes et~al.(2006{\natexlab{a}})Candes, Romberg, and
+  Tao]{candes2006robust}
+Emmanuel~J. Candes, Justin Romberg, and Terence Tao.
+\newblock Robust uncertainty principles: Exact signal reconstruction from
+  highly incomplete frequency information.
+\newblock \emph{IEEE Transactions on Information Theory}, 52\penalty0
+  (2):\penalty0 489--509, 2006{\natexlab{a}}.
+
+\bibitem[Candes et~al.(2006{\natexlab{b}})Candes, Romberg, and
+  Tao]{candes2006stable}
+Emmanuel~J. Candes, Justin~K. Romberg, and Terence Tao.
+\newblock Stable signal recovery from incomplete and inaccurate measurements.
+\newblock \emph{Communications on Pure and Applied Mathematics}, 59\penalty0
+  (8):\penalty0 1207--1223, 2006{\natexlab{b}}.
+
+\bibitem[Donoho(2006)]{donoho2006compressed}
+David~L. Donoho.
+\newblock Compressed sensing.
+\newblock \emph{IEEE Transactions on Information Theory}, 52\penalty0
+  (4):\penalty0 1289--1306, 2006.
+
+\bibitem[Ellis and Singer(2007)]{ellis2007well}
+Darwin~V. Ellis and Julian~M. Singer.
+\newblock \emph{Well Logging for Earth Scientists}.
+\newblock Springer, 2 edition, 2007.
+
+\bibitem[Hoerl and Kennard(1970)]{hoerl1970ridge}
+Arthur~E. Hoerl and Robert~W. Kennard.
+\newblock Ridge regression: Biased estimation for nonorthogonal problems.
+\newblock \emph{Technometrics}, 12\penalty0 (1):\penalty0 55--67, 1970.
+
+\bibitem[Kamath et~al.(2020)Kamath, Price, and Scarlett]{kamath2020power}
+Akshay Kamath, Eric Price, and Jonathan Scarlett.
+\newblock On the power of compressed sensing with generative models.
+\newblock In \emph{Proceedings of the 37th International Conference on Machine
+  Learning}, volume 119 of \emph{Proceedings of Machine Learning Research},
+  pages 5101--5109. PMLR, 2020.
+
+\bibitem[Lucas et~al.(2018)Lucas, Iliadis, Molina, and
+  Katsaggelos]{lucas2018using}
+Alice Lucas, Michael Iliadis, Rafael Molina, and Aggelos~K. Katsaggelos.
+\newblock Using deep neural networks for inverse problems in imaging: Beyond
+  analytical methods.
+\newblock \emph{IEEE Signal Processing Magazine}, 35\penalty0 (1):\penalty0
+  20--36, 2018.
+
+\bibitem[Mirza and Osindero(2014)]{mirza2014conditional}
+Mehdi Mirza and Simon Osindero.
+\newblock Conditional generative adversarial nets, 2014.
+
+\bibitem[Ongie et~al.(2020)Ongie, Jalal, Metzler, Baraniuk, Dimakis, and
+  Willett]{ongie2020deep}
+Greg Ongie, Ajil Jalal, Christopher~A. Metzler, Richard~G. Baraniuk,
+  Alexandros~G. Dimakis, and Rebecca Willett.
+\newblock Deep learning techniques for inverse problems in imaging.
+\newblock \emph{IEEE Journal on Selected Areas in Information Theory},
+  1\penalty0 (1):\penalty0 39--56, 2020.
+
+\bibitem[Sohn et~al.(2015)Sohn, Lee, and Yan]{sohn2015learning}
+Kihyuk Sohn, Honglak Lee, and Xinchen Yan.
+\newblock Learning structured output representation using deep conditional
+  generative models.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~28, 2015.
+
+\bibitem[Ulyanov et~al.(2018)Ulyanov, Vedaldi, and Lempitsky]{ulyanov2018deep}
+Dmitry Ulyanov, Andrea Vedaldi, and Victor Lempitsky.
+\newblock Deep image prior.
+\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition}, pages 9446--9454, 2018.
+
+\bibitem[Wood(2020)]{wood2020predicting}
+David~A. Wood.
+\newblock Predicting porosity, permeability and water saturation applying an
+  optimized nearest-neighbour, machine-learning and data-mining network of
+  well-log data.
+\newblock \emph{Journal of Petroleum Science and Engineering}, 184:\penalty0
+  106587, 2020.
+
+\end{thebibliography}

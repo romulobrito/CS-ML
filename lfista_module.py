@@ -88,21 +88,57 @@ class LFISTATrainConfig:
     loss_alpha_weight: float
     loss_l1_alpha_weight: float
     measurement_noise_std: float
+    bg_type: str = "mlp2"
 
 
 class BackgroundMLP(nn.Module):
-    def __init__(self, p_input: int, n_output: int, hidden: Tuple[int, int], dropout: float = 0.0):
+    """Background regressor u -> y with selectable capacity.
+
+    bg_type:
+      - "linear":  y = W u + c    (single Linear; OLS/ridge-like when trained).
+      - "shallow": one hidden layer (GELU) with width = hidden[0].
+      - "mlp2":    two hidden layers (GELU) -- legacy default.
+
+    Lower-capacity bg models preserve residual sparsity, which the Psi-CS
+    sparse block is designed to exploit.
+    """
+
+    def __init__(
+        self,
+        p_input: int,
+        n_output: int,
+        hidden: Tuple[int, int],
+        dropout: float = 0.0,
+        bg_type: str = "mlp2",
+    ):
         super().__init__()
-        h1, h2 = hidden
-        self.net = nn.Sequential(
-            nn.Linear(p_input, h1),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(h1, h2),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(h2, n_output),
-        )
+        bg_type_norm = str(bg_type).strip().lower()
+        if bg_type_norm == "linear":
+            self.net = nn.Linear(p_input, n_output)
+        elif bg_type_norm == "shallow":
+            h = int(hidden[0])
+            self.net = nn.Sequential(
+                nn.Linear(p_input, h),
+                nn.GELU(),
+                nn.Dropout(dropout),
+                nn.Linear(h, n_output),
+            )
+        elif bg_type_norm in ("mlp2", "deep", "default"):
+            h1, h2 = hidden
+            self.net = nn.Sequential(
+                nn.Linear(p_input, h1),
+                nn.GELU(),
+                nn.Dropout(dropout),
+                nn.Linear(h1, h2),
+                nn.GELU(),
+                nn.Dropout(dropout),
+                nn.Linear(h2, n_output),
+            )
+        else:
+            raise ValueError(
+                "Unknown bg_type: {} (expected linear|shallow|mlp2)".format(bg_type)
+            )
+        self.bg_type = bg_type_norm
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
@@ -424,7 +460,13 @@ def run_lfista_experiment_dataframe(
 
     _log(f"--- [lfista] seed={seed} rho={measurement_ratio:.2f} ---")
 
-    bg = BackgroundMLP(cfg_train.p_input, cfg_train.n_output, cfg_train.bg_hidden, cfg_train.bg_dropout)
+    bg = BackgroundMLP(
+        cfg_train.p_input,
+        cfg_train.n_output,
+        cfg_train.bg_hidden,
+        cfg_train.bg_dropout,
+        bg_type=cfg_train.bg_type,
+    )
     bg = train_background(cfg_train, bg, X_train, Y_train, X_val, Y_val, log_fn)
 
     sparse_frozen = LFISTAUnrolled(

@@ -1,0 +1,20 @@
+Direct [u,b] -> y benchmark (methodological protocol)
+
+0) residual_basis=dct (Psi = get_basis(N, residual_basis); y_res = Psi @ alpha per row).
+0a) residual_k=6 (synthetic innovation sparsity level in make_dataset; OMP oracle k in hybrid CS when used).
+   Alpha support/amplitudes use the same generator rule as identity runs; only Psi differs in Psi-axis studies.
+0b) measurement_kind=subsample (M = build_measurement_matrix: gaussian = i.i.d. N(0,1/sqrt(m)) rows;
+    subsample = m distinct coordinate indicators, one per row). M-axis studies change only this, keeping other knobs fixed when configured.
+0c) measurement_noise_std=0.005 (eta in b = M y + eta on train/val/test and per-sample test rows).
+
+1) Same synthetic generator and splits as sir_cs_pipeline_optimized (make_dataset).
+2) Same M, noise on b, per (seed, measurement_ratio) as hybrid CS evaluation.
+3) Train features: [u, b] with b = M y + eta on train/val/test (independent noise per row).
+4) StandardScaler fit on train [u,b] only; transform val/test.
+5) mlp_concat_ub: sklearn MLPRegressor, same hidden/max_iter/alpha as Config baseline MLP.
+6) pca_regression_ub: PCA on Y_train only; r chosen by val RMSE/MAE (cfg.model_selection_metric);
+   MLP maps scaled [u,b] to PCA scores; inverse transform to y.
+7) ae_regression_ub: PyTorch AE on standardized Y_train; MLP maps [u,b] to latent; decode.
+8) ml_only: sklearn MLP on u only (reference).
+9) Proposed method only: hybrid_lfista_joint (run_lfista_branch, keep joint rows only).
+   No hybrid_fista, ml_only_torch, or hybrid_lfista_frozen in this run.

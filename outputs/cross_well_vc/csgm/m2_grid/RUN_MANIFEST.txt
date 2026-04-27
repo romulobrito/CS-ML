@@ -1,0 +1,55 @@
+CLP-CSGM Ridge cross-well Vc benchmark.
+run_id: m2_grid
+elapsed_seconds: 3.9
+measurement_kind: subsample
+measurement_noise_std: 0.005
+
+tables/
+  detailed_results.csv
+  summary_by_seed.csv
+  summary.csv
+  summary_focus_csgm_vs_ub.csv
+  csgm_vs_ae_winners.csv
+  overall_rank.csv
+  pivot_rmse.csv
+  pivot_relative_l2.csv
+  pivot_rmse.tex
+
+figures/
+  figures/01_rmse_vs_measurement_ratio.png
+  figures/02_mae_vs_measurement_ratio.png
+  figures/03_relative_l2_vs_measurement_ratio.png
+  figures/04_csgm_gain_vs_ae.png
+  figures/05_overall_rmse_ranking.png
+  figures/06_lambda_vs_measurement_ratio.png
+
+paper_assets/
+  paper/figures/csgm_m2_grid/
+  paper/experiments_csgm_m2.tex
+
+all_artifacts:
+  tables/detailed_results.csv
+  tables/summary_by_seed.csv
+  tables/summary.csv
+  tables/summary_focus_clp_csgm_vs_ub.csv
+  tables/csgm_vs_ae_winners.csv
+  tables/overall_rank.csv
+  tables/pivot_rmse.csv
+  tables/pivot_relative_l2.csv
+  tables/pivot_rmse.tex
+  figures/01_rmse_vs_measurement_ratio.png
+  figures/02_mae_vs_measurement_ratio.png
+  figures/03_relative_l2_vs_measurement_ratio.png
+  figures/04_csgm_gain_vs_ae.png
+  figures/05_overall_rmse_ranking.png
+  figures/06_lambda_vs_measurement_ratio.png
+  PROTOCOL.txt
+  DATASET_MANIFEST.txt
+  config.json
+  ../../../../paper/figures/csgm_m2_grid/01_rmse_vs_measurement_ratio.png
+  ../../../../paper/figures/csgm_m2_grid/02_mae_vs_measurement_ratio.png
+  ../../../../paper/figures/csgm_m2_grid/03_relative_l2_vs_measurement_ratio.png
+  ../../../../paper/figures/csgm_m2_grid/04_csgm_gain_vs_ae.png
+  ../../../../paper/figures/csgm_m2_grid/05_overall_rmse_ranking.png
+  ../../../../paper/figures/csgm_m2_grid/06_lambda_vs_measurement_ratio.png
+  ../../../../paper/experiments_csgm_m2.tex

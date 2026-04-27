@@ -9,8 +9,10 @@
 \usepackage{natbib}
 \usepackage{hyperref}
 \usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
 
-\graphicspath{{figures/}{../outputs/real_well_f03/direct_ub/runs/f03_full_gr_only_clp_csgm_ridge/figures/}}
+\graphicspath{{figures/}}
 
 \newtheorem{assumption}{Assumption}
 \newtheorem{proposition}{Proposition}
@@ -31,18 +33,20 @@ Dense well logs provide continuous indirect observations of subsurface
 properties, whereas core measurements are sparse, expensive, and usually
 available only at selected depths. Direct supervised models can exploit log
 features, but they often use sparse target-well measurements only as additional
-inputs. Classical compressed sensing provides a principled measurement
-consistency mechanism, but its fixed-basis sparsity assumption can be too rigid
-for cross-well petrophysical prediction. We propose Conditional Latent-Prior
-Compressed Sensing with Generative Models (CLP-CSGM), a method that learns a
-generative manifold of target-property windows and uses well logs to predict a
-latent prior. Sparse core measurements then refine the reconstruction through a
-test-time latent inverse problem. In low-data cross-well clay-volume prediction,
-CLP-CSGM Ridge improves over a direct autoencoder baseline in all tested
-training-size and measurement-ratio cells, reducing mean RMSE from 0.01905 to
-0.01397. In a real-well F03-4 porosity benchmark using only gamma ray as dense
-input, CLP-CSGM Ridge attains the best average RMSE, with strongest gains in
-the sparsest measurement regimes.
+inputs. Classical compressed sensing provides measurement consistency, but its
+fixed-basis sparsity assumption can be too rigid for cross-well petrophysical
+prediction. We propose Conditional Latent-Prior Compressed Sensing with
+Generative Models (CLP-CSGM), which learns a generative range of
+target-property windows and uses well logs to predict a latent prior. Sparse
+core measurements then refine the reconstruction through a test-time latent
+inverse problem. In low-data cross-well clay-volume prediction, CLP-CSGM Ridge
+improves over a direct autoencoder baseline in all tested training-size and
+measurement-ratio cells, reducing mean RMSE from 0.01905 to 0.01397. In a
+real-well F03-4 GR-only porosity stress test, CLP-CSGM Ridge attains the best
+average RMSE, with strongest gains in the sparsest measurement regimes.
+Ablations confirm that both the conditional prior and the sparse-measurement
+term are necessary, and that Ridge is more stable than an MLP latent prior in
+the tested low-data grids.
 \end{abstract}
 
 \input{sections/01_introduction}

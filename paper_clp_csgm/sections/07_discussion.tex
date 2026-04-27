@@ -17,6 +17,20 @@ could overfit. The sparse measurements then act as a local correction rather
 than as the only source of information. This explains why the method performs
 especially well in low-data and low-\(\rho\) settings.
 
+The ablation results strengthen this interpretation. The prior-only decoder is
+weaker than the full method, which shows that sparse measurements add useful
+target-well information beyond the log-conditioned latent estimate. The
+measurement-only CSGM variant is also weaker, especially at low \(\rho\), which
+shows that the sparse observations alone do not sufficiently identify a stable
+latent code. The method works best when both sources are used together: logs
+anchor the latent search, and sparse measurements correct it.
+
+The Ridge-versus-MLP sensitivity study further supports the low-data design
+choice. A more flexible MLP prior does not improve the conditional latent prior
+in the tested grids; it is consistently worse than Ridge. This suggests that,
+with few training windows, regularized linear latent prediction is preferable to
+a higher-capacity prior that can overfit or become unstable.
+
 The real-well F03 experiment gives a more nuanced result. CLP-CSGM Ridge is the
 best method on average and is strongest when \(\rho\) is small. However, AE
 \([u,b]\) slightly outperforms it at larger \(\rho\). This loss is not
@@ -37,4 +51,4 @@ is needed before claiming field-wide generality.
 These limitations also clarify the contribution. CLP-CSGM Ridge is not a
 replacement for all direct petrophysical regressors. It is a targeted method
 for regimes where dense logs provide a useful but incomplete prior and sparse
-core measurements should be honored as physical evidence in the target well.
+core measurements should be treated as measurement evidence in the target well.

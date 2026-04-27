@@ -1,0 +1,23 @@
+Direct [u,b] benchmark: hybrid_lfista_joint vs mlp_concat / PCA / AE (joint-only mode).
+run_id: prod_step08
+elapsed_seconds: 328.2
+residual_basis: dct
+measurement_kind: subsample
+measurement_noise_std: 0.005
+residual_k: 6
+
+tables/
+  detailed_results.csv
+  summary_by_seed.csv
+  summary.csv
+  summary_focus_lfista_joint_vs_ub.csv
+  summary_by_seed_focus_lfista_joint_vs_ub.csv
+  PROTOCOL.txt
+
+figures/
+
+focus_tables:
+  tables/summary_focus_lfista_joint_vs_ub.csv
+  tables/summary_by_seed_focus_lfista_joint_vs_ub.csv
+  PROTOCOL.txt
+  DATASET_MANIFEST.txt

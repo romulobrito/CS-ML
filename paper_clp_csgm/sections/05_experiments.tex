@@ -20,11 +20,44 @@ is selected by validation RMSE.
 \subsection{Real-well F03 GR-only porosity benchmark}
 
 The real-well experiment uses F03-4 AC, GR, and porosity data, but the dense
-input is restricted to GR only. Windows have length \(N=64\) and are split
-contiguously by depth: 823 training windows, 274 validation windows, and 275
-test windows. Sparse porosity measurements are simulated by coordinate
-subsampling with \(\rho\in\{0.20,0.30,0.40,0.50,0.60\}\). This experiment tests
-whether sparse porosity observations can refine a weak log-only prior.
+input is intentionally restricted to GR only. Windows have length \(N=64\) and
+are split contiguously by depth: 823 training windows, 274 validation windows,
+and 275 test windows. Sparse porosity measurements are simulated by coordinate
+subsampling with \(\rho\in\{0.20,0.30,0.40,0.50,0.60\}\). This experiment should
+be interpreted as a stress test of sparse-measurement assimilation under weak
+dense context, not as a claim that GR-only is the preferred operational
+petrophysical configuration.
+
+\subsection{Implementation details}
+
+All target windows are standardized using the training-set mean and standard
+deviation before autoencoder training and latent optimization; predictions are
+mapped back to the original target scale before metric computation. The
+CLP-CSGM generator is a multilayer-perceptron autoencoder with one hidden layer
+of width 128 in both encoder and decoder, a latent dimension \(k=16\), ReLU
+activations, and a linear output layer. The autoencoder is trained for 200
+epochs with Adam, learning rate \(10^{-3}\), weight decay \(10^{-5}\), and batch
+size 64.
+
+After autoencoder training, the encoder maps each standardized training target
+window to a latent code. The paper-facing prior \(h(u)\) is a Ridge regressor
+with \(\alpha=1.0\), fitted from standardized log windows to standardized latent
+codes. For the prior-class sensitivity experiment, the MLP prior uses two hidden
+layers of width 128, \(L_2\) penalty \(10^{-4}\), learning rate \(10^{-3}\), a
+maximum of 500 iterations, and early stopping.
+
+At validation and test time, latent refinement is optimized with Adam for 400
+iterations, learning rate \(0.05\), and three restarts. The first restart is
+initialized at \(z_0=h(u)\); the remaining restarts add small Gaussian
+perturbations. The regularization parameter is selected on the validation split
+from
+\[
+  \lambda\in\{10^{-4},3\cdot10^{-4},10^{-3},3\cdot10^{-3},
+  10^{-2},3\cdot10^{-2},10^{-1}\}.
+\]
+For the measurement-only ablation, \(\lambda=0\) and the latent search is
+initialized from zero rather than from \(h(u)\). For the prior-only ablation, no
+latent optimization is performed and the prediction is \(G(h(u))\).
 
 \subsection{Baselines and metrics}
 

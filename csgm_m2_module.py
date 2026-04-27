@@ -239,6 +239,21 @@ def csgm_recover_with_prior(
     return best_y_hat
 
 
+def decode_latent_prior(
+    ae: TinyAE,
+    z0_np: np.ndarray,
+    y_mean: np.ndarray,
+    y_scale: np.ndarray,
+    device: str,
+) -> np.ndarray:
+    """Decode latent prior predictions without sparse-measurement refinement."""
+    ae.eval()
+    with torch.no_grad():
+        z0 = torch.tensor(z0_np, dtype=torch.float32, device=device)
+        y_n = ae.decode(z0).cpu().numpy()
+    return y_n * y_scale[None, :] + y_mean[None, :]
+
+
 def _rmse(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     return float(np.sqrt(np.mean((y_pred - y_true) ** 2)))
 
@@ -344,7 +359,8 @@ def run_csgm_m2_experiment_dataframe(
     rows: List[Dict[str, Any]] = []
     nan_f = float("nan")
     m = int(M.shape[0])
-    method = "{}_prior_csgm".format(str(cfg.csgm_prior_type).strip().lower())
+    prior_type = str(cfg.csgm_prior_type).strip().lower()
+    method = "{}_prior_csgm".format(prior_type)
     for i in range(int(Y_test.shape[0])):
         rows.append(
             extb.per_sample_metrics_row(
@@ -364,11 +380,99 @@ def run_csgm_m2_experiment_dataframe(
         )
         rows[-1]["val_score"] = best_score
         rows[-1]["ae_recon_train_rmse"] = ae_recon_train_rmse
+
+    if bool(getattr(cfg, "run_csgm_ablations", False)):
+        prior_val_hat = decode_latent_prior(
+            ae=ae,
+            z0_np=z0_val,
+            y_mean=y_mean,
+            y_scale=y_scale,
+            device=device,
+        )
+        prior_test_hat = decode_latent_prior(
+            ae=ae,
+            z0_np=z0_test,
+            y_mean=y_mean,
+            y_scale=y_scale,
+            device=device,
+        )
+        prior_score = _select_score(prior_val_hat, Y_val, str(cfg.model_selection_metric))
+        prior_method = "{}_prior_only_decoder".format(prior_type)
+        for i in range(int(Y_test.shape[0])):
+            rows.append(
+                extb.per_sample_metrics_row(
+                    int(seed),
+                    float(measurement_ratio),
+                    prior_method,
+                    int(i),
+                    Y_test[i],
+                    prior_test_hat[i],
+                    Alpha_test[i],
+                    np.zeros_like(Alpha_test[i]),
+                    nan_f,
+                    "csgm_prior_only",
+                    m,
+                    support_f1_override=nan_f,
+                )
+            )
+            rows[-1]["val_score"] = float(prior_score)
+            rows[-1]["ae_recon_train_rmse"] = ae_recon_train_rmse
+
+        zero_val = np.zeros_like(z0_val)
+        zero_test = np.zeros_like(z0_test)
+        meas_val_hat = csgm_recover_with_prior(
+            ae=ae,
+            M=M,
+            B=B_val,
+            z0_np=zero_val,
+            y_mean=y_mean,
+            y_scale=y_scale,
+            lam=0.0,
+            n_iters=int(cfg.csgm_iters),
+            opt_lr=float(cfg.csgm_opt_lr),
+            n_restarts=int(cfg.csgm_restarts),
+            device=device,
+            seed=int(seed) + 9100,
+        )
+        meas_score = _select_score(meas_val_hat, Y_val, str(cfg.model_selection_metric))
+        meas_test_hat = csgm_recover_with_prior(
+            ae=ae,
+            M=M,
+            B=B_test,
+            z0_np=zero_test,
+            y_mean=y_mean,
+            y_scale=y_scale,
+            lam=0.0,
+            n_iters=int(cfg.csgm_iters),
+            opt_lr=float(cfg.csgm_opt_lr),
+            n_restarts=int(cfg.csgm_restarts),
+            device=device,
+            seed=int(seed) + 9200,
+        )
+        for i in range(int(Y_test.shape[0])):
+            rows.append(
+                extb.per_sample_metrics_row(
+                    int(seed),
+                    float(measurement_ratio),
+                    "measurement_only_csgm",
+                    int(i),
+                    Y_test[i],
+                    meas_test_hat[i],
+                    Alpha_test[i],
+                    np.zeros_like(Alpha_test[i]),
+                    0.0,
+                    "csgm_measurement_only",
+                    m,
+                    support_f1_override=nan_f,
+                )
+            )
+            rows[-1]["val_score"] = float(meas_score)
+            rows[-1]["ae_recon_train_rmse"] = ae_recon_train_rmse
     return CSGMM2Result(
         df=pd.DataFrame(rows),
         predictions=np.asarray(y_test_hat, dtype=np.float64),
         selected_lambda=best_lam,
         val_score=best_score,
         ae_recon_train_rmse=ae_recon_train_rmse,
-        prior_type=str(cfg.csgm_prior_type).strip().lower(),
+        prior_type=prior_type,
     )

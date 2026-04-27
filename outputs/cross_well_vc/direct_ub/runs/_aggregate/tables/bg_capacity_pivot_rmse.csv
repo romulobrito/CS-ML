@@ -1,0 +1,16 @@
+measurement_ratio,method,linear,mlp2,shallow
+0.05,ae_regression_ub,0.0141,0.0141,0.0141
+0.05,hybrid_lfista_joint,0.0599,0.0271,0.0635
+0.05,ml_only,0.0172,0.0172,0.0172
+0.1,ae_regression_ub,0.0141,0.0141,0.0141
+0.1,hybrid_lfista_joint,0.0601,0.0263,0.0624
+0.1,ml_only,0.0172,0.0172,0.0172
+0.15,ae_regression_ub,0.014,0.014,0.014
+0.15,hybrid_lfista_joint,0.0589,0.024,0.0582
+0.15,ml_only,0.0172,0.0172,0.0172
+0.2,ae_regression_ub,0.0139,0.0139,0.0139
+0.2,hybrid_lfista_joint,0.0579,0.0239,0.0592
+0.2,ml_only,0.0172,0.0172,0.0172
+0.3,ae_regression_ub,0.0137,0.0137,0.0137
+0.3,hybrid_lfista_joint,0.0546,0.0204,0.0513
+0.3,ml_only,0.0172,0.0172,0.0172

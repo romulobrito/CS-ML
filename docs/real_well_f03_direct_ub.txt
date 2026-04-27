@@ -1,0 +1,56 @@
+Real well F03-4: direct [u,b]->y benchmark (Path A)
+==================================================
+
+Data file (repository)
+----------------------
+  data/F03-4_AC+GR+Porosity.txt
+
+Columns: depth (m), AC (us/ft), GR (API), Porosity. Rows sorted by depth after load.
+
+Scientific setup
+----------------
+- Target y: porosity vector along a depth window of length L (n_output).
+- Context u: concatenation [AC segment || GR segment] in R^{2L} (p_input = 2L).
+- Psi: DCT or identity; Alpha_i = y_i @ Psi (spectral coefficients of y; used as LFISTA
+  training targets, not a generative sparse model).
+- b = M y + eta: same as synthetic direct UB (subsample M by default).
+- Split: contiguous window indices (train = shallow block, val, then test = deep block).
+  No shuffle across depth to limit correlation leakage between splits.
+- Seeds: control only RNG for M and measurement noise; u and y are fixed for all seeds.
+
+Script
+------
+  python sir_cs_benchmark_real_well_direct_ub.py [options]
+
+Key options:
+  --data-path, --window-len L, --step, --train-frac, --val-frac
+  --seeds (comma-separated), --rhos (measurement_ratio grid)
+  --residual-basis dct|identity, --measurement-kind subsample|gaussian
+  --measurement-noise-std, --residual-k
+  --fast: one seed, two rhos (0.3, 0.5) for a shorter smoke test
+
+Outputs (per run)
+-----------------
+  <base_dir>/runs/<run_id>/
+    DATASET_MANIFEST.txt   (split sizes, depth ranges, methodology)
+    PROTOCOL.txt           (same template as direct_ub; 0a residual_k; real data note in manifest)
+    tables/*.csv           (detailed_results, summary, focus tables)
+    figures/01-07, 08_example_ground_truth_vs_models.png (per-window curves, first job),
+    09_parity*.png  (if --no-plots not set)
+    tables/parity_pooled.npz     (if parity enabled)
+    config.json, RUN_MANIFEST.txt, logs/run_console.log
+
+Default base-dir: outputs/real_well_f03/direct_ub
+
+Shell helpers
+-------------
+  bash scripts/run_real_well_f03_direct_ub.sh
+  bash scripts/sweep_real_well_f03_residual_k.sh   (sensitivity: residual_k only)
+
+Sensitivity analysis
+--------------------
+- rho: use --rhos "0.2,0.3,0.4,0.5,0.6" (default) in one run, or a subset.
+- k: run sweep script (separate runs; merge CSVs manually or extend with merge script).
+- noise: vary --measurement-noise-std; scale may need tuning vs porosity units.
+
+Note: LFISTA cost grows with n_test; reduce L or use --fast for iteration.

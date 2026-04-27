@@ -38,14 +38,88 @@ the power and limitations of generative compressed sensing
 problem can be solved by searching a structured generative representation rather
 than a fixed sparse basis.
 
+% \paragraph{Conditional generative priors and learned inverse problems.}
+% Conditional generative models use auxiliary information to guide generation,
+% for example through conditional adversarial models \citep{mirza2014conditional}
+% or conditional variational models \citep{sohn2015learning}. In parallel, learned
+% inverse-problem methods use neural models as reconstruction maps, regularizers,
+% or priors \citep{ongie2020deep,lucas2018using}. CLP-CSGM is related to this
+% family because it uses logs as side information, but its inference mechanism is
+% different from direct conditional generation: the logs define a latent prior
+% \(z_0=h(u)\), while sparse target-well observations remain in the data-fidelity
+% term. Thus the conditional information guides the latent search without
+% replacing the measurement-consistency objective.
+
+\paragraph{Conditional inverse reconstruction.}
+A useful distinction in the inverse-problem literature is between \emph{direct
+conditional prediction} and \emph{conditional inverse reconstruction}. In direct
+conditional prediction, auxiliary variables are used to predict the output
+directly, as in supervised regression, conditional generative modeling, or
+latent-code prediction followed by decoding
+\citep{mirza2014conditional,sohn2015learning}. In conditional inverse
+reconstruction, by contrast, side information does not eliminate the inverse
+problem itself; rather, it regularizes the solution while measurement
+consistency remains explicit in the objective
+\citep{ongie2020deep,lucas2018using}. This distinction is central in our
+setting. Dense logs provide contextual information about the target interval,
+but sparse core-derived measurements remain the only direct observations of the
+property to be reconstructed. A method that simply predicts \(y\) from \(u\), or
+even from \([u,b]\), does not preserve this separation of roles.
+
+From this perspective, CLP-CSGM is neither a standard conditional generator nor
+a direct latent regressor. Standard conditional generative models use
+contextual information to generate samples directly from the conditioning
+variable \citep{mirza2014conditional,sohn2015learning}. Such models are
+appropriate when the conditional input is intended to determine the output
+distribution by itself. Our problem is different: the dense logs \(u\) are
+informative but incomplete, while the sparse target-well measurements \(b\)
+carry direct evidence about the quantity of interest. For this reason, CLP-CSGM
+does not ask the model to synthesize \(y\) from \(u\) alone. Instead, it uses
+\(u\) only to define a target-specific latent anchor \(z_0=h(u)\), while the
+final estimate is obtained through a measurement-consistent latent inverse
+problem.
+
+This formulation is also distinct from standard CSGM
+\citep{bora2017compressed}. Classical CSGM searches the generator range by
+minimizing only the measurement mismatch. In CLP-CSGM, the latent search is
+additionally regularized toward a context-dependent prior predicted from dense
+logs. This difference is structural, not merely procedural: the term
+\(\lambda\|z-z_0(u)\|_2^2\) remains active throughout the optimization and
+changes the reconstructed solution selected from the decoder range. Therefore,
+the proposed method should not be interpreted as ``CSGM with a warm start.'' The
+logs do not only provide an initialization; they define a persistent latent
+regularizer that remains part of the inverse problem during test-time
+refinement.
+
+A second relevant distinction is with respect to latent-regression baselines.
+One may first learn a latent representation and then regress directly from logs
+to latent codes, producing predictions of the form \(G(h(u))\). This already
+introduces a learned target manifold, but it still performs \emph{prediction
+without test-time assimilation}. Sparse target-well measurements do not alter
+the estimate once the latent code has been predicted. In CLP-CSGM, by contrast,
+the latent prior and the sparse measurements play complementary roles: the prior
+\(z_0=h(u)\) defines a context-dependent center in latent space, while the
+measurement term \(\|M G(z)-b\|_2^2\) pulls the estimate toward consistency with
+target-well observations. The ablation analysis in this paper confirms that
+neither component alone explains the observed gains; the strongest performance
+arises from their combination.
+
+The proposed method also differs from fixed-basis sparse recovery. Classical
+compressed sensing assumes that the unknown signal is sparse or compressible in
+a predetermined transform basis
+\citep{donoho2006compressed,candes2006robust,candes2006stable}. That prior can
+be too rigid for petrophysical windows affected by cross-well distribution
+shift, where geological variability is not naturally aligned with a universal
+hand-crafted basis. CLP-CSGM replaces that assumption with a learned generative
+range, while preserving the core compressed-sensing principle that observed
+entries should appear explicitly in a data-fidelity term.
+
 \paragraph{Position of this work.}
-Our contribution is not a new generic theory of CSGM. Instead, we specialize the
-generative compressed sensing idea to petrophysical property windows with two
-information sources: dense logs and sparse direct measurements. The novelty is
-the conditional latent prior \(z_0=h(u)\), learned from logs, combined with
-test-time measurement consistency. In contrast with direct \([u,b]\to y\)
-baselines, sparse core measurements are not merely concatenated to the input;
-they define the data-fidelity term of a latent inverse problem. In contrast
-with classical CSGM, the latent search is guided by target-well logs through
-\(\|z-z_0(u)\|_2^2\), making the method conditional on local geological
-context.
+The proposed CLP-CSGM framework is positioned at the intersection of generative
+priors, conditional inverse reconstruction, and petrophysical estimation from
+sparse core measurements. Its contribution is not a new general theory of
+generative compressed sensing, but a task-specific formulation in which dense
+logs define a conditional latent prior, sparse target-well measurements define
+explicit test-time constraints, and reconstruction is restricted to a learned
+range of plausible property windows. This separation of roles distinguishes the
+method from direct regression, standard CSGM, and fixed-basis sparse recovery.

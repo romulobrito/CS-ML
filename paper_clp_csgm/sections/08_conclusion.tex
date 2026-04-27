@@ -15,6 +15,15 @@ measurement regimes. These results indicate that conditional latent generative
 priors are a promising alternative to fixed-basis sparse residual recovery for
 petrophysical sparse-measurement assimilation.
 
+The ablation results clarify why the method works in the studied regimes. The
+prior-only decoder \(G(h(u))\) is weaker than the full method, showing that
+sparse target-well measurements add information beyond log-conditioned latent
+regression. Measurement-only CSGM is also weaker, showing that sparse
+observations alone do not provide a stable latent estimate in these low-data
+settings. Finally, the Ridge prior is consistently stronger than the MLP prior,
+supporting the use of a low-capacity conditional latent prior when training
+windows are scarce.
+
 Future work should evaluate the method on additional fields, compare richer
 conditional priors, investigate uncertainty quantification in latent space, and
 study measurement designs beyond coordinate subsampling.

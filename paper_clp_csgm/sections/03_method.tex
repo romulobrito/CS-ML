@@ -70,6 +70,96 @@ At validation and test time, the latent code is refined by
 The regularization parameter \(\lambda\) is selected on validation windows for
 each measurement ratio and random seed.
 
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{%
+  \begin{tikzpicture}[
+    node distance=7mm and 8mm,
+    >=Latex,
+    every node/.style={font=\small},
+    block/.style={
+      draw,
+      rounded corners=2pt,
+      align=center,
+      minimum width=2.45cm,
+      minimum height=0.95cm,
+      inner sep=5pt
+    },
+    io/.style={block, fill=blue!8},
+    model/.style={block, fill=green!10},
+    latent/.style={block, fill=orange!12},
+    solve/.style={block, fill=red!10},
+    artifact/.style={block, fill=green!6},
+    stage/.style={
+      draw,
+      rounded corners=4pt,
+      dashed,
+      inner sep=8pt
+    },
+    arrow/.style={->, thick},
+    guide/.style={->, thick, dashed}
+  ]
+    % Offline stage
+    \node[io] (y) {Training target\\windows \(y\)};
+    \node[model, right=of y] (ae) {Train autoencoder\\\(E, G\)};
+    \node[latent, right=of ae] (ey) {Encode targets\\\(E(y)\)};
+    \node[artifact, right=of ey] (g) {Frozen decoder\\\(G\)};
+
+    \node[io, below=of y] (u) {Training dense\\logs \(u\)};
+    \node[model, right=of u] (hfit) {Fit latent prior\\from \((u, E(y))\)};
+    \node[artifact, right=of hfit] (h) {Trained prior\\\(h:u\mapsto z_0\)};
+
+    \draw[arrow] (y) -- (ae);
+    \draw[arrow] (ae) -- (ey);
+    \draw[arrow] (ey) -- (g);
+    \draw[arrow] (u) -- (hfit);
+    \draw[arrow] (ey) -- (hfit);
+    \draw[arrow] (hfit) -- (h);
+
+    \node[stage, fit=(y)(ae)(ey)(g)(u)(hfit)(h),
+      label={[font=\bfseries\small]above:Offline training}] (offline) {};
+
+    % Target-well stage
+    \node[io, below=20mm of u] (uast) {Target-well dense\\logs \(u_\ast\)};
+    \node[latent, right=of uast] (z0) {Latent anchor\\\(z_0=h(u_\ast)\)};
+    \node[solve, right=of z0, minimum width=4.4cm] (opt) {Latent refinement\\$\min_z\, \|MG(z)-b_\ast\|_2^2 + \lambda\|z-z_0\|_2^2$};
+    \node[model, right=of opt] (yhat) {Reconstruction\\\(\hat y = G(\hat z)\)};
+    \node[io, below=of opt] (bast) {Sparse target\\measurements \(b_\ast\)};
+
+    \draw[arrow] (uast) -- (z0);
+    \draw[arrow] (z0) -- (opt);
+    \draw[arrow] (opt) -- (yhat);
+    \draw[arrow] (bast) -- (opt);
+    \draw[guide] (h.south) -- node[right] {apply \(h\)} (z0.north);
+    \draw[guide] (g.south) -- node[right] {use \(G\)} (opt.north);
+
+    \node[stage, fit=(uast)(z0)(opt)(yhat)(bast),
+      label={[font=\bfseries\small]above:Target-well inference}] (online) {};
+  \end{tikzpicture}
+  }
+  \caption{CLP-CSGM workflow. Offline, target windows train an autoencoder and
+  dense logs are paired with encoded latents to fit the conditional prior
+  \(h\). For a target well, dense logs produce the latent anchor \(z_0\), sparse
+  measurements enforce data consistency, and latent optimization is decoded by
+  \(G\) to obtain the final estimate.}
+  \label{fig:clp_csgm_workflow}
+\end{figure}
+
+Figure~\ref{fig:clp_csgm_workflow} summarizes the complete CLP-CSGM workflow and
+separates the operations that are learned offline from the operations performed
+for a target well. In the offline stage, target windows \(y\) train an
+autoencoder, whose decoder \(G\) is retained as the generative range used by the
+inverse problem. The same trained encoder maps target windows to latent codes
+\(E(y)\); these latents, paired with dense log windows \(u\), define the
+supervised training set for the latent prior \(h:u\mapsto z_0\). In the
+target-well stage, the dense logs \(u_\ast\) are used only to compute the latent
+anchor \(z_0=h(u_\ast)\), while sparse observations \(b_\ast\) enter only
+through the data-fidelity term. The final estimate is therefore not a direct
+regression from \([u_\ast,b_\ast]\) to \(y_\ast\); it is the decoded output of a
+latent code selected to remain close to the log-conditioned prior and consistent
+with the measured target entries.
+
+
 \begin{proposition}[MAP and Tikhonov interpretation]
 \label{prop:map}
 Assume \(b\mid z\sim\mathcal{N}(M G(z),\sigma_b^2 I)\) and
@@ -96,11 +186,85 @@ forced toward the direct latent prediction \(z_0(u)\), and the method approaches
 the decoder-only estimate \(G(z_0(u))\).
 \end{proposition}
 
-\begin{remark}[Role of \(\lambda\)]
-Small \(\lambda\) trusts sparse measurements more and can overfit noisy or very
-sparse observations. Large \(\lambda\) trusts the log-conditioned prior more and
-can underuse available core measurements. The validation grid implements this
-trade-off empirically.
+\begin{proposition}[Existence of a minimizer]
+\label{prop:existence}
+Assume that the decoder \(G:\mathbb{R}^k \to \mathbb{R}^n\) is continuous and
+that \(\lambda>0\). For fixed \(M\), \(b\), and \(z_0\), the objective
+\[
+  \mathcal{J}(z)
+  =
+  \|M G(z)-b\|_2^2
+  +
+  \lambda\|z-z_0\|_2^2
+\]
+admits at least one global minimizer in \(\mathbb{R}^k\).
+\end{proposition}
+
+\begin{proof}
+Since \(G\) is continuous and \(M\) is linear, the map
+\[
+  z \mapsto \|M G(z)-b\|_2^2
+\]
+is continuous. The quadratic regularization term
+\[
+  z \mapsto \lambda\|z-z_0\|_2^2
+\]
+is also continuous and, because \(\lambda>0\), coercive in \(z\). Therefore,
+\[
+  \mathcal{J}(z)\to+\infty
+  \qquad \text{as} \qquad
+  \|z\|_2\to\infty .
+\]
+Hence \(\mathcal{J}\) is continuous and coercive on \(\mathbb{R}^k\), so it
+attains its global minimum at some \(\hat z\in\mathbb{R}^k\).
+\end{proof}
+
+\begin{remark}[Role of the regularization parameter]
+\label{rem:lambda_role}
+The parameter \(\lambda\) balances adherence to the log-conditioned latent
+anchor against sparse-measurement consistency. Small values of \(\lambda\)
+recover behavior closer to measurement-driven generative inversion, while large
+values increasingly restrict the solution toward the decoder-only conditional
+estimate \(G(h(u))\). Thus, \(\lambda\) does not merely scale a penalty term; it
+determines how strongly dense contextual information is allowed to shape the
+final reconstruction relative to sparse direct observations. The validation grid
+implements this trade-off empirically.
+\end{remark}
+
+\begin{remark}[Representation error and decoder mismatch]
+\label{rem:representation_error}
+The proposed reconstruction is restricted to the image of the decoder \(G\).
+Therefore, even when the sparse measurements are noiseless and the optimization
+is solved exactly, the reconstruction error cannot in general be smaller than
+the mismatch between the true signal and the decoder range. More precisely, if
+\(y^\star\) denotes the unknown target signal and
+\[
+  \mathcal{M}=\operatorname{Im}(G)
+\]
+denotes the learned manifold, then the method operates under an implicit
+approximation error of the form
+\[
+  \inf_{\tilde y\in\mathcal{M}}\|y^\star-\tilde y\| .
+\]
+This term is not specific to the conditional latent prior; it is inherited from
+the use of a learned generative range itself. Consequently, CLP-CSGM should be
+interpreted as combining two sources of inductive bias: a manifold constraint
+induced by the decoder and a conditional latent regularization induced by the
+logs.
+\end{remark}
+
+\begin{remark}[Interpretation of the ablation study]
+\label{rem:ablation_interpretation}
+The ablation study separates the contributions of three structural components:
+the learned manifold \(G\), the conditional latent anchor \(z_0=h(u)\), and the
+sparse-measurement consistency term. The prior-only variant isolates the
+conditional latent prior without test-time assimilation, whereas the
+measurement-only variant isolates the generative inverse problem without dense
+contextual anchoring. The complete CLP-CSGM objective combines both mechanisms.
+Thus, improvements of the full method over both ablated variants empirically
+support the claim that its gains arise from the interaction between contextual
+latent regularization and sparse-measurement refinement, rather than from either
+component alone.
 \end{remark}
 
 \begin{remark}[Theoretical scope]

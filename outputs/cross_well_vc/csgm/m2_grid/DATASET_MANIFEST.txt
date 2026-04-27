@@ -1,0 +1,12 @@
+CLP-CSGM Ridge cross-well Vc dataset manifest
+
+train_path: data/F02-1,F03-2,F06-1_6logs_30dB.txt
+test_path:  data/F03-4_6logs_30dB.txt
+target: VC
+channels: SONIC, RHOB, GR, AI, VP
+window_len: 64
+steps: 8,16,32
+measurement_ratios: 0.05,0.1,0.2
+seeds: 7,23,41
+
+Note: each step defines a different sliding-window density and therefore a distinct low-data regime.

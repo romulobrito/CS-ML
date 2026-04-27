@@ -223,6 +223,7 @@ class Config:
 
     # CSGM M2 (conditional generative-prior CS): optional direct-UB branch.
     run_csgm_m2: bool = False
+    run_csgm_ablations: bool = False
     csgm_device: str = ""
     csgm_prior_type: str = "ridge"  # "ridge" or "mlp"
     csgm_latent_dim: int = 16
@@ -1889,6 +1890,9 @@ METHOD_COLORS: Dict[str, str] = {
     "ae_regression_ub": "#17becf",
     "ridge_prior_csgm": "#d62728",
     "mlp_prior_csgm": "#8c564b",
+    "ridge_prior_only_decoder": "#ff9896",
+    "mlp_prior_only_decoder": "#c49c94",
+    "measurement_only_csgm": "#7f7f7f",
 }
 METHOD_DISPLAY_NAMES: Dict[str, str] = {
     "ml_only": "ML only",
@@ -1898,6 +1902,9 @@ METHOD_DISPLAY_NAMES: Dict[str, str] = {
     "ae_regression_ub": "AE [u,b]",
     "ridge_prior_csgm": "CLP-CSGM Ridge",
     "mlp_prior_csgm": "CLP-CSGM MLP",
+    "ridge_prior_only_decoder": "Prior-only Ridge",
+    "mlp_prior_only_decoder": "Prior-only MLP",
+    "measurement_only_csgm": "Measurement-only CSGM",
     "hybrid_fista": "Hybrid FISTA",
     "hybrid_spgl1": "Hybrid SPGL1",
     "cs_only_fista": "CS only FISTA",
@@ -1923,6 +1930,9 @@ METHOD_ORDER_DIRECT_UB = [
     "ae_regression_ub",
     "ridge_prior_csgm",
     "mlp_prior_csgm",
+    "ridge_prior_only_decoder",
+    "mlp_prior_only_decoder",
+    "measurement_only_csgm",
     "hybrid_fista",
     "hybrid_lfista_frozen",
     "hybrid_lfista_joint",
@@ -1934,6 +1944,9 @@ METHOD_ORDER_DIRECT_UB_JOINT_FOCUS = [
     "ae_regression_ub",
     "ridge_prior_csgm",
     "mlp_prior_csgm",
+    "ridge_prior_only_decoder",
+    "mlp_prior_only_decoder",
+    "measurement_only_csgm",
     "hybrid_lfista_joint",
 ]
 METHOD_ORDER_STAGE1_EXTERNAL = [

@@ -1,0 +1,19 @@
+Conditional Latent-Prior CSGM (CLP-CSGM) cross-well Vc benchmark protocol
+
+0) Dataset: F02-1,F03-2,F06-1 train wells and F03-4 held-out test well.
+1) Target: Vc windows, L=64, noisy 30dB logs.
+2) u channels: sonic,rhob,gr,ai,vp.
+3) Low-data axis: step in {8,16,32}; resulting n_train approx {104,52,27}.
+4) Measurement model: b = M y + eta, M is coordinate subsampling.
+5) measurement_ratio rho in {0.05,0.10,0.20}; seeds {7,23,41}.
+6) CLP-CSGM Ridge: AE decoder G(z) trained on standardized Y_train only.
+7) Ridge prior h(u) maps u to z0 using encoded train latents z=E(y).
+8) For each validation/test row, solve:
+   z_hat = argmin_z ||M G(z) - b||_2^2 + lambda ||z - z0(u)||_2^2.
+9) Lambda is selected on validation RMSE per (step, seed, rho), then evaluated on test.
+10) Benchmarks are the existing low-data direct [u,b]->y summaries:
+    ml_only, mlp_concat_ub, pca_regression_ub, ae_regression_ub.
+
+Decision summary:
+  CSGM wins vs ae_regression_ub: 9 / 9
+  Average CSGM gap vs ae_regression_ub: -25.68%

@@ -17,7 +17,7 @@ targets may underuse sparse core observations available in the target well. A
 common direct workaround is to concatenate the sparse measurement vector with
 the logs and train a supervised model from \([u,b]\) to \(y\). Although this can
 be competitive, it treats the sparse measurements as features rather than as
-hard evidence about the reconstructed signal.
+measurement evidence about the reconstructed signal.
 
 Compressed sensing (CS) offers the complementary perspective: measurements
 should constrain the reconstruction through a forward model
@@ -51,7 +51,7 @@ measurement-consistent inverse problem,
   \hat y = G(\hat z).
   \label{eq:intro_clp_csgm}
 \end{equation}
-The first term enforces sparse core consistency; the second term keeps the
+The first term penalizes sparse core inconsistency; the second term keeps the
 solution close to the log-conditioned latent prior.
 
 The contributions are:
@@ -61,9 +61,12 @@ The contributions are:
   \item We provide a theoretical interpretation of the objective as a
   Tikhonov/MAP latent inverse problem and relate it to standard CSGM guarantees.
   \item We evaluate the method in low-data cross-well clay-volume prediction
-  and in a real-well F03-4 porosity benchmark using gamma ray only as dense
-  input.
+  and in a real-well F03-4 GR-only porosity stress test.
   \item We show that CLP-CSGM Ridge improves over strong direct baselines in
-  sparse-measurement regimes and discuss when direct autoencoder regression
-  remains competitive.
+  sparse-measurement regimes, and we use structural ablations to show that both
+  the conditional latent prior and the sparse-measurement term are needed.
 \end{itemize}
+
+The remainder of the paper reviews related work, defines CLP-CSGM, describes the
+datasets and experimental protocol, reports quantitative and ablation results,
+and discusses the regimes in which the method is most appropriate.
