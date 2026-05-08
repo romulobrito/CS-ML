@@ -1,8 +1,209 @@
-# CS-ML (SIR-CS)
+# CLP-CSGM
 
-Sparse Innovation Regression with Compressed Sensing: synthetic pipeline, Phase~0 baseline, and LaTeX draft.
+Conditional Latent-Prior Compressed Sensing with Generative Models (CLP-CSGM)
+for petrophysical property estimation from dense logs and sparse target
+measurements.
 
-- **Method and experiments:** see `README_SIR_CS.md` (Portuguese protocol).
-- **Code:** `sir_cs_pipeline_optimized.py` (run with `--profile paper`, `explore`, or `phase0_baseline`).
-- **Paper:** `paper/main.tex` (figures under `paper/figures/phase0_baseline/`).
-- **Roadmap:** `paper/roadmap_proximos_passos.md`.
+This repository contains the code needed to reproduce CLP-CSGM experiments.
+It intentionally excludes private raw data and heavy experiment outputs.
+
+## 1) What this repository contains
+
+- Core CLP-CSGM implementation:
+  - `csgm_m2_module.py`
+- Shared benchmark infrastructure:
+  - `sir_cs_benchmark_direct_ub.py`
+  - `sir_cs_pipeline_optimized.py`
+  - `direct_ub_baselines.py`
+  - `external_benchmarks.py`
+- Dataset loaders/builders:
+  - `multi_well_vc.py`
+  - `real_well_f03.py`
+- Main benchmark launchers:
+  - `sir_cs_benchmark_multi_well_vc.py`
+  - `sir_cs_benchmark_real_well_direct_ub.py`
+- Reproduction helpers:
+  - `scripts/`
+
+Note: some filenames keep historical `sir_cs_*` names because CLP-CSGM was
+developed on top of a broader CS benchmark codebase. For CLP-CSGM runs, use
+`--run-csgm-m2` and `--no-lfista`.
+
+## 2) Method summary
+
+CLP-CSGM learns:
+
+1. a decoder `G(z)` via autoencoder on target windows;
+2. a conditional latent prior `z0 = h(u)` from dense log windows.
+
+At validation and test time, latent refinement solves:
+
+`z_hat = argmin_z ||M G(z) - b||_2^2 + lambda ||z - z0(u)||_2^2`
+
+and returns:
+
+`y_hat = G(z_hat)`
+
+where:
+
+- `M` is the sparse measurement operator (typically coordinate subsampling),
+- `b` is the sparse target observation vector,
+- `lambda` is selected on validation split.
+
+## 3) Data requirements
+
+Raw data are not included. Create `data/` and place required local files there.
+
+Required files for the paper runs:
+
+- `data/F02-1,F03-2,F06-1_6logs_30dB.txt`
+- `data/F03-4_6logs_30dB.txt`
+- `data/F03-4_AC+GR+Porosity.txt`
+
+Optional files for supplementary Lapa/Auddys scripts depend on your local
+private data organization.
+
+## 4) Installation
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Main dependencies are listed in `requirements.txt`:
+`numpy`, `pandas`, `matplotlib`, `scikit-learn`, `torch`, `PyWavelets`.
+
+## 5) Main reproducibility runs
+
+### 5.1 Cross-well Vc (Ridge prior + CLP-CSGM ablations)
+
+```bash
+python sir_cs_benchmark_multi_well_vc.py \
+  --train-path data/F02-1,F03-2,F06-1_6logs_30dB.txt \
+  --test-path data/F03-4_6logs_30dB.txt \
+  --channels sonic,rhob,gr,ai,vp \
+  --target vc \
+  --step 8 \
+  --rhos 0.05,0.10,0.20 \
+  --seeds 7,23,41 \
+  --run-csgm-m2 \
+  --run-csgm-ablations \
+  --csgm-prior-type ridge \
+  --no-lfista
+```
+
+Repeat with `--step 16` and `--step 32`.
+
+### 5.2 Cross-well Vc (MLP prior sensitivity)
+
+```bash
+python sir_cs_benchmark_multi_well_vc.py \
+  --train-path data/F02-1,F03-2,F06-1_6logs_30dB.txt \
+  --test-path data/F03-4_6logs_30dB.txt \
+  --channels sonic,rhob,gr,ai,vp \
+  --target vc \
+  --step 8 \
+  --rhos 0.05,0.10,0.20 \
+  --seeds 7,23,41 \
+  --run-csgm-m2 \
+  --csgm-prior-type mlp \
+  --no-lfista
+```
+
+Repeat with `--step 16` and `--step 32`.
+
+### 5.3 Real-well F03-4 GR-only porosity (Ridge + ablations)
+
+```bash
+python sir_cs_benchmark_real_well_direct_ub.py \
+  --data-path data/F03-4_AC+GR+Porosity.txt \
+  --u-channels gr \
+  --rhos 0.20,0.30,0.40,0.50,0.60 \
+  --seeds 7,23,41 \
+  --run-csgm-m2 \
+  --run-csgm-ablations \
+  --csgm-prior-type ridge \
+  --no-lfista
+```
+
+### 5.4 Real-well F03-4 GR-only porosity (MLP prior sensitivity)
+
+```bash
+python sir_cs_benchmark_real_well_direct_ub.py \
+  --data-path data/F03-4_AC+GR+Porosity.txt \
+  --u-channels gr \
+  --rhos 0.20,0.30,0.40,0.50,0.60 \
+  --seeds 7,23,41 \
+  --run-csgm-m2 \
+  --csgm-prior-type mlp \
+  --no-lfista
+```
+
+## 6) Fast smoke tests
+
+```bash
+python sir_cs_benchmark_multi_well_vc.py \
+  --train-path data/F02-1,F03-2,F06-1_6logs_30dB.txt \
+  --test-path data/F03-4_6logs_30dB.txt \
+  --channels sonic,rhob,gr,ai,vp \
+  --target vc \
+  --step 32 \
+  --run-csgm-m2 \
+  --run-csgm-ablations \
+  --csgm-prior-type ridge \
+  --no-lfista \
+  --fast
+
+python sir_cs_benchmark_real_well_direct_ub.py \
+  --data-path data/F03-4_AC+GR+Porosity.txt \
+  --u-channels gr \
+  --run-csgm-m2 \
+  --run-csgm-ablations \
+  --csgm-prior-type ridge \
+  --no-lfista \
+  --fast
+```
+
+## 7) Robustness and supplementary scripts
+
+Scripts commonly used for paper supplementary analyses:
+
+- `scripts/auddys_smoke_direct_ub.py`
+- `scripts/auddys_clp_csgm_eda.py`
+- `scripts/clp_csgm_diagnostic_assets.py`
+- `scripts/clp_csgm_runtime_study.py`
+- `scripts/clp_csgm_srec_diagnostics.py`
+- `scripts/clp_csgm_ablation_assets.py`
+- `scripts/clp_csgm_paper_assets.py`
+- `scripts/clp_csgm_quick_figures.py`
+
+## 8) Embargo boundary check (anti-leakage)
+
+For cross-well train/validation overlap diagnostics, use:
+
+- `--val-embargo-windows <k>` in `sir_cs_benchmark_multi_well_vc.py`
+
+This drops overlap-prone boundary windows between train and validation tails.
+
+## 9) Outputs and repository policy
+
+This repository should remain lightweight:
+
+- do not commit `outputs/**` heavy run artifacts;
+- do not commit private/raw data files;
+- keep only code, small configs/tables needed for reproducibility logic.
+
+## 10) Reproducibility defaults
+
+- Main seeds: `7,23,41`
+- Cross-well low-data steps: `8,16,32`
+- Cross-well rhos: `0.05,0.10,0.20`
+- F03-4 rhos: `0.20,0.30,0.40,0.50,0.60`
+- Main method: CLP-CSGM Ridge
+- Sensitivity method: CLP-CSGM MLP prior
+
+## 11) Citation
+
+If you use this codebase, cite the CLP-CSGM paper and the corresponding data
+source papers referenced in the manuscript.
