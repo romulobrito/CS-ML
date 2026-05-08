@@ -120,6 +120,15 @@ def parse_args() -> argparse.Namespace:
         default=0.1,
         help="Tail-per-well validation fraction (held out inside training wells).",
     )
+    p.add_argument(
+        "--val-embargo-windows",
+        type=int,
+        default=0,
+        help=(
+            "Optional count of boundary windows dropped between train and val "
+            "inside each training well to reduce overlap leakage."
+        ),
+    )
     p.add_argument("--base-dir", type=str, default="outputs/cross_well_vc/direct_ub")
     p.add_argument("--run-id", type=str, default="", help="Run folder name (default: timestamp).")
     p.add_argument(
@@ -269,6 +278,8 @@ def write_dataset_manifest(
         "window_len (L, n_output): " + str(meta.get("window_len", 0)),
         "step: " + str(meta.get("step", 0)),
         "val_frac (tail per train well): " + str(meta.get("val_frac", 0.0)),
+        "val_embargo_windows (train/val boundary): "
+        + str(meta.get("val_embargo_windows", 0)),
         "n_train n_val n_test (windows): " + str(n_tr) + " " + str(n_va) + " " + str(n_te),
         "",
         "train_wells_rows: " + json.dumps(meta.get("train_wells_rows", {})),
@@ -339,6 +350,7 @@ def main() -> None:
         window_len=int(args.window_len),
         step=int(args.step),
         val_frac=float(args.val_frac),
+        val_embargo_windows=int(args.val_embargo_windows),
         residual_basis=str(args.residual_basis),
     )
     meta = data["meta"]

@@ -330,7 +330,7 @@ def concat_windows(batches: Sequence[MultiWellWindows]) -> MultiWellWindows:
 
 
 def tail_per_well_val_mask(
-    wells: np.ndarray, val_frac: float
+    wells: np.ndarray, val_frac: float, val_embargo_windows: int = 0
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Partition window indices by marking the last val_frac of each well as val.
@@ -338,11 +338,16 @@ def tail_per_well_val_mask(
     Windows are assumed to be ordered with non-decreasing row_start_in_well within
     each well (true for the output of build_windows_for_segment).
 
+    Optional embargo:
+      - If val_embargo_windows > 0, the last `val_embargo_windows` windows
+        before the validation tail are dropped from train/val (neither split).
+
     Returns (is_train, is_val) boolean arrays of shape wells.shape.
     """
     if not (0.0 < float(val_frac) < 1.0):
         raise ValueError("val_frac must be in (0,1).")
     names = np.asarray(wells, dtype=object).ravel()
+    emb = max(0, int(val_embargo_windows))
     n = names.size
     is_train = np.ones(n, dtype=bool)
     is_val = np.zeros(n, dtype=bool)
@@ -358,6 +363,13 @@ def tail_per_well_val_mask(
         val_idx = idx[-n_val:]
         is_val[val_idx] = True
         is_train[val_idx] = False
+        if emb > 0:
+            lo = max(0, int(idx.size - n_val - emb))
+            hi = max(0, int(idx.size - n_val))
+            if hi > lo:
+                emb_idx = idx[lo:hi]
+                is_val[emb_idx] = False
+                is_train[emb_idx] = False
     return is_train, is_val
 
 
@@ -375,6 +387,7 @@ def build_cross_well_data_dict(
     window_len: int = 64,
     step: int = 4,
     val_frac: float = 0.1,
+    val_embargo_windows: int = 0,
     residual_basis: str = "dct",
     scale_x: bool = True,
     train_well_names: Optional[Sequence[str]] = None,
@@ -416,7 +429,11 @@ def build_cross_well_data_dict(
     ]
     te_all = concat_windows(te_batches)
 
-    is_train, is_val = tail_per_well_val_mask(tr_all.well_of_window, val_frac=val_frac)
+    is_train, is_val = tail_per_well_val_mask(
+        tr_all.well_of_window,
+        val_frac=val_frac,
+        val_embargo_windows=int(val_embargo_windows),
+    )
     x_tr_raw = tr_all.x[is_train]
     y_tr = tr_all.y[is_train]
     x_va_raw = tr_all.x[is_val]
@@ -454,6 +471,7 @@ def build_cross_well_data_dict(
         "window_len": int(window_len),
         "step": int(step),
         "val_frac": float(val_frac),
+        "val_embargo_windows": int(val_embargo_windows),
         "residual_basis": str(residual_basis),
         "scale_x": bool(scale_x),
         "n_train": int(x_tr.shape[0]),
