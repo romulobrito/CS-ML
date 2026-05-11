@@ -52,16 +52,45 @@ where:
 
 ## 3) Data requirements
 
-Raw data are not included. Create `data/` and place required local files there.
+### 3.1 Repository policy
 
-Required files for the paper runs:
+This repository ships **code only**. It does **not** commit processed well-log
+tables or field datasets. Reasons:
+
+- **F3 / Zhang et al. (Sensors):** the study publishes scripts and data via an
+  external archive and cites industry/academic data access (see their Data
+  Availability Statement). Redistribution here would require checking **their**
+  archive license and any **third-party** data terms (e.g., F3 demo projects).
+  Users should obtain files from the sources linked in that paper and place them
+  locally under `data/`.
+- **Lapa / Alvarez et al. (Journal of Applied Geophysics):** the article states
+  that the authors **do not have permission to share the data**. Do **not**
+  expect a public drop-in dataset for those supplementary scripts; keep any local
+  copies private and compliant with your data-use agreement.
+
+### 3.2 Where to look first (external pointers)
+
+These are **starting points** cited in the literature; follow each provider's
+current terms:
+
+- Zhang et al. (2025) Data Availability (scripts + data bundle):  
+  `https://gitee.com/zhangjixju/ml-code/tree/master`
+- F3 Demo / OpendTect context (often referenced alongside F3 studies):  
+  `https://terranubis.com/datainfo/F3-Demo-2020`
+
+### 3.3 Local layout expected by the benchmarks
+
+Create `data/` at the repository root and place required files there after you
+obtain them under the applicable licenses.
+
+Required files for the **main paper** benchmark commands:
 
 - `data/F02-1,F03-2,F06-1_6logs_30dB.txt`
 - `data/F03-4_6logs_30dB.txt`
 - `data/F03-4_AC+GR+Porosity.txt`
 
-Optional files for supplementary Lapa/Auddys scripts depend on your local
-private data organization.
+Optional inputs for supplementary Lapa/Auddys-style scripts are **not** provided
+here; organize private paths consistent with your agreements.
 
 ## 4) Installation
 
@@ -191,7 +220,7 @@ This drops overlap-prone boundary windows between train and validation tails.
 This repository should remain lightweight:
 
 - do not commit `outputs/**` heavy run artifacts;
-- do not commit private/raw data files;
+- do not commit processed well-log tables or field datasets (see Section 3);
 - keep only code, small configs/tables needed for reproducibility logic.
 
 ## 10) Reproducibility defaults
