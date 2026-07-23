@@ -161,13 +161,12 @@
   \footnotesize
   \begin{enumerate}
     \item Herança da Etapa~1: o que entra e o que fica de fora.
-    \item Cadeia física, o que entra do CT vs lab, \textbf{premissas}
-          e ordem das inclusões.
-    \item Protocolo de validação em três escalas.
-    \item Calibração por HFU nos dez plugs (linha de base $\rightarrow$ LOO).
+    \item Cadeia física, CT vs lab, premissas e ordem das inclusões.
+    \item Como medimos o erro (lab $\neq$ poço) e calibração por HFU.
+    \item Resultados nos plugs (linha de base $\rightarrow$ LOO; multiescala 2f).
     \item Extrapolação ao perfil e confronto com o sónico DSI.
-    \item Fase~2b: Gassmann; fases~2f/2g: multiescala CT e NMR.
-    \item Conclusões e caminho para a Etapa~3 (ML no resíduo).
+    \item Gassmann; NMR (o que mudou / o que ficou fixo); decisão.
+    \item Conclusões e caminho para a Etapa~3.
   \end{enumerate}
 \end{frame}
 
@@ -482,6 +481,102 @@
   \end{block}
 \end{frame}
 
+\begin{frame}{Como medimos a divergência: lab $\neq$ poço}
+  \footnotesize
+  O DEM gera um \Vp{} \textbf{previsto}. A divergência é sempre
+  previsto $-$ observado --- mas o observado muda de escala.
+  \vspace{0.10cm}
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!12,
+      align=center, text width=3.4cm, inner sep=5pt, font=\scriptsize
+    },
+    labbox/.style={
+      draw=orange!70!black, thick, rounded corners=3pt, fill=orange!12,
+      align=center, text width=4.0cm, inner sep=5pt, font=\scriptsize
+    },
+    wellbox/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=4.0cm, inner sep=5pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.5mm]}, thick, po861blue},
+    note/.style={font=\tiny, text=drpgray, align=center}
+  ]
+    \node[box] (dem) at (0,0) {%
+      \textbf{\Vp{} previsto}\\
+      DEM / SC\\
+      (seco ou + Gassmann)
+    };
+    \node[labbox] (lab) at (5.2,1.15) {%
+      \textbf{Observado: lab}\\
+      \Vp{} ROCKPHYS (plugs)\\
+      $\rightarrow$ MAPE, LOO
+    };
+    \node[wellbox] (well) at (5.2,-1.15) {%
+      \textbf{Observado: poço}\\
+      \Vp{} sónico DSI (perfil)\\
+      $\rightarrow$ MAPE, viés
+    };
+    \draw[arr] (dem.east) -- ++(0.55,0) |- (lab.west)
+      node[pos=0.75, above, font=\tiny, text=orange!70!black] {erro lab};
+    \draw[arr] (dem.east) -- ++(0.55,0) |- (well.west)
+      node[pos=0.75, below, font=\tiny, text=po861green] {erro poço};
+    \node[note] at (2.6,-2.45) {%
+      \textbf{Não} usamos $(V_{p,\mathrm{lab}}-V_{p,\mathrm{poco}})$ como nota do DEM.\\
+      São duas validações independentes.
+    };
+  \end{tikzpicture}
+  \vspace{0.08cm}
+  \begin{exampleblock}{Mensagem}
+    \scriptsize
+    Dois erros, duas perguntas: fecha o laboratório? Extrapolação fecha o sónico?
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Calibração por HFU: aprender no plug, aplicar no perfil}
+  \footnotesize
+  Parâmetros elásticos são ajustados no \textbf{lab} e só então levados às
+  87 linhas --- sem reajuste ao sónico.
+  \vspace{0.08cm}
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!12,
+      align=center, text width=5.8cm, inner sep=5pt, font=\scriptsize
+    },
+    warn/.style={
+      draw=drpred, thick, rounded corners=3pt, fill=red!6,
+      align=center, text width=5.8cm, inner sep=4pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.5mm]}, thick, po861blue},
+  ]
+    \node[box] (a) {%
+      \textbf{1. Aprender (10 plugs)}\\
+      \philab{} + \Vp{} lab + microCT\\
+      $\rightarrow$ ajusta $\alpha$, $K_{\mathrm{scale}}$, $G_{\mathrm{scale}}$
+      \textbf{por HFU}
+    };
+    \node[box, below=0.45cm of a, fill=po861green!12, draw=po861green] (b) {%
+      \textbf{2. Aplicar (87 linhas)}\\
+      $\phi=\phiND{}$ + HFU lab\\
+      $\rightarrow$ usa os parâmetros daquela HFU
+    };
+    \node[box, below=0.45cm of b, fill=orange!12, draw=orange!70!black] (c) {%
+      \textbf{3. Validar no poço}\\
+      compara \Vp{} DEM com sónico DSI\\
+      (\textbf{sem} recalibrar no DSI)
+    };
+    \node[warn, below=0.45cm of c] (d) {%
+      HFU~4: sem plugs $\rightarrow$ \emph{fallback} (média HFU~2 e~3)\\
+      confiança menor --- não tratar como HFU~2
+    };
+    \draw[arr] (a) -- (b);
+    \draw[arr] (b) -- (c);
+    \draw[arr] (c) -- (d);
+  \end{tikzpicture}
+\end{frame}
+
 % ------------------------------------------------------------------
 \section{Calibração laboratorial}
 
@@ -738,6 +833,104 @@
     \slidefigure[0.72]{fig2_multiscale_nmr_crossplot_vp}{M1 versus M3 no
     plano 1:1 (sónico no eixo $y$).}
   \end{columns}
+\end{frame}
+
+\begin{frame}{Por que o ganho NMR foi marginal: só um ``botão'' mudou}
+  \footnotesize
+  Teste A/B: liberar \textbf{apenas} as frações contínuas; manter o resto igual ao M1.
+  \vspace{0.08cm}
+  \centering
+  \begin{tikzpicture}[
+    knob/.style={
+      draw, thick, rounded corners=2pt, align=center,
+      text width=2.15cm, inner sep=3pt, font=\scriptsize, minimum height=0.95cm
+    },
+    arr/.style={-{Stealth[length=2.2mm]}, thick, po861blue},
+  ]
+    \node[font=\small\bfseries] at (0,1.55) {M1 monoescala};
+    \node[knob, fill=po861blue!10, draw=po861blue] (m1a) at (-3.3,0.55) {$\phi=\phiND{}$};
+    \node[knob, fill=po861blue!10, draw=po861blue] (m1b) at (-1.1,0.55) {$\alpha$ efetivo\\por HFU};
+    \node[knob, fill=po861blue!10, draw=po861blue] (m1c) at (1.1,0.55) {matriz\\$K,G$};
+    \node[knob, fill=po861blue!10, draw=po861blue] (m1d) at (3.3,0.55) {Gassmann};
+
+    \node[font=\small\bfseries] at (0,-0.55) {M3 NMR multiescala};
+    \node[knob, fill=po861blue!10, draw=po861blue] (m3a) at (-3.3,-1.55) {$\phi=\phiND{}$\\{\tiny (igual)}};
+    \node[knob, fill=drpyellow!40, draw=orange!80!black] (m3b) at (-1.1,-1.55) {%
+      \textbf{frações NMR}\\{\tiny CMFF/BFV $\star$}
+    };
+    \node[knob, fill=gray!15, draw=gray] (m3c) at (1.1,-1.55) {%
+      AR meso/micro\\{\tiny \textbf{fixo} por HFU}
+    };
+    \node[knob, fill=po861blue!10, draw=po861blue] (m3d) at (3.3,-1.55) {matriz +\\Gassmann};
+
+    \draw[arr, orange!80!black] (m1b.south) -- (m3b.north)
+      node[midway, right, font=\tiny, text=orange!80!black] {mudou};
+    \draw[arr, gray] (m1b.south) -- ++(0,-0.35) -| (m3c.north);
+  \end{tikzpicture}
+  \vspace{0.10cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \begin{block}{O que o NMR trouxe}
+      \scriptsize
+      Quanto é macro vs micro\\
+      \textbf{em cada profundidade}.
+    \end{block}
+    \column{0.48\textwidth}
+    \begin{exampleblock}{O que ficou travado}
+      \scriptsize
+      Quão achatado é o poro ($\alpha$)\\
+      --- ainda constante por HFU.
+    \end{exampleblock}
+  \end{columns}
+  \vspace{0.06cm}
+  {\scriptsize Centro: $\alpha$ manda na ``moleza'' elástica; mudar só frações
+  move pouco o \Vp{} $\Rightarrow$ ganho $\approx 1{,}3$~p.p.}
+\end{frame}
+
+\begin{frame}{Decisão multiescala: limiar de 2~p.p.}
+  \footnotesize
+  Critério pré-registrado: só troca o produto se o ganho for claro e consistente.
+  \vspace{0.08cm}
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!12,
+      align=center, text width=2.55cm, inner sep=3pt, font=\scriptsize
+    },
+    q/.style={
+      draw=orange!70!black, thick, rounded corners=3pt, fill=orange!12,
+      align=center, text width=3.2cm, inner sep=4pt, font=\scriptsize
+    },
+    yes/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=2.6cm, inner sep=3pt, font=\scriptsize
+    },
+    no/.style={
+      draw=drpred, thick, rounded corners=3pt, fill=red!6,
+      align=center, text width=3.0cm, inner sep=3pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.4mm]}, thick, po861blue},
+  ]
+    \node[box] (m1) at (0,1.35) {M1 monoescala\\(baseline)};
+    \node[box] (m2) at (3.3,1.35) {M2b CT\\(fase 2f)};
+    \node[box] (m3) at (6.6,1.35) {M3 NMR\\(fase 2g)};
+    \node[q] (q) at (3.3,0.0) {Ganho MAPE $\geq 2$~p.p.\ vs M1?};
+    \node[yes] (y) at (0.6,-1.45) {Sim $\rightarrow$\\adotar multi};
+    \node[no] (n) at (5.6,-1.45) {Não $\rightarrow$\\
+      \textbf{manter mono}\\{\tiny (caso 861)}};
+    \draw[arr] (m1) -- (q);
+    \draw[arr] (m2) -- (q);
+    \draw[arr] (m3) -- (q);
+    \draw[arr] (q) -- (y);
+    \draw[arr] (q) -- (n);
+  \end{tikzpicture}
+  \vspace{0.08cm}
+  \begin{exampleblock}{No 861}
+    \scriptsize
+    2f: forward sem ganho in-sample claro.
+    2g: $\Delta \approx 1{,}3$~p.p.\ $< 2$~p.p.
+    Produto: monoescala Gassmann + $\alpha$ efetivo por HFU.
+  \end{exampleblock}
 \end{frame}
 
 \begin{frame}{Síntese das validações de \Vp{}}

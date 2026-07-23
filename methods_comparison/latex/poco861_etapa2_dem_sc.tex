@@ -17,6 +17,8 @@
 \usepackage{subcaption}
 \usepackage{siunitx}
 \usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta}
 
 \geometry{margin=2.5cm}
 \hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
@@ -122,13 +124,15 @@ Nesta fase \emph{não} repetimos aprendizado de máquina perfil $\rightarrow$
 A Seção~\ref{sec:dados} apresenta as fontes de dados, o inventário de
 parâmetros de entrada (Subsecao~\ref{sec:parametros}) e o que cada fonte
 contribui.
-A Seção~\ref{sec:protocolo} descreve a cadeia física e os protocolos de
-validação.
+A Seção~\ref{sec:protocolo} descreve a cadeia física, o papel do microCT
+frente ao laboratório, o encadeamento calibração--perfil e os protocolos de
+validação (incluindo como o erro é medido em cada escala).
 As Seções~\ref{sec:poc}--\ref{sec:dlis} trazem os resultados por fase do
 pipeline; a Seção~\ref{sec:multiscale_ab} documenta o teste A/B multiescala
 versus monoescala calibrado nos dez plugs CT.
 A Seção~\ref{sec:gassmann} aplica substituição de fluido; a
-Seção~\ref{sec:multiscale_nmr} testa frações NMR/CMR no perfil completo.
+Seção~\ref{sec:multiscale_nmr} testa frações NMR/CMR no perfil completo e
+explica por que o ganho permaneceu abaixo do limiar adotado.
 A Seção~\ref{sec:discussao} interpreta os achados sob ênfase
 geológica e metodológica, e a Seção~\ref{sec:conclusoes} resume as
 recomendações e o caminho para a Etapa~3.
@@ -269,8 +273,9 @@ As velocidades a seco seguem:
 Na Equacao~\eqref{eq:velocidades}, $\rho_{\mathrm{eff}}$ é a densidade do
 arcabouço poroso, $\rho_m$ a densidade da matriz mineral e $\phi$ a
 porosidade total de entrada.
-Nesta etapa ainda não aplicamos correcção de saturação por
-Gassmann; $K_{\mathrm{dry}}$ e $G_{\mathrm{dry}}$ referem-se à rocha a seco.
+A cadeia a seco é a base da calibração e da extrapolação; a substituição
+de fluido de Gassmann entra na fase~2b (Seção~\ref{sec:gassmann}),
+depois do arcabouço seco calibrado.
 
 \textbf{Por que comparar DEM e SC?}
 O DEM adiciona poros incrementalmente a uma matriz mineral; o SC trata todas as
@@ -281,12 +286,75 @@ calibração dos parâmetros petrofísicos.
 No perfil calibrado, a diferença média DEM--SC sobe para cerca de 4,5\%,
 ainda aceitável frente ao erro de validação externa.
 
-\subsection{Entradas por escala}
+\subsection{Entradas por escala: imagem versus laboratório}
+\label{sec:entradas_escala}
 
 No perfil (87 linhas): \phiND{} como porosidade; HFU de laboratório;
 parâmetros calibrados por HFU.
 Nos dez plugs de validação: \philab{}; mesma cadeia para comparar com
 \Vp{} medido no laboratório (eixo~$Z$, 22,1~MPa).
+
+Uma confusão frequente é tratar o microCT como fonte da \textbf{porosidade
+de entrada} do DEM.
+Na Etapa~2, a imagem alimenta \textbf{geometria e composição}
+(razão de aspecto, frações mineralógicas e, na multiescala, o
+particionamento meso--macro/micro); a porosidade total do modelo no plug
+permanece \philab{}, porque a porosidade de imagem costuma subestimar o
+espaço poroso (microporos abaixo da resolução).
+A Figura~\ref{fig:plug_inputs} resume esse papel dual.
+Validamos o \Vp{} previsto contra o \Vp{} de laboratório---não existe
+``\Vp{} da imagem'' como alvo.
+No perfil, a porosidade passa a ser \phiND{} e do CT herdam-se apenas os
+parâmetros médios por HFU.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    src/.style={
+      draw, thick, rounded corners=2pt, align=center,
+      text width=4.2cm, inner sep=5pt, font=\small,
+      minimum height=2.4cm
+    },
+    midbox/.style={
+      draw=blue!50!black, thick, rounded corners=2pt, fill=blue!8,
+      align=center, text width=7.2cm, inner sep=6pt, font=\small
+    },
+    resultbox/.style={
+      draw=green!40!black, thick, rounded corners=2pt, fill=green!8,
+      align=center, text width=7.2cm, inner sep=5pt, font=\small
+    },
+    arr/.style={-{Stealth[length=2.4mm]}, thick, blue!50!black},
+  ]
+    \node[src, fill=orange!12, draw=orange!70!black] (ct) at (0,0) {%
+      \textbf{MicroCT (imagem)}\\[0.15em]
+      $\alpha$ / AR; Solido1/2 (VRH)\\
+      frações meso/micro\\
+      {\footnotesize (só na multiescala)}
+    };
+    \node[src, fill=blue!6, draw=blue!50!black] (lab) at (6.2,0) {%
+      \textbf{Laboratório}\\[0.15em]
+      $\phi=\philab{}$\\
+      \Vp{}, \Vs{} de referência; HFU
+    };
+    \node[midbox] (dem) at (3.1,-3.0) {%
+      \textbf{DEM/SC} --- inclusões secas
+      $\rightarrow$ $K_{\mathrm{dry}}$, $G_{\mathrm{dry}}$
+      $\rightarrow$ \Vp{} previsto
+    };
+    \node[resultbox] (cmp) at (3.1,-4.7) {%
+      Compara com \Vp{} \textbf{lab}
+      (não com ``\Vp{} da imagem'')
+    };
+    \draw[arr] (ct.south) -- ++(0,-0.35) -| (dem.north);
+    \draw[arr] (lab.south) -- ++(0,-0.35) -| (dem.north);
+    \draw[arr] (dem) -- (cmp);
+  \end{tikzpicture}
+  \caption{Papel do microCT e do laboratório no plug: a imagem popula
+           geometria e minerais; a porosidade de entrada do DEM é
+           \philab{}. No perfil, $\phi=\phiND{}$ e os parâmetros CT
+           entram apenas por HFU.}
+  \label{fig:plug_inputs}
+\end{figure}
 
 \subsection{Calibração inversa por HFU}
 
@@ -309,6 +377,56 @@ laboratório.
 Quando $\alpha$ calibrado cola no limite superior (0,95) ou inferior (0,19),
 isso indica que a mediana do microCT, sozinha, não descreve a elástica
 daquela unidade de fluxo.
+
+O encadeamento operacional é, portanto, \textbf{aprender} nos plugs,
+\textbf{aplicar} nas 87 linhas e \textbf{validar} no sónico \emph{sem}
+reajustar parâmetros ao DSI (Figura~\ref{fig:calib_flow}).
+Essa disciplina preserva a honestidade da validação de perfil: se
+calibrássemos no sónico, o confronto com o DSI deixaria de ser
+independente.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=blue!50!black, thick, rounded corners=2pt, fill=blue!8,
+      align=center, text width=11.5cm, inner sep=6pt, font=\small
+    },
+    warn/.style={
+      draw=red!60!black, thick, rounded corners=2pt, fill=red!5,
+      align=center, text width=11.5cm, inner sep=5pt, font=\small
+    },
+    arr/.style={-{Stealth[length=2.5mm]}, thick, blue!50!black},
+  ]
+    \node[box] (a) {%
+      \textbf{1. Aprender (10 plugs)} ---
+      \philab{} + \Vp{} lab + microCT
+      $\rightarrow$ ajusta $\alpha$, $K_{\mathrm{scale}}$, $G_{\mathrm{scale}}$
+      \textbf{por HFU}
+    };
+    \node[box, below=0.45cm of a, fill=green!8, draw=green!40!black] (b) {%
+      \textbf{2. Aplicar (87 linhas)} ---
+      $\phi=\phiND{}$ + HFU lab
+      $\rightarrow$ usa os parâmetros daquela HFU
+    };
+    \node[box, below=0.45cm of b, fill=orange!10, draw=orange!70!black] (c) {%
+      \textbf{3. Validar no poço} ---
+      compara \Vp{} DEM com sónico DSI
+      (\textbf{sem} recalibrar no DSI)
+    };
+    \node[warn, below=0.45cm of c] (d) {%
+      HFU~4: sem plugs $\rightarrow$ \emph{fallback} (média HFU~2 e~3);
+      confiança menor --- não tratar como HFU~2
+    };
+    \draw[arr] (a) -- (b);
+    \draw[arr] (b) -- (c);
+    \draw[arr] (c) -- (d);
+  \end{tikzpicture}
+  \caption{Encadeamento calibração--extrapolação--validação: parâmetros
+           elásticos são aprendidos no laboratório por HFU e aplicados ao
+           perfil; o sónico DSI valida, mas não entra no ajuste.}
+  \label{fig:calib_flow}
+\end{figure}
 
 \subsection{Três escalas de validação}
 
@@ -353,6 +471,56 @@ A linha de base quantifica o desvio antes do ajuste; o \emph{in-sample} mostra
 o melhor caso com dez pontos; o LOO penaliza memorização; o sónico
 testa o produto final ao longo do poço~861 em condições distintas do
 laboratório seco.
+
+A Figura~\ref{fig:error_scales} deixa explícito que a ``divergência do DEM''
+\textbf{não} é a diferença direta entre \Vp{} de laboratório e \Vp{} de
+poço.
+Em cada escala, o erro é
+$V_p^{\mathrm{previsto}}-V_p^{\mathrm{observado}}$, e o observado muda:
+nos plugs, $V_{p,\mathrm{lab}}$; no perfil, $V_{p,\mathrm{DSI}}$.
+São duas perguntas independentes---fechar o laboratório versus
+extrapolar \emph{in situ}.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=blue!50!black, thick, rounded corners=2pt, fill=blue!8,
+      align=center, text width=4.0cm, inner sep=6pt, font=\small
+    },
+    labbox/.style={
+      draw=orange!70!black, thick, rounded corners=2pt, fill=orange!10,
+      align=center, text width=4.8cm, inner sep=6pt, font=\small
+    },
+    wellbox/.style={
+      draw=green!40!black, thick, rounded corners=2pt, fill=green!8,
+      align=center, text width=4.8cm, inner sep=6pt, font=\small
+    },
+    arr/.style={-{Stealth[length=2.5mm]}, thick, blue!50!black},
+  ]
+    \node[box] (dem) at (0,0) {%
+      \textbf{\Vp{} previsto}\\
+      DEM/SC\\
+      (seco ou + Gassmann)
+    };
+    \node[labbox] (lab) at (7.0,1.35) {%
+      \textbf{Observado: lab}\\
+      \Vp{} ROCKPHYS (plugs)\\
+      $\rightarrow$ MAPE, LOO
+    };
+    \node[wellbox] (well) at (7.0,-1.35) {%
+      \textbf{Observado: poço}\\
+      \Vp{} sónico DSI (perfil)\\
+      $\rightarrow$ MAPE, viés
+    };
+    \draw[arr] (dem.east) -- ++(0.6,0) |- (lab.west);
+    \draw[arr] (dem.east) -- ++(0.6,0) |- (well.west);
+  \end{tikzpicture}
+  \caption{Duas escalas de erro do DEM: previsto versus laboratório nos
+           plugs, e previsto versus sónico DSI no perfil. A diferença
+           lab--poço não é a métrica oficial do modelo.}
+  \label{fig:error_scales}
+\end{figure}
 
 \subsection{Como ler MAPE, RMSE e viés}
 
@@ -1127,6 +1295,54 @@ Comparamos:
 As razões de aspecto $\alpha_{\mathrm{meso}}$ e $\alpha_{\mathrm{micro}}$
 permanecem fixas por HFU (medianas da fase~2f); apenas as frações volumétricas
 passam a variar com a profundidade via CMR.
+Essa restrição é deliberada: o experimento isola o efeito das frações NMR
+sem reabrir a calibração de geometria (Figura~\ref{fig:nmr_knobs}).
+Em termos operacionais, o M3 libera o ``botão'' das frações contínuas e
+mantém travados $\phi=\phiND{}$, a matriz calibrada e o AR por HFU.
+Como a razão de aspecto controla grande parte da ``moleza'' elástica no
+DEM, esperar ganho grande apenas com CMFF/BFV seria otimista demais---o
+resultado empírico confirma essa leitura.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    knob/.style={
+      draw, thick, rounded corners=2pt, align=center,
+      text width=2.55cm, inner sep=4pt, font=\footnotesize,
+      minimum height=1.15cm
+    },
+  ]
+    \node[font=\normalsize\bfseries] at (0,1.7) {M1 monoescala};
+    \node[knob, fill=blue!8, draw=blue!50!black] at (-3.9,0.55) {$\phi=\phiND{}$};
+    \node[knob, fill=blue!8, draw=blue!50!black] at (-1.3,0.55) {$\alpha$ efetivo\\por HFU};
+    \node[knob, fill=blue!8, draw=blue!50!black] at (1.3,0.55) {matriz $K,G$};
+    \node[knob, fill=blue!8, draw=blue!50!black] at (3.9,0.55) {Gassmann};
+
+    \node[font=\normalsize\bfseries] at (0,-0.85) {M3 NMR multiescala};
+    \node[knob, fill=blue!8, draw=blue!50!black] at (-3.9,-2.0) {$\phi=\phiND{}$\\{\scriptsize (igual)}};
+    \node[knob, fill=yellow!25, draw=orange!70!black] at (-1.3,-2.0) {%
+      \textbf{frações NMR}\\{\scriptsize CMFF/BFV}
+    };
+    \node[knob, fill=gray!15, draw=gray] at (1.3,-2.0) {%
+      AR meso/micro\\{\scriptsize \textbf{fixo} por HFU}
+    };
+    \node[knob, fill=blue!8, draw=blue!50!black] at (3.9,-2.0) {matriz +\\Gassmann};
+  \end{tikzpicture}
+  \caption{Desenho do experimento da fase~2g: apenas as frações
+           macro/micro passam a variar com a profundidade via CMR; a
+           razão de aspecto permanece constante por HFU. O ganho
+           marginal de MAPE ($\approx 1{,}3$~p.p.) é coerente com esse
+           desenho.}
+  \label{fig:nmr_knobs}
+\end{figure}
+
+No DEM sequencial, as inclusões são aplicadas em ordem de incremento de
+porosidade $\phi_{\mathrm{inc}}=f_{\mathrm{pore}}\times\phi_{\mathrm{total}}$
+\textbf{decrescente} (maior volume primeiro), alinhada à referência
+Equinor/Berryman do projeto.
+Essa ordem é por contribuição volumétrica, não por ``maior impacto
+elástico'': poros achatados (baixo $\alpha$) podem amolecer mais por
+unidade de volume do que poros arredondados.
 
 \subsection{Extração e merge do CMR}
 
@@ -1207,9 +1423,49 @@ de forma material.
 \textbf{Conclusão:} manter o produto monoescala Gassmann no perfil de 87
 linhas; as frações CMR documentam variabilidade local de porosidade, mas não
 justificam substituir o encadeamento M1 com o limiar adotado.
+A Figura~\ref{fig:multiscale_decision} resume o critério pré-registrado
+aplicado às fases~2f e~2g: só se promove multiescala se o ganho de MAPE
+frente ao M1 for de pelo menos 2~p.p.\ de forma consistente.
+No poço~861, nenhum dos dois experimentos atingiu esse limiar.
 O experimento completo, scripts e \texttt{metrics.json} estão em
 \texttt{dem\_sc\_runs/multiscale\_nmr/}; o planejamento em
 \texttt{planning/etapa2g\_dem\_multiscale\_nmr\_poco861.md}.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=blue!50!black, thick, rounded corners=2pt, fill=blue!8,
+      align=center, text width=3.2cm, inner sep=5pt, font=\small
+    },
+    q/.style={
+      draw=orange!70!black, thick, rounded corners=2pt, fill=orange!10,
+      align=center, text width=4.2cm, inner sep=5pt, font=\small
+    },
+    no/.style={
+      draw=red!60!black, thick, rounded corners=2pt, fill=red!5,
+      align=center, text width=4.0cm, inner sep=5pt, font=\small
+    },
+    arr/.style={-{Stealth[length=2.4mm]}, thick, blue!50!black},
+  ]
+    \node[box] (m1) at (0,1.6) {M1 monoescala\\(baseline)};
+    \node[box] (m2) at (4.2,1.6) {M2b CT forward\\(fase~2f)};
+    \node[box] (m3) at (8.4,1.6) {M3 NMR\\(fase~2g)};
+    \node[q] (q) at (4.2,0.05) {Ganho MAPE $\geq 2$~p.p.\ vs M1?};
+    \node[no] (n) at (4.2,-1.55) {%
+      Não $\rightarrow$ \textbf{manter monoescala}\\
+      {\footnotesize (caso do poço~861)}
+    };
+    \draw[arr] (m1) -- (q);
+    \draw[arr] (m2) -- (q);
+    \draw[arr] (m3) -- (q);
+    \draw[arr] (q) -- (n);
+  \end{tikzpicture}
+  \caption{Critério de decisão das fases~2f e~2g: o produto de 87 linhas
+           só migra para multiescala se o ganho frente ao monoescala
+           atingir o limiar pré-registrado de 2~p.p.}
+  \label{fig:multiscale_decision}
+\end{figure}
 
 A Figura~\ref{fig:multiscale_nmr_panel} contrasta M1 e M3 no plano 1:1 e ao
 longo da profundidade; a Figura~\ref{fig:multiscale_nmr_fractions} mostra as
@@ -1326,6 +1582,10 @@ A fase~2g (Seção~\ref{sec:multiscale_nmr}) repete o exercicio com fracoes NMR
 ponto a ponto no perfil de 87 linhas: o ganho MAPE frente ao M1 Gassmann e
 de apenas $\approx 1{,}3$~p.p., abaixo do limiar de 2~p.p., e a validacao
 CMR versus CT nos dez plugs mostra correlacao fraca ($r \approx -0{,}30$).
+Esse resultado e coerente com o desenho do experimento
+(Figura~\ref{fig:nmr_knobs}): as fracoes variam com a profundidade, mas a
+razao de aspecto do micro---que controla grande parte da resposta
+elastica---permanece fixa por HFU.
 Mantemos $\alpha$ efetivo por HFU no produto de 87 linhas; as fracoes
 multiescala do CT e do CMR ficam arquivadas para estudos futuros (p.ex.\ poco~1045
 ou novos plugs).
