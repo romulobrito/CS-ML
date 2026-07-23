@@ -1,0 +1,846 @@
+% Apresentacao Beamer -- Poco 861 Etapa 2 (campo Lapa)
+% Versao com layout inspirado no template DRP (UENF--Equinor)
+% Compilar (a partir desta pasta):
+%   pdflatex poco861_etapa2_beamer_DRP.tex
+%   pdflatex poco861_etapa2_beamer_DRP.tex
+% Numeros alinhados a poco861_etapa2_dem_sc.tex (junho de 2026).
+
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, calc}
+% DRP template uses Calibri; Carlito is the TeX metric-compatible substitute.
+\usepackage[sfdefault]{carlito}
+\usefonttheme{professionalfonts}
+
+% Fundos DRP + figuras fig2_* do relatorio Etapa 2.
+\graphicspath{%
+  {./poco861_drp_assets/}%
+  {./poco861_drp_assets/figures/}%
+  {../figures/}%
+  {../data/processed/dem_sc_runs/lab_validation/figures/}%
+  {../data/processed/dem_sc_runs/multiscale_ab/figures/}%
+  {../data/processed/dem_sc_runs/multiscale_nmr/figures/}%
+  {../data/processed/dlis_861/figures/}%
+}
+
+% ------------------------------------------------------------------
+% Paleta DRP
+\definecolor{drpblue}{RGB}{29,55,113}
+\definecolor{drporange}{RGB}{255,145,39}
+\definecolor{drpyellow}{RGB}{250,238,0}
+\definecolor{drpred}{RGB}{220,0,0}
+\definecolor{drpgray}{RGB}{70,70,70}
+\definecolor{po861blue}{RGB}{0,74,127}
+\definecolor{po861green}{RGB}{0,128,96}
+
+\usecolortheme{default}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=drpblue}
+\setbeamercolor{frametitle}{fg=black,bg=}
+\setbeamercolor{title}{fg=black,bg=}
+\setbeamercolor{subtitle}{fg=drpgray,bg=}
+\setbeamercolor{block title}{fg=white,bg=drpblue}
+\setbeamercolor{block body}{fg=black,bg=drpblue!5}
+\setbeamercolor{block title example}{fg=black,bg=drpyellow}
+\setbeamercolor{block body example}{fg=black,bg=drpyellow!12}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamersize{text margin left=7mm, text margin right=7mm}
+
+\setbeamerfont{normal text}{size=\small}
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\setbeamerfont{itemize/enumerate subbody}{size=\footnotesize}
+\setbeamerfont{block title}{size=\small,series=\bfseries}
+\setbeamerfont{block body}{size=\footnotesize}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{title}{size=\Huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{institute}{size=\small}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{page number in head/foot}{size=\scriptsize,series=\mdseries}
+
+\setlength{\parskip}{2pt}
+\setlength{\itemsep}{2pt}
+\setbeamertemplate{itemize item}{\raise0.2ex\hbox{\large\textbullet}}
+\setbeamertemplate{itemize subitem}{\raise0.2ex\hbox{\small\textbullet}}
+\setbeamercolor{itemize item}{fg=drpblue}
+\setbeamercolor{itemize subitem}{fg=drpblue}
+
+\usebackgroundtemplate{}
+
+\setbeamertemplate{frametitle}{%
+  \vspace*{0.18cm}%
+  \hspace*{0.12cm}{\usebeamerfont{frametitle}\insertframetitle}\par%
+  \vspace*{0.20cm}%
+}
+
+\newlength{\drpfooterheight}
+\setlength{\drpfooterheight}{1.12cm}
+\setbeamertemplate{footline}{%
+  \begin{tikzpicture}[baseline=(base.base)]
+    \node[inner sep=0pt,anchor=south west] (base) at (0,0)
+      {\includegraphics[width=\paperwidth,height=\drpfooterheight]{drp_footer.png}};
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.13cm]base.south east) {\insertframenumber};
+  \end{tikzpicture}%
+}
+
+\newcommand{\philab}{\ensuremath{\phi_{\mathrm{lab}}}}
+\newcommand{\phiND}{\ensuremath{\phi_{\mathrm{ND}}}}
+\newcommand{\phiS}{\ensuremath{\phi_{\mathrm{S}}}}
+\newcommand{\Vp}{\ensuremath{V_{\mathrm{p}}}}
+\newcommand{\Vs}{\ensuremath{V_{\mathrm{s}}}}
+\newcommand{\VpVs}{\ensuremath{V_{\mathrm{p}}/V_{\mathrm{s}}}}
+
+\newlength{\drpbodyheight}
+\setlength{\drpbodyheight}{0.62\textheight}
+
+\newcommand{\slidefig}[2][0.75]{%
+  \includegraphics[width=\linewidth,height=#1\drpbodyheight,keepaspectratio]{#2}%
+}
+\newcommand{\slidecaption}[1]{%
+  \par\vspace{0.05cm}%
+  \begin{minipage}{\linewidth}%
+    \centering\scriptsize #1%
+  \end{minipage}%
+}
+\newcommand{\slidefigure}[3][0.72]{%
+  \begin{minipage}[t]{\linewidth}%
+    \centering
+    \slidefig[#1]{#2}%
+    \slidecaption{#3}%
+  \end{minipage}%
+}
+
+\title{Poço~861 (campo Lapa): modelagem física DEM/SC}
+\subtitle{Etapa~2 --- calibração por HFU e validação lab / perfil}
+\author{Romulo Brito da Silva}
+\institute{UENF / LENEP}
+\date{Junho de 2026}
+
+\begin{document}
+
+% ------------------------------------------------------------------
+{%
+\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{drp_title_bg.png}}%
+\begin{frame}[plain]
+  \vspace*{0.40cm}
+  \begin{center}
+    {\huge\bfseries Poço~861\\[0.04cm]
+    (campo Lapa)}\\[0.18cm]
+    {\usebeamerfont{subtitle}\bfseries Modelagem física DEM/SC calibrada por HFU}\\[0.12cm]
+    {\large Etapa~2 --- laboratório, perfil sónico e saturação}\\[0.22cm]
+    {\usebeamerfont{author} Rômulo Brito da Silva}\\[0.08cm]
+    {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
+    {\usebeamerfont{date} Junho de 2026}\\[0.18cm]
+    {\footnotesize
+    Intervalo 5205,91--5233,72~m $\cdot$ 87 linhas de perfil\\
+    10 plugs microCT $\cdot$ ROCKPHYS $\cdot$ DSI (DLIS) $\cdot$ CMR}\\[0.08cm]
+    {\footnotesize Prova de conceito física \emph{local} --- não é validação interpoços}
+  \end{center}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.15cm]current page.south east) {\insertframenumber};
+  \end{tikzpicture}
+\end{frame}
+}%
+\usebackgroundtemplate{}
+
+% ------------------------------------------------------------------
+\begin{frame}{Roteiro}
+  \footnotesize
+  \begin{enumerate}
+    \item Herança da Etapa~1: o que entra e o que fica de fora.
+    \item Cadeia física, o que entra do CT vs lab, \textbf{premissas}
+          e ordem das inclusões.
+    \item Protocolo de validação em três escalas.
+    \item Calibração por HFU nos dez plugs (linha de base $\rightarrow$ LOO).
+    \item Extrapolação ao perfil e confronto com o sónico DSI.
+    \item Fase~2b: Gassmann; fases~2f/2g: multiescala CT e NMR.
+    \item Conclusões e caminho para a Etapa~3 (ML no resíduo).
+  \end{enumerate}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Contexto}
+
+\begin{frame}{Da Etapa~1: insumos fixos para a física}
+  \footnotesize
+  A Etapa~1 mostrou o limite informacional do perfil. Aqui usamos só o que
+  passou nesse filtro.
+  \vspace{0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+    \begin{block}{Entra na Etapa~2}
+      \scriptsize
+      \begin{itemize}
+        \item \phiND{} como porosidade de entrada (default).
+        \item HFU de laboratório (1--4) para segmentar.
+        \item MicroCT: razão de aspecto e frações mineralógicas.
+        \item Velocidades de laboratório (ROCKPHYS) e sónico DSI.
+      \end{itemize}
+    \end{block}
+    \begin{exampleblock}{Fica de fora}
+      \scriptsize
+      \begin{itemize}
+        \item ML direto perfil $\rightarrow$ \Vp{}/\Vs{}.
+        \item FZI ou $k$ previstos só com wireline.
+        \item MicroCT como feature extra de regressor.
+      \end{itemize}
+    \end{exampleblock}
+    \column{0.46\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.85cm,
+      flowbox/.style={
+        draw, thick, rounded corners=4pt,
+        align=center, text width=5.2cm,
+        inner sep=5pt, font=\scriptsize
+      },
+      flowarr/.style={-{Stealth[length=2.8mm]}, thick, po861blue},
+    ]
+      \node[flowbox, fill=po861blue!18, draw=po861blue] (e1) {%
+        \textbf{1. Diagnóstico ML}\\
+        \phiND{}, HFU lab, microCT $\rightarrow$ física
+      };
+      \node[flowbox, fill=po861green!18, draw=po861green, below=of e1] (e2) {%
+        \textbf{2. DEM/SC + Gassmann}\\
+        calibração por HFU $\rightarrow$ \Vp{}, \Vs{}
+      };
+      \node[flowbox, fill=orange!18, draw=orange!70!black, below=of e2] (e3) {%
+        \textbf{3. ML no resíduo}\\
+        depois da física validada
+      };
+      \draw[flowarr] (e1.south) -- (e2.north);
+      \draw[flowarr] (e2.south) -- (e3.north);
+    \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Dados e cadeia}
+
+\begin{frame}{Fontes elásticas que fecham a Etapa~2}
+  \footnotesize
+  Além do perfil enriquecido da Etapa~1, entram velocidades de lab e de poço.
+  \vspace{0.08cm}
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llrc}
+    \toprule
+    Fonte & Papel & $n$ & Escala \\
+    \midrule
+    Perfil integrado & \phiND{}, HFU, profundidade & 87 & $\sim$28~m \\
+    Plugs microCT & geometria de poros, \philab{} & 10 & pontual \\
+    ROCKPHYS (Velocity) & \Vp{}, \Vs{} de laboratório & 28 & plugs \\
+    Sónico DSI (DLIS) & DTCO/DTSM \emph{in situ} & 190 & contínuo \\
+    CMR/ECS (DLIS) & CMFF, BFV (macro/micro) & 152 & contínuo \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.14cm}
+  \begin{block}{Distribuição de HFU no perfil}
+    \scriptsize
+    HFU1 $=42$, HFU2 $=29$, HFU3 $=10$, HFU4 $=6$.
+    HFU4 \textbf{não tem plug} de calibração --- usa fallback das HFU~2 e~3.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Cadeia física: da matriz ao \Vp{} saturado}
+  \footnotesize
+  Ordem fixa; parâmetros elásticos calibrados \textbf{por HFU}, não globalmente.
+  \vspace{0.06cm}
+  \centering
+  \begin{tikzpicture}[
+    node distance=0.28cm and 0.18cm,
+    box/.style={
+      draw=po861blue, thick, rounded corners=2pt, fill=po861blue!10,
+      minimum height=0.85cm, text width=2.15cm,
+      align=center, font=\scriptsize, inner sep=2pt},
+    arr/.style={-{Stealth[length=2.2mm]}, thick, po861blue},
+  ]
+    \node[box] (m) {Matriz VRH\\$K_m$, $G_m$};
+    \node[box, right=of m] (a) {Aspecto $\alpha$\\(por HFU)};
+    \node[box, right=of a] (d) {DEM/SC\\inclusões secas};
+    \node[box, right=of d] (v) {\Vp{}, \Vs{}\\a seco};
+    \node[box, right=of v, fill=po861green!12, draw=po861green] (g) {Gassmann\\$K_f\!\approx\!2{,}2$~GPa};
+    \draw[arr] (m) -- (a);
+    \draw[arr] (a) -- (d);
+    \draw[arr] (d) -- (v);
+    \draw[arr] (v) -- (g);
+  \end{tikzpicture}
+  \vspace{0.12cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \begin{itemize}
+      \item Entrada de porosidade: \phiND{} (perfil) ou \philab{} (plugs).
+      \item $\alpha$ inicial: mediana microCT por HFU.
+      \item Calibração inversa: $\alpha$, $K_{\mathrm{scale}}$, $G_{\mathrm{scale}}$.
+    \end{itemize}
+    \column{0.48\textwidth}
+    \begin{itemize}
+      \item Inclusões secas ($K_i=G_i=0$) até $\phi$ alvo.
+      \item Fase~2b: saturação total ($S_w=1$).
+      \item Sem reajuste ao sónico na calibração.
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{O que entra no plug: imagem $\neq$ porosidade do DEM}
+  \footnotesize
+  MicroCT alimenta \textbf{geometria e minerais}; $\phi$ do DEM no plug é
+  \philab{} --- não a porosidade da imagem.
+  \vspace{0.02cm}
+  \centering
+  \begin{tikzpicture}[
+    src/.style={
+      draw, thick, rounded corners=3pt, align=center,
+      text width=3.5cm, inner sep=3pt, font=\scriptsize,
+      minimum height=1.95cm
+    },
+    midbox/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!12,
+      align=center, text width=5.4cm, inner sep=4pt, font=\scriptsize
+    },
+    resultbox/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=5.4cm, inner sep=3pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.4mm]}, thick, po861blue},
+    note/.style={font=\tiny, text=drpgray, align=center}
+  ]
+    \node[src, fill=orange!15, draw=orange!70!black] (ct) at (0,0) {%
+      \textbf{MicroCT (imagem)}\\[0.04cm]
+      $\alpha$ / AR; Solido1/2 (VRH)\\
+      frações meso/micro\\
+      {\tiny (só na multiescala)}
+    };
+    \node[src, fill=drpblue!8, draw=drpblue] (lab) at (4.8,0) {%
+      \textbf{Laboratório}\\[0.04cm]
+      $\phi = \philab{}$\\
+      \Vp{}, \Vs{} de referência; HFU
+    };
+    \node[midbox] (dem) at (2.4,-2.25) {%
+      \textbf{DEM / SC} --- inclusões secas
+      $\rightarrow$ $K_{\mathrm{dry}}$, $G_{\mathrm{dry}}$
+      $\rightarrow$ \Vp{} previsto
+    };
+    \node[resultbox] (cmp) at (2.4,-3.55) {%
+      Compara com \Vp{} \textbf{lab}
+      (não com ``\Vp{} da imagem'')
+    };
+    \draw[arr] (ct.south) -- ++(0,-0.28) -| (dem.north);
+    \draw[arr] (lab.south) -- ++(0,-0.28) -| (dem.north);
+    \draw[arr] (dem) -- (cmp);
+    \node[note] at (2.4,-4.25) {%
+      No \textbf{perfil} (87 linhas): $\phi=\phiND{}$;
+      do CT herdam-se só parâmetros \textbf{por HFU}.
+    };
+  \end{tikzpicture}
+  \vspace{0.02cm}
+  \begin{exampleblock}{Mensagem}
+    \scriptsize
+    Populamos o plug com imagem para \textbf{forma e composição};
+    a porosidade do modelo vem do \textbf{laboratório}.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Premissas da modelagem física}
+  \footnotesize
+  Decisões fixadas \emph{antes} dos testes A/B --- não ajustadas ao sónico.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.49\textwidth}
+    \begin{block}{Petrofísica e textura}
+      \scriptsize
+      \begin{itemize}
+        \item Porosidade de entrada: \phiND{} (perfil) / \philab{} (plugs).
+        \item Segmentação por \textbf{HFU de laboratório}.
+        \item Solido~1 $\rightarrow$ calcita; Solido~2 $\rightarrow$ dolomita
+              (VRH; normalizado no CT).
+        \item $\alpha$ inicial $=$ mediana microCT por HFU;
+              depois calibração em $[0{,}05,\,0{,}95]$.
+        \item HFU~4 sem plugs: \emph{fallback} (média HFU~2 e~3).
+      \end{itemize}
+    \end{block}
+    \column{0.49\textwidth}
+    \begin{block}{Elástica e fluido}
+      \scriptsize
+      \begin{itemize}
+        \item DEM Berryman a seco; SC só como controle.
+        \item Inclusões vazias ($K_i = G_i = 0$).
+        \item Gassmann \emph{depois} do arcabouço seco
+              ($K_f \approx 2{,}2$~GPa, $S_w = 1$).
+        \item $K_{\mathrm{scale}}$, $G_{\mathrm{scale}}$ e $\alpha$
+              calibrados no \textbf{lab}, não no DSI.
+        \item Limiar A/B multiescala: ganho MAPE $\geq 2$~p.p.
+              (in-sample \emph{e} LOO / perfil).
+      \end{itemize}
+    \end{block}
+  \end{columns}
+  \vspace{0.08cm}
+  \begin{exampleblock}{Escopo}
+    \scriptsize
+    Prova de conceito \textbf{local} no poço~861 --- não implica transferência
+    interpoços. ML direto perfil~$\rightarrow$\Vp{} fica fora desta etapa.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Ordem das inclusões: volume decrescente (literatura)}
+  \footnotesize
+  DEM sequencial é \emph{path-dependent}; a ordem precisa ser explícita.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+    \begin{block}{Convenção adotada}
+      \scriptsize
+      \begin{enumerate}
+        \item $\phi_{\mathrm{inc}} = f_{\mathrm{pore}}\times\phi_{\mathrm{total}}$
+              (meso--macro e micro).
+        \item Inclusões aplicadas em ordem de
+              $\phi_{\mathrm{inc}}$ \textbf{decrescente}
+              (maior volume $\rightarrow$ menor).
+        \item Mesma regra da referência Equinor/Berryman do projeto.
+      \end{enumerate}
+    \end{block}
+    \vspace{0.04cm}
+    {\scriptsize
+    \textbf{Não} é ``maior impacto elástico primeiro'': poros achatados
+    (baixo $\alpha$) amolecem mais por unidade de volume do que poros
+    arredondados. Volume $\neq$ impacto elástico.}
+    \column{0.46\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.42cm,
+      box/.style={
+        draw=po861blue, thick, rounded corners=3pt, fill=po861blue!10,
+        text width=4.6cm, align=center, font=\scriptsize, inner sep=4pt
+      },
+      arr/.style={-{Stealth[length=2.4mm]}, thick, po861blue},
+    ]
+      \node[box] (m) {Matriz VRH ($K_m$, $G_m$)};
+      \node[box, below=of m, fill=po861green!12, draw=po861green] (a) {%
+        1.\ Inclusão de maior $\phi_{\mathrm{inc}}$\\
+        (em geral meso--macro)
+      };
+      \node[box, below=of a, fill=orange!12, draw=orange!70!black] (b) {%
+        2.\ Inclusão de menor $\phi_{\mathrm{inc}}$\\
+        (em geral micro)
+      };
+      \node[box, below=of b] (o) {$K_{\mathrm{dry}}$, $G_{\mathrm{dry}}$
+        $\rightarrow$ Gassmann};
+      \draw[arr] (m) -- (a);
+      \draw[arr] (a) -- (b);
+      \draw[arr] (b) -- (o);
+    \end{tikzpicture}
+  \end{columns}
+  \vspace{0.06cm}
+  \begin{block}{Boas práticas}
+    \scriptsize
+    Carbonatos: AR meso/macro do microCT (ou frações NMR);
+    micro como inclusão crítica (abaixo da resolução ou via CMR).
+    Produto monoescala quando o forward multiescala não supera o limiar.
+  \end{block}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Protocolo}
+
+\begin{frame}{Três escalas de validação --- três perguntas}
+  \footnotesize
+  Nenhuma escala sozinha aprova o modelo.
+  \vspace{0.08cm}
+  \centering
+  \scriptsize
+  \begin{tabular}{lll}
+    \toprule
+    Escala & Amostras & Pergunta \\
+    \midrule
+    Lab (linha de base) & 10 plugs CT & DEM cru vs \Vp{} lab? \\
+    Lab in-sample / LOO & 10 plugs / 10 folds & Fecha o lab? Generaliza? \\
+    Multiescala A/B (2f) & 10 plugs CT & DEM sequencial ganha vs M1? \\
+    Perfil sónico DSI & 87 linhas & Extrapolação \emph{in situ}? \\
+    Multiescala NMR (2g) & 87 linhas & Frações CMR melhoram M1? \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.12cm}
+  \begin{block}{Como ler as métricas}
+    \scriptsize
+    \textbf{MAPE:} erro relativo típico em \Vp{}.
+    \textbf{RMSE:} penaliza outliers (km/s).
+    \textbf{Viés:} sinal sistemático (positivo $=$ modelo mais rápido).
+  \end{block}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Calibração laboratorial}
+
+\begin{frame}{Sem calibração: MAPE $\approx 26\%$, viés $+1{,}2$~km/s}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.42\textwidth}
+    \footnotesize
+    DEM a seco com $\alpha$ do microCT e matriz VRH
+    \textbf{superestima} \Vp{} de laboratório.
+    \vspace{0.08cm}
+    \begin{tabular}{lr}
+      \toprule
+      Métrica & Valor \\
+      \midrule
+      MAPE \Vp{} & 26,0\% \\
+      RMSE & 1,36~km/s \\
+      Viés & $+1{,}20$~km/s \\
+      $n$ & 10 plugs \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.10cm}
+    {\scriptsize Um único $\alpha$ global não basta:
+    a dispersão por HFU já aparece nesta linha de base.}
+    \column{0.56\textwidth}
+    \slidefigure[0.85]{fig2_vp_dem_vs_lab}{DEM cru versus \Vp{} de laboratório
+    (dez plugs CT, confinamento 22,1~MPa).}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Calibração por HFU: MAPE in-sample cai para $\approx 9\%$}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \footnotesize
+    Ajuste de $\alpha$, $K_{\mathrm{scale}}$ e $G_{\mathrm{scale}}$
+    \textbf{por HFU} (limites $\alpha \in [0{,}05,\,0{,}95]$).
+    \vspace{0.06cm}
+    \scriptsize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{cccc}
+      \toprule
+      HFU & $n$ & $\alpha_{\mathrm{cal}}$ & $\alpha_{\mathrm{CT}}$ \\
+      \midrule
+      1 & 4 & 0,95 & 0,55 \\
+      2 & 4 & 0,19 & 0,55 \\
+      3 & 2 & 0,95 & --- \\
+      4 & 0 & fallback & --- \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.08cm}
+    {\scriptsize HFU~1 e~3 saturam no teto (0,95): limite do modelo,
+    não geometria CT. HFU~2 é o caso mais sustentado.}
+    \column{0.50\textwidth}
+    \slidefigure[0.82]{fig2_alpha_by_hfu}{$\alpha$ calibrado versus mediana
+    microCT por HFU.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{LOO: MAPE $\approx 15\%$ --- métrica honesta no laboratório}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.44\textwidth}
+    \footnotesize
+    Leave-one-plug-out: recalibra sem o plug avaliado.
+    \vspace{0.08cm}
+    \centering
+    \scriptsize
+    \begin{tabular}{lcc}
+      \toprule
+      Escopo & MAPE (\%) & RMSE \\
+      \midrule
+      In-sample & 9,1 & 0,52 \\
+      LOO & 14,8 & 0,85 \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.10cm}
+    \begin{block}{Leitura}
+      \scriptsize
+      Gap $\approx 6$~p.p.\ entre in-sample e LOO:
+      diferença esperada com $n=10$.
+      Viés LOO quase nulo no lab seco.
+    \end{block}
+    \column{0.54\textwidth}
+    \slidefigure[0.82]{fig2_vp_calib_before_after}{Antes versus depois da
+    calibração (dez plugs).}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Multiescala CT (fase~2f): manter monoescala}
+  \footnotesize
+  DEM sequencial meso-macro + micro (frações CT). Critério: ganho
+  \emph{forward} $\geq 2$~p.p.\ com confirmação in-sample.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \scriptsize
+    \begin{tabular}{llcc}
+      \toprule
+      Modelo & Escopo & MAPE & RMSE \\
+      \midrule
+      M1 & In-sample & 9,1 & 0,52 \\
+      M2b forward & In-sample & 9,1 & 0,55 \\
+      M1 & LOO & 14,8 & 0,85 \\
+      M2b forward & LOO & 12,3 & 0,76 \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.08cm}
+    {\scriptsize Oracle ($\approx 3\%$) é teto diagnóstico, não previsão.
+    Forward LOO ganha 2,5~p.p.\ \textbf{sem} melhora in-sample.}
+    \begin{exampleblock}{Decisão}
+      \scriptsize Manter $\alpha$ efetivo por HFU no produto de 87 linhas.
+    \end{exampleblock}
+    \column{0.52\textwidth}
+    \slidefigure[0.78]{fig2_multiscale_ab_crossplot}{M1 versus M2b
+    \emph{forward} (in-sample).}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Perfil e sónico}
+
+\begin{frame}{Extrapolação: 87 linhas com parâmetros por HFU}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.40\textwidth}
+    \footnotesize
+    \begin{itemize}
+      \item Entrada: \phiND{} e HFU de laboratório.
+      \item \Vp{} médio a seco $\approx 5{,}20$~km/s.
+      \item \VpVs{} médio $\approx 1{,}82$.
+      \item \phiND{} vs \phiS{}: $r \approx 0{,}94$.
+    \end{itemize}
+    \vspace{0.06cm}
+    {\scriptsize Entrada de porosidade sólida; a pergunta elástica
+    vem no confronto com o DSI.}
+    \column{0.58\textwidth}
+    \slidefigure[0.85]{fig2_phi_nd_vs_phi_sonic}{\phiND{} versus porosidade
+    sónica no perfil ($n=87$).}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Contra o DSI a seco: MAPE $\approx 16\%$, viés $+0{,}62$~km/s}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.40\textwidth}
+    \footnotesize
+    87/87 profundidades casadas (DTCO $\rightarrow$ \Vp{}).
+    \vspace{0.06cm}
+    \centering
+    \scriptsize
+    \begin{tabular}{lr}
+      \toprule
+      Métrica & Valor \\
+      \midrule
+      MAPE \Vp{} & 16,2\% \\
+      RMSE & 0,85~km/s \\
+      Viés & $+0{,}62$~km/s \\
+      \Vp{} DEM médio & 5,20~km/s \\
+      \Vp{} sónico médio & 4,58~km/s \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.08cm}
+    {\scriptsize Modelo sistematicamente mais rápido que o sónico
+    \emph{in situ}.}
+    \column{0.58\textwidth}
+    \slidefigure[0.82]{fig2_vp_dem_vs_sonic_depth}{Trilha de profundidade:
+    DEM seco versus sónico DSI.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Por HFU: confiar na HFU~2; cautela na HFU~4}
+  \footnotesize
+  O erro global esconde heterogeneidade forte entre unidades.
+  \vspace{0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \centering
+    \scriptsize
+    \begin{tabular}{cccc}
+      \toprule
+      HFU & $n$ & MAPE (\%) & Nota \\
+      \midrule
+      1 & 42 & 19,7 & ressalvas \\
+      2 & 29 & 7,9 & \textbf{benchmark} \\
+      3 & 10 & 13,1 & 2 plugs \\
+      4 & 6 & 37,2 & sem calibração \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.10cm}
+    \begin{block}{Uso interpretativo}
+      \scriptsize
+      HFU~2: produto preferencial.
+      HFU~4: não entregar sem novos plugs.
+    \end{block}
+    \column{0.50\textwidth}
+    \slidefigure[0.78]{fig2_vp_error_vs_depth}{Erro de \Vp{} versus
+    profundidade (DEM seco vs DSI).}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Gassmann e multiescala NMR}
+
+\begin{frame}{Fase~2b: Gassmann reduz pouco o viés ($+0{,}59$~km/s)}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.42\textwidth}
+    \footnotesize
+    Fluido default: $K_f \approx 2{,}2$~GPa, $S_w=1$.
+    \vspace{0.06cm}
+    \centering
+    \scriptsize
+    \begin{tabular}{lccc}
+      \toprule
+      Condição & MAPE & RMSE & Viés \\
+      \midrule
+      DEM seco & 16,2 & 0,85 & $+0{,}62$ \\
+      + Gassmann & 15,4 & 0,81 & $+0{,}59$ \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.10cm}
+    {\scriptsize Fluido explica \emph{parte} do gap seca/saturada,
+    não o fecha. Motivação para resíduo (Etapa~3).}
+    \column{0.56\textwidth}
+    \slidefigure[0.82]{fig2_vp_dry_gassmann_sonic_depth}{Sónico, DEM seco e
+    DEM + Gassmann ao longo da profundidade.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Fase~2g: NMR ponto a ponto --- ganho abaixo do limiar}
+  \footnotesize
+  Hipótese: frações CMR (CMFF/BFV) resolvem a fragilidade das medianas CT por HFU.
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \scriptsize
+    \begin{itemize}
+      \item Merge CMR + perfil: \textbf{87/87}.
+      \item M3 = DEM sequencial + Gassmann.
+      \item $\alpha_{\mathrm{meso/micro}}$ fixos por HFU (2f).
+    \end{itemize}
+    \vspace{0.04cm}
+    \centering
+    \begin{tabular}{lccc}
+      \toprule
+      Modelo & MAPE & Viés & $r$ \\
+      \midrule
+      M1 Gassmann & 15,4 & $+0{,}59$ & $-0{,}17$ \\
+      M3 NMR & 14,0 & $+0{,}30$ & $-0{,}13$ \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.06cm}
+    {\scriptsize $\Delta$MAPE $\approx 1{,}3$~p.p.\ $<$ limiar 2~p.p.
+    CMR vs CT nos plugs: $r \approx -0{,}30$.}
+    \begin{exampleblock}{Decisão}
+      \scriptsize Manter monoescala Gassmann no produto de 87 linhas.
+    \end{exampleblock}
+    \column{0.52\textwidth}
+    \slidefigure[0.72]{fig2_multiscale_nmr_crossplot_vp}{M1 versus M3 no
+    plano 1:1 (sónico no eixo $y$).}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Síntese das validações de \Vp{}}
+  \footnotesize
+  Patamar honesto: MAPE 14--16\%; viés muda de sinal do lab para o perfil.
+  \vspace{0.08cm}
+  \centering
+  \scriptsize
+  \begin{tabular}{lcccc}
+    \toprule
+    Escala & MAPE (\%) & RMSE & Viés & $n$ \\
+    \midrule
+    Lab, sem calibração & 26,0 & 1,36 & $+1{,}20$ & 10 \\
+    Lab, in-sample & 9,1 & 0,52 & $-0{,}01$ & 10 \\
+    Lab, LOO & 14,8 & 0,85 & $-0{,}07$ & 10 \\
+    Perfil DSI (seco) & 16,2 & 0,85 & $+0{,}62$ & 87 \\
+    Perfil DSI (Gassmann) & 15,4 & 0,81 & $+0{,}59$ & 87 \\
+    Perfil DSI (NMR M3) & 14,0 & 0,74 & $+0{,}30$ & 87 \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.12cm}
+  \begin{block}{Mensagem}
+    \scriptsize
+    Física localmente consistente após calibração por HFU; gap residual
+    contra o DSI persiste --- alvo da Etapa~3, não motivo para abandonar DEM/SC.
+  \end{block}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Conclusões}
+
+\begin{frame}{Conclusões e recomendações}
+  \footnotesize
+  \begin{enumerate}
+    \item \textbf{Viabilidade local:} DEM/SC por HFU fecha o lab (LOO
+          $\approx 15\%$) e o perfil seco ($\approx 16\%$); melhor em
+          \VpVs{} do que em \Vp{} absoluto.
+    \item \textbf{Uso por HFU:} priorizar HFU~2; ressalvas em HFU~1 e~3;
+          evitar HFU~4 sem novos plugs.
+    \item \textbf{Entrada:} manter \phiND{}; microCT na geometria, não no ML.
+    \item \textbf{Multiescala (2f/2g):} CT forward e NMR ponto a ponto não
+          superam o limiar de 2~p.p.\ --- manter monoescala Gassmann.
+    \item \textbf{Gassmann:} melhora parcial do viés ($+0{,}62 \rightarrow
+          +0{,}59$~km/s); não fecha o gap.
+    \item \textbf{Etapa~3:} ML sobre o \emph{resíduo} (sónico $-$ física),
+          com prioridade nas HFU~1 e~4 --- sem substituir a cadeia DEM/SC.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Caminho: física validada $\rightarrow$ ML residual}
+  \vspace{-0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    \textbf{Produto da Etapa~2}
+    \begin{itemize}
+      \item \Vp{}/\Vs{} teóricos por HFU (seco + Gassmann).
+      \item Parâmetros calibrados rastreáveis.
+      \item Decisão documentada: monoescala.
+    \end{itemize}
+    \textbf{Próximo (Etapa~3)}
+    \begin{itemize}
+      \item Alvo: resíduo $= \Vp^{\mathrm{sonico}} - \Vp^{\mathrm{fisica}}$.
+      \item Validação: blocos de profundidade (protocolo Etapa~1).
+      \item Híbrido: física + correção ML --- não end-to-end.
+    \end{itemize}
+    \column{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.90cm,
+      flowbox/.style={
+        draw, thick, rounded corners=4pt,
+        align=center, text width=5.4cm,
+        inner sep=5pt, font=\scriptsize
+      },
+      flowarr/.style={-{Stealth[length=2.8mm]}, thick, po861blue},
+      arrlabel/.style={
+        midway, fill=white, inner sep=2pt,
+        font=\tiny, text=po861blue, align=center
+      }
+    ]
+      \node[flowbox, fill=po861blue!18, draw=po861blue] (e1) {%
+        \textbf{1. Diagnóstico ML}\\
+        Limites do perfil
+      };
+      \node[flowbox, fill=po861green!18, draw=po861green, below=of e1] (e2) {%
+        \textbf{2. DEM/SC + Gassmann}\\
+        \textbf{concluída nesta apresentação}
+      };
+      \node[flowbox, fill=orange!18, draw=orange!70!black, below=of e2] (e3) {%
+        \textbf{3. Física + ML residual}\\
+        Ajuste fino de \Vp{} (OOF)
+      };
+      \draw[flowarr] (e1.south) --
+        node[arrlabel] {$\phi$, HFU} (e2.north);
+      \draw[flowarr] (e2.south) --
+        node[arrlabel] {resíduo} (e3.north);
+    \end{tikzpicture}
+  \end{columns}
+  \vspace{0.12cm}
+  \begin{center}
+    {\small Obrigado.}
+  \end{center}
+\end{frame}
+
+\end{document}

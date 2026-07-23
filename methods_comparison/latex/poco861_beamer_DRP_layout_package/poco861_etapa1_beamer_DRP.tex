@@ -1,0 +1,788 @@
+% Apresentacao Beamer -- Poco 861 Etapa 1 (campo Lapa)
+% Versao com layout inspirado no template DRP (UENF--Equinor)
+% Compilar: pdflatex poco861_etapa1_beamer_DRP.tex
+
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, calc}
+% DRP template uses Calibri; Carlito is the TeX metric-compatible substitute.
+\usepackage[sfdefault]{carlito}
+\usefonttheme{professionalfonts}
+
+% Figuras originais + fundos extraidos do template DRP.
+\graphicspath{%
+  {./poco861_drp_assets/}%
+  {./poco861_drp_assets/figures/}%
+  {figures/}%
+  {../data/processed/ml_runs/diagnostics_861/figures/}%
+  {../data/processed/ml_runs/well_profile/phi_lab/rf/}%
+  {../data/processed/ml_runs/well_profile/phi_lab/compare/figures/}%
+  {../data/processed/ml_runs/well_profile/phi_lab/alternatives/}%
+  {../data/processed/ml_runs/well_profile/hfu/classifier/}%
+  {../data/processed/ml_runs/ct_plugs/by_target/FZI_lab/wireline_only/}%
+}
+
+% ------------------------------------------------------------------
+% Paleta DRP
+\definecolor{drpblue}{RGB}{29,55,113}
+\definecolor{drporange}{RGB}{255,145,39}
+\definecolor{drpyellow}{RGB}{250,238,0}
+\definecolor{drpred}{RGB}{220,0,0}
+\definecolor{drpgray}{RGB}{70,70,70}
+\definecolor{po861blue}{RGB}{0,74,127}
+\definecolor{po861green}{RGB}{0,128,96}
+
+\usecolortheme{default}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=drpblue}
+\setbeamercolor{frametitle}{fg=black,bg=}
+\setbeamercolor{title}{fg=black,bg=}
+\setbeamercolor{subtitle}{fg=drpgray,bg=}
+\setbeamercolor{block title}{fg=white,bg=drpblue}
+\setbeamercolor{block body}{fg=black,bg=drpblue!5}
+\setbeamercolor{block title example}{fg=black,bg=drpyellow}
+\setbeamercolor{block body example}{fg=black,bg=drpyellow!12}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamersize{text margin left=7mm, text margin right=7mm}
+
+\setbeamerfont{normal text}{size=\small}
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\setbeamerfont{itemize/enumerate subbody}{size=\footnotesize}
+\setbeamerfont{block title}{size=\small,series=\bfseries}
+\setbeamerfont{block body}{size=\footnotesize}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{title}{size=\Huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{institute}{size=\small}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{page number in head/foot}{size=\scriptsize,series=\mdseries}
+
+\setlength{\parskip}{2pt}
+\setlength{\itemsep}{2pt}
+\setbeamertemplate{itemize item}{\raise0.2ex\hbox{\large\textbullet}}
+\setbeamertemplate{itemize subitem}{\raise0.2ex\hbox{\small\textbullet}}
+\setbeamercolor{itemize item}{fg=drpblue}
+\setbeamercolor{itemize subitem}{fg=drpblue}
+
+% Fundo branco; o rodape DRP entra como footline real para reservar espaco.
+\usebackgroundtemplate{}
+
+% Titulo de frame no estilo DRP: preto, grande, sem barra superior.
+\setbeamertemplate{frametitle}{%
+  \vspace*{0.18cm}%
+  \hspace*{0.12cm}{\usebeamerfont{frametitle}\insertframetitle}\par%
+  \vspace*{0.20cm}%
+}
+
+% Rodape DRP como parte da area util do Beamer: evita sobreposicao do conteudo.
+\newlength{\drpfooterheight}
+\setlength{\drpfooterheight}{1.12cm}
+\setbeamertemplate{footline}{%
+  \begin{tikzpicture}[baseline=(base.base)]
+    \node[inner sep=0pt,anchor=south west] (base) at (0,0)
+      {\includegraphics[width=\paperwidth,height=\drpfooterheight]{drp_footer.png}};
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.13cm]base.south east) {\insertframenumber};
+  \end{tikzpicture}%
+}
+
+\newcommand{\philab}{\ensuremath{\phi_{\mathrm{lab}}}}
+\newcommand{\fzilab}{\ensuremath{\mathrm{FZI}_{\mathrm{lab}}}}
+\newcommand{\klab}{\ensuremath{k_{\mathrm{lab}}}}
+\newcommand{\phiND}{\ensuremath{\phi_{\mathrm{ND}}}}
+
+% Altura util abaixo do titulo e acima do rodape DRP (~1,12 cm).
+\newlength{\drpbodyheight}
+\setlength{\drpbodyheight}{0.62\textheight}
+
+% #1 = fracao de drpbodyheight reservada so para a imagem (caption fica fora).
+\newcommand{\slidefig}[2][0.75]{%
+  \includegraphics[width=\linewidth,height=#1\drpbodyheight,keepaspectratio]{#2}%
+}
+\newcommand{\slidecaption}[1]{%
+  \par\vspace{0.05cm}%
+  \begin{minipage}{\linewidth}%
+    \centering\scriptsize #1%
+  \end{minipage}%
+}
+% Figura + legenda como bloco unico (evita corte da legenda).
+\newcommand{\slidefigure}[3][0.72]{%
+  \begin{minipage}[t]{\linewidth}%
+    \centering
+    \slidefig[#1]{#2}%
+    \slidecaption{#3}%
+  \end{minipage}%
+}
+\newcommand{\oofcv}{validação \emph{out-of-fold} (OOF) em 3 blocos de profundidade ($n=87$)}
+\newcommand{\rSqOOF}{$R^2$ OOF médio (3 blocos)}
+
+\title{Poço~861 (campo Lapa): integração de dados\\e modelos preditivos}
+\subtitle{Etapa~1 --- limites do perfil antes da física de rochas}
+\author{Romulo Brito da Silva}
+\institute{UENF / LENEP}
+\date{Junho de 2026}
+
+\begin{document}
+
+% ------------------------------------------------------------------
+{%
+\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{drp_title_bg.png}}%
+\begin{frame}[plain]
+  \vspace*{0.45cm}
+  \begin{center}
+    {\huge\bfseries Poço~861\\[0.04cm]
+    (campo Lapa)}\\[0.20cm]
+    {\usebeamerfont{subtitle}\bfseries Integração de dados e modelos preditivos}\\[0.15cm]
+    {\large Etapa~1 --- limites do perfil antes da física de rochas}\\[0.26cm]
+    {\usebeamerfont{author} Rômulo Brito da Silva}\\[0.08cm]
+    {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
+    {\usebeamerfont{date} Junho de 2026}\\[0.22cm]
+    {\footnotesize
+    Intervalo 5205,91--5233,72~m $\cdot$ campo Lapa (pré-sal)\\
+    87 amostras perfil+laboratório $\cdot$ 10 plugs com microtomografia (microCT)\\[0.10cm]
+    Etapa diagnóstica: ainda não há produto de $V_p$/$V_s$}
+  \end{center}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.15cm]current page.south east) {\insertframenumber};
+  \end{tikzpicture}
+\end{frame}
+}%
+\usebackgroundtemplate{}
+
+% ------------------------------------------------------------------
+\begin{frame}{Roteiro}
+  \footnotesize
+  \begin{enumerate}
+    \item Intervalo do poço~861 e montagem do \emph{perfil enriquecido}.
+    \item Protocolo de validação: 87 linhas (blocos OOF) e 10 plugs (LOPO).
+    \item Correlações perfil--laboratório e teste \emph{oracle} de FZI.
+    \item Resultados do Random Forest: \philab, FZI, $k$ e HFU; comparação
+          \phiND{} direto versus RF.
+    \item Encaminhamento para DEM/SC (Etapa~2).
+  \end{enumerate}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Contexto}
+
+\begin{frame}{O intervalo do poço~861 antes de modelar $V_p$}
+  \footnotesize
+  Carbonatos pré-sal do campo Lapa, $\sim$28~m (5206--5234~m).
+  \philab, \klab{} e \fzilab{} variam bastante ($n=87$ de laboratório).
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.32\textwidth}
+    \begin{itemize}
+      \item \textbf{Três escalas:} perfil (87 linhas), laboratório,
+            micro-CT (10 plugs).
+      \item \textbf{Alvos testados:} \philab, \fzilab, \klab, HFU.
+      \item Nesta etapa \textbf{não} estimamos $V_p$ nem $V_s$ diretamente.
+    \end{itemize}
+    \vspace{0.06cm}
+    {\tiny
+    \textbf{Médias por bloco de validação OOF}
+    \vspace{0.1cm}
+    \begin{tabular}{@{}ccrrr@{}}
+      \toprule
+      Bl. & Prof.\ (m) & $\overline{\phi}$ & $\overline{k}$ & $\overline{\mathrm{FZI}}$ \\
+      & & (pu) & (mD) & \\
+      \midrule
+      0 & 5206--5214 & 0,092 & 3,6 & 1,39 \\
+      1 & 5215--5223 & 0,115 & 9,5 & 1,25 \\
+      2 & 5225--5234 & 0,145 & 54,6 & 1,87 \\
+      \bottomrule
+    \end{tabular}}
+    \column{0.66\textwidth}
+    \slidefigure[0.7]{mogno_lab_properties_vs_depth}{Esquerda: \philab;
+    centro: \klab{} (mD, escala log); direita: \fzilab{} vs.\ profundidade
+    ($n=87$ pontos de laboratório).}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Dados}
+
+\begin{frame}{Perfil enriquecido: como montamos a tabela}
+  \scriptsize
+  Alinhamos perfil, laboratório e microtomografia na mesma profundidade.
+  O laboratório entra só como alvo ($y$), nunca como entrada ($X$).
+  \vspace{0.05cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \begin{itemize}
+      \item \textbf{Coluna de perfil} ($n=87$): curvas wireline e, em cada
+            ponto, \philab, \klab, \fzilab, HFU de laboratório.
+      \item \textbf{Dez plugs microCT}: porosidade de imagem, textura e
+            composição mineral em escala milimétrica.
+      \item \textbf{Casamento} ($\pm$0,5~m): cada plug vai para a linha de
+            perfil mais próxima; oito profundidades recebem descritores de CT.
+      \item \textbf{Dois usos:} coluna inteira ($\sim$28~m) ou análise plug a
+            plug nos dez pontos com imagem 3D.
+    \end{itemize}
+    \vspace{0.02cm}
+    {\scriptsize
+    \emph{Perfil enriquecido}: 87 linhas com perfil e lab em todo o intervalo;
+    CT só onde há plug. Nas 87 linhas, $X$ = curvas de perfil; $y$ = lab.}
+    \column{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=0.68, every node/.style={font=\scriptsize}]
+      \draw[fill=po861blue!12, draw=po861blue, thick, rounded corners=2pt]
+        (-0.2,5.6) rectangle (4.6,6.5);
+      \node[align=center] at (2.2,6.05)
+        {\textbf{Perfil + laboratório}\\87 profundidades};
+      \draw[fill=po861green!12, draw=po861green, thick, rounded corners=2pt]
+        (-0.2,3.7) rectangle (4.6,4.6);
+      \node[align=center] at (2.2,4.15)
+        {\textbf{MicroCT}\\10 plugs};
+      \draw[fill=orange!12, draw=orange!80!black, thick, rounded corners=2pt]
+        (-0.2,1.8) rectangle (4.6,2.7);
+      \node[align=center] at (2.2,2.25)
+        {\textbf{Alinhamento $\pm$0,5~m}\\8 prof.\ com CT};
+      \draw[fill=po861blue!8, draw=po861blue, thick, rounded corners=2pt]
+        (-0.2,0.0) rectangle (4.6,1.0);
+      \node[align=center] at (2.2,0.5)
+        {\textbf{Perfil enriquecido} ($n=87$)};
+      \draw[->, thick, po861blue] (2.2,3.6) -- (2.2,2.8);
+      \draw[->, thick, po861blue] (2.2,5.5) -- (2.2,4.7);
+      \draw[->, thick, po861blue] (2.2,1.7) -- (2.2,1.1);
+    \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Entradas ($X$) e alvos ($y$) dos experimentos}
+  \footnotesize
+  Cada modelo prevê \textbf{um} alvo de laboratório a partir de
+  \textbf{oito} curvas de perfil. Lab fora de $X$ para evitar vazamento.
+  \vspace{0.06cm}
+  \setlength{\columnsep}{0.05\textwidth}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.45\textwidth}
+    \begin{block}{Features ($X$)}
+      \scriptsize
+      Oito curvas medidas \emph{in situ} (87 profundidades):
+      \vspace{0.04cm}
+      \centering
+      \setlength{\tabcolsep}{3pt}
+      \renewcommand{\arraystretch}{1.05}
+      \begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.65cm}>{\raggedright\arraybackslash}p{2.45cm}@{}}
+        \toprule
+        Variável & Significado \\
+        \midrule
+        GR, $\rho_b$ & litologia / densidade \\
+        $R_t$ profunda e rasa & resistividade \\
+        $\phi_{\mathrm{N}}$, $\phi_{\mathrm{S}}$, \phiND{} & porosidade estimada \\
+        Litotipo & cod.\ 1--4 (legenda abaixo) \\
+        \bottomrule
+      \end{tabular}
+      \vspace{0.04cm}
+
+      {\scriptsize Total: 8 features wireline em cada linha.}
+    \end{block}
+    \column{0.45\textwidth}
+    \begin{block}{Alvos ($y$)}
+      \scriptsize
+      Grandezas de laboratório na mesma profundidade:
+      \vspace{0.04cm}
+      \centering
+      \setlength{\tabcolsep}{3pt}
+      \renewcommand{\arraystretch}{1.05}
+      \begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.0cm}>{\raggedright\arraybackslash}p{0.9cm}>{\raggedright\arraybackslash}p{2.2cm}@{}}
+        \toprule
+        Alvo & Tipo & Papel \\
+        \midrule
+        \philab & regressão & porosidade medida \\
+        \fzilab & regressão & qualid.\ zona de fluxo \\
+        \klab & regressão & permeabilidade \\
+        HFU (1--4) & classif. & classe de fluxo \\
+        \bottomrule
+      \end{tabular}
+      \vspace{0.04cm}
+
+      {\scriptsize HFU: 42 / 29 / 10 / 6 amostras/classe.}
+    \end{block}
+  \end{columns}
+  \vspace{0.06cm}
+  {\scriptsize
+  \textbf{Dois datasets:} perfil enriquecido ($n=87$, 5205,9--5233,7~m);
+  dez plugs com microCT (CT só no segundo caso).\\
+  Litotipos:\\
+  1=Grainstone, 2=Shrubs, 3=Laminite, 4=Spherulite.}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Protocolo}
+
+\begin{frame}{Dois protocolos de validação}
+  \vspace{-0.25cm}
+  {\footnotesize
+  $y$ = medidas de laboratório; lab nunca em $X$.
+  Modelos testados: RF, GB, XGB, MLP, LR.}
+  \vspace{0.06cm}
+
+  \begin{columns}[T,onlytextwidth]
+    \column{0.49\textwidth}
+    \begin{block}{Cenário A --- perfil completo ($n=87$)}
+      \scriptsize
+      \textbf{$X$:} oito curvas wireline \quad
+      \textbf{$y$:} \philab, \fzilab, \klab, HFU \quad
+      \textbf{CV:} 3 blocos OOF
+      \vspace{0.05cm}
+
+      \centering
+      \begin{tikzpicture}[
+        node distance=0.35cm and 0.22cm,
+        mlbox/.style={
+          draw=po861blue, thick, rounded corners=2pt, fill=po861blue!10,
+          minimum height=0.62cm, minimum width=1.45cm,
+          align=center, font=\scriptsize, inner sep=1pt},
+        mlarr/.style={-{Stealth[length=2mm]}, thick, po861blue},
+      ]
+        \node[mlbox] (xa) {$X$\\8 curvas};
+        \node[mlbox, right=of xa] (cva) {3 blocos\\OOF};
+        \node[mlbox, right=of cva] (ma) {$R^2$, RMSE};
+        \draw[mlarr] (xa) -- (cva) -- (ma);
+        \node[font=\tiny, text=po861blue, below=0.12cm of cva]
+          {treino 2 $\cdot$ teste 1 bloco};
+      \end{tikzpicture}
+      \vspace{0.06cm}
+
+      \centering
+      \begin{tabular}{ccrr}
+        \toprule
+        Bloco & Prof.\ (m) & $\overline{\phi}$ (pu) & $\overline{k}$ (mD) \\
+        \midrule
+        0 & 5206--5214 & 0,092 & 3,6 \\
+        1 & 5215--5223 & 0,115 & 9,5 \\
+        2 & 5225--5234 & 0,145 & 54,6 \\
+        \bottomrule
+      \end{tabular}
+    \end{block}
+
+    \column{0.49\textwidth}
+    \begin{exampleblock}{Cenário B --- plugs + microCT ($n=10$)}
+      \scriptsize
+      \textbf{$X$:} oito curvas + descritores CT \quad
+      \textbf{$y$:} \philab{} ou \fzilab \quad
+      \textbf{CV:} LOPO
+      \vspace{0.05cm}
+
+      \centering
+      \begin{tikzpicture}[
+        node distance=0.35cm and 0.22cm,
+        mlbox/.style={
+          draw=po861green!70!black, thick, rounded corners=2pt,
+          fill=po861green!12, minimum height=0.62cm, minimum width=1.45cm,
+          align=center, font=\scriptsize, inner sep=1pt},
+        mlarr/.style={
+          -{Stealth[length=2mm]}, thick, po861green!60!black},
+      ]
+        \node[mlbox] (xb) {$X$\\8 curvas\\+ CT};
+        \node[mlbox, right=of xb] (cvb) {LOPO\\1 plug};
+        \node[mlbox, right=of cvb] (mb) {$R^2$, RMSE};
+        \draw[mlarr] (xb) -- (cvb) -- (mb);
+        \node[font=\tiny, text=po861green!60!black, below=0.12cm of cvb]
+          {treino 9 $\cdot$ teste 1 plug};
+      \end{tikzpicture}
+      \vspace{0.06cm}
+
+      {\tiny
+      CT entra só nos plugs, não nas 87 linhas.
+      Comparamos RF com e sem descritores CT (LOPO): CT não ajudou
+      em \philab{} nem \fzilab{} (próximo slide).}
+    \end{exampleblock}
+  \end{columns}
+
+  \vspace{0.04cm}
+  {\scriptsize
+  Sem vazamento: lab não prediz lab.
+  OOF = cada bloco (ou plug) é testado sem ter participado do treino.
+  Evitamos sorteio 80/20, que infla $R^2$ neste tipo de dado.}
+
+  \vspace{-0.03cm}
+  \begin{block}{Falha no bloco~2 (Cenário~A)}
+    \scriptsize Bloco~2 (5225--5234~m): faixa mais permeável e com mudança
+    litológica; o RF de \philab{} treinado acima não generaliza ($R^2<0$).
+  \end{block}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Diagnóstico}
+
+\begin{frame}{Porosidade sim, FZI quase não}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.44\textwidth}
+    \footnotesize
+    \textbf{$|r|$ com \fzilab}
+    \vspace{0.04cm}
+    \begin{tabular}{lr}
+      \toprule
+      Variável & $|r|$ \\
+      \midrule
+      RQI (lab) & 0,887 \\
+      \klab{} (lab) & 0,709 \\
+      HFU (lab) & 0,614 \\
+      \phiND{} (perfil) & 0,308 \\
+      GR (perfil) & 0,040 \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.10cm}
+    \textbf{Com \philab:} $\phi_{\mathrm{N}}$ ($r \approx 0{,}74$),
+    \phiND{} ($r \approx 0{,}69$).
+
+    \vspace{0.08cm}
+    {\scriptsize FZI depende de textura e $k$ --- o perfil mal captura isso:
+    o melhor $r$ de curva (\phiND) fica em 0,31.}
+    \column{0.54\textwidth}
+    \slidefigure[0.9]{log_features_vs_FZI_lab_corr}{Correlação de Pearson:
+    curvas de perfil versus \fzilab}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Teste \emph{oracle}: FZI precisa de lab, não de perfil}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    \begin{itemize}
+      \item RF só com perfis: \fzilab{} falha (bloco~1, $R^2 \approx -1{,}95$).
+      \item \emph{Oracle} (diagnóstico): entram \philab{} e \klab{} ---
+            informação que só teríamos depois do testemunho.
+      \item Com isso, $R^2$ sobe para 0,37--0,88 nos blocos~0 e~1
+            (média $\approx 0{,}69$).
+    \end{itemize}
+    \vspace{0.04cm}
+    {\scriptsize FZI tem sinal previsível, mas vem de porosidade e $k$ de
+    laboratório --- não das oito curvas de perfil. O problema não é o
+    algoritmo.}
+    \column{0.48\textwidth}
+    \slidefigure[0.9]{FZI_oracle_vs_logs_r2_by_fold}{$R^2$ por bloco: perfil
+    isolado versus \emph{oracle}}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Resultados no perfil}
+
+\begin{frame}{RF nas 87 linhas: só \philab{} com $R^2$ OOF positivo}
+  \footnotesize
+  Mesmo RF, mesmo protocolo (\oofcv): oito curvas $\rightarrow$ um alvo.
+  $R^2<0$ = pior que prever a média do bloco de teste.
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+    \begin{tabular}{lrrr}
+      \toprule
+      Alvo ($y$) & RMSE & \rSqOOF & std \\
+      \midrule
+      \philab{} (pu) & 0,033 & \textbf{0,146} & 0,222 \\
+      \fzilab & 1,813 & $-0{,}819$ & 0,820 \\
+      \klab{} (mD) & 76,2 & $-15{,}4$ & 18,4 \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.04cm}
+    {\scriptsize
+    Só \philab{} serve como porosidade preliminar de perfil.
+    FZI e $k$ negativos não indicam RF ruim em \philab{} --- são alvos sem
+    sinal wireline.\\[0.04cm]
+    $R^2 \approx 0{,}15$ em \philab{} é modesto, mas positivo ---
+    dá para usar como entrada de DEM/SC, sem substituir testemunho.}
+    \column{0.46\textwidth}
+    \slidefigure[0.9]{target_comparison_mean_r2}{\rSqOOF{} por alvo (RF);
+    referência = média do treino}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Cinco regressores em \philab{}: só RF acima de $R^2=0$}
+  \footnotesize
+  Alvo fixo: \philab{} ($n=87$, \oofcv). Comparação de algoritmos
+  \textbf{só para porosidade} --- FZI e $k$ ficam no slide anterior.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.58\textwidth}
+    \textbf{\philab{} (pu) --- comparação entre algoritmos}
+    \vspace{0.04cm}
+    \begin{tabular}{lrr}
+      \toprule
+      Algoritmo & RMSE & \rSqOOF \\
+      \midrule
+      Random Forest & 0,033 & \textbf{0,146} \\
+      Regressão linear & 0,036 & $-0{,}261$ \\
+      XGBoost & 0,036 & $-0{,}099$ \\
+      Grad.\ Boosting & 0,040 & $-0{,}313$ \\
+      MLP & 0,097 & $-6{,}871$ \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.08cm}
+    {\scriptsize
+    Nos outros alvos (mesma validação): FZI $R^2_{\mathrm{RF}}=-0{,}82$;
+    $k$ $R^2_{\mathrm{RF}}=-15{,}4$. Nenhum regressor se salva.}
+    \column{0.40\textwidth}
+    \begin{itemize}
+      \item Em \philab, só RF fica com $R^2>0$.
+      \item Trocar algoritmo não compensa falta de informação no perfil.
+      \item Próximo slide: \phiND{} direto versus RF em \philab.
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{\phiND{} direto supera o RF para \philab{}}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.31\textwidth}
+    \scriptsize
+    A porosidade neutrão--densidade (\phiND{}) funciona como proxy
+    direta de \philab{} --- sem aprendizado de máquina.
+    \vspace{0.03cm}
+
+    \centering
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{lrrr}
+      \toprule
+      Método & RMSE & MAE & $R^2$ \\
+      \midrule
+      \phiND{} direto & 0,032 & 0,022 & \textbf{0,446} \\
+      RF OOF & 0,036 & 0,026 & 0,300 \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.04cm}
+
+    {\scriptsize
+    $r(\phiND{}, \philab) = 0{,}701$ ($n=87$).\\[0.03cm]
+    \textbf{Acima:} perfil em profundidade.\\
+    \textbf{Abaixo:} métricas e dispersão 1:1.}
+    \column{0.67\textwidth}
+    \centering
+    \slidefig[0.7]{phi_nd_vs_rf_depth_profile}
+  \end{columns}
+  \vspace{0.04cm}
+  \centering
+  \slidefig[0.6]{phi_nd_vs_rf_bottom_panels}
+\end{frame}
+
+\begin{frame}{\philab{} RF: métricas OOF por bloco de profundidade}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.44\textwidth}
+    \footnotesize
+    \textbf{Random Forest, alvo \philab{}}
+    \vspace{0.04cm}
+    \begin{tabular}{ccrr}
+      \toprule
+      Bloco & Prof.\ (m) & RMSE & $R^2$ OOF \\
+      \midrule
+      0 & 5206--5214 & 0,015 & 0,367 \\
+      1 & 5215--5223 & 0,037 & 0,227 \\
+      2 & 5225--5234 & 0,047 & $-0{,}157$ \\
+      \midrule
+      Média & -- & 0,033 & 0,146 \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.08cm}
+    {\scriptsize
+    $R^2$ negativo só no bloco~2 (faixa mais profunda e heterogênea).
+    A média dos três blocos segue positiva (0,146).
+    Sorteio 80/20 inflaria o $R^2$ --- por isso não o usamos.}
+    \column{0.54\textwidth}
+    \slidefigure[0.90]{phi_lab_oof_rmse_by_depth_fold}{RMSE OOF por bloco:
+    RF, GB, MLP e LR (\philab{})}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{\philab{} em profundidade: predições OOF}
+  \footnotesize
+  Mesmo protocolo das tabelas: $n=87$, 8 wireline, \oofcv.
+  Linhas tracejadas vermelhas = limites entre blocos de teste.
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.56\textwidth}
+    \slidefigure[0.72]{phi_lab_oof_depth_panels}{Observado (tracejado) versus
+    OOF (colorido) por regressor}
+    \column{0.42\textwidth}
+    \begin{itemize}
+      \item \textbf{RF (verde):} acompanha \philab{} nos blocos 0--1;
+            perde no bloco profundo.
+      \item \textbf{LR (azul):} próximo do RF neste poço.
+      \item \textbf{MLP (vermelho):} instável ($R^2 \ll 0$).
+      \item O erro cresce com a profundidade em todos os modelos.
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Limites e alternativas}
+
+\begin{frame}{MicroCT nos 10 plugs: RF não ganhou com CT}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.44\textwidth}
+    \footnotesize
+    \textbf{$R^2$ global LOPO}
+    \vspace{0.04cm}
+    \begin{tabular}{lrr}
+      \toprule
+      Alvo & Só perfil & Perfil + CT \\
+      \midrule
+      \fzilab & 0,151 & 0,116 \\
+      \philab & $-0{,}334$ & $-0{,}466$ \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.10cm}
+    \begin{itemize}
+      \item Com dez pontos, qualquer $R^2$ oscila bastante.
+      \item Incluir CT \emph{piorou} o RF --- provável overfitting.
+      \item O CT volta na Etapa~2, para geometria no DEM/SC.
+    \end{itemize}
+    \column{0.54\textwidth}
+    \slidefigure[1.1]{plug_out_pred_vs_obs_rf}{FZI nos plugs: predito versus
+    observado (LOPO, só perfil)}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{HFU pelo perfil: resultado fraco}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    \textbf{Classificação OOF (blocos)}
+    \vspace{0.04cm}
+    \begin{tabular}{lrrr}
+      \toprule
+      Modelo & Acc. & Acc.\ bal. & F1 \\
+      \midrule
+      Logística bal. & 0,356 & 0,220 & 0,217 \\
+      RF balanceado & 0,299 & 0,179 & 0,161 \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.08cm}
+    {\scriptsize Quatro classes: acaso $\approx 25\%$. Sempre chutar HFU1
+    daria 48\% sem aprender nada.}
+
+    \vspace{0.08cm}
+    {\scriptsize Na Etapa~2 usamos HFU de laboratório; o classificador fica
+    só como recurso onde lab faltar.}
+    \column{0.52\textwidth}
+    \slidefigure[0.9]{hfu_model_comparison_oof}{Métricas OOF: logística
+    balanceada versus RF balanceado}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{GAM e Ridge não batem o RF em \philab}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.44\textwidth}
+    \footnotesize
+    \begin{tabular}{lrr}
+      \toprule
+      Modelo & RMSE (pu) & $R^2$ \\
+      \midrule
+      RF & 0,033 & \textbf{0,146} \\
+      GAM (spline+Ridge) & 0,036 & $-0{,}052$ \\
+      Ridge & 0,037 & $-0{,}261$ \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.10cm}
+    Com 87 amostras e oito curvas, modelos lineares e splines não seguram
+    a mudança litológica entre blocos.
+    \column{0.54\textwidth}
+    \slidefigure[0.90]{phi_model_comparison_mean_r2}{$R^2$ médio: RF versus
+    GAM e Ridge}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Encaminhamento}
+
+\begin{frame}{Da Etapa~1 à física de rochas}
+  \vspace{-0.12cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    \textbf{Fechamos na Etapa~1}
+    \begin{itemize}
+      \item Porosidade de entrada: \phiND{} do perfil (RF como reserva).
+      \item FZI e $k$: fora do escopo com perfil isolado.
+      \item HFU de laboratório para fatiar a modelagem física.
+    \end{itemize}
+    \textbf{Próximo}
+    \begin{itemize}
+      \item Etapa~2: DEM/SC e Gassmann por HFU, microCT nos dez plugs.
+      \item Etapa~3: ML no resíduo de $V_p$, depois de validar a física.
+    \end{itemize}
+    \column{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.95cm,
+      flowbox/.style={
+        draw, thick, rounded corners=4pt,
+        align=center, text width=5.5cm,
+        inner sep=5pt, font=\scriptsize
+      },
+      flowarr/.style={-{Stealth[length=2.8mm]}, thick, po861blue},
+      arrlabel/.style={
+        midway, fill=white, inner sep=2pt,
+        font=\tiny, text=po861blue, align=center
+      }
+    ]
+      \node[flowbox, fill=po861blue!18, draw=po861blue] (e1) {%
+        \textbf{1. Diagnóstico ML}\\
+        Limites do perfil
+      };
+      \node[flowbox, fill=po861green!18, draw=po861green, below=of e1] (e2) {%
+        \textbf{2. DEM/SC + Gassmann}\\
+        microCT + HFU $\rightarrow$ $V_p$, $V_s$
+      };
+      \node[flowbox, fill=orange!18, draw=orange!70!black, below=of e2] (e3) {%
+        \textbf{3. Física + ML residual}\\
+        Ajuste fino de $V_p$ (RF / Ridge OOF)
+      };
+      \draw[flowarr] (e1.south) --
+        node[arrlabel] {porosidade, HFU} (e2.north);
+      \draw[flowarr] (e2.south) --
+        node[arrlabel] {resíduo} (e3.north);
+    \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Conclusões}
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \column{0.56\textwidth}
+    \begin{enumerate}
+      \item \phiND{} direto como porosidade para a física ($R^2 = 0{,}45$;
+            RF OOF fica em 0,30).
+      \item FZI só com perfil: não usar como produto.
+      \item HFU de laboratório na Etapa~2; classificador automático em segundo plano.
+      \item microCT para DEM/SC, não para enriquecer RF de perfil.
+      \item Física de rochas antes de mais \emph{tuning} perfil $\rightarrow$ $V_p$.
+    \end{enumerate}
+    \column{0.40\textwidth}
+    \centering
+    \textbf{Referência rápida}\\[0.08cm]
+    \begin{tabular}{lc}
+      \toprule
+      Grandeza & $R^2$ ou acc. \\
+      \midrule
+      \philab & 0,146 \\
+      \fzilab & $-0{,}819$ \\
+      \klab & $-15{,}4$ \\
+      HFU & 36\% \\
+      \bottomrule
+    \end{tabular}
+  \end{columns}
+  \vspace{0.12cm}
+  \noindent\footnotesize O perfil ajuda na porosidade via \phiND{}; RF não
+  supera essa proxy. Para textura e permeabilidade, seguimos com DEM/SC e HFU
+  de laboratório na Etapa~2.
+  \vspace{0.15cm}
+  \begin{center}
+    {\small Obrigado.}
+  \end{center}
+\end{frame}
+
+\end{document}

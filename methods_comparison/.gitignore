@@ -1,0 +1,26 @@
+# Raw / heavy field data (do not commit)
+data/*.dlis
+data/**/*.dlis
+data/*.xlsx
+data/**/*.xlsx
+data/*-2026*/
+data/Samples_*/
+data/PETROFISICA*/
+data/PVT-*/
+data/Sismica*/
+data/ROCKPHYS*
+data/processed/
+
+# LaTeX build junk
+latex/**/*.aux
+latex/**/*.log
+latex/**/*.out
+latex/**/*.toc
+latex/**/*.nav
+latex/**/*.snm
+latex/**/*.fls
+latex/**/*.fdb_latexmk
+latex/**/*.synctex.gz
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
