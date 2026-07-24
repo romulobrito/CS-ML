@@ -1,0 +1,36 @@
+{
+  "well_id": "861",
+  "version": "v2_corrected",
+  "generated_utc": "2026-07-24T10:58:16Z",
+  "nested_lambda": false,
+  "exclude_samples": [],
+  "huber_delta": 0.15,
+  "lambda_beta": 10.0,
+  "w_s_grid": [
+    0.0,
+    0.05,
+    0.1,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "p3_median_w_s_oof": 0.5,
+  "lexicographic_winner": "G_huber",
+  "accepted_models": [
+    "G_huber",
+    "P1",
+    "P2",
+    "P3"
+  ],
+  "production_reference": "P0",
+  "fixes": [
+    "data_loss normalized as (J_vp + w_s*J_vs)/(1+w_s)",
+    "global model uses identifiable (alpha, scale) only",
+    "global skips lambda selection",
+    "P3 selects w_s inside outer-fold training",
+    "optimizer success/finite checks with restarts",
+    "acceptance gate implemented (not docstring-only)",
+    "lexicographic_pick excludes P0"
+  ],
+  "pred_cache_size": 109124
+}
