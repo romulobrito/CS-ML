@@ -1,0 +1,40 @@
+{
+  "nested_oof_plugs": {
+    "protocol": "leave-one-depth/core-out, 8 groups; inner lambda up to 3 folds; grid [0.1,1,10,100]",
+    "M0_joint_rel_sq": 0.021027,
+    "M3_joint_rel_sq": 0.021442,
+    "joint_gain_m3_vs_m0_pct": -2.0,
+    "M3_mape_vp_pct": 12.26,
+    "M0_mape_vp_pct": 12.59,
+    "M3_mae_vpvs": 0.0629,
+    "M0_mae_vpvs": 0.1134,
+    "M3_frac_alpha_at_bound": 0.0,
+    "M0_frac_alpha_at_bound": 0.5,
+    "M3_groups_beats_m0": "4/8",
+    "median_lambda": [
+      50.5,
+      100.0
+    ],
+    "continuity_criterion_10pct_joint": false
+  },
+  "profile_dsi_eval_only": {
+    "M0_dry_mape": 16.21,
+    "M3_nested_dry_mape": 13.34,
+    "M0_dry_bias": 0.616,
+    "M3_nested_dry_bias": 0.467,
+    "M0_dry_r": -0.153,
+    "M3_nested_dry_r": -0.171,
+    "M0_gass_mape": 15.37,
+    "M3_nested_gass_mape": 14.19,
+    "M0_gass_r": -0.165,
+    "M3_nested_gass_r": -0.172,
+    "vertical_correlation_fixed": false
+  },
+  "interpretation": [
+    "Nested: M3 does not beat M0 on joint OOF (-2%); criterion not met.",
+    "M3 improves Vp/Vs and parameter stability (less alpha at bounds).",
+    "Profile: M3 reduces MAPE/bias vs DSI but Pearson r stays ~-0.17.",
+    "High nested lambda pools HFUs nearly to a global (alpha,s).",
+    "Useful as modest profile bias fix; not as depth-tracking model."
+  ]
+}

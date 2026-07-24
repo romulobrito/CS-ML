@@ -1,0 +1,23 @@
+{
+  "well_id": "861",
+  "generated_utc": "2026-07-23T18:11:00Z",
+  "n_plugs": 10,
+  "n_depth_groups": 8,
+  "depth_tol_m": 0.15,
+  "nested_lambda": false,
+  "exclude_samples": [],
+  "lambda_grid": [
+    0.0,
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "models": [
+    "M0",
+    "M1",
+    "M2",
+    "M3"
+  ],
+  "criterion_note": "Success if M3 cuts joint_rel_sq OOF by ~10%+ vs M0, improves most depth groups, and Vp does not degrade materially."
+}
