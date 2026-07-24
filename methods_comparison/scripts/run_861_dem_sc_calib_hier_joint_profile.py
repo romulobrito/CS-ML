@@ -301,12 +301,19 @@ def main() -> None:
         default=None,
         help="Override lambda_s.",
     )
+    parser.add_argument(
+        "--out-dir",
+        type=str,
+        default="",
+        help=(
+            "Output directory. Default: profile_m3_nested_median when lambdas "
+            "come from nested metrics; profile_m3_lambda_cli when --lambda-* set; "
+            "profile_m3_inner_loo otherwise."
+        ),
+    )
     args = parser.parse_args()
 
     clear_pred_cache()
-    out_dir = OUT_ROOT / "profile_m3"
-    tables = out_dir / "tables"
-    tables.mkdir(parents=True, exist_ok=True)
 
     nested_dir = Path(args.nested_dir)
     la: Optional[float] = args.lambda_alpha
@@ -329,11 +336,25 @@ def main() -> None:
             rows0 = assign_depth_groups(plugs0, depth_by_id0)
             la, ls = select_lambda_nested(rows0, use_vs=True)
             lambda_source = "inner_loo_all_plugs"
+    else:
+        lambda_source = "cli"
 
     assert la is not None and ls is not None
 
+    if args.out_dir.strip():
+        out_dir = Path(args.out_dir)
+    elif lambda_source == "nested_median":
+        out_dir = OUT_ROOT / "profile_m3_nested_median"
+    elif lambda_source == "cli":
+        out_dir = OUT_ROOT / "profile_m3_lambda_cli"
+    else:
+        out_dir = OUT_ROOT / "profile_m3_inner_loo"
+    tables = out_dir / "tables"
+    tables.mkdir(parents=True, exist_ok=True)
+
     print("=== M3 profile evaluation vs DSI ===")
     print("lambda_alpha={:.4g}, lambda_s={:.4g} (source={})".format(la, ls, lambda_source))
+    print("out_dir={}".format(out_dir))
 
     ct_df = load_ct_samples()
     lab_val = pd.read_csv(LAB_VAL_CSV)

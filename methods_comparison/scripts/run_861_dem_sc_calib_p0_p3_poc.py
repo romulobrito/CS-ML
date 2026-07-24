@@ -78,6 +78,7 @@ class FitConfig:
     orientation: bool
     w_s: float
     structure: str  # "hfu" | "global"
+    select_ws: bool = False
 
 
 @dataclass(frozen=True)
@@ -171,28 +172,101 @@ def data_loss(
     huber: bool,
     w_s: float,
 ) -> float:
-    """Mean Vp (+ optional weighted Vs) loss over plugs."""
+    """
+    Mean Vp loss, optionally combined with weighted Vs.
+
+    Consistent normalization:
+      J = J_vp                         if w_s <= 0
+      J = (J_vp + w_s * J_vs) / (1+w_s) otherwise
+    """
     if not plugs:
         return float("nan")
-    vals: List[float] = []
+    vp_vals: List[float] = []
+    vs_vals: List[float] = []
     for plug in plugs:
         hp = resolve_params_for_hfu(params, plug.hfu)
         vp_d, vs_d = predict_dem(plug, hp.alpha, hp.scale)
         vp_p, vs_p = apply_orientation(vp_d, vs_d, plug.ct_sample_id, orient)
         if huber:
-            vals.append(huber_rel(vp_p, plug.vp_lab_z_km_s))
+            vp_vals.append(huber_rel(vp_p, plug.vp_lab_z_km_s))
             if w_s > 0.0:
-                vals.append(w_s * huber_rel(vs_p, plug.vs_lab_z_km_s))
+                vs_vals.append(huber_rel(vs_p, plug.vs_lab_z_km_s))
         else:
-            vals.append(sq_rel(vp_p, plug.vp_lab_z_km_s))
+            vp_vals.append(sq_rel(vp_p, plug.vp_lab_z_km_s))
             if w_s > 0.0:
-                vals.append(w_s * sq_rel(vs_p, plug.vs_lab_z_km_s))
-    return float(np.mean(np.asarray(vals, dtype=np.float64)))
+                vs_vals.append(sq_rel(vs_p, plug.vs_lab_z_km_s))
+    j_vp = float(np.mean(np.asarray(vp_vals, dtype=np.float64)))
+    if w_s <= 0.0 or not vs_vals:
+        return j_vp
+    j_vs = float(np.mean(np.asarray(vs_vals, dtype=np.float64)))
+    return (j_vp + float(w_s) * j_vs) / (1.0 + float(w_s))
 
 
-def fit_p0(plugs: Sequence[PlugCalibRecord]) -> Tuple[Dict[int, HfuParams], Optional[OrientParams]]:
-    """Baseline M0."""
-    return fit_m0(plugs), None
+@dataclass(frozen=True)
+class FitResult:
+    """Fitted parameters plus optimizer diagnostics."""
+
+    params: Dict[int, HfuParams]
+    orient: Optional[OrientParams]
+    success: bool
+    message: str
+    fun: float
+    n_restarts: int
+
+
+def _finite_objective(fun: float) -> bool:
+    """True if objective value is usable."""
+    return bool(np.isfinite(fun))
+
+
+def run_minimize_checked(
+    objective,
+    x0: np.ndarray,
+    restarts: Sequence[np.ndarray],
+) -> Tuple[np.ndarray, bool, str, float, int]:
+    """
+    L-BFGS-B with restarts; require finite fun.
+
+    Returns (x_best, success, message, fun, n_restarts_used).
+    """
+    best_x = np.asarray(x0, dtype=np.float64).copy()
+    best_fun = float("inf")
+    best_ok = False
+    best_msg = "not_run"
+    n_used = 0
+    starts = [np.asarray(x0, dtype=np.float64)]
+    starts.extend(np.asarray(r, dtype=np.float64) for r in restarts)
+    for start in starts:
+        n_used += 1
+        res = minimize(objective, start, method="L-BFGS-B")
+        fun = float(res.fun) if res.fun is not None else float("nan")
+        ok = bool(res.success) and _finite_objective(fun)
+        if ok and fun < best_fun:
+            best_fun = fun
+            best_x = np.asarray(res.x, dtype=np.float64).copy()
+            best_ok = True
+            best_msg = str(res.message)
+        elif (not best_ok) and _finite_objective(fun) and fun < best_fun:
+            # Keep best finite even if optimizer flag failed.
+            best_fun = fun
+            best_x = np.asarray(res.x, dtype=np.float64).copy()
+            best_msg = "finite_but_flag_false:" + str(res.message)
+    if not _finite_objective(best_fun):
+        return best_x, False, "non_finite_objective", best_fun, n_used
+    return best_x, best_ok, best_msg, best_fun, n_used
+
+
+def fit_p0(plugs: Sequence[PlugCalibRecord]) -> FitResult:
+    """Baseline M0 (independent per-HFU Vp calibration)."""
+    params = fit_m0(plugs)
+    return FitResult(
+        params=params,
+        orient=None,
+        success=True,
+        message="m0_closed_form_lbfgs_per_hfu",
+        fun=data_loss(plugs, params, None, huber=False, w_s=0.0),
+        n_restarts=1,
+    )
 
 
 def fit_hierarchical_config(
@@ -200,25 +274,65 @@ def fit_hierarchical_config(
     cfg: FitConfig,
     lambda_alpha: float,
     lambda_s: float,
-) -> Tuple[Dict[int, HfuParams], Optional[OrientParams]]:
+) -> FitResult:
     """
-    Fit hierarchical (or global) model with optional Huber, orientation, Vs weight.
+    Fit hierarchical or global model with optional Huber, orientation, Vs weight.
 
-    Parameterization: logistic alpha/scale; hierarchy on unconstrained deltas;
-    scale penalty uses (log s_h - log s0)^2 via transformed values.
+    Global structure uses only (alpha, scale) [-- plus beta if orientation].
+    HFU structure uses logistic alpha/scale with hierarchy on (alpha_h - alpha0)
+    and (log s_h - log s0).
     """
-    if cfg.structure == "global":
-        hfus = [0]
-    else:
-        hfus = sorted({p.hfu for p in plugs})
-        if not hfus:
-            return {}, None
+    if not plugs:
+        return FitResult({}, None, False, "empty_plugs", float("nan"), 0)
 
     alpha_ct = float(np.median([p.alpha_ct for p in plugs]))
     u0 = inv_logistic(alpha_ct, ALPHA_BOUNDS[0], ALPHA_BOUNDS[1])
     v0 = inv_logistic(1.0, MATRIX_SCALE_BOUNDS[0], MATRIX_SCALE_BOUNDS[1])
 
-    # x = [u0, v0, du_h..., dv_h..., (beta_p, beta_s)?]
+    if cfg.structure == "global":
+        # Identifiable params only: u, v [, beta_p, beta_s]
+        x0_list = [u0, v0]
+        if cfg.orientation:
+            x0_list.extend([0.0, 0.0])
+        x0 = np.asarray(x0_list, dtype=np.float64)
+
+        def unpack_global(
+            x: np.ndarray,
+        ) -> Tuple[Dict[int, HfuParams], Optional[OrientParams], float, float]:
+            alpha = logistic_alpha(float(x[0]))
+            scale = logistic_scale(float(x[1]))
+            gp = HfuParams(alpha=alpha, scale=scale)
+            params = {p.hfu: gp for p in plugs}
+            params[0] = gp
+            orient = None
+            if cfg.orientation:
+                orient = OrientParams(beta_p=float(x[2]), beta_s=float(x[3]))
+            return params, orient, alpha, scale
+
+        def objective(x: np.ndarray) -> float:
+            params, orient, _, _ = unpack_global(x)
+            loss = data_loss(plugs, params, orient, cfg.huber, cfg.w_s)
+            if orient is not None:
+                loss += float(LAMBDA_BETA) * (orient.beta_p ** 2 + orient.beta_s ** 2)
+            return loss
+
+        restarts = [
+            np.asarray(x0, dtype=np.float64) + np.array(
+                [0.5, -0.5] + ([0.0, 0.0] if cfg.orientation else []),
+                dtype=np.float64,
+            )[: len(x0)],
+            np.asarray(
+                [inv_logistic(0.5, *ALPHA_BOUNDS), inv_logistic(0.8, *MATRIX_SCALE_BOUNDS)]
+                + ([0.0, 0.0] if cfg.orientation else []),
+                dtype=np.float64,
+            ),
+        ]
+        x_best, ok, msg, fun, n_re = run_minimize_checked(objective, x0, restarts)
+        params, orient, _, _ = unpack_global(x_best)
+        return FitResult(params, orient, ok, msg, fun, n_re)
+
+    # Hierarchical by HFU
+    hfus = sorted({p.hfu for p in plugs})
     x0_list = [u0, v0]
     for _ in hfus:
         x0_list.extend([0.0, 0.0])
@@ -226,9 +340,9 @@ def fit_hierarchical_config(
         x0_list.extend([0.0, 0.0])
     x0 = np.asarray(x0_list, dtype=np.float64)
 
-    n_h = len(hfus)
-
-    def unpack(x: np.ndarray) -> Tuple[Dict[int, HfuParams], Optional[OrientParams], float, float]:
+    def unpack_hfu(
+        x: np.ndarray,
+    ) -> Tuple[Dict[int, HfuParams], Optional[OrientParams], float, float]:
         u_g = float(x[0])
         v_g = float(x[1])
         alpha0 = logistic_alpha(u_g)
@@ -239,81 +353,109 @@ def fit_hierarchical_config(
             du = float(x[idx])
             dv = float(x[idx + 1])
             idx += 2
-            if cfg.structure == "global":
-                params[0] = HfuParams(alpha=logistic_alpha(u_g + du), scale=logistic_scale(v_g + dv))
-            else:
-                params[hfu] = HfuParams(
-                    alpha=logistic_alpha(u_g + du),
-                    scale=logistic_scale(v_g + dv),
-                )
+            params[hfu] = HfuParams(
+                alpha=logistic_alpha(u_g + du),
+                scale=logistic_scale(v_g + dv),
+            )
         orient = None
         if cfg.orientation:
             orient = OrientParams(beta_p=float(x[idx]), beta_s=float(x[idx + 1]))
-        # global fallback for missing HFU
-        if cfg.structure != "global":
-            params[0] = HfuParams(alpha=alpha0, scale=s0)
+        params[0] = HfuParams(alpha=alpha0, scale=s0)
         return params, orient, alpha0, s0
 
     def objective(x: np.ndarray) -> float:
-        params, orient, alpha0, s0 = unpack(x)
-        # map HFU params for plugs when global: all use params[0]
-        use_params = params
-        if cfg.structure == "global":
-            gp = params[0]
-            use_params = {p.hfu: gp for p in plugs}
-            use_params[0] = gp
-        loss = data_loss(plugs, use_params, orient, cfg.huber, cfg.w_s)
-        # hierarchy: deltas in probability space via alpha/s differences
+        params, orient, alpha0, s0 = unpack_hfu(x)
+        loss = data_loss(plugs, params, orient, cfg.huber, cfg.w_s)
         hier = 0.0
-        if cfg.structure == "hfu":
-            for hfu in hfus:
-                hp = params[hfu]
-                hier += float(lambda_alpha) * (hp.alpha - alpha0) ** 2
-                hier += float(lambda_s) * (np.log(hp.scale) - np.log(s0)) ** 2
+        for hfu in hfus:
+            hp = params[hfu]
+            hier += float(lambda_alpha) * (hp.alpha - alpha0) ** 2
+            hier += float(lambda_s) * (np.log(hp.scale) - np.log(s0)) ** 2
         if orient is not None:
             hier += float(LAMBDA_BETA) * (orient.beta_p ** 2 + orient.beta_s ** 2)
         return loss + hier
 
-    res = minimize(objective, x0, method="L-BFGS-B")
-    params, orient, _, _ = unpack(res.x)
-    if cfg.structure == "global":
-        gp = params[0]
-        params = {h: gp for h in sorted({p.hfu for p in plugs})}
-        params[0] = gp
-    return params, orient
+    restarts = [
+        np.asarray(x0, dtype=np.float64) * 0.0
+        + np.concatenate(
+            [
+                np.array([u0 + 0.3, v0 - 0.3], dtype=np.float64),
+                np.zeros(len(x0) - 2, dtype=np.float64),
+            ]
+        ),
+    ]
+    x_best, ok, msg, fun, n_re = run_minimize_checked(objective, x0, restarts)
+    params, orient, _, _ = unpack_hfu(x_best)
+    return FitResult(params, orient, ok, msg, fun, n_re)
 
 
-def select_lambda(
+def select_hyperparams(
     train_rows: Sequence[PlugRow],
     cfg: FitConfig,
-) -> Tuple[float, float]:
-    """Nested lambda pick with up to MAX_INNER depth groups."""
+    nested: bool,
+) -> Tuple[float, float, float]:
+    """
+    Nested pick of (lambda_alpha, lambda_s, w_s).
+
+    Global models skip lambda (unused). P3 with select_ws also searches w_s
+    inside the outer-fold training set only.
+    Selection score is Vp-only relative squared loss (primary gate).
+    """
+    if cfg.structure == "global":
+        return 0.0, 0.0, float(cfg.w_s)
+
+    w_grid: Sequence[float]
+    if cfg.select_ws:
+        w_grid = tuple(w for w in W_S_GRID if w > 0.0)
+    else:
+        w_grid = (float(cfg.w_s),)
+
+    if not nested:
+        # Fixed defaults for --fast; still allow explicit cfg.w_s.
+        if cfg.select_ws:
+            # Cheap default mid weight when not nesting.
+            return 1.0, 1.0, 0.5
+        return 1.0, 1.0, float(cfg.w_s)
+
     groups = sorted({r.group_id for r in train_rows})
     if len(groups) < 2:
-        return 1.0, 1.0
+        return 1.0, 1.0, float(w_grid[0])
     if len(groups) > MAX_INNER:
         idxs = np.linspace(0, len(groups) - 1, MAX_INNER)
         groups = sorted({groups[int(round(i))] for i in idxs})
 
-    best = (1.0, 1.0)
+    best = (1.0, 1.0, float(w_grid[0]))
     best_score = float("inf")
     for la in LAMBDA_GRID:
         for ls in LAMBDA_GRID:
-            scores: List[float] = []
-            for gid in groups:
-                tr = [r.record for r in train_rows if r.group_id != gid]
-                te = [r.record for r in train_rows if r.group_id == gid]
-                if not tr or not te:
+            for ws in w_grid:
+                scores: List[float] = []
+                trial_cfg = FitConfig(
+                    name=cfg.name,
+                    huber=cfg.huber,
+                    orientation=cfg.orientation,
+                    w_s=float(ws),
+                    structure=cfg.structure,
+                    select_ws=False,
+                )
+                for gid in groups:
+                    tr = [r.record for r in train_rows if r.group_id != gid]
+                    te = [r.record for r in train_rows if r.group_id == gid]
+                    if not tr or not te:
+                        continue
+                    fit = fit_hierarchical_config(tr, trial_cfg, la, ls)
+                    if not _finite_objective(fit.fun):
+                        continue
+                    # Vp-only score for hyperparameter selection.
+                    scores.append(
+                        score_holdout(te, fit.params, fit.orient, huber=False, w_s=0.0)
+                    )
+                if not scores:
                     continue
-                params, orient = fit_hierarchical_config(tr, cfg, la, ls)
-                # Select lambda by Vp-only OOF (primary criterion).
-                scores.append(score_holdout(te, params, orient, huber=False, w_s=0.0))
-            if not scores:
-                continue
-            m = float(np.mean(scores))
-            if m < best_score:
-                best_score = m
-                best = (float(la), float(ls))
+                m = float(np.mean(scores))
+                if m < best_score:
+                    best_score = m
+                    best = (float(la), float(ls), float(ws))
     return best
 
 
@@ -324,8 +466,8 @@ def score_holdout(
     huber: bool,
     w_s: float,
 ) -> float:
-    """Joint relative squared score (always sq for fair comparison)."""
-    return data_loss(plugs, params, orient, huber=False, w_s=max(w_s, 1.0e-12) if w_s > 0 else 0.0)
+    """Holdout score with consistent data_loss normalization."""
+    return data_loss(plugs, params, orient, huber=huber, w_s=w_s)
 
 
 def predict_table(
@@ -337,6 +479,9 @@ def predict_table(
     group_id: int,
     lambda_alpha: float,
     lambda_s: float,
+    w_s: float,
+    opt_success: bool,
+    opt_message: str,
 ) -> List[dict]:
     """Per-plug OOF predictions."""
     rows: List[dict] = []
@@ -360,6 +505,9 @@ def predict_table(
                 "beta_s": orient.beta_s if orient else 0.0,
                 "lambda_alpha": lambda_alpha,
                 "lambda_s": lambda_s,
+                "w_s": w_s,
+                "opt_success": int(opt_success),
+                "opt_message": opt_message,
                 "vp_lab_km_s": vp_lab,
                 "vs_lab_km_s": vs_lab,
                 "vpvs_lab": plug.vpvs_lab_z,
@@ -444,20 +592,40 @@ def wins_vs_p0(pred: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def build_configs(include_global: bool) -> List[FitConfig]:
-    """P0-P3 configurations (P3 expands w_s)."""
+def build_configs(include_global: bool, sweep_ws: bool) -> List[FitConfig]:
+    """
+    Core sequence: P0, P1, P2, P3 (inner w_s selection).
+
+    Optional --sweep-ws keeps fixed-weight exploratory P3_w* models.
+    """
     cfgs = [
         FitConfig("P0", huber=False, orientation=False, w_s=0.0, structure="hfu"),
         FitConfig("P1", huber=True, orientation=False, w_s=0.0, structure="hfu"),
         FitConfig("P2", huber=True, orientation=True, w_s=0.0, structure="hfu"),
+        FitConfig(
+            "P3",
+            huber=True,
+            orientation=True,
+            w_s=0.5,
+            structure="hfu",
+            select_ws=True,
+        ),
     ]
-    for w in W_S_GRID:
-        if w <= 0.0:
-            continue
-        name = "P3_w{:g}".format(w).replace(".", "p")
-        cfgs.append(
-            FitConfig(name, huber=True, orientation=True, w_s=float(w), structure="hfu")
-        )
+    if sweep_ws:
+        for w in W_S_GRID:
+            if w <= 0.0:
+                continue
+            name = "P3_w{:g}".format(w).replace(".", "p")
+            cfgs.append(
+                FitConfig(
+                    name,
+                    huber=True,
+                    orientation=True,
+                    w_s=float(w),
+                    structure="hfu",
+                    select_ws=False,
+                )
+            )
     if include_global:
         cfgs.append(
             FitConfig("G_huber", huber=True, orientation=False, w_s=0.0, structure="global")
@@ -490,29 +658,37 @@ def run_cv(
         for cfg in configs:
             t0 = time.time()
             if cfg.name == "P0":
-                params, orient = fit_p0(train_plugs)
-                la, ls = 0.0, 0.0
+                fit = fit_p0(train_plugs)
+                la, ls, ws = 0.0, 0.0, 0.0
             else:
-                if nested_lambda:
-                    la, ls = select_lambda(train_rows, cfg)
-                else:
-                    la, ls = 1.0, 1.0
-                params, orient = fit_hierarchical_config(train_plugs, cfg, la, ls)
+                la, ls, ws = select_hyperparams(train_rows, cfg, nested=nested_lambda)
+                fit_cfg = FitConfig(
+                    name=cfg.name,
+                    huber=cfg.huber,
+                    orientation=cfg.orientation,
+                    w_s=float(ws),
+                    structure=cfg.structure,
+                    select_ws=False,
+                )
+                fit = fit_hierarchical_config(train_plugs, fit_cfg, la, ls)
             pred_rows.extend(
                 predict_table(
                     test_plugs,
-                    params,
-                    orient,
+                    fit.params,
+                    fit.orient,
                     model=cfg.name,
                     fold_id=fold_id,
                     group_id=gid,
                     lambda_alpha=la,
                     lambda_s=ls,
+                    w_s=ws,
+                    opt_success=fit.success,
+                    opt_message=fit.message,
                 )
             )
             print(
-                "  {} {:.1f}s lambda=({:.3g},{:.3g})".format(
-                    cfg.name, time.time() - t0, la, ls
+                "  {} {:.1f}s lambda=({:.3g},{:.3g}) w_s={:g} ok={}".format(
+                    cfg.name, time.time() - t0, la, ls, ws, fit.success
                 ),
                 flush=True,
             )
@@ -521,17 +697,73 @@ def run_cv(
 
 def lexicographic_pick(summary: pd.DataFrame, tol_frac: float = 0.05) -> Optional[str]:
     """
-    Among models with MAPE Vp within tol of best, pick lowest MAE Vp/Vs.
-
-    Excludes P0 from 'candidate improvements' but reports winner name.
+    Among non-P0 models with MAPE Vp within tol of best non-P0, pick lowest MAE Vp/Vs.
     """
-    sub = summary.copy()
+    sub = summary[summary["model"] != "P0"].copy()
+    if sub.empty:
+        return None
     best_vp = float(sub["mape_vp_pct"].min())
     near = sub[sub["mape_vp_pct"] <= best_vp * (1.0 + tol_frac)]
     if near.empty:
         return None
     near = near.sort_values(["mae_vpvs", "mape_vp_pct"])
     return str(near.iloc[0]["model"])
+
+
+def acceptance_gate(
+    summary: pd.DataFrame,
+    win_sum: pd.DataFrame,
+    pred: pd.DataFrame,
+    n_groups: int,
+) -> pd.DataFrame:
+    """
+    Automatic acceptance gate vs P0.
+
+    Requires simultaneously:
+      - mape_vp <= P0
+      - mape_vs < P0 OR mae_vpvs < P0
+      - majority of depth groups beat P0 on mape_vp
+      - frac_alpha_at_bound <= P0
+      - opt_success rate >= 0.8 on OOF rows
+    """
+    p0 = summary[summary["model"] == "P0"]
+    if p0.empty:
+        return pd.DataFrame()
+    p0r = p0.iloc[0]
+    wins_map = {
+        str(r["model"]): int(r["n_groups_beats_p0_vp"])
+        for _, r in win_sum.iterrows()
+    }
+    rows: List[dict] = []
+    for _, row in summary.iterrows():
+        model = str(row["model"])
+        if model == "P0":
+            continue
+        sub = pred[pred["model"] == model]
+        opt_rate = float(np.mean(sub["opt_success"])) if len(sub) and "opt_success" in sub else 1.0
+        n_win = int(wins_map.get(model, 0))
+        vp_ok = float(row["mape_vp_pct"]) <= float(p0r["mape_vp_pct"])
+        vs_ok = (float(row["mape_vs_pct"]) < float(p0r["mape_vs_pct"])) or (
+            float(row["mae_vpvs"]) < float(p0r["mae_vpvs"])
+        )
+        maj_ok = n_win > (n_groups / 2.0)
+        bound_ok = float(row["frac_alpha_at_bound"]) <= float(p0r["frac_alpha_at_bound"])
+        opt_ok = opt_rate >= 0.8
+        accepted = bool(vp_ok and vs_ok and maj_ok and bound_ok and opt_ok)
+        rows.append(
+            {
+                "model": model,
+                "vp_le_p0": int(vp_ok),
+                "vs_or_vpvs_improved": int(vs_ok),
+                "majority_groups": int(maj_ok),
+                "bounds_le_p0": int(bound_ok),
+                "opt_success_rate_ge_0p8": int(opt_ok),
+                "n_groups_beats_p0_vp": n_win,
+                "opt_success_rate": opt_rate,
+                "accepted": int(accepted),
+            }
+        )
+    return pd.DataFrame(rows).sort_values("model").reset_index(drop=True)
 
 
 def main() -> None:
@@ -553,6 +785,11 @@ def main() -> None:
         help="Also compare global (+ orientation) structures.",
     )
     parser.add_argument(
+        "--sweep-ws",
+        action="store_true",
+        help="Also run fixed-weight exploratory P3_w* models (not nested w_s).",
+    )
+    parser.add_argument(
         "--only",
         type=str,
         default="",
@@ -561,11 +798,13 @@ def main() -> None:
     args = parser.parse_args()
 
     clear_pred_cache()
-    out_dir = OUT_ROOT
+    out_dir = OUT_ROOT / "v2"
     if args.exclude_f2911v:
-        out_dir = OUT_ROOT / "robust_no_f2911v"
+        out_dir = out_dir / "robust_no_f2911v"
     if not args.fast:
         out_dir = out_dir / "nested"
+    else:
+        out_dir = out_dir / "fast"
     tables = out_dir / "tables"
     tables.mkdir(parents=True, exist_ok=True)
 
@@ -577,14 +816,14 @@ def main() -> None:
         str(r["ct_sample_id"]): float(r["ct_depth_m"]) for _, r in lab_val.iterrows()
     }
     rows = assign_depth_groups(plugs, depth_by_id)
-    configs = build_configs(include_global=args.with_global)
+    configs = build_configs(include_global=args.with_global, sweep_ws=args.sweep_ws)
     if args.only.strip():
         wanted = {s.strip() for s in args.only.split(",") if s.strip()}
         configs = [c for c in configs if c.name in wanted]
         if not configs:
             raise ValueError("No configs matched --only={}".format(args.only))
 
-    print("=== P0-P3 POC ===")
+    print("=== P0-P3 POC v2 (corrected) ===")
     print(
         "plugs={} groups={} nested={} configs={}".format(
             len(rows),
@@ -603,6 +842,8 @@ def main() -> None:
         .sum()
         .rename(columns={"beats_p0_vp": "n_groups_beats_p0_vp"})
     )
+    n_groups = int(len({r.group_id for r in rows}))
+    gate = acceptance_gate(summary, win_sum, pred, n_groups=n_groups)
     lex = lexicographic_pick(summary)
 
     p0 = summary[summary["model"] == "P0"].iloc[0]
@@ -610,25 +851,43 @@ def main() -> None:
     summary["d_mape_vp_vs_p0"] = summary["mape_vp_pct"] - float(p0["mape_vp_pct"])
     summary["d_joint_vs_p0"] = summary["joint_rel_sq"] - float(p0["joint_rel_sq"])
 
+    # Median selected w_s for P3 across folds (diagnostic only).
+    p3_ws_median = float("nan")
+    if "P3" in set(pred["model"]) and "w_s" in pred.columns:
+        p3_ws_median = float(np.median(pred.loc[pred["model"] == "P3", "w_s"]))
+
     pred.to_csv(tables / "oof_predictions.csv", index=False, float_format="%.6f")
     summary.to_csv(tables / "summary_metrics.csv", index=False, float_format="%.6f")
     by_orient.to_csv(tables / "summary_by_orientation.csv", index=False, float_format="%.6f")
     wins.to_csv(tables / "group_mape_vp.csv", index=False, float_format="%.6f")
     win_sum.to_csv(tables / "wins_vs_p0.csv", index=False)
+    gate.to_csv(tables / "acceptance_gate.csv", index=False, float_format="%.6f")
 
+    accepted_models = [
+        str(r["model"]) for _, r in gate.iterrows() if int(r["accepted"]) == 1
+    ]
     meta = {
         "well_id": "861",
+        "version": "v2_corrected",
         "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "nested_lambda": (not args.fast),
         "exclude_samples": exclude,
         "huber_delta": HUBER_DELTA,
         "lambda_beta": LAMBDA_BETA,
         "w_s_grid": list(W_S_GRID),
+        "p3_median_w_s_oof": p3_ws_median,
         "lexicographic_winner": lex,
-        "criterion": (
-            "Keep increment if Vp OOF <= P0 and Vs or Vp/Vs improves; "
-            "majority of depth groups; less bound hitting."
-        ),
+        "accepted_models": accepted_models,
+        "production_reference": "P0",
+        "fixes": [
+            "data_loss normalized as (J_vp + w_s*J_vs)/(1+w_s)",
+            "global model uses identifiable (alpha, scale) only",
+            "global skips lambda selection",
+            "P3 selects w_s inside outer-fold training",
+            "optimizer success/finite checks with restarts",
+            "acceptance gate implemented (not docstring-only)",
+            "lexicographic_pick excludes P0",
+        ],
         "pred_cache_size": len(_PRED_CACHE),
     }
     with open(out_dir / "metrics.json", "w", encoding="ascii") as handle:
@@ -648,9 +907,12 @@ def main() -> None:
     print(summary[cols].to_string(index=False))
     print("\n--- wins vs P0 (MAPE Vp) ---")
     print(win_sum.to_string(index=False))
+    print("\n--- acceptance gate ---")
+    print(gate.to_string(index=False))
     print("\n--- by orientation ---")
     print(by_orient.to_string(index=False))
-    print("\nlexicographic pick:", lex)
+    print("\nlexicographic pick (non-P0):", lex)
+    print("accepted models:", accepted_models)
     print("Output:", out_dir)
 
 

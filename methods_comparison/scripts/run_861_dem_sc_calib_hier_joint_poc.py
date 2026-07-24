@@ -124,21 +124,31 @@ def joint_data_loss(
     params_by_hfu: Dict[int, HfuParams],
     use_vs: bool,
 ) -> float:
-    """Mean relative squared error over plugs (Vp, optional Vs)."""
+    """
+    Mean relative squared error over plugs.
+
+    If use_vs: J = (J_vp + J_vs) / 2  (equal weight, consistent with w_s=1).
+    Else: J = J_vp.
+    """
     if not plugs:
         return float("nan")
-    vals: List[float] = []
+    vp_vals: List[float] = []
+    vs_vals: List[float] = []
     for plug in plugs:
         hp = params_by_hfu.get(plug.hfu)
         if hp is None:
             continue
         vp_p, vs_p = _predict_vp_vs(plug, hp.alpha, hp.scale)
-        vals.append(_rel_sq_err(vp_p, plug.vp_lab_z_km_s))
+        vp_vals.append(_rel_sq_err(vp_p, plug.vp_lab_z_km_s))
         if use_vs:
-            vals.append(_rel_sq_err(vs_p, plug.vs_lab_z_km_s))
-    if not vals:
+            vs_vals.append(_rel_sq_err(vs_p, plug.vs_lab_z_km_s))
+    if not vp_vals:
         return float("nan")
-    return float(np.mean(np.asarray(vals, dtype=np.float64)))
+    j_vp = float(np.mean(np.asarray(vp_vals, dtype=np.float64)))
+    if not use_vs or not vs_vals:
+        return j_vp
+    j_vs = float(np.mean(np.asarray(vs_vals, dtype=np.float64)))
+    return (j_vp + j_vs) / 2.0
 
 
 def assign_depth_groups(
@@ -315,6 +325,16 @@ def fit_hierarchical(
         return data + hier
 
     res = minimize(objective, x0, method="L-BFGS-B", bounds=bounds)
+    if not bool(res.success):
+        # One restart from CT median / unit scale if primary solve fails.
+        x1 = np.asarray(x0, dtype=np.float64).copy()
+        res2 = minimize(objective, x1 * 0.0 + x0, method="L-BFGS-B", bounds=bounds)
+        if bool(res2.success) or (
+            np.isfinite(res2.fun) and (not np.isfinite(res.fun) or res2.fun < res.fun)
+        ):
+            res = res2
+    if not np.isfinite(float(res.fun)):
+        raise RuntimeError("hierarchical fit produced non-finite objective")
     alpha0, s0, da, ds = _unpack_hier_x(res.x, hfus)
     params = _params_from_hier(alpha0, s0, da, ds)
     # Ensure global defaults exist for missing HFUs (e.g. held-out HFU3).
@@ -336,6 +356,7 @@ def select_lambda_nested(
 
     Uses up to max_inner_folds evenly spaced train groups for speed while
     remaining nested (lambdas chosen without the outer holdout).
+    Score matches the model definition (Vp-only for M2, Vp+Vs for M3).
     """
     groups = sorted({r.group_id for r in train_rows})
     if len(groups) < 2:
@@ -369,7 +390,7 @@ def select_lambda_nested(
                     lambda_alpha=la,
                     lambda_s=ls,
                 )
-                score = score_holdout(inner_test, params, use_vs=True)
+                score = score_holdout(inner_test, params, use_vs=use_vs)
                 if np.isfinite(score):
                     fold_scores.append(score)
             if not fold_scores:
