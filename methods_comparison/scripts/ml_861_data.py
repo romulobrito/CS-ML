@@ -142,6 +142,10 @@ LEAKAGE_FOR_VP_RESIDUAL: Tuple[str, ...] = (
     "vp_hybrid_km_s",
     "dtco_usft",
     "dtsm_usft",
+    # Phi_Sonic is a Wyllie transform of the same DTCO that defines the
+    # residual target (fit: dt_ma=47.3, dt_fl=191.1 us/ft, R2=0.991), so it
+    # leaks the target. It stays a valid feature for non-sonic targets.
+    "Phi_Sonic (pu)",
 )
 
 # Etapa 1f: CLP-CSGM phi_lab profile reconstruction (861 MOGNO)

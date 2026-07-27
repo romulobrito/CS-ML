@@ -140,7 +140,7 @@
     (campo Lapa)}\\[0.18cm]
     {\usebeamerfont{subtitle}\bfseries Modelagem física DEM/SC calibrada por HFU}\\[0.12cm]
     {\large Etapa~2 --- laboratório, perfil sónico e saturação}\\[0.22cm]
-    {\usebeamerfont{author} Rômulo Brito da Silva}\\[0.08cm]
+    {\usebeamerfont{author} Romulo Brito da Silva}\\[0.08cm]
     {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
     {\usebeamerfont{date} Junho de 2026}\\[0.18cm]
     {\footnotesize
@@ -243,7 +243,7 @@
     Perfil integrado & \phiND{}, HFU, profundidade & 87 & $\sim$28~m \\
     Plugs microCT & geometria de poros, \philab{} & 10 & pontual \\
     ROCKPHYS (Velocity) & \Vp{}, \Vs{} de laboratório & 28 & plugs \\
-    Sónico DSI (DLIS) & DTCO/DTSM \emph{in situ} & 190 & contínuo \\
+    Sónico DSI (DLIS) & DTCO/DTSM \emph{in situ} & 182 & contínuo \\
     CMR/ECS (DLIS) & CMFF, BFV (macro/micro) & 152 & contínuo \\
     \bottomrule
   \end{tabular}
@@ -305,7 +305,7 @@
     src/.style={
       draw, thick, rounded corners=3pt, align=center,
       text width=3.5cm, inner sep=3pt, font=\scriptsize,
-      minimum height=1.95cm
+      minimum height=1.70cm
     },
     midbox/.style={
       draw=po861blue, thick, rounded corners=3pt, fill=po861blue!12,
@@ -329,19 +329,19 @@
       $\phi = \philab{}$\\
       \Vp{}, \Vs{} de referência; HFU
     };
-    \node[midbox] (dem) at (2.4,-2.25) {%
+    \node[midbox] (dem) at (2.4,-1.95) {%
       \textbf{DEM / SC} --- inclusões secas
       $\rightarrow$ $K_{\mathrm{dry}}$, $G_{\mathrm{dry}}$
       $\rightarrow$ \Vp{} previsto
     };
-    \node[resultbox] (cmp) at (2.4,-3.55) {%
+    \node[resultbox] (cmp) at (2.4,-3.10) {%
       Compara com \Vp{} \textbf{lab}
       (não com ``\Vp{} da imagem'')
     };
-    \draw[arr] (ct.south) -- ++(0,-0.28) -| (dem.north);
-    \draw[arr] (lab.south) -- ++(0,-0.28) -| (dem.north);
+    \draw[arr] (ct.south) -- ++(0,-0.24) -| (dem.north);
+    \draw[arr] (lab.south) -- ++(0,-0.24) -| (dem.north);
     \draw[arr] (dem) -- (cmp);
-    \node[note] at (2.4,-4.25) {%
+    \node[note] at (2.4,-3.75) {%
       No \textbf{perfil} (87 linhas): $\phi=\phiND{}$;
       do CT herdam-se só parâmetros \textbf{por HFU}.
     };
@@ -368,7 +368,7 @@
         \item Solido~1 $\rightarrow$ calcita; Solido~2 $\rightarrow$ dolomita
               (VRH; normalizado no CT).
         \item $\alpha$ inicial $=$ mediana microCT por HFU;
-              depois calibração em $[0{,}05,\,0{,}95]$.
+              depois calibração em $[0{,}15,\,0{,}95]$.
         \item HFU~4 sem plugs: \emph{fallback} (média HFU~2 e~3).
       \end{itemize}
     \end{block}
@@ -591,12 +591,13 @@
       \toprule
       Métrica & Valor \\
       \midrule
-      MAPE \Vp{} & 26,0\% \\
-      RMSE & 1,36~km/s \\
-      Viés & $+1{,}20$~km/s \\
+      MAPE \Vp{} & 26,3\% \\
+      RMSE & 1,37~km/s \\
+      Viés & $+1{,}22$~km/s \\
       $n$ & 10 plugs \\
       \bottomrule
     \end{tabular}
+    \par
     \vspace{0.10cm}
     {\scriptsize Um único $\alpha$ global não basta:
     a dispersão por HFU já aparece nesta linha de base.}
@@ -611,7 +612,8 @@
     \column{0.48\textwidth}
     \footnotesize
     Ajuste de $\alpha$, $K_{\mathrm{scale}}$ e $G_{\mathrm{scale}}$
-    \textbf{por HFU} (limites $\alpha \in [0{,}05,\,0{,}95]$).
+    \textbf{por HFU} (limites $\alpha \in [0{,}15,\,0{,}95]$).
+    \par
     \vspace{0.06cm}
     \scriptsize
     \setlength{\tabcolsep}{3pt}
@@ -620,11 +622,12 @@
       HFU & $n$ & $\alpha_{\mathrm{cal}}$ & $\alpha_{\mathrm{CT}}$ \\
       \midrule
       1 & 4 & 0,95 & 0,55 \\
-      2 & 4 & 0,19 & 0,55 \\
-      3 & 2 & 0,95 & --- \\
+      2 & 4 & 0,18 & 0,55 \\
+      3 & 2 & 0,95 & 0,61 \\
       4 & 0 & fallback & --- \\
       \bottomrule
     \end{tabular}
+    \par
     \vspace{0.08cm}
     {\scriptsize HFU~1 e~3 saturam no teto (0,95): limite do modelo,
     não geometria CT. HFU~2 é o caso mais sustentado.}
@@ -655,7 +658,9 @@
       \scriptsize
       Gap $\approx 6$~p.p.\ entre in-sample e LOO:
       diferença esperada com $n=10$.
-      Viés LOO quase nulo no lab seco.
+      Viés LOO quase nulo: o erro é dispersão, não deslocamento.
+      Métrica mais severa do conjunto --- retirar um plug remove
+      25--50\% do suporte da sua HFU.
     \end{block}
     \column{0.54\textwidth}
     \slidefigure[0.82]{fig2_vp_calib_before_after}{Antes versus depois da
@@ -676,14 +681,16 @@
       Modelo & Escopo & MAPE & RMSE \\
       \midrule
       M1 & In-sample & 9,1 & 0,52 \\
-      M2b forward & In-sample & 9,1 & 0,55 \\
+      M2b forward & In-sample & 8,7 & 0,54 \\
       M1 & LOO & 14,8 & 0,85 \\
-      M2b forward & LOO & 12,3 & 0,76 \\
+      M2b forward & LOO & 12,0 & 0,78 \\
       \bottomrule
     \end{tabular}
+    \par
     \vspace{0.08cm}
     {\scriptsize Oracle ($\approx 3\%$) é teto diagnóstico, não previsão.
-    Forward LOO ganha 2,5~p.p.\ \textbf{sem} melhora in-sample.}
+    Forward LOO ganha 2,9~p.p., mas in-sample melhora só 0,4~p.p.\ e o
+    RMSE piora.}
     \begin{exampleblock}{Decisão}
       \scriptsize Manter $\alpha$ efetivo por HFU no produto de 87 linhas.
     \end{exampleblock}
@@ -715,7 +722,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Contra o DSI a seco: MAPE $\approx 16\%$, viés $+0{,}62$~km/s}
+\begin{frame}{Contra o DSI a seco: MAPE $\approx 9\%$, viés $+0{,}30$~km/s}
   \begin{columns}[T,onlytextwidth]
     \column{0.40\textwidth}
     \footnotesize
@@ -727,23 +734,25 @@
       \toprule
       Métrica & Valor \\
       \midrule
-      MAPE \Vp{} & 16,2\% \\
-      RMSE & 0,85~km/s \\
-      Viés & $+0{,}62$~km/s \\
+      MAPE \Vp{} & 8,7\% \\
+      RMSE & 0,54~km/s \\
+      Viés & $+0{,}30$~km/s \\
       \Vp{} DEM médio & 5,20~km/s \\
-      \Vp{} sónico médio & 4,58~km/s \\
+      \Vp{} sónico médio & 4,90~km/s \\
       \bottomrule
     \end{tabular}
+    \par
     \vspace{0.08cm}
-    {\scriptsize Modelo sistematicamente mais rápido que o sónico
-    \emph{in situ}.}
+    {\scriptsize O viés responde por $\approx 3/4$ do erro absoluto:
+    o modelo é sistematicamente mais rápido que o sónico \emph{in situ},
+    não apenas ruidoso.}
     \column{0.58\textwidth}
     \slidefigure[0.82]{fig2_vp_dem_vs_sonic_depth}{Trilha de profundidade:
     DEM seco versus sónico DSI.}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Por HFU: confiar na HFU~2; cautela na HFU~4}
+\begin{frame}{Por HFU: o erro segue o número de plugs de calibração}
   \footnotesize
   O erro global esconde heterogeneidade forte entre unidades.
   \vspace{0.08cm}
@@ -751,20 +760,21 @@
     \column{0.48\textwidth}
     \centering
     \scriptsize
-    \begin{tabular}{cccc}
+    \begin{tabular}{ccccc}
       \toprule
-      HFU & $n$ & MAPE (\%) & Nota \\
+      HFU & $n$ & Plugs & MAPE (\%) & Nota \\
       \midrule
-      1 & 42 & 19,7 & ressalvas \\
-      2 & 29 & 7,9 & \textbf{benchmark} \\
-      3 & 10 & 13,1 & 2 plugs \\
-      4 & 6 & 37,2 & sem calibração \\
+      1 & 42 & 4 & 8,0 & utilizável \\
+      2 & 29 & 4 & 3,3 & \textbf{benchmark} \\
+      3 & 10 & 2 & 13,6 & ressalvas \\
+      4 & 6 & 0 & 30,4 & sem calibração \\
       \bottomrule
     \end{tabular}
     \vspace{0.10cm}
     \begin{block}{Uso interpretativo}
       \scriptsize
-      HFU~2: produto preferencial.
+      A gradação 3\%--30\% acompanha o suporte experimental:
+      o gargalo é amostragem de laboratório, não formulação física.
       HFU~4: não entregar sem novos plugs.
     \end{block}
     \column{0.50\textwidth}
@@ -776,7 +786,7 @@
 % ------------------------------------------------------------------
 \section{Gassmann e multiescala NMR}
 
-\begin{frame}{Fase~2b: Gassmann reduz pouco o viés ($+0{,}59$~km/s)}
+\begin{frame}{Fase~2b: Gassmann leva o MAPE a $\approx 7\%$, viés persiste}
   \begin{columns}[T,onlytextwidth]
     \column{0.42\textwidth}
     \footnotesize
@@ -788,20 +798,23 @@
       \toprule
       Condição & MAPE & RMSE & Viés \\
       \midrule
-      DEM seco & 16,2 & 0,85 & $+0{,}62$ \\
-      + Gassmann & 15,4 & 0,81 & $+0{,}59$ \\
+      DEM seco & 8,7 & 0,54 & $+0{,}30$ \\
+      + Gassmann & 7,3 & 0,48 & $+0{,}27$ \\
       \bottomrule
     \end{tabular}
+    \par
     \vspace{0.10cm}
-    {\scriptsize Fluido explica \emph{parte} do gap seca/saturada,
-    não o fecha. Motivação para resíduo (Etapa~3).}
+    {\scriptsize Com $\phi \approx 11\%$ e arcabouço rígido, o ganho em
+    $K_{\mathrm{sat}}$ é quase anulado pelo aumento de densidade.
+    O fluido explica \emph{parte} do gap, não o fecha ---
+    motivação para o resíduo (Etapa~3).}
     \column{0.56\textwidth}
     \slidefigure[0.82]{fig2_vp_dry_gassmann_sonic_depth}{Sónico, DEM seco e
     DEM + Gassmann ao longo da profundidade.}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Fase~2g: NMR ponto a ponto --- ganho abaixo do limiar}
+\begin{frame}{Fase~2g: NMR ponto a ponto --- centra o erro, mas o espalha}
   \footnotesize
   Hipótese: frações CMR (CMFF/BFV) resolvem a fragilidade das medianas CT por HFU.
   \vspace{0.04cm}
@@ -819,12 +832,14 @@
       \toprule
       Modelo & MAPE & Viés & $r$ \\
       \midrule
-      M1 Gassmann & 15,4 & $+0{,}59$ & $-0{,}17$ \\
-      M3 NMR & 14,0 & $+0{,}30$ & $-0{,}13$ \\
+      M1 Gassmann & 7,3 & $+0{,}27$ & $+0{,}42$ \\
+      M3 NMR & 8,5 & $+0{,}04$ & $+0{,}45$ \\
       \bottomrule
     \end{tabular}
+    \par
     \vspace{0.06cm}
-    {\scriptsize $\Delta$MAPE $\approx 1{,}3$~p.p.\ $<$ limiar 2~p.p.
+    {\scriptsize M3 quase zera o viés, mas o MAPE \textbf{piora}
+    1,2~p.p.\ --- troca acerto sistemático por dispersão.
     CMR vs CT nos plugs: $r \approx -0{,}30$.}
     \begin{exampleblock}{Decisão}
       \scriptsize Manter monoescala Gassmann no produto de 87 linhas.
@@ -835,7 +850,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Por que o ganho NMR foi marginal: só um ``botão'' mudou}
+\begin{frame}{Por que o NMR não ganhou: só um ``botão'' mudou}
   \footnotesize
   Teste A/B: liberar \textbf{apenas} as frações contínuas; manter o resto igual ao M1.
   \vspace{0.08cm}
@@ -884,7 +899,7 @@
   \end{columns}
   \vspace{0.06cm}
   {\scriptsize Centro: $\alpha$ manda na ``moleza'' elástica; mudar só frações
-  move pouco o \Vp{} $\Rightarrow$ ganho $\approx 1{,}3$~p.p.}
+  redistribui o \Vp{} sem reduzir o erro $\Rightarrow$ MAPE piora 1,2~p.p.}
 \end{frame}
 
 \begin{frame}{Decisão multiescala: limiar de 2~p.p.}
@@ -927,15 +942,15 @@
   \vspace{0.08cm}
   \begin{exampleblock}{No 861}
     \scriptsize
-    2f: forward sem ganho in-sample claro.
-    2g: $\Delta \approx 1{,}3$~p.p.\ $< 2$~p.p.
+    2f: forward ganha 0,4~p.p.\ in-sample.
+    2g: MAPE piora 1,2~p.p.
     Produto: monoescala Gassmann + $\alpha$ efetivo por HFU.
   \end{exampleblock}
 \end{frame}
 
 \begin{frame}{Síntese das validações de \Vp{}}
   \footnotesize
-  Patamar honesto: MAPE 14--16\%; viés muda de sinal do lab para o perfil.
+  Dois regimes de erro: dispersão no lab, viés no perfil.
   \vspace{0.08cm}
   \centering
   \scriptsize
@@ -943,19 +958,20 @@
     \toprule
     Escala & MAPE (\%) & RMSE & Viés & $n$ \\
     \midrule
-    Lab, sem calibração & 26,0 & 1,36 & $+1{,}20$ & 10 \\
+    Lab, sem calibração & 26,3 & 1,37 & $+1{,}22$ & 10 \\
     Lab, in-sample & 9,1 & 0,52 & $-0{,}01$ & 10 \\
     Lab, LOO & 14,8 & 0,85 & $-0{,}07$ & 10 \\
-    Perfil DSI (seco) & 16,2 & 0,85 & $+0{,}62$ & 87 \\
-    Perfil DSI (Gassmann) & 15,4 & 0,81 & $+0{,}59$ & 87 \\
-    Perfil DSI (NMR M3) & 14,0 & 0,74 & $+0{,}30$ & 87 \\
+    Perfil DSI (seco) & 8,7 & 0,54 & $+0{,}30$ & 87 \\
+    Perfil DSI (Gassmann) & 7,3 & 0,48 & $+0{,}27$ & 87 \\
+    Perfil DSI (NMR M3) & 8,5 & 0,47 & $+0{,}04$ & 87 \\
     \bottomrule
   \end{tabular}
   \vspace{0.12cm}
   \begin{block}{Mensagem}
     \scriptsize
-    Física localmente consistente após calibração por HFU; gap residual
-    contra o DSI persiste --- alvo da Etapa~3, não motivo para abandonar DEM/SC.
+    No lab o erro é dispersão com viés nulo (dez plugs, três conjuntos de
+    parâmetros); no perfil é viés positivo dominante. A segunda falha é a
+    mais tratável --- alvo da Etapa~3, não motivo para abandonar DEM/SC.
   \end{block}
 \end{frame}
 
@@ -965,18 +981,20 @@
 \begin{frame}{Conclusões e recomendações}
   \footnotesize
   \begin{enumerate}
-    \item \textbf{Viabilidade local:} DEM/SC por HFU fecha o lab (LOO
-          $\approx 15\%$) e o perfil seco ($\approx 16\%$); melhor em
-          \VpVs{} do que em \Vp{} absoluto.
-    \item \textbf{Uso por HFU:} priorizar HFU~2; ressalvas em HFU~1 e~3;
-          evitar HFU~4 sem novos plugs.
+    \item \textbf{Viabilidade local:} DEM/SC por HFU fecha o perfil
+          ($\approx 9\%$ seco, $\approx 7\%$ com Gassmann) e o lab sob a
+          métrica mais severa (LOO $\approx 15\%$).
+    \item \textbf{Uso por HFU:} 3\% (HFU~2), 8\% (HFU~1), 14\% (HFU~3),
+          30\% (HFU~4) --- o erro segue o número de plugs; evitar HFU~4
+          sem novos dados.
     \item \textbf{Entrada:} manter \phiND{}; microCT na geometria, não no ML.
     \item \textbf{Multiescala (2f/2g):} CT forward e NMR ponto a ponto não
           superam o limiar de 2~p.p.\ --- manter monoescala Gassmann.
-    \item \textbf{Gassmann:} melhora parcial do viés ($+0{,}62 \rightarrow
-          +0{,}59$~km/s); não fecha o gap.
+    \item \textbf{Gassmann:} MAPE 8,7\% $\rightarrow$ 7,3\%, viés
+          $+0{,}30 \rightarrow +0{,}27$~km/s; melhora consistente,
+          sem fechar o gap.
     \item \textbf{Etapa~3:} ML sobre o \emph{resíduo} (sónico $-$ física),
-          com prioridade nas HFU~1 e~4 --- sem substituir a cadeia DEM/SC.
+          com prioridade nas HFU~3 e~4 --- sem substituir a cadeia DEM/SC.
   \end{enumerate}
 \end{frame}
 

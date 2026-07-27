@@ -48,6 +48,7 @@ from clp_861_plug_fixed_runner import (  # noqa: E402
 from clp_861_protocol import load_plug_measurement_rows, plug_row_indices_unique  # noqa: E402
 from ml_861_data import (  # noqa: E402
     DEPTH_COL,
+    LEAKAGE_FOR_VP_RESIDUAL,
     LOG_FEATURE_COLUMNS,
     RESIDUAL_VP_FEATURE_EXTRA,
     RESIDUAL_VP_TARGET,
@@ -120,8 +121,10 @@ class VpClpCvResult:
 
 
 def vp_clp_u_channels() -> Tuple[str, ...]:
-    """Dense u channels: eight wireline logs plus Vp Gassmann."""
-    return tuple(LOG_FEATURE_COLUMNS) + tuple(RESIDUAL_VP_FEATURE_EXTRA)
+    """Dense u channels: wireline logs plus Vp Gassmann, minus leakage columns."""
+    cols = tuple(LOG_FEATURE_COLUMNS) + tuple(RESIDUAL_VP_FEATURE_EXTRA)
+    leak = set(LEAKAGE_FOR_VP_RESIDUAL)
+    return tuple(c for c in cols if c not in leak)
 
 
 def encode_zero_residual_z0(

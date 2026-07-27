@@ -1,0 +1,12 @@
+{
+  "well_id": "861",
+  "description": "Default PVT / fluid properties for Gassmann phase 2b (MOGNO carbonate).",
+  "fluid_name": "formation_brine",
+  "kf_gpa": 2.2,
+  "rho_fluid_gcc": 1.03,
+  "sw": 1.0,
+  "pressure_mpa": 22.1,
+  "temperature_c": 60.0,
+  "source_note": "Planning default Kf~2.2 GPa for formation water/brine; no dedicated PVT file in repo.",
+  "generated_utc": "2026-06-15T00:00:00Z"
+}

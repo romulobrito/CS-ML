@@ -33,14 +33,10 @@ from dem_sc_861_calibrate import (
     MATRIX_SCALE_BOUNDS,
     PlugCalibRecord,
     build_plug_records,
-    calibrate_hfu_alpha_matrix_scale,
-    calibrate_hfu_alpha_only,
-    choose_best_scenario,
 )
 from dem_sc_861_core import run_plug_case
 from ml_861_data import load_ct_samples
 from run_861_dem_sc_calib_hier_joint_poc import (
-    DEPTH_TOL_M,
     LAB_VAL_CSV,
     assign_depth_groups,
     clear_pred_cache,
@@ -48,7 +44,6 @@ from run_861_dem_sc_calib_hier_joint_poc import (
     HfuParams,
     PlugRow,
     resolve_params_for_hfu,
-    _fallback_params,
     _PRED_CACHE,
 )
 
@@ -67,6 +62,9 @@ LAMBDA_GRID = (0.1, 1.0, 10.0, 100.0)
 W_S_GRID = (0.0, 0.05, 0.10, 0.25, 0.50, 1.0)
 LAMBDA_BETA = 10.0
 MAX_INNER = 3
+INNER_VP_TOL_PCT = 0.5
+GATE_VP_TOL_PCT = 0.5
+SENSITIVITY_MARGIN_TOL_PCT = 0.5
 
 
 @dataclass(frozen=True)
@@ -217,6 +215,11 @@ class FitResult:
 def _finite_objective(fun: float) -> bool:
     """True if objective value is usable."""
     return bool(np.isfinite(fun))
+
+
+def _usable_fit(fit: FitResult) -> bool:
+    """Only converged finite fits may influence model selection."""
+    return bool(fit.success) and _finite_objective(fit.fun)
 
 
 def run_minimize_checked(
@@ -389,6 +392,41 @@ def fit_hierarchical_config(
     return FitResult(params, orient, ok, msg, fun, n_re)
 
 
+def pick_inner_candidate(
+    candidates: Sequence[dict],
+    vp_tol_pct: float = INNER_VP_TOL_PCT,
+) -> Tuple[float, float, float]:
+    """
+    Pick one inner-CV candidate without using the outer holdout.
+
+    The Vp tolerance is absolute in percentage points, not a relative fraction.
+    """
+    if not candidates:
+        raise ValueError("candidates must not be empty")
+    best_vp = min(float(c["mape_vp_pct"]) for c in candidates)
+    near = [
+        c
+        for c in candidates
+        if float(c["mape_vp_pct"]) <= best_vp + float(vp_tol_pct)
+    ]
+    winner = min(
+        near,
+        key=lambda c: (
+            float(c["mape_vs_pct"]),
+            float(c["mae_vpvs"]),
+            float(c["mape_vp_pct"]),
+            float(c["w_s"]),
+            float(c["lambda_alpha"]),
+            float(c["lambda_s"]),
+        ),
+    )
+    return (
+        float(winner["lambda_alpha"]),
+        float(winner["lambda_s"]),
+        float(winner["w_s"]),
+    )
+
+
 def select_hyperparams(
     train_rows: Sequence[PlugRow],
     cfg: FitConfig,
@@ -399,14 +437,20 @@ def select_hyperparams(
 
     Global models skip lambda (unused). P3 with select_ws also searches w_s
     inside the outer-fold training set only.
-    Selection score is Vp-only relative squared loss (primary gate).
+    P3 selection is lexicographic:
+      1. retain candidates within 0.5 percentage point of best Vp MAPE;
+      2. minimize Vs MAPE;
+      3. minimize Vp/Vs MAE.
+
+    Vp-only models select lambdas strictly by Vp MAPE.
+    A candidate is rejected if any inner-fold optimization does not converge.
     """
     if cfg.structure == "global":
         return 0.0, 0.0, float(cfg.w_s)
 
     w_grid: Sequence[float]
     if cfg.select_ws:
-        w_grid = tuple(w for w in W_S_GRID if w > 0.0)
+        w_grid = tuple(W_S_GRID)
     else:
         w_grid = (float(cfg.w_s),)
 
@@ -424,39 +468,133 @@ def select_hyperparams(
         idxs = np.linspace(0, len(groups) - 1, MAX_INNER)
         groups = sorted({groups[int(round(i))] for i in idxs})
 
-    best = (1.0, 1.0, float(w_grid[0]))
-    best_score = float("inf")
-    for la in LAMBDA_GRID:
-        for ls in LAMBDA_GRID:
-            for ws in w_grid:
-                scores: List[float] = []
-                trial_cfg = FitConfig(
-                    name=cfg.name,
-                    huber=cfg.huber,
-                    orientation=cfg.orientation,
-                    w_s=float(ws),
-                    structure=cfg.structure,
-                    select_ws=False,
-                )
-                for gid in groups:
-                    tr = [r.record for r in train_rows if r.group_id != gid]
-                    te = [r.record for r in train_rows if r.group_id == gid]
-                    if not tr or not te:
-                        continue
-                    fit = fit_hierarchical_config(tr, trial_cfg, la, ls)
-                    if not _finite_objective(fit.fun):
-                        continue
-                    # Vp-only score for hyperparameter selection.
-                    scores.append(
-                        score_holdout(te, fit.params, fit.orient, huber=False, w_s=0.0)
+    def evaluate_candidates(
+        lambda_alpha_values: Sequence[float],
+        lambda_s_values: Sequence[float],
+        w_values: Sequence[float],
+    ) -> List[dict]:
+        candidates: List[dict] = []
+        for la in lambda_alpha_values:
+            for ls in lambda_s_values:
+                for ws in w_values:
+                    vp_abs: List[float] = []
+                    vs_abs: List[float] = []
+                    vpvs_abs: List[float] = []
+                    valid_candidate = True
+                    trial_cfg = FitConfig(
+                        name=cfg.name,
+                        huber=cfg.huber,
+                        orientation=cfg.orientation,
+                        w_s=float(ws),
+                        structure=cfg.structure,
+                        select_ws=False,
                     )
-                if not scores:
-                    continue
-                m = float(np.mean(scores))
-                if m < best_score:
-                    best_score = m
-                    best = (float(la), float(ls), float(ws))
-    return best
+                    for gid in groups:
+                        tr = [r.record for r in train_rows if r.group_id != gid]
+                        te = [r.record for r in train_rows if r.group_id == gid]
+                        if not tr or not te:
+                            continue
+                        fit = fit_hierarchical_config(tr, trial_cfg, la, ls)
+                        if not _usable_fit(fit):
+                            valid_candidate = False
+                            break
+                        for plug in te:
+                            hp = resolve_params_for_hfu(fit.params, plug.hfu)
+                            vp_d, vs_d = predict_dem(plug, hp.alpha, hp.scale)
+                            vp_p, vs_p = apply_orientation(
+                                vp_d, vs_d, plug.ct_sample_id, fit.orient
+                            )
+                            if (
+                                plug.vp_lab_z_km_s <= 0.0
+                                or plug.vs_lab_z_km_s <= 0.0
+                            ):
+                                valid_candidate = False
+                                break
+                            vp_abs.append(
+                                abs(
+                                    (vp_p - plug.vp_lab_z_km_s)
+                                    / plug.vp_lab_z_km_s
+                                )
+                                * 100.0
+                            )
+                            vs_abs.append(
+                                abs(
+                                    (vs_p - plug.vs_lab_z_km_s)
+                                    / plug.vs_lab_z_km_s
+                                )
+                                * 100.0
+                            )
+                            vpvs_pred = vp_p / vs_p if vs_p > 0.0 else float("nan")
+                            vpvs_abs.append(abs(vpvs_pred - plug.vpvs_lab_z))
+                        if not valid_candidate:
+                            break
+                    if not valid_candidate or not vp_abs:
+                        continue
+                    candidates.append(
+                        {
+                            "lambda_alpha": float(la),
+                            "lambda_s": float(ls),
+                            "w_s": float(ws),
+                            "mape_vp_pct": float(np.mean(vp_abs)),
+                            "mape_vs_pct": float(np.mean(vs_abs)),
+                            "mae_vpvs": float(np.mean(vpvs_abs)),
+                        }
+                    )
+        return candidates
+
+    # Sequential nested search: select lambda_alpha, then lambda_s, then w_s.
+    # The outer holdout remains untouched throughout.
+    lambda_alpha_candidates = evaluate_candidates(
+        LAMBDA_GRID,
+        (1.0,),
+        (0.0,) if cfg.select_ws else w_grid,
+    )
+    if not lambda_alpha_candidates:
+        raise RuntimeError(
+            "No fully converged lambda_alpha candidate across inner folds "
+            "for model {}".format(cfg.name)
+        )
+    lambda_alpha_winner = min(
+        lambda_alpha_candidates,
+        key=lambda c: (
+            float(c["mape_vp_pct"]),
+            float(c["lambda_alpha"]),
+        ),
+    )
+    lambda_s_candidates = evaluate_candidates(
+        (float(lambda_alpha_winner["lambda_alpha"]),),
+        LAMBDA_GRID,
+        (0.0,) if cfg.select_ws else w_grid,
+    )
+    if not lambda_s_candidates:
+        raise RuntimeError(
+            "No fully converged lambda_s candidate across inner folds "
+            "for model {}".format(cfg.name)
+        )
+    lambda_winner = min(
+        lambda_s_candidates,
+        key=lambda c: (
+            float(c["mape_vp_pct"]),
+            float(c["lambda_s"]),
+        ),
+    )
+    if not cfg.select_ws:
+        return (
+            float(lambda_winner["lambda_alpha"]),
+            float(lambda_winner["lambda_s"]),
+            float(lambda_winner["w_s"]),
+        )
+    ws_candidates = evaluate_candidates(
+        (float(lambda_winner["lambda_alpha"]),),
+        (float(lambda_winner["lambda_s"]),),
+        w_grid,
+    )
+    if not ws_candidates:
+        raise RuntimeError(
+            "No fully converged w_s candidate across inner folds "
+            "for model {}".format(cfg.name)
+        )
+    return pick_inner_candidate(ws_candidates)
 
 
 def score_holdout(
@@ -671,6 +809,12 @@ def run_cv(
                     select_ws=False,
                 )
                 fit = fit_hierarchical_config(train_plugs, fit_cfg, la, ls)
+                if not _usable_fit(fit):
+                    raise RuntimeError(
+                        "Outer fit did not converge for model={} group={}: {}".format(
+                            cfg.name, gid, fit.message
+                        )
+                    )
             pred_rows.extend(
                 predict_table(
                     test_plugs,
@@ -720,7 +864,7 @@ def acceptance_gate(
     Automatic acceptance gate vs P0.
 
     Requires simultaneously:
-      - mape_vp <= P0
+      - mape_vp <= P0 + 0.5 percentage point
       - mape_vs < P0 OR mae_vpvs < P0
       - majority of depth groups beat P0 on mape_vp
       - frac_alpha_at_bound <= P0
@@ -740,9 +884,14 @@ def acceptance_gate(
         if model == "P0":
             continue
         sub = pred[pred["model"] == model]
-        opt_rate = float(np.mean(sub["opt_success"])) if len(sub) and "opt_success" in sub else 1.0
+        opt_rate = (
+            float(np.mean(sub["opt_success"]))
+            if len(sub) and "opt_success" in sub
+            else 1.0
+        )
         n_win = int(wins_map.get(model, 0))
-        vp_ok = float(row["mape_vp_pct"]) <= float(p0r["mape_vp_pct"])
+        vp_margin_pct = float(row["mape_vp_pct"]) - float(p0r["mape_vp_pct"])
+        vp_ok = vp_margin_pct <= GATE_VP_TOL_PCT
         vs_ok = (float(row["mape_vs_pct"]) < float(p0r["mape_vs_pct"])) or (
             float(row["mae_vpvs"]) < float(p0r["mae_vpvs"])
         )
@@ -753,7 +902,8 @@ def acceptance_gate(
         rows.append(
             {
                 "model": model,
-                "vp_le_p0": int(vp_ok),
+                "vp_within_p0_plus_0p5pp": int(vp_ok),
+                "vp_margin_vs_p0_pct": vp_margin_pct,
                 "vs_or_vpvs_improved": int(vs_ok),
                 "majority_groups": int(maj_ok),
                 "bounds_le_p0": int(bound_ok),
@@ -764,6 +914,67 @@ def acceptance_gate(
             }
         )
     return pd.DataFrame(rows).sort_values("model").reset_index(drop=True)
+
+
+def cross_sensitivity_gate(
+    primary_summary: pd.DataFrame,
+    primary_gate: pd.DataFrame,
+    sensitivity_summary: pd.DataFrame,
+    sensitivity_gate: pd.DataFrame,
+    margin_tol_pct: float = SENSITIVITY_MARGIN_TOL_PCT,
+) -> pd.DataFrame:
+    """
+    Require acceptance both with and without F2911V and a stable Vp margin.
+
+    Stability compares each model's MAPE margin relative to P0 from the same
+    run, avoiding raw-MAPE comparisons across different sample counts.
+    """
+
+    def margins(summary: pd.DataFrame) -> Dict[str, float]:
+        p0 = summary.loc[summary["model"] == "P0", "mape_vp_pct"]
+        if p0.empty:
+            raise ValueError("P0 is required for sensitivity comparison")
+        ref = float(p0.iloc[0])
+        return {
+            str(r["model"]): float(r["mape_vp_pct"]) - ref
+            for _, r in summary.iterrows()
+            if str(r["model"]) != "P0"
+        }
+
+    primary_margins = margins(primary_summary)
+    sensitivity_margins = margins(sensitivity_summary)
+    primary_accept = {
+        str(r["model"]): bool(int(r["accepted"])) for _, r in primary_gate.iterrows()
+    }
+    sensitivity_accept = {
+        str(r["model"]): bool(int(r["accepted"]))
+        for _, r in sensitivity_gate.iterrows()
+    }
+    models = sorted(set(primary_margins) & set(sensitivity_margins))
+    rows: List[dict] = []
+    for model in models:
+        delta = sensitivity_margins[model] - primary_margins[model]
+        stable = abs(delta) <= float(margin_tol_pct)
+        robust = bool(
+            primary_accept.get(model, False)
+            and sensitivity_accept.get(model, False)
+            and stable
+        )
+        rows.append(
+            {
+                "model": model,
+                "accepted_primary": int(primary_accept.get(model, False)),
+                "accepted_without_f2911v": int(
+                    sensitivity_accept.get(model, False)
+                ),
+                "vp_margin_primary_pct": primary_margins[model],
+                "vp_margin_without_f2911v_pct": sensitivity_margins[model],
+                "vp_margin_shift_pct": delta,
+                "margin_stable_within_0p5pp": int(stable),
+                "robustly_accepted": int(robust),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def main() -> None:
@@ -875,6 +1086,8 @@ def main() -> None:
         "huber_delta": HUBER_DELTA,
         "lambda_beta": LAMBDA_BETA,
         "w_s_grid": list(W_S_GRID),
+        "inner_vp_tolerance_percentage_points": INNER_VP_TOL_PCT,
+        "gate_vp_tolerance_percentage_points": GATE_VP_TOL_PCT,
         "p3_median_w_s_oof": p3_ws_median,
         "lexicographic_winner": lex,
         "accepted_models": accepted_models,
@@ -884,14 +1097,49 @@ def main() -> None:
             "global model uses identifiable (alpha, scale) only",
             "global skips lambda selection",
             "P3 selects w_s inside outer-fold training",
-            "optimizer success/finite checks with restarts",
+            "P3 inner selection includes w_s=0 and uses Vp/Vs lexicographic criteria",
+            "nested search selects lambdas before w_s without outer-fold leakage",
+            "inner and outer fits require optimizer success and finite objective",
             "acceptance gate implemented (not docstring-only)",
             "lexicographic_pick excludes P0",
+            "cross-run gate requires robustness to excluding F2911V",
         ],
         "pred_cache_size": len(_PRED_CACHE),
     }
     with open(out_dir / "metrics.json", "w", encoding="ascii") as handle:
         json.dump(meta, handle, indent=2)
+
+    cross_gate = pd.DataFrame()
+    if args.exclude_f2911v and not args.fast:
+        primary_tables = OUT_ROOT / "v2" / "nested" / "tables"
+        primary_summary_path = primary_tables / "summary_metrics.csv"
+        primary_gate_path = primary_tables / "acceptance_gate.csv"
+        if primary_summary_path.exists() and primary_gate_path.exists():
+            primary_summary = pd.read_csv(primary_summary_path)
+            primary_gate = pd.read_csv(primary_gate_path)
+            cross_gate = cross_sensitivity_gate(
+                primary_summary,
+                primary_gate,
+                summary,
+                gate,
+            )
+            cross_gate.to_csv(
+                tables / "cross_sensitivity_gate.csv",
+                index=False,
+                float_format="%.6f",
+            )
+            cross_gate.to_csv(
+                primary_tables / "cross_sensitivity_gate.csv",
+                index=False,
+                float_format="%.6f",
+            )
+            meta["robustly_accepted_models"] = [
+                str(r["model"])
+                for _, r in cross_gate.iterrows()
+                if int(r["robustly_accepted"]) == 1
+            ]
+            with open(out_dir / "metrics.json", "w", encoding="ascii") as handle:
+                json.dump(meta, handle, indent=2)
 
     print("\n--- OOF summary ---")
     cols = [
@@ -913,6 +1161,9 @@ def main() -> None:
     print(by_orient.to_string(index=False))
     print("\nlexicographic pick (non-P0):", lex)
     print("accepted models:", accepted_models)
+    if not cross_gate.empty:
+        print("\n--- cross-sensitivity gate ---")
+        print(cross_gate.to_string(index=False))
     print("Output:", out_dir)
 
 

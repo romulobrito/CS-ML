@@ -319,14 +319,24 @@ def plot_regressor_depth_tracks(depth_df: pd.DataFrame, out_path: Path) -> None:
     plt.close(fig)
 
 
-def plot_regressor_sensitivity_bar(df: pd.DataFrame, out_path: Path) -> None:
+def plot_regressor_sensitivity_bar(
+    df: pd.DataFrame,
+    out_path: Path,
+    gassmann_mape_pct: float,
+) -> None:
     """Bar chart: hybrid Vp MAPE OOF by regressor."""
     work = df.sort_values("hybrid_mape_vp_pct")
     labels = [REGRESSOR_DISPLAY.get(r, r) for r in work["regressor"].tolist()]
     fig, ax = plt.subplots(figsize=(7.5, 4.5))
     colors = ["#d62728" if r == "rf" else "#4c72b0" for r in work["regressor"].tolist()]
     ax.barh(labels, work["hybrid_mape_vp_pct"].to_numpy(dtype=np.float64), color=colors)
-    ax.axvline(15.369, color="#1f77b4", linestyle="--", linewidth=1.0, label="Gassmann MAPE")
+    ax.axvline(
+        float(gassmann_mape_pct),
+        color="#1f77b4",
+        linestyle="--",
+        linewidth=1.0,
+        label="Gassmann MAPE",
+    )
     ax.set_xlabel("MAPE Vp hybrid OOF vs DSI (%)")
     ax.set_title("Regressor sensitivity (depth-block OOF, 87 rows)")
     ax.grid(True, axis="x", alpha=0.3)
@@ -492,6 +502,11 @@ def run_residual_pipeline(
     def rf_factory() -> RandomForestRegressor:
         return RandomForestRegressor(n_estimators=n_estimators, random_state=random_state)
 
+    physics_metrics = vp_metrics_vs_sonic(
+        bundle.df["vp_gassmann_km_s"].to_numpy(dtype=np.float64),
+        bundle.df["vp_sonic_km_s"].to_numpy(dtype=np.float64),
+    )
+
     cv_rf, oof_residual = evaluate_depth_blocks_oof(rf_factory, bundle, n_blocks=n_blocks)
     cv_rf.model_name = "RandomForestRegressor"
 
@@ -522,6 +537,7 @@ def run_residual_pipeline(
         plot_regressor_sensitivity_bar(
             ok_df,
             figures_dir / "regressor_sensitivity_mape.png",
+            gassmann_mape_pct=physics_metrics.mape_pct,
         )
     if not reg_depth_df.empty:
         plot_regressor_depth_tracks(
@@ -533,10 +549,6 @@ def run_residual_pipeline(
     work["residual_pred_oof_km_s"] = oof_residual
     work["vp_hybrid_oof_km_s"] = work["vp_gassmann_km_s"] + work["residual_pred_oof_km_s"]
 
-    physics_metrics = vp_metrics_vs_sonic(
-        work["vp_gassmann_km_s"].to_numpy(dtype=np.float64),
-        work["vp_sonic_km_s"].to_numpy(dtype=np.float64),
-    )
     hybrid_metrics = vp_metrics_vs_sonic(
         work["vp_hybrid_oof_km_s"].to_numpy(dtype=np.float64),
         work["vp_sonic_km_s"].to_numpy(dtype=np.float64),

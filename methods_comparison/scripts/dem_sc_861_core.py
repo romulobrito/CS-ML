@@ -209,7 +209,11 @@ def berryman_dem(
     if phi_use <= 0.0:
         return DryElasticResult(k_gpa=km_gpa, g_gpa=gm_gpa, model="DEM")
     t_inc = 0.005
-    t_grid = np.arange(0.0, phi_use + t_inc, t_inc, dtype=np.float64)
+    # The grid must land exactly on phi_use. np.arange would overshoot by up to
+    # t_inc, freezing the moduli across each step while density keeps varying,
+    # which inverts the sign of dVp/dphi within a step.
+    n_steps = max(int(np.ceil(phi_use / t_inc)), 1)
+    t_grid = np.linspace(0.0, phi_use, n_steps + 1, dtype=np.float64)
     params = (float(gi_gpa), float(ki_gpa), float(alpha))
     y0 = [float(km_gpa), float(gm_gpa)]
     sol = odeint(_dem_ode, y0, t_grid, args=(params,))

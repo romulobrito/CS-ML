@@ -175,12 +175,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument(
         "--out-panels",
         type=Path,
-        default=FIG_DIR / "fig_clp_three_methods_depth_panels.png",
+        default=FIG_DIR / "fig1_clp_three_methods_depth_panels.png",
     )
     p.add_argument(
         "--out-overlay",
         type=Path,
-        default=FIG_DIR / "fig_clp_three_methods_depth_overlay.png",
+        default=FIG_DIR / "fig1_clp_three_methods_depth_overlay.png",
     )
     return p.parse_args(argv)
 

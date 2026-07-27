@@ -6,8 +6,9 @@ MAIN3 = poco861_etapa3_residual
 DRP_DIR = poco861_beamer_DRP_layout_package
 BEAMER1_DRP = poco861_etapa1_beamer_DRP
 BEAMER2_DRP = poco861_etapa2_beamer_DRP
+BEAMER3_DRP = poco861_etapa3_beamer_DRP
 
-.PHONY: all etapa1 beamer1 beamer1-drp beamer2-drp etapa2 etapa3 clean
+.PHONY: all etapa1 beamer1 beamer1-drp beamer2-drp beamer3-drp etapa2 etapa3 clean
 
 all: etapa1 etapa2 etapa3
 
@@ -26,6 +27,10 @@ beamer1-drp:
 beamer2-drp:
 	cd $(DRP_DIR) && pdflatex -interaction=nonstopmode $(BEAMER2_DRP).tex
 	cd $(DRP_DIR) && pdflatex -interaction=nonstopmode $(BEAMER2_DRP).tex
+
+beamer3-drp:
+	cd $(DRP_DIR) && pdflatex -interaction=nonstopmode $(BEAMER3_DRP).tex
+	cd $(DRP_DIR) && pdflatex -interaction=nonstopmode $(BEAMER3_DRP).tex
 
 etapa2:
 	pdflatex -interaction=nonstopmode $(MAIN2).tex
@@ -46,3 +51,6 @@ clean:
 	rm -f $(DRP_DIR)/$(BEAMER2_DRP).aux $(DRP_DIR)/$(BEAMER2_DRP).log \
 	      $(DRP_DIR)/$(BEAMER2_DRP).nav $(DRP_DIR)/$(BEAMER2_DRP).out \
 	      $(DRP_DIR)/$(BEAMER2_DRP).snm $(DRP_DIR)/$(BEAMER2_DRP).toc
+	rm -f $(DRP_DIR)/$(BEAMER3_DRP).aux $(DRP_DIR)/$(BEAMER3_DRP).log \
+	      $(DRP_DIR)/$(BEAMER3_DRP).nav $(DRP_DIR)/$(BEAMER3_DRP).out \
+	      $(DRP_DIR)/$(BEAMER3_DRP).snm $(DRP_DIR)/$(BEAMER3_DRP).toc

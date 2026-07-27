@@ -120,6 +120,12 @@ def build_metrics(result: SonicExtractResult) -> dict:
         "depth_max_m": cal.depth_max_m,
         "tdep_scale": cal.tdep_scale,
         "auddys_merge_matches": cal.merge_matches,
+        "tdep_declared_units": cal.declared_units,
+        "tdep_declared_scale": cal.declared_scale,
+        "tdep_fitted_scale": cal.fitted_scale,
+        "tdep_scale_source": cal.scale_source,
+        "tdep_scale_rel_diff": cal.scale_rel_diff,
+        "tdep_scale_warning": cal.scale_warning,
     }
     if n_vp > 0:
         vp = sonic["vp_sonic_km_s"].dropna()
@@ -143,7 +149,18 @@ def write_manifest(result: SonicExtractResult, metrics: dict) -> None:
         "Depth calibration:",
         "  method: {}".format(cal.method),
         "  formula: {}".format(cal.depth_formula),
-        "  tdep_scale: {:.4f}".format(cal.tdep_scale),
+        "  tdep_scale: {:.4f} (source: {})".format(cal.tdep_scale, cal.scale_source),
+        "  declared TDEP units: {!r} -> {}".format(
+            cal.declared_units,
+            "{:.4f}".format(cal.declared_scale) if cal.declared_scale else "unknown",
+        ),
+        "  fitted scale (cross-check): {}".format(
+            "{:.4f}".format(cal.fitted_scale) if cal.fitted_scale else "n/a"
+        ),
+        "  scale disagreement: {}".format(
+            "{:.2%}".format(cal.scale_rel_diff) if cal.scale_rel_diff is not None else "n/a"
+        ),
+        "  warning: {}".format(cal.scale_warning or "none"),
         "  Auddys depth range: {:.2f} - {:.2f} m".format(
             cal.auddys_depth_min_m, cal.auddys_depth_max_m
         ),

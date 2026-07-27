@@ -419,7 +419,7 @@ sinal relevante está nas medidas de laboratório, não nas curvas.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth]{figures/fig_fzi_log_correlations}
+  \includegraphics[width=0.85\linewidth]{figures/fig1_fzi_log_correlations}
   \caption{Correlação de Pearson entre curvas de perfil e
            \fzilab{} ($n=87$). Barras curtas indicam pouca
            relação linear.}
@@ -514,7 +514,7 @@ de porosidade e permeabilidade de laboratório, não das curvas de perfil.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.78\linewidth]{figures/fig_fzi_oracle_vs_logs}
+  \includegraphics[width=0.78\linewidth]{figures/fig1_fzi_oracle_vs_logs}
   \caption{$R^2$ por bloco de profundidade para \fzilab{}:
            apenas perfis versus teste \emph{oracle}
            (\philab{} + \klab{} de laboratório).}
@@ -562,7 +562,7 @@ prever simplesmente a média do treino.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.82\linewidth]{figures/fig_target_comparison_r2}
+  \includegraphics[width=0.82\linewidth]{figures/fig1_target_comparison_r2}
   \caption{$R^2$ médio (RF, validação por blocos) para cada alvo,
            comparado à referência de prever a média.}
   \label{fig:target_r2}
@@ -749,14 +749,14 @@ para cada predição).
   \centering
   \begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_phi_rf_pred_vs_obs}
+    \includegraphics[width=\linewidth]{figures/fig1_phi_rf_pred_vs_obs}
     \caption{Predito versus observado (divisão 80/20, ilustrativo).}
     \label{fig:phi_pred}
   \end{subfigure}
   \hfill
   \begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_phi_shap_bar}
+    \includegraphics[width=\linewidth]{figures/fig1_phi_shap_bar}
     \caption{Contribuição das curvas (SHAP).}
     \label{fig:phi_shap}
   \end{subfigure}
@@ -851,7 +851,7 @@ A Figura~\ref{fig:ct_fzi} mostra o ajuste plug a plug para FZI.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.72\linewidth]{figures/fig_ct_plugs_fzi_wireline}
+  \includegraphics[width=0.72\linewidth]{figures/fig1_ct_plugs_fzi_wireline}
   \caption{LOPO-RF para \fzilab{} nos plugs: predito versus
            observado (somente curvas de perfil).}
   \label{fig:ct_fzi}
@@ -917,7 +917,7 @@ por indisponibilidade da biblioteca especializada no ambiente de execução.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.78\linewidth]{figures/fig_phi_model_comparison}
+  \includegraphics[width=0.78\linewidth]{figures/fig1_phi_model_comparison}
   \caption{$R^2$ médio para \philab{}: RF, GAM e Ridge.}
   \label{fig:phi_models}
 \end{figure}
@@ -964,14 +964,14 @@ o modelo pareça bom apenas por acertar a classe majoritária (HFU1).
   \centering
   \begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_hfu_classifier_oof}
+    \includegraphics[width=\linewidth]{figures/fig1_hfu_classifier_oof}
     \caption{Métricas por modelo.}
     \label{fig:hfu_metrics}
   \end{subfigure}
   \hfill
   \begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/fig_hfu_confusion_logistic}
+    \includegraphics[width=\linewidth]{figures/fig1_hfu_confusion_logistic}
     \caption{Matriz de confusão (logística).}
     \label{fig:hfu_confusion}
   \end{subfigure}
@@ -1585,7 +1585,7 @@ num único painel para leitura global.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{figures/fig_clp_three_methods_depth_panels.png}
+  \includegraphics[width=\linewidth]{figures/fig1_clp_three_methods_depth_panels.png}
   \caption{Perfis OOF de \philab{} ao longo da profundidade (\emph{seed}~7):
            observado (tracejado) versus RF pontual, CLP prior RF
            (variante~A) e CLP residual RF (variante~B), em painéis lado a
@@ -1596,7 +1596,7 @@ num único painel para leitura global.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.62\linewidth]{figures/fig_clp_three_methods_depth_overlay.png}
+  \includegraphics[width=0.62\linewidth]{figures/fig1_clp_three_methods_depth_overlay.png}
   \caption{Mesmas curvas da Figura~\ref{fig:clp_three_methods_depth} em
            painel único: comparação direta das três predições OOF.}
   \label{fig:clp_three_methods_overlay}

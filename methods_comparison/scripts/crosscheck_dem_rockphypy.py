@@ -169,15 +169,17 @@ def build_plug_cases() -> pd.DataFrame:
     """Merge POC matrix inputs with calibrated alpha/scale per plug."""
     poc = pd.read_csv(PLUG_POC_CSV)
     calib = pd.read_csv(PLUG_CALIB_CSV)
+    calib_cols = [
+        "ct_sample_id",
+        "alpha_calibrated",
+        "matrix_k_scale",
+        "matrix_g_scale",
+    ]
+    # The POC table also exports matrix scales (uncalibrated); the calibration
+    # table is authoritative here, so drop the duplicates to avoid _x/_y suffixes.
+    poc = poc.drop(columns=[c for c in calib_cols if c in poc.columns])
     merged = poc.merge(
-        calib[
-            [
-                "ct_sample_id",
-                "alpha_calibrated",
-                "matrix_k_scale",
-                "matrix_g_scale",
-            ]
-        ],
+        calib[calib_cols],
         left_on="sample_id",
         right_on="ct_sample_id",
         how="inner",

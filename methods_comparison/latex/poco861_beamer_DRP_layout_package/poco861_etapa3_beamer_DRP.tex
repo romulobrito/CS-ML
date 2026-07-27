@@ -1,0 +1,977 @@
+% Apresentacao Beamer -- Poco 861 Etapa 3 (campo Lapa)
+% Versao com layout inspirado no template DRP (UENF--Equinor)
+% Compilar (a partir desta pasta):
+%   pdflatex poco861_etapa3_beamer_DRP.tex
+%   pdflatex poco861_etapa3_beamer_DRP.tex
+% Numeros alinhados a poco861_etapa3_residual.tex (junho de 2026).
+
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, calc}
+% DRP template uses Calibri; Carlito is the TeX metric-compatible substitute.
+\usepackage[sfdefault]{carlito}
+\usefonttheme{professionalfonts}
+
+% Fundos DRP + figuras fig2_*/fig3_* dos relatorios Etapa 2 e 3.
+\graphicspath{%
+  {./poco861_drp_assets/}%
+  {./poco861_drp_assets/figures/}%
+  {../figures/}%
+  {../../data/processed/ml_runs/residual_vp/figures/}%
+  {../../data/processed/ml_runs/residual_vp/clp_csgm/figures/}%
+  {../../data/processed/ml_runs/residual_vp/clp_csgm/rho_subsample/figures/}%
+}
+
+% ------------------------------------------------------------------
+% Paleta DRP
+\definecolor{drpblue}{RGB}{29,55,113}
+\definecolor{drporange}{RGB}{255,145,39}
+\definecolor{drpyellow}{RGB}{250,238,0}
+\definecolor{drpred}{RGB}{220,0,0}
+\definecolor{drpgray}{RGB}{70,70,70}
+\definecolor{po861blue}{RGB}{0,74,127}
+\definecolor{po861green}{RGB}{0,128,96}
+
+\usecolortheme{default}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=drpblue}
+\setbeamercolor{frametitle}{fg=black,bg=}
+\setbeamercolor{title}{fg=black,bg=}
+\setbeamercolor{subtitle}{fg=drpgray,bg=}
+\setbeamercolor{block title}{fg=white,bg=drpblue}
+\setbeamercolor{block body}{fg=black,bg=drpblue!5}
+\setbeamercolor{block title example}{fg=black,bg=drpyellow}
+\setbeamercolor{block body example}{fg=black,bg=drpyellow!12}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamersize{text margin left=7mm, text margin right=7mm}
+
+\setbeamerfont{normal text}{size=\small}
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\setbeamerfont{itemize/enumerate subbody}{size=\footnotesize}
+\setbeamerfont{block title}{size=\small,series=\bfseries}
+\setbeamerfont{block body}{size=\footnotesize}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{title}{size=\Huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{institute}{size=\small}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{page number in head/foot}{size=\scriptsize,series=\mdseries}
+
+\setlength{\parskip}{2pt}
+\setlength{\itemsep}{2pt}
+\setbeamertemplate{itemize item}{\raise0.2ex\hbox{\large\textbullet}}
+\setbeamertemplate{itemize subitem}{\raise0.2ex\hbox{\small\textbullet}}
+\setbeamercolor{itemize item}{fg=drpblue}
+\setbeamercolor{itemize subitem}{fg=drpblue}
+
+\usebackgroundtemplate{}
+
+\setbeamertemplate{frametitle}{%
+  \vspace*{0.18cm}%
+  \hspace*{0.12cm}{\usebeamerfont{frametitle}\insertframetitle}\par%
+  \vspace*{0.20cm}%
+}
+
+\newlength{\drpfooterheight}
+\setlength{\drpfooterheight}{1.12cm}
+\setbeamertemplate{footline}{%
+  \begin{tikzpicture}[baseline=(base.base)]
+    \node[inner sep=0pt,anchor=south west] (base) at (0,0)
+      {\includegraphics[width=\paperwidth,height=\drpfooterheight]{drp_footer.png}};
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.13cm]base.south east) {\insertframenumber};
+  \end{tikzpicture}%
+}
+
+\newcommand{\philab}{\ensuremath{\phi_{\mathrm{lab}}}}
+\newcommand{\fzilab}{\ensuremath{\mathrm{FZI}_{\mathrm{lab}}}}
+\newcommand{\phiND}{\ensuremath{\phi_{\mathrm{ND}}}}
+\newcommand{\phiS}{\ensuremath{\phi_{\mathrm{S}}}}
+\newcommand{\Vp}{\ensuremath{V_{\mathrm{p}}}}
+\newcommand{\Vs}{\ensuremath{V_{\mathrm{s}}}}
+\newcommand{\dVp}{\ensuremath{\Delta V_{\mathrm{p}}}}
+% Acentos nao sobrevivem a \mathrm; \text mantem o modo texto dentro da formula.
+\newcommand{\Vpson}{\ensuremath{V_{\mathrm{p}}^{\text{sónico}}}}
+\newcommand{\Vpsonsub}{\ensuremath{V_{\mathrm{p,}\text{sónico}}}}
+
+% Orcamento vertical das figuras. As trilhas de profundidade sao retrato
+% (aspecto ~0,75), logo a altura -- nao a largura -- limita o tamanho; o teto
+% precisa cobrir quase todo o corpo do slide para elas nao ficarem estreitas.
+\newlength{\drpbodyheight}
+\setlength{\drpbodyheight}{0.86\textheight}
+
+\newcommand{\slidefig}[2][0.75]{%
+  \includegraphics[width=\linewidth,height=#1\drpbodyheight,keepaspectratio]{#2}%
+}
+\newcommand{\slidecaption}[1]{%
+  \par\vspace{0.05cm}%
+  \begin{minipage}{\linewidth}%
+    \centering\scriptsize #1%
+  \end{minipage}%
+}
+\newcommand{\slidefigure}[3][0.72]{%
+  \begin{minipage}[t]{\linewidth}%
+    \centering
+    \slidefig[#1]{#2}%
+    \slidecaption{#3}%
+  \end{minipage}%
+}
+
+\title{Poço~861 (campo Lapa): modelo híbrido de \Vp{}}
+\subtitle{Etapa~3 --- física Gassmann + aprendizado sobre resíduos}
+\author{Romulo Brito da Silva}
+\institute{UENF / LENEP}
+\date{Junho de 2026}
+
+\begin{document}
+
+% ------------------------------------------------------------------
+{%
+\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{drp_title_bg.png}}%
+\begin{frame}[plain]
+  \vspace*{0.40cm}
+  \begin{center}
+    {\huge\bfseries Poço~861\\[0.04cm]
+    (campo Lapa)}\\[0.18cm]
+    {\usebeamerfont{subtitle}\bfseries Modelo híbrido: física Gassmann + ML sobre resíduos}\\[0.12cm]
+    {\large Etapa~3 --- corretor empírico de \Vp{} validado por blocos de profundidade}\\[0.22cm]
+    {\usebeamerfont{author} Romulo Brito da Silva}\\[0.08cm]
+    {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
+    {\usebeamerfont{date} Junho de 2026}\\[0.18cm]
+    {\footnotesize
+    Intervalo 5205,91--5233,72~m $\cdot$ 87 linhas de perfil\\
+    Alvo $\dVp = \Vpson - V_{\mathrm{p}}^{\mathrm{Gassmann}}$
+    $\cdot$ oito \emph{features} $\cdot$ três blocos de profundidade}\\[0.08cm]
+    {\footnotesize Validação \emph{intra-poço} --- o sónico entra no alvo, não é poço cego}
+  \end{center}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.15cm]current page.south east) {\insertframenumber};
+  \end{tikzpicture}
+\end{frame}
+}%
+\usebackgroundtemplate{}
+
+% ------------------------------------------------------------------
+\begin{frame}{Roteiro}
+  \footnotesize
+  \begin{enumerate}
+    \item Herança da Etapa~2: o gap que sobra depois da física.
+    \item Alvo residual, \emph{features} e a regra anti-\emph{leakage}.
+    \item Protocolo: blocos de profundidade e o que a OOF mede (e não mede).
+    \item Resultado central: Gassmann versus híbrido nas 87 linhas.
+    \item Sensibilidade ao regressor e leitura por HFU.
+    \item CLP-CSGM em janelas (3b) e o sweep de calibração esparsa (3c).
+    \item Síntese das três etapas, limitações e conclusões.
+  \end{enumerate}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Contexto}
+
+\begin{frame}{Da Etapa~2: a física fecha a ordem de grandeza, não o perfil}
+  \footnotesize
+  A cadeia DEM/SC + Gassmann foi validada e \textbf{congelada}. Aqui atacamos só
+  o que sobrou.
+  \vspace{0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+    \begin{block}{Entra na Etapa~3}
+      \scriptsize
+      \begin{itemize}
+        \item \Vp{} Gassmann por linha (produto 2b) como \emph{baseline}.
+        \item Curvas wireline da Etapa~1 (não acústicas).
+        \item Protocolo depth-block herdado da Etapa~1.
+        \item \Vp{} sónico DSI --- apenas no alvo, nunca em $X$.
+      \end{itemize}
+    \end{block}
+    \begin{exampleblock}{Fica de fora}
+      \scriptsize
+      \begin{itemize}
+        \item Reabrir porosidade de entrada ou calibração DEM/SC.
+        \item ML direto perfil $\rightarrow$ \Vp{} (descartado na Etapa~1).
+        \item \phiS{} e qualquer transformada de DTCO em $X$.
+      \end{itemize}
+    \end{exampleblock}
+    \column{0.46\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.85cm,
+      flowbox/.style={
+        draw, thick, rounded corners=4pt,
+        align=center, text width=5.2cm,
+        inner sep=5pt, font=\scriptsize
+      },
+      flowarr/.style={-{Stealth[length=2.8mm]}, thick, po861blue},
+      arrlabel/.style={
+        midway, fill=white, inner sep=2pt,
+        font=\tiny, text=po861blue, align=center
+      }
+    ]
+      \node[flowbox, fill=po861blue!18, draw=po861blue] (e1) {%
+        \textbf{1. Diagnóstico ML}\\
+        limites do perfil; protocolo
+      };
+      \node[flowbox, fill=po861green!18, draw=po861green, below=of e1] (e2) {%
+        \textbf{2. DEM/SC + Gassmann}\\
+        \Vp{} física calibrada por HFU
+      };
+      \node[flowbox, fill=orange!18, draw=orange!70!black, below=of e2] (e3) {%
+        \textbf{3. ML no resíduo}\\
+        \textbf{esta apresentação}
+      };
+      \draw[flowarr] (e1.south) -- node[arrlabel] {$\phi$, HFU, CV} (e2.north);
+      \draw[flowarr] (e2.south) -- node[arrlabel] {resíduo} (e3.north);
+    \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{O gap que motiva a etapa: viés positivo persistente}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    Depois de Gassmann, a trilha física continua \textbf{acima} do sónico ao
+    longo de todo o intervalo.
+    \par
+    \vspace{0.08cm}
+    {\centering
+    \scriptsize
+    \begin{tabular}{lr}
+      \toprule
+      Etapa~2b (87 linhas) & Valor \\
+      \midrule
+      MAPE \Vp{} & 7,3\% \\
+      RMSE & 0,48~km/s \\
+      Viés & $+0{,}27$~km/s \\
+      \Vp{} Gassmann médio & 5,17~km/s \\
+      \Vp{} sónico médio & 4,90~km/s \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.10cm}
+    {\scriptsize Dos 0,48~km/s de RMSE, 0,27~km/s são viés puro: o erro é
+    \textbf{deslocamento sistemático}, não só ruído. Isso é o que se pode
+    tentar aprender.}
+    \column{0.46\textwidth}
+    \slidefigure[0.82]{fig2_vp_dry_gassmann_sonic_depth}{Referência da
+    Etapa~2b: sónico, DEM a seco e DEM + Gassmann em profundidade.}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Alvo e features}
+
+\begin{frame}{Por que resíduo e não ML direto perfil $\rightarrow$ \Vp{}}
+  \footnotesize
+  O esquema residual separa dois papéis e preserva a interpretação física.
+  \vspace{0.10cm}
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!12,
+      align=center, text width=3.5cm, inner sep=5pt, font=\scriptsize
+    },
+    mlbox/.style={
+      draw=orange!70!black, thick, rounded corners=3pt, fill=orange!12,
+      align=center, text width=3.5cm, inner sep=5pt, font=\scriptsize
+    },
+    outbox/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=3.5cm, inner sep=5pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.5mm]}, thick, po861blue},
+    note/.style={font=\tiny, text=drpgray, align=center}
+  ]
+    \node[box] (fis) at (0,0.95) {%
+      \textbf{Física (Etapa~2b)}\\
+      $V_{\mathrm{p,Gassmann}}$\\
+      explica a tendência
+    };
+    \node[mlbox] (ml) at (0,-0.95) {%
+      \textbf{ML (Etapa~3)}\\
+      $\widehat{\dVp}$\\
+      explica o desvio local
+    };
+    \node[outbox] (out) at (5.4,0) {%
+      \textbf{Produto híbrido}\\
+      $V_{\mathrm{p,hybrid}} =
+       V_{\mathrm{p,Gassmann}} + \widehat{\dVp}$
+    };
+    \draw[arr] (fis.east) -| ([xshift=-0.8cm]out.north west) -- (out.west);
+    \draw[arr, orange!70!black] (ml.east) -| ([xshift=-0.8cm]out.south west) -- (out.west);
+    \node[note] at (2.7,-2.30) {%
+      Alvo de treino:
+      $\dVp = \Vpsonsub - V_{\mathrm{p,Gassmann}}$.\\
+      O sónico entra em $y$; \textbf{nunca} em $X$.
+    };
+  \end{tikzpicture}
+  \vspace{0.06cm}
+  \begin{exampleblock}{Mensagem}
+    \scriptsize
+    ML direto perfil $\rightarrow$ \Vp{} misturaria escala de medida, condição
+    \emph{in situ} e litologia sem âncora física. O resíduo mantém o DEM/SC
+    interpretável e delega ao ML só o que ele sobra.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Features: oito entradas e uma exclusão que importa}
+  \footnotesize
+  Sete curvas wireline mais a própria \Vp{} Gassmann --- que é \emph{feature}
+  legítima porque o modelo corrige \emph{em torno} dela.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.47\textwidth}
+    \begin{block}{Entra em $X$ (oito)}
+      \scriptsize
+      \begin{itemize}
+        \item GR, densidade.
+        \item Res\_Deep, Res\_Shallow.
+        \item Phi\_Neutron, \phiND{}.
+        \item Lithotype (categórica).
+        \item $V_{\mathrm{p,Gassmann}}$ (baseline 2b).
+      \end{itemize}
+    \end{block}
+    \column{0.51\textwidth}
+    \begin{exampleblock}{Proibido em $X$}
+      \scriptsize
+      \begin{itemize}
+        \item \Vp{}/\Vs{} sónicos, DTCO/DTSM, resíduo observado.
+        \item \textbf{\phiS{}}: é Wyllie de DTCO ---
+              $r = 0{,}995$ com a lentidão e $r = -0{,}993$ com
+              \Vpsonsub{}.
+        \item HFU de laboratório (circularidade com a calibração 2b);
+              usada só na análise pós-hoc.
+      \end{itemize}
+    \end{exampleblock}
+  \end{columns}
+  \vspace{0.08cm}
+  \begin{block}{Sensibilidade do \emph{leakage}}
+    \scriptsize
+    Admitir \phiS{} baixaria o MAPE OOF aparente de \textbf{2,8\% para 2,2\%}.
+    Esses 0,6~p.p.\ medem prêmio de vazamento, não capacidade preditiva ---
+    por isso ficam fora do resultado reportado.
+  \end{block}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Protocolo}
+
+\begin{frame}{Validação por blocos de profundidade: três folds}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    Mesmo protocolo da Etapa~1: dois blocos treinam, um testa; as predições de
+    teste formam a OOF sobre as 87 linhas.
+    \par
+    \vspace{0.08cm}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{clcc}
+      \toprule
+      Fold & Profundidade (m) & RMSE res. & $R^2$ res. \\
+      \midrule
+      0 & 5205,91--5214,48 & 0,12 & 0,87 \\
+      1 & 5214,67--5223,63 & 0,16 & 0,82 \\
+      2 & 5224,39--5233,72 & 0,24 & 0,74 \\
+      \midrule
+      OOF & 5205,91--5233,72 & 0,18 & 0,79 \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.10cm}
+    {\scriptsize Os três folds concordam em ordem de grandeza: o resíduo é
+    estruturado ao longo de \emph{toda} a coluna. A degradação é monotônica com
+    a profundidade --- a base do intervalo é a mais heterogênea.}
+    \column{0.52\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      tr/.style={
+        draw=po861blue, thick, rounded corners=2pt, fill=po861blue!10,
+        align=center, text width=1.55cm, minimum height=0.85cm,
+        inner sep=2pt, font=\tiny
+      },
+      te/.style={
+        draw=orange!70!black, thick, rounded corners=2pt, fill=orange!22,
+        align=center, text width=1.55cm, minimum height=0.85cm,
+        inner sep=2pt, font=\tiny
+      },
+      lbl/.style={font=\tiny, text=drpgray, align=center},
+    ]
+      \node[lbl] at (0,0.95) {topo\\5205,9~m};
+      \node[lbl] at (1.9,0.95) {meio};
+      \node[lbl] at (3.8,0.95) {base\\5233,7~m};
+
+      \node[lbl] at (-1.45,0.0) {Fold 0};
+      \node[te] at (0.0,0.0) {\textbf{teste}};
+      \node[tr] at (1.9,0.0) {treino};
+      \node[tr] at (3.8,0.0) {treino};
+
+      \node[lbl] at (-1.45,-1.15) {Fold 1};
+      \node[tr] at (0.0,-1.15) {treino};
+      \node[te] at (1.9,-1.15) {\textbf{teste}};
+      \node[tr] at (3.8,-1.15) {treino};
+
+      \node[lbl] at (-1.45,-2.30) {Fold 2};
+      \node[tr] at (0.0,-2.30) {treino};
+      \node[tr] at (1.9,-2.30) {treino};
+      \node[te] at (3.8,-2.30) {\textbf{teste}};
+
+      \node[lbl] at (1.9,-3.05) {29 linhas por bloco};
+    \end{tikzpicture}
+    \par
+    \vspace{0.10cm}
+    {\scriptsize Nenhuma profundidade de teste foi vista no treino daquela
+    rodada --- honestidade espacial em poço único.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{O que a OOF mede --- e o que ela não prova}
+  \footnotesize
+  O rótulo ``fora-da-amostra'' precisa de qualificação explícita nesta etapa.
+  \vspace{0.10cm}
+  \centering
+  \begin{tikzpicture}[
+    okbox/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=5.6cm, inner sep=5pt, font=\scriptsize
+    },
+    warn/.style={
+      draw=drpred, thick, rounded corners=3pt, fill=red!6,
+      align=center, text width=5.6cm, inner sep=5pt, font=\scriptsize
+    },
+    note/.style={font=\tiny, text=drpgray, align=center}
+  ]
+    \node[okbox] (a) at (-3.1,0) {%
+      \textbf{O que está demonstrado}\\
+      O corretor generaliza \textbf{em profundidade}
+      dentro do poço~861: blocos de teste
+      não entram no treino da sua rodada.
+    };
+    \node[warn] (b) at (3.1,0) {%
+      \textbf{O que não está}\\
+      O sónico entra na construção do alvo.
+      A OOF \textbf{não} equivale a poço cego
+      nem prova extrapolação interpoços.
+    };
+    \node[note] at (0,-1.75) {%
+      Afirmação defensável: \emph{parte do desvio DEM/Gassmann--DSI é modelável
+      por variáveis de perfil em escala local}.\\
+      Não: ``o modelo prevê \Vp{} em qualquer poço''.
+    };
+  \end{tikzpicture}
+  \vspace{0.10cm}
+  \begin{exampleblock}{Ressalva de escala}
+    \scriptsize
+    O teste cobre 28~m com amostragem densa; blocos vizinhos compartilham
+    facies. É interpolação em profundidade, mais branda do que o rótulo OOF
+    pode sugerir.
+  \end{exampleblock}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Resultado central}
+
+\begin{frame}{Híbrido OOF: MAPE $7{,}3\% \rightarrow 2{,}8\%$, viés eliminado}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    87/87 profundidades casadas; híbrido usa predições OOF do RF.
+    \par
+    \vspace{0.06cm}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{3.5pt}
+    \begin{tabular}{lcccc}
+      \toprule
+      Modelo & MAPE & RMSE & Viés & $\bar{V}_{\mathrm{p}}$ \\
+      \midrule
+      Gassmann & 7,3 & 0,48 & $+0{,}27$ & 5,17 \\
+      Híbrido RF & \textbf{2,8} & \textbf{0,18} & $+0{,}01$ & 4,91 \\
+      DSI (ref.) & --- & --- & --- & 4,90 \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.10cm}
+    {\scriptsize O RMSE cai 63\%, mais que o MAPE em proporção: o corretor
+    ataca justamente as excursões grandes. O resultado final (0,18~km/s) fica
+    abaixo até do desvio-padrão do erro Gassmann ($\approx 0{,}39$~km/s), ou
+    seja, o ML explica viés \emph{e} dispersão.}
+    \column{0.46\textwidth}
+    \slidefigure[0.84]{fig3_vp_hybrid_depth}{Trilha pós-Etapa~3: sónico,
+    Gassmann e híbrido OOF (RF).}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{O resíduo é previsível: $R^2_{\mathrm{OOF}} \approx 0{,}79$}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    Resíduo observado versus predito OOF (RF).
+    \vspace{0.06cm}
+    \begin{itemize}
+      \item Resíduos \textbf{negativos} predominam (Gassmann acima do sónico),
+            coerentes com o viés $+0{,}27$~km/s.
+      \item Nuvem densa entre $-0{,}6$ e $+0{,}3$~km/s: o corpo do intervalo.
+      \item Cinco pontos entre $-1{,}6$ e $-1{,}0$~km/s: as profundidades de
+            HFU~4, recuperadas com erro de 0,1--0,3~km/s.
+    \end{itemize}
+    \vspace{0.04cm}
+    \begin{exampleblock}{Ressalva}
+      \scriptsize
+      Cinco pontos não sustentam extrapolação: resíduo novo dessa magnitude
+      cairia fora do suporte efetivo de treino.
+    \end{exampleblock}
+    \column{0.52\textwidth}
+    \slidefigure[0.83]{fig3_residual_oof_scatter}{Resíduo observado versus
+    predito OOF (Random Forest, depth-block CV).}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Sensibilidade e HFU}
+
+\begin{frame}{Sensibilidade ao regressor: o ganho não é de um algoritmo}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    Cinco regressores da Etapa~1 mais Ridge, mesmo alvo e mesmas oito
+    \emph{features}.
+    \par
+    \vspace{0.06cm}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{3.5pt}
+    \begin{tabular}{lcccc}
+      \toprule
+      Regressor & $R^2$ res. & MAPE & RMSE & Viés \\
+      \midrule
+      Regressão linear & 0,88 & 2,1 & 0,14 & $+0{,}00$ \\
+      \textbf{Random Forest} & 0,79 & \textbf{2,8} & 0,18 & $+0{,}01$ \\
+      Gradient Boosting & 0,69 & 3,0 & 0,22 & $+0{,}01$ \\
+      XGBoost & 0,52 & 3,6 & 0,27 & $+0{,}02$ \\
+      Ridge ($\alpha=1$) & 0,14 & 6,1 & 0,36 & $+0{,}04$ \\
+      MLP & $-0{,}04$ & 6,5 & 0,40 & $+0{,}01$ \\
+      \midrule
+      Gassmann & --- & 7,3 & 0,48 & $+0{,}27$ \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.08cm}
+    {\scriptsize Os \textbf{seis} ficam abaixo do baseline físico. O RF segue
+    como produto oficial por alinhamento à Etapa~1.}
+    \column{0.52\textwidth}
+    \slidefigure[0.80]{fig3_regressor_sensitivity_mape}{MAPE de \Vp{} híbrida
+    OOF por regressor; tracejado $=$ baseline Gassmann (7,3\%).}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Linear vence o Ridge: efeito de escala, não de método}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    \begin{itemize}
+      \item A \textbf{regressão linear} tem o menor MAPE (2,1\%) e o maior
+            $R^2$ residual (0,88): o desvio pós-Gassmann é quase linear na
+            baseline física e nas curvas.
+      \item O \textbf{Ridge} ($\alpha=1$) roda \emph{sem padronização};
+            com resistividades de escala grande, a penalidade $L_2$ encolhe
+            demais os coeficientes pequenos e subajusta.
+      \item O \textbf{MLP} é o pior ($R^2$ levemente negativo) --- rede com
+            $n=87$ é instável.
+    \end{itemize}
+    \vspace{0.04cm}
+    \begin{block}{Leitura}
+      \scriptsize
+      Se o resíduo é aproximadamente linear, o corretor simples é mais fácil
+      de auditar e transferir. Vale exportar as duas trilhas.
+    \end{block}
+    \column{0.46\textwidth}
+    \slidefigure[0.82]{fig3_regressor_depth_comparison}{Trilhas OOF por
+    regressor. MLP (laranja) e Ridge (roxo) oscilam; os demais colam no sónico.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Por HFU: o ganho vem de onde a calibração falhava}
+  \footnotesize
+  Análise \emph{pós-hoc} --- HFU não entra no treino.
+  \vspace{0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \centering
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{cccccc}
+      \toprule
+      \multirow{2}{*}{HFU} & \multirow{2}{*}{$n$} &
+      \multicolumn{2}{c}{MAPE (\%)} & \multicolumn{2}{c}{Viés (km/s)} \\
+      \cmidrule(lr){3-4}\cmidrule(lr){5-6}
+       & & Gass. & Híbr. & Gass. & Híbr. \\
+      \midrule
+      1 & 42 & 6,8 & 2,2 & $+0{,}33$ & $+0{,}02$ \\
+      2 & 29 & 2,2 & 2,3 & $-0{,}11$ & $-0{,}09$ \\
+      3 & 10 & 11,5 & 5,4 & $+0{,}51$ & $+0{,}15$ \\
+      4 & 6  & 28,1 & 4,8 & $+1{,}31$ & $+0{,}17$ \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.12cm}
+    \begin{exampleblock}{Contraexemplo instrutivo}
+      \scriptsize
+      A HFU~2 já entregava 2,2\% na física pura e o corretor \textbf{não
+      melhora nada} (2,3\%). O ML não degrada onde a física fecha --- mas
+      também não tem o que extrair ali.
+    \end{exampleblock}
+    \column{0.48\textwidth}
+    \begin{block}{Onde está o ganho}
+      \scriptsize
+      \begin{itemize}
+        \item \textbf{HFU~4} (sem plugs, \emph{fallback}): 28,1\%
+              $\rightarrow$ 4,8\%; a física errava por mais de 1,3~km/s
+              (6,08 versus 4,77~km/s sónico). Só \textbf{seis} amostras.
+        \item \textbf{HFU~3} (dois plugs): 11,5\% $\rightarrow$ 5,4\%.
+        \item \textbf{HFU~1}: 42 das 87 linhas; 6,8\% $\rightarrow$ 2,2\% ---
+              é ela que puxa o MAPE global.
+      \end{itemize}
+    \end{block}
+    \vspace{0.04cm}
+    {\scriptsize O corretor está compensando \textbf{deficiência de calibração
+    DEM/SC por HFU}, não descobrindo física nova. Mesmo diagnóstico da
+    Etapa~2, agora quantificado.}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{CLP-CSGM e calibração esparsa}
+
+\begin{frame}{Etapa~3b: CLP-CSGM em janelas não supera o RF pontual}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    Resíduo modelado em janelas ($L=16$, passo~1) com autoencoder e stitch
+    \emph{uniform\_mean}, em vez de regressão ponto a ponto.
+    \par
+    \vspace{0.06cm}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{lccc}
+      \toprule
+      Modelo & MAPE & RMSE & Viés \\
+      \midrule
+      Gassmann & 7,3 & 0,48 & $+0{,}27$ \\
+      \textbf{RF híbrido OOF} & \textbf{2,8} & 0,18 & $+0{,}01$ \\
+      CLP Ridge prior ($m{=}0$) & 6,5 & 0,44 & $+0{,}06$ \\
+      CLP zero residual ($m{=}0$) & 6,7 & 0,44 & $+0{,}19$ \\
+      CLP plug sparse $b$ & 6,3 & 0,43 & $+0{,}18$ \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.08cm}
+    {\scriptsize As três CLP ficam agrupadas em 6,3--6,7\%: batem o Gassmann
+    por menos de 1~p.p.\ e perdem do RF por 3,6~p.p.}
+    \column{0.52\textwidth}
+    \slidefigure[0.80]{fig3_clp_comparison_mape}{MAPE de \Vp{} versus DSI:
+    Gassmann, RF híbrido e as três variantes CLP.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Onde o CLP perde: a janela suaviza o degrau da HFU~4}
+  \footnotesize
+  O agrupamento das três variantes já é um diagnóstico.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.54\textwidth}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{ccccc}
+      \toprule
+      HFU & $n$ & MAPE RF & MAPE CLP & Viés RF / CLP \\
+      \midrule
+      1 & 42 & 2,2 & 4,8 & $+0{,}02$ / $+0{,}21$ \\
+      2 & 29 & 2,3 & 3,3 & $-0{,}09$ / $-0{,}16$ \\
+      3 & 10 & 5,4 & 9,8 & $+0{,}15$ / $+0{,}43$ \\
+      4 & 6  & 4,8 & \textbf{25,9} & $+0{,}17$ / $+1{,}20$ \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.10cm}
+    {\scriptsize CLP $=$ plug sparse $b$ (a melhor variante).
+    Nas HFU~1 e~2 a diferença é de 2--3~p.p.; na HFU~4 salta para 21~p.p.
+    A variante CLP herda quase intacto o erro físico daquela unidade.}
+    \begin{block}{Diagnóstico}
+      \scriptsize
+      \emph{Plug sparse} (6,3\%) e \emph{zero residual} (6,7\%) praticamente
+      empatam: o ganho das CLP vem do \emph{prior} do autoencoder, não da
+      informação esparsa injetada em $b$.
+    \end{block}
+    \column{0.44\textwidth}
+    \slidefigure[0.77]{fig3_clp_three_methods_depth}{Sónico, Gassmann, RF
+    híbrido e as duas melhores CLP em profundidade.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Etapa~3c: quanta calibração esparsa o CLP exige}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    Varredura da fração $\rho$ de profundidades com \dVp{} conhecido em $b$;
+    mesma contagem de calibração para CLP e RF sparse.
+    \par
+    \vspace{0.06cm}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{cccc}
+      \toprule
+      $\rho$ & $n_{\mathrm{cal,test}}$ & CLP & RF sparse \\
+      \midrule
+      0 & 0 & 6,8 & 7,3 \\
+      0,115 (plugs) & 3 & 6,5 & 7,5 \\
+      0,30 & 9 & 4,7 & 6,2 \\
+      0,50 & 14 & 4,0 & 3,7 \\
+      0,70 & 20 & \textbf{2,5} & 3,8 \\
+      1,00 & 29 & 1,0 & 3,5 \\
+      \midrule
+      \multicolumn{2}{l}{RF oracle (denso)} & \multicolumn{2}{c}{2,9} \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.08cm}
+    {\scriptsize Com dez plugs ($\rho \approx 0{,}12$) as duas abordagens
+    esparsas mal se distinguem do próprio Gassmann.}
+    \column{0.52\textwidth}
+    \slidefigure[0.80]{fig3_rho_sweep_mape}{MAPE versus $\rho$: CLP sparse $b$
+    e RF sparse, contra RF oracle e Gassmann.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Leitura operacional do sweep $\rho$}
+  \footnotesize
+  A pergunta prática é: \emph{quando vale trocar o corretor pontual pelo CLP?}
+  \vspace{0.10cm}
+  \centering
+  \begin{tikzpicture}[
+    q/.style={
+      draw=orange!70!black, thick, rounded corners=3pt, fill=orange!12,
+      align=center, text width=3.6cm, inner sep=4pt, font=\scriptsize
+    },
+    opt/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!10,
+      align=center, text width=3.5cm, inner sep=4pt, font=\scriptsize
+    },
+    good/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=3.5cm, inner sep=4pt, font=\scriptsize
+    },
+    bad/.style={
+      draw=drpred, thick, rounded corners=3pt, fill=red!6,
+      align=center, text width=3.5cm, inner sep=4pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.4mm]}, thick, po861blue},
+  ]
+    \node[q] (q) at (0,0) {Há sónico denso no intervalo de treino?};
+    \node[good] (rf) at (5.2,1.15) {%
+      \textbf{Sim} $\rightarrow$ RF pontual\\
+      2,8\% MAPE (produto)
+    };
+    \node[opt] (sp) at (5.2,-1.15) {%
+      \textbf{Não} $\rightarrow$ depende de $\rho$
+    };
+    \node[bad] (lo) at (10.4,-0.15) {%
+      $\rho \lesssim 0{,}5$: CLP e RF sparse\\
+      empatam com o Gassmann
+    };
+    \node[good] (hi) at (10.4,-2.15) {%
+      $\rho \gtrsim 0{,}7$: CLP cruza\\
+      o oracle (2,5\% vs 2,9\%)
+    };
+    \draw[arr] (q.east) |- (rf.west);
+    \draw[arr] (q.east) |- (sp.west);
+    \draw[arr] (sp.east) |- (lo.west);
+    \draw[arr] (sp.east) |- (hi.west);
+  \end{tikzpicture}
+  \vspace{0.10cm}
+  \begin{exampleblock}{Mensagem}
+    \scriptsize
+    Exigir calibração em $\gtrsim 70\%$ das profundidades é pouco realista em
+    poço novo. Neste regime, o fator limitante é a \textbf{densidade de
+    calibração}, não o algoritmo.
+  \end{exampleblock}
+\end{frame}
+
+% ------------------------------------------------------------------
+\section{Síntese e conclusões}
+
+\begin{frame}{Síntese das Etapas~1--3}
+  \footnotesize
+  Cada etapa responde a uma pergunta distinta na cadeia
+  perfil $\rightarrow$ física $\rightarrow$ correção residual.
+  \vspace{0.08cm}
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{clllrc}
+    \toprule
+    Etapa & Pergunta central & Validação & Métrica & Valor & $n$ \\
+    \midrule
+    1 & \philab{} prevível com perfil? & depth-block OOF & $R^2$ (RF) & 0,15 & 87 \\
+    1 & \fzilab{} prevível com perfil? & depth-block OOF & $R^2$ (RF) & $-0{,}82$ & 87 \\
+    2 & \Vp{} DEM fecha o laboratório? & LOO plugs & MAPE (\%) & 14,8 & 10 \\
+    2 & \Vp{} Gassmann fecha o DSI? & casamento 87/87 & MAPE (\%) & 7,3 & 87 \\
+    2 & Gassmann elimina o viés? & casamento 87/87 & Viés (km/s) & $+0{,}27$ & 87 \\
+    3 & Resíduo prevível com perfil? & depth-block OOF & $R^2$ resíduo & 0,79 & 87 \\
+    3 & Híbrido fecha o DSI? & depth-block OOF & MAPE (\%) & \textbf{2,8} & 87 \\
+    3 & Híbrido elimina o viés? & depth-block OOF & Viés (km/s) & $+0{,}01$ & 87 \\
+    3b & CLP residual fecha o DSI? & depth-block OOF & MAPE (\%) & 6,3 & 87 \\
+    3b & CLP versus RF (melhor CLP) & depth-block OOF & $\Delta$MAPE (p.p.) & $+3{,}6$ & 87 \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.12cm}
+  \begin{block}{Como ler as duas linhas da Etapa~2}
+    \scriptsize
+    O LOO de plugs (14,8\%, $n=10$) é bem pior que o casamento com o perfil
+    (7,3\%, $n=87$): retirar um plug remove fração grande da calibração da sua
+    HFU, enquanto o perfil é avaliado com todos os plugs dentro do ajuste.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Limitações que acompanham qualquer uso destes números}
+  \footnotesize
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.49\textwidth}
+    \begin{block}{Amostragem}
+      \scriptsize
+      \begin{itemize}
+        \item 87 linhas, oito \emph{features}; RF mantido modesto
+              (200 árvores) para conter sobreajuste.
+        \item HFU~4 com $n=6$ é estatisticamente frágil --- e é justamente ela
+              que concentra o maior ganho reportado.
+      \end{itemize}
+    \end{block}
+    \begin{block}{Escopo da validação}
+      \scriptsize
+      \begin{itemize}
+        \item O sónico entra no alvo: OOF $\neq$ poço cego.
+        \item 28~m com blocos vizinhos de mesma facies: é interpolação em
+              profundidade.
+      \end{itemize}
+    \end{block}
+    \column{0.49\textwidth}
+    \begin{exampleblock}{Física não identificada}
+      \scriptsize
+      \begin{itemize}
+        \item PVT fixo ($K_f$, $S_w=1$, pressão): sensibilidade não explorada.
+        \item O resíduo aprendido pode combinar pressão efetiva, limites de
+              Gassmann, erro de segmentação HFU, anisotropia e condição de
+              medida do DSI.
+        \item \textbf{Não} é novo modelo físico nem explicação mecanística
+              única do desvio elástico.
+      \end{itemize}
+    \end{exampleblock}
+    \vspace{0.04cm}
+    {\scriptsize Antes de inversão sísmica: validar em poço vizinho ou
+    intervalo não usado no treino e refinar PVT onde houver amostra de fluido.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Conclusões}
+  \footnotesize
+  \begin{enumerate}
+    \item \textbf{Viabilidade do híbrido:} MAPE de \Vp{} cai de 7,3\% para
+          2,8\% e o viés de $+0{,}27$ para $+0{,}01$~km/s no OOF; parte do
+          desvio DEM/Gassmann--DSI é modelável por variáveis de perfil em
+          escala local.
+    \item \textbf{Papel na cadeia:} o ML é \textbf{corretor empírico} da física
+          DEM/SC + Gassmann --- não substitui o sónico, não é atalho perfil
+          $\rightarrow$ \Vp{} e não constitui novo modelo físico.
+    \item \textbf{HFU:} ganho concentrado em HFU~4 ($28\% \rightarrow 5\%$,
+          $n=6$) e HFU~3 ($11{,}5\% \rightarrow 5{,}4\%$); a HFU~2 já era boa
+          ($\approx 2\%$) e permanece estável --- o corretor compensa
+          calibração deficiente, não física ausente.
+    \item \textbf{\phiS{}:} excluída de $X$ por ser transformada de Wyllie do
+          DTCO que define o alvo; admiti-la inflaria o MAPE aparente em
+          $\approx 0{,}6$~p.p.\ sem ganho preditivo real.
+    \item \textbf{Regressor:} RF oficial (2,8\%); regressão linear ainda melhor
+          (2,1\%); GB e XGB próximos (3,0--3,6\%) --- o resultado não depende de
+          um algoritmo específico.
+    \item \textbf{CLP-CSGM (3b/3c):} variantes por janelas ficam em 6,3--6,7\%
+          e só superam o oracle com calibração esparsa em
+          $\gtrsim 70\%$ das profundidades.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Caminho: do corretor local ao produto de perfil}
+  \vspace{-0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    \textbf{Produto da Etapa~3}
+    \begin{itemize}
+      \item Coluna $V_{\mathrm{p,hybrid}}$ OOF nas 87 linhas.
+      \item Corretor RF serializado e trilha alternativa linear.
+      \item Regra anti-\emph{leakage} documentada e auditável.
+    \end{itemize}
+    \textbf{Próximos passos}
+    \begin{itemize}
+      \item Exportar $V_{\mathrm{p,hybrid}}$ ao perfil de produção.
+      \item Repetir a validação tripla da Etapa~2 com a nova trilha.
+      \item Validar em poço ou intervalo independente \emph{antes} de
+            inversão sísmica.
+    \end{itemize}
+    \column{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.58cm,
+      flowbox/.style={
+        draw, thick, rounded corners=4pt,
+        align=center, text width=5.2cm,
+        inner sep=3pt, font=\scriptsize
+      },
+      flowarr/.style={-{Stealth[length=2.4mm]}, thick, po861blue},
+      arrlabel/.style={
+        midway, fill=white, inner sep=1pt,
+        font=\tiny, text=po861blue, align=center
+      }
+    ]
+      \node[flowbox, fill=po861blue!18, draw=po861blue] (e1) {%
+        \textbf{1. Diagnóstico ML}\\
+        Limites do perfil
+      };
+      \node[flowbox, fill=po861green!18, draw=po861green, below=of e1] (e2) {%
+        \textbf{2. DEM/SC + Gassmann}\\
+        \Vp{} física calibrada
+      };
+      \node[flowbox, fill=orange!18, draw=orange!70!black, below=of e2] (e3) {%
+        \textbf{3. Física + ML residual}\\
+        \textbf{concluída nesta apresentação}
+      };
+      \node[flowbox, fill=drpgray!12, draw=drpgray, below=of e3] (e4) {%
+        \textbf{4. Poço independente}\\
+        pré-requisito para inversão
+      };
+      \draw[flowarr] (e1.south) -- node[arrlabel] {$\phi$, HFU} (e2.north);
+      \draw[flowarr] (e2.south) -- node[arrlabel] {resíduo} (e3.north);
+      \draw[flowarr] (e3.south) -- node[arrlabel] {transferência} (e4.north);
+    \end{tikzpicture}
+  \end{columns}
+  \vspace{0.04cm}
+  \begin{center}
+    {\small Obrigado.}
+  \end{center}
+\end{frame}
+
+\end{document}

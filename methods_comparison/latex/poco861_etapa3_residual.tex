@@ -8,6 +8,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[brazil]{babel}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \numberwithin{equation}{section}
 \usepackage{booktabs}
 \usepackage{graphicx}
@@ -52,20 +53,20 @@ O alvo de aprendizado é o resíduo
 $\Delta V_{\mathrm{p}} = V_{\mathrm{p,sonic}} - V_{\mathrm{p,Gassmann}}$;
 o produto final é
 $V_{\mathrm{p,hybrid}} = V_{\mathrm{p,Gassmann}} + \widehat{\Delta V_{\mathrm{p}}}$,
-com nove \emph{features} (oito curvas wireline mais a própria \Vp{} Gassmann)
+com oito \emph{features} (sete curvas wireline mais a própria \Vp{} Gassmann)
 e validação por blocos contíguos de profundidade (três folds, protocolo
 idêntico ao da Etapa~1).
 
 Contra o sônico de poço (87/87 profundidades casadas), o baseline Gassmann
-apresenta MAPE de 15,4\%, RMSE de 0,81~km/s e viés de $+0{,}59$~km/s
-(\Vp{} teórica média $\approx 5{,}17$~km/s versus sônica $\approx 4{,}58$~km/s).
+apresenta MAPE de 7,3\%, RMSE de 0,48~km/s e viés de $+0{,}27$~km/s
+(\Vp{} teórica média $\approx 5{,}17$~km/s versus sônica $\approx 4{,}90$~km/s).
 O híbrido Random Forest com predições fora-da-amostra (OOF) reduz o MAPE
-para 8,1\%, o RMSE para 0,46~km/s e o viés para $+0{,}03$~km/s, alinhando a
-média predita ($\approx 4{,}60$~km/s) ao patamar sônico.
-O ganho concentra-se nas HFU~1 e~4, onde a física superestimava \Vp{}
-(viés $+0{,}76$ e $+1{,}56$~km/s, respectivamente); a HFU~2, já boa na
-Etapa~2 ($\approx 8\%$ MAPE), permanece estável.
-A HFU~4 passa de MAPE $\approx 35\%$ para $\approx 5\%$ no híbrido OOF---resultado
+para 2,8\%, o RMSE para 0,18~km/s e o viés para $+0{,}01$~km/s, alinhando a
+média predita ($\approx 4{,}91$~km/s) ao patamar sônico.
+O ganho concentra-se nas HFU~3 e~4, onde a física superestimava \Vp{}
+(viés $+0{,}51$ e $+1{,}31$~km/s, respectivamente); a HFU~2, já boa na
+Etapa~2 ($\approx 2\%$ MAPE), permanece estável.
+A HFU~4 passa de MAPE $\approx 28\%$ para $\approx 5\%$ no híbrido OOF---resultado
 promissor, porém com apenas seis amostras e validação no mesmo poço.
 O ML não substitui DEM/SC nem o sônico; atua como \textbf{correção
 empírica local} onde PVT default e segmentação HFU não fecham o perfil
@@ -76,8 +77,8 @@ independente.
 Recomenda-se validação em intervalo ou poço independente antes de uso
 em inversão sísmica.
 Complementarmente (Etapa~3b), testamos CLP-CSGM em janelas sobre o mesmo
-resíduo: o RF pontual (8,1\% MAPE) supera as variantes CLP
-(11,4--14,0\% MAPE), confirmando que a correção residual neste poço
+resíduo: o RF pontual (2,8\% MAPE) supera as variantes CLP
+(6,3--6,7\% MAPE), confirmando que a correção residual neste poço
 beneficia-se da predição ponto a ponto em vez da reconstrução por janelas.
 \end{abstract}
 
@@ -103,15 +104,15 @@ profundidades casadas).
 A fase~2b aplicou Gassmann com fluido de formação ($K_f \approx 2{,}2$~GPa,
 saturação total) sobre o arcabouço seco.
 O resultado foi uma melhora \emph{modesta} do viés frente ao sônico
-($+0{,}62 \rightarrow +0{,}59$~km/s; MAPE $\approx 16\% \rightarrow 15\%$),
+($+0{,}30 \rightarrow +0{,}27$~km/s; MAPE $\approx 8{,}7\% \rightarrow 7{,}3\%$),
 confirmando que a cadeia física captura a ordem de grandeza de \Vp{}, mas não
 fecha o gap \emph{in-situ}.
-A HFU~2 apresentou o melhor acordo ($\approx 8\%$ MAPE); a HFU~4, sem plugs de
-calibração e com parâmetros \emph{fallback}, divergiu ($\approx 35\%$
-MAPE, viés $+1{,}6$~km/s).
+A HFU~2 apresentou o melhor acordo ($\approx 2\%$ MAPE); a HFU~4, sem plugs de
+calibração e com parâmetros \emph{fallback}, divergiu ($\approx 28\%$
+MAPE, viés $+1{,}3$~km/s).
 
 A Etapa~2 encerrou recomendando explicitamente a Etapa~3: aprendizado sobre
-\emph{resíduos} da física, em especial nas HFU~1 e~4, em vez de abandonar
+\emph{resíduos} da física, em especial nas HFU~3 e~4, em vez de abandonar
 DEM/SC ou treinar ML direto perfil $\rightarrow$ \Vp{}.
 
 \subsection{Pergunta da Etapa~3 e motivação}
@@ -122,7 +123,8 @@ DSI, existe informação nas curvas de perfil---já usadas na Etapa~1---que
 explique o desvio residual local, sem descartar o arcabouço DEM/SC?}
 
 A motivação petrofísica é dupla.
-Primeiro, o viés positivo persistente ($\approx +0{,}6$~km/s) indica que
+Primeiro, o viés positivo persistente ($\approx +0{,}27$~km/s, com excursões
+locais acima de $1$~km/s) indica que
 incertezas em PVT \emph{in-situ} ($K_f$, saturação, pressão), em
 parâmetros de matriz por HFU (especialmente HFU~4) ou em condições de
 medida (frequência sônica versus escala de amostra) deixam um resíduo
@@ -148,8 +150,8 @@ sônico em vez de corrigir a física.
 
 A Seção~\ref{sec:dados} descreve fontes, casamento 87/87 e definição
 do alvo residual.
-A Seção~\ref{sec:protocolo} detalha \emph{features} (incluindo cenários
-de uso de \phiS{}), regras de validação, escopo intra-poço e métricas.
+A Seção~\ref{sec:protocolo} detalha \emph{features} (incluindo a exclusão
+de \phiS{}), regras de validação, escopo intra-poço e métricas.
 A Seção~\ref{sec:resultados} apresenta o confronto global Gassmann versus
 híbrido, a referência visual da Etapa~2, sensibilidade aos regressores da
 Etapa~1, as trilhas em profundidade, o desempenho por HFU e a síntese das
@@ -194,11 +196,11 @@ sônico é previsível a partir do perfil.
 
 \subsection{Features, alvo e regras anti-\emph{leakage}}
 
-A Tabela~\ref{tab:features} lista as nove variáveis de entrada do ML residual.
-As oito primeiras são as mesmas curvas wireline empregadas nos regressores da
-Etapa~1 (gama-ray, densidade, resistividades profunda e rasa, três porosidades
-de perfil e litotipo codificado).
-A nona é \Vp{} Gassmann: a própria predição física, tratada como
+A Tabela~\ref{tab:features} lista as oito variáveis de entrada do ML residual.
+As sete primeiras são curvas wireline empregadas nos regressores da
+Etapa~1 (gama-ray, densidade, resistividades profunda e rasa, duas porosidades
+de perfil não acústicas e litotipo codificado).
+A oitava é \Vp{} Gassmann: a própria predição física, tratada como
 \emph{feature} legítima porque o modelo deve aprender \emph{correções
 locais} em torno dela, não substituí-la.
 
@@ -213,7 +215,7 @@ locais} em torno dela, não substituí-la.
     GR & API & Litologia / argilosidade \\
     Densidade & g/cc & Compactação e fluido \\
     Res\_Deep, Res\_Shallow & ohm$\cdot$m & Saturacao / litologia \\
-    Phi\_Neutron, Phi\_Sonic, \phiND{} & pu & Porosidade e litologia \\
+    Phi\_Neutron, \phiND{} & pu & Porosidade e litologia \\
     Lithotype & categórica & Facies de perfil \\
     $V_{\mathrm{p,Gassmann}}$ & km/s & Baseline física (Etapa~2b) \\
     \midrule
@@ -224,43 +226,49 @@ locais} em torno dela, não substituí-la.
 
 Na Tabela~\ref{tab:features}, o alvo é o resíduo em km/s.
 Variáveis \textbf{proibidas} em $X$ incluem \Vp{} sônica, \Vs{} sônica,
-lentidões DTCO/DTSM e o próprio resíduo observado---qualquer uma
+lentidões DTCO/DTSM, qualquer transformada dessas lentidões e o próprio
+resíduo observado---qualquer uma
 permitiria ao modelo reproduzir o sônico sem generalizar.
 A HFU de laboratório \textbf{não} entra em $X$ (evita circularidade com a
 segmentação usada na calibração DEM/SC); é usada apenas na
 análise pós-hoc por unidade de fluxo.
 
-\subsection{Cuidado com \phiS{} (\texttt{Phi\_Sonic}) nas features}
+\subsection{Exclusão de \phiS{} (\texttt{Phi\_Sonic}) das features}
+\label{sec:phi_sonic}
 
-Nesta rodada, \phiS{} entra como curva operacional de perfil (porosidade
-sônica derivada de ferramenta de poço), aceitável no cenário de
-\textbf{calibração local} em que o DSI está disponível para construir
-o alvo residual.
-Para aplicação em que se pretenda \textbf{substituir ou reconstruir} o
-sônico sem medição elástica de referência, \phiS{} deve ser tratada
-com cautela: porosidade acústica pode carregar informação elástica
-indireta e configurar vazamento de informação no residual.
-Recomenda-se, nesse cenário futuro, re-treinar o corretor \textbf{sem}
-\phiS{} e reportar sensibilidade de MAPE e viés.
-A Tabela~\ref{tab:phi_sonic_scenarios} resume os dois contextos de uso.
+\phiS{} é a porosidade sônica obtida por tempo médio de Wyllie a partir de
+DTCO---exatamente a lentidão compressional que define
+$V_{\mathrm{p,sonic}} = 1/\mathrm{DTCO}$ e, portanto, o alvo residual.
+No perfil de 87 linhas, a relação é praticamente determinística:
+$r = 0{,}995$ entre \phiS{} e DTCO ($R^2 = 0{,}99$ em ajuste linear) e
+$r = -0{,}993$ entre \phiS{} e $V_{\mathrm{p,sonic}}$.
+Admiti-la em $X$ equivaleria a fornecer o sônico ao corretor sob outro nome,
+violando a regra anti-\emph{leakage} da equação~\eqref{eq:hybrid}.
+Por isso \phiS{} fica \textbf{fora} de $X$ em todos os experimentos desta
+etapa, embora permaneça no perfil integrado para uso em outros alvos
+(por exemplo, na validação de porosidade da Etapa~2c/2d, onde é referência
+e não entrada).
+A Tabela~\ref{tab:phi_sonic_scenarios} resume a regra por contexto.
 
 \begin{table}[H]
   \centering
-  \caption{Cenários de uso de \phiS{} no ML residual.}
+  \caption{Tratamento de \phiS{} conforme o alvo modelado.}
   \label{tab:phi_sonic_scenarios}
   \begin{tabular}{p{3.2cm}p{4.5cm}p{5.5cm}}
     \toprule
-    Cenário & \phiS{} em $X$? & Interpretação \\
+    Contexto & \phiS{} em $X$? & Justificativa \\
     \midrule
-    Calibração local (este estudo) & Sim & DSI disponível; residual treinado com referência sônica \\
-    Predição sem sônico & Não recomendado & Re-treinar sem \phiS{}; evitar proxy acústico no corretor \\
+    Corretor residual de \Vp{} (esta etapa) & Não & Transformada de DTCO; proxy direto do alvo \\
+    Alvos não elásticos (\philab{}, \fzilab{}) & Sim & Curva operacional independente do alvo \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Na Tabela~\ref{tab:phi_sonic_scenarios}, o resultado OOF desta etapa (MAPE 8,1\%)
-vale para o primeiro cenário; não deve ser transferido automaticamente ao
-segundo sem nova validação.
+Na Tabela~\ref{tab:phi_sonic_scenarios}, a distinção é entre curva de perfil
+\emph{informativa} e curva \emph{derivada do alvo}.
+Como sensibilidade, incluir \phiS{} em $X$ baixaria o MAPE OOF aparente de
+2,8\% para 2,2\%: o ganho de 0,6 ponto percentual mede o prêmio de vazamento,
+não capacidade preditiva adicional, e por isso não é reportado como resultado.
 
 A Tabela~\ref{tab:hybrid_def} fixa a aritmética do produto híbrido conforme
 a equação~\eqref{eq:hybrid}.
@@ -317,19 +325,22 @@ do RF no \emph{alvo residual} por fold (RMSE e $R^2$ do resíduo, não de
     \toprule
     Fold & Profundidade (m) & $n_{\mathrm{test}}$ & RMSE resíduo (km/s) & $R^2$ resíduo \\
     \midrule
-    0 & 5205,91--5214,48 & 29 & 0,55 & 0,18 \\
-    1 & 5214,67--5223,63 & 29 & 0,47 & 0,42 \\
-    2 & 5224,39--5233,72 & 29 & 0,34 & 0,27 \\
+    0 & 5205,91--5214,48 & 29 & 0,12 & 0,87 \\
+    1 & 5214,67--5223,63 & 29 & 0,16 & 0,82 \\
+    2 & 5224,39--5233,72 & 29 & 0,24 & 0,74 \\
     \midrule
-    Global OOF & 5205,91--5233,72 & 87 & 0,46 & 0,32 \\
+    Global OOF & 5205,91--5233,72 & 87 & 0,18 & 0,79 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Na Tabela~\ref{tab:folds}, a variabilidade entre folds (RMSE 0,34--0,55~km/s)
-reflete heterogeneidade ao longo da coluna: o bloco superior (fold~0) é o mais
-difícil para o resíduo ($R^2 \approx 0{,}18$), enquanto o bloco central
-(fold~1) concentra HFU~2 mais homogênea e atinge $R^2 \approx 0{,}42$.
+Na Tabela~\ref{tab:folds}, os três folds concordam em ordem de grandeza
+($R^2$ entre 0,74 e 0,87), o que indica que o resíduo é estruturado ao longo
+de toda a coluna e não apenas em um trecho.
+A degradação é monotônica com a profundidade: o bloco superior (fold~0) é o
+mais previsível ($R^2 \approx 0{,}87$; RMSE 0,12~km/s) e o bloco inferior
+(fold~2) o mais difícil ($R^2 \approx 0{,}74$; RMSE 0,24~km/s), coerente com a
+maior heterogeneidade litológica na base do intervalo.
 Esses números referem-se ao ajuste de $\Delta V_{\mathrm{p}}$, não ao MAPE
 final de \Vp{} híbrida---métrica de negócio reportada na
 Seção~\ref{sec:resultados}.
@@ -357,7 +368,8 @@ regressores da Etapa~1 mais Ridge (Tabela~\ref{tab:regressor_sensitivity}).
 Lista completa:
 \begin{itemize}
   \item \textbf{Random Forest} (200 árvores, semente 42)---corretor oficial.
-  \item \textbf{Ridge} ($\alpha = 1$)---melhor MAPE híbrido nesta rodada (7,7\%).
+  \item \textbf{Ridge} ($\alpha = 1$, sem padronização de escala)---variante
+        penalizada da Etapa~1d.
   \item \textbf{Gradient Boosting, XGBoost, MLP, regressão linear}---mesma
         configuração da Etapa~1, para sensibilidade.
 \end{itemize}
@@ -372,8 +384,9 @@ A avaliação oficial confronta \Vp{} \textbf{híbrida OOF} e \Vp{}
         positivo indica superestimativa sistemática da \Vp{} teórica.
 \end{itemize}
 Reportamos viés junto com MAPE porque, na Etapa~2, um MAPE moderado com viés
-$+0{,}6$~km/s tinha interpretação diferente de erro simétrico: a física
-``acertava a forma'' mas deslocava a trilha para cima.
+$+0{,}27$~km/s tinha interpretação diferente de erro simétrico: a física
+``acertava a forma'' mas deslocava a trilha para cima---o viés respondia por
+mais da metade do RMSE observado contra o DSI.
 
 \section{Resultados}
 \label{sec:resultados}
@@ -394,23 +407,27 @@ predições OOF do RF no resíduo.
     \toprule
     Modelo & MAPE (\%) & RMSE (km/s) & Viés (km/s) & $\bar{V}_{\mathrm{p}}$ pred. (km/s) \\
     \midrule
-    Gassmann (Etapa~2b) & 15,4 & 0,81 & $+0{,}59$ & 5,17 \\
-    Híbrido RF OOF & 8,1 & 0,46 & $+0{,}03$ & 4,60 \\
-    DSI (referência) & -- & -- & -- & 4,58 \\
+    Gassmann (Etapa~2b) & 7,3 & 0,48 & $+0{,}27$ & 5,17 \\
+    Híbrido RF OOF & 2,8 & 0,18 & $+0{,}01$ & 4,91 \\
+    DSI (referência) & -- & -- & -- & 4,90 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Na Tabela~\ref{tab:compare_global}, o híbrido reduz o MAPE em 7,3 pontos
-percentuais (15,4\% $\rightarrow$ 8,1\%) e praticamente elimina o viés global
-($+0{,}59 \rightarrow +0{,}03$~km/s).
-O RMSE cai de 0,81 para 0,46~km/s.
-A média de \Vp{} predita passa de 5,17~km/s (Gassmann) para 4,60~km/s
-(híbrido), próxima da média sônica 4,58~km/s---evidéncia de que o ML
-corrigiu principalmente o \emph{deslocamento sistemático} da física, não
-apenas flutuações aleatórias.
-O patamar de 8,1\% MAPE no OOF supera o critério de aceite parcial definido
-no planejamento (MAPE $< 12\%$ ou $|\mathrm{viés}| < 0{,}35$~km/s), mas deve
+Na Tabela~\ref{tab:compare_global}, o híbrido reduz o MAPE em 4,5 pontos
+percentuais (7,3\% $\rightarrow$ 2,8\%) e praticamente elimina o viés global
+($+0{,}27 \rightarrow +0{,}01$~km/s).
+O RMSE cai de 0,48 para 0,18~km/s---queda de 63\%, maior em proporção que a
+do MAPE, porque o corretor ataca justamente as excursões grandes.
+A média de \Vp{} predita passa de 5,17~km/s (Gassmann) para 4,91~km/s
+(híbrido), praticamente coincidente com a média sônica 4,90~km/s.
+Vale notar a decomposição do erro físico: dos 0,48~km/s de RMSE do baseline,
+0,27~km/s são viés puro, de modo que o corretor precisa explicar tanto o
+deslocamento sistemático quanto a dispersão remanescente---e faz as duas
+coisas, já que o RMSE final (0,18~km/s) fica abaixo até do desvio-padrão do
+erro Gassmann ($\approx 0{,}39$~km/s).
+O patamar de 2,8\% MAPE no OOF supera o critério de aceite definido
+no planejamento (MAPE $< 12\%$ ou $|\text{viés}| < 0{,}35$~km/s), mas deve
 ser lido como validação \emph{no mesmo poço}, não como garantia de
 extrapolação espacial.
 
@@ -430,12 +447,12 @@ explica apenas parte do desvio.
   \caption{Referência da Etapa~2b: trilha de profundidade com \Vp{} sônico
            (verde), DEM a seco (azul tracejado) e DEM com Gassmann (vermelho).
            A saturação aproxima parcialmente o sônico, mas o viés
-           $+0{,}59$~km/s persiste---motivação direta da Etapa~3.}
+           $+0{,}27$~km/s persiste---motivação direta da Etapa~3.}
   \label{fig:gassmann_depth_ref}
 \end{figure}
 
 Na Figura~\ref{fig:gassmann_depth_ref}, trechos onde as três curvas se separam
-mais (em especial faixas associadas às HFU~1 e~4 na discussão da Etapa~2)
+mais (em especial faixas associadas às HFU~3 e~4 na discussão da Etapa~2)
 coincidem com os maiores resíduos observados na Tabela~\ref{tab:hfu_compare}.
 A Etapa~3 não altera a física Gassmann; aprende um corretor
 $\widehat{\Delta V_{\mathrm{p}}}$ que desloca a trilha vermelha em direção
@@ -446,7 +463,7 @@ $\widehat{\Delta V_{\mathrm{p}}}$ que desloca a trilha vermelha em direção
 Para verificar se a escolha do Random Forest é robusta, repetimos o protocolo
 depth-block OOF com os \textbf{cinco regressores} da Etapa~1 (RF, Gradient
 Boosting, XGBoost, MLP, regressão linear) mais \textbf{Ridge} (alternativa da
-Etapa~1d), no mesmo alvo residual e nas mesmas nove \emph{features}.
+Etapa~1d), no mesmo alvo residual e nas mesmas oito \emph{features}.
 A métrica decisiva é \Vp{} híbrida OOF versus DSI (MAPE e viés), não
 apenas $R^2$ do resíduo.
 
@@ -465,14 +482,14 @@ híbrida.
     Regressor & $R^2$ resíduo & RMSE res. (km/s) & MAPE híbr. (\%) &
     RMSE híbr. (km/s) & Viés híbr. (km/s) \\
     \midrule
-    Ridge ($\alpha=1$) & 0,44 & 0,42 & 7,7 & 0,42 & $+0{,}07$ \\
-    Random Forest & 0,32 & 0,46 & 8,1 & 0,46 & $+0{,}03$ \\
-    MLP & 0,23 & 0,49 & 8,9 & 0,49 & $+0{,}01$ \\
-    XGBoost & 0,13 & 0,52 & 9,2 & 0,52 & $+0{,}13$ \\
-    Gradient Boosting & 0,09 & 0,53 & 9,6 & 0,53 & $+0{,}06$ \\
-    Regressão linear & $-0{,}53$ & 0,69 & 12,2 & 0,69 & $+0{,}14$ \\
+    Regressão linear & 0,88 & 0,14 & 2,1 & 0,14 & $+0{,}00$ \\
+    Random Forest & 0,79 & 0,18 & 2,8 & 0,18 & $+0{,}01$ \\
+    Gradient Boosting & 0,69 & 0,22 & 3,0 & 0,22 & $+0{,}01$ \\
+    XGBoost & 0,52 & 0,27 & 3,6 & 0,27 & $+0{,}02$ \\
+    Ridge ($\alpha=1$) & 0,14 & 0,36 & 6,1 & 0,36 & $+0{,}04$ \\
+    MLP & $-0{,}04$ & 0,40 & 6,5 & 0,40 & $+0{,}01$ \\
     \midrule
-    Gassmann (baseline) & -- & -- & 15,4 & 0,81 & $+0{,}59$ \\
+    Gassmann (baseline) & -- & -- & 7,3 & 0,48 & $+0{,}27$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -481,48 +498,56 @@ híbrida.
   \centering
   \includegraphics[width=0.82\linewidth]{figures/fig3_regressor_sensitivity_mape}
   \caption{MAPE de \Vp{} híbrida OOF versus DSI por regressor. Linha tracejada:
-           baseline Gassmann (15,4\%). RF permanece produto oficial; Ridge apresenta
-           menor MAPE nesta rodada.}
+           baseline Gassmann (7,3\%). Todos os seis regressores ficam abaixo do
+           baseline; RF (barra vermelha) permanece produto oficial e a regressão
+           linear apresenta o menor MAPE nesta rodada.}
   \label{fig:regressor_sensitivity}
 \end{figure}
 
 A Figura~\ref{fig:regressor_depth_compare} exibe as trilhas de profundidade
 comparativas: \Vp{} sônica (referência), Gassmann (baseline) e \Vp{}
 híbrida OOF de cada regressor no mesmo intervalo 5205,91--5233,72~m.
-As linhas RF (vermelho) e Ridge (roxo) destacam-se; demais regressores aparecem
-com traço mais fino para não poluir a leitura.
+A linha RF (vermelho) recebe traço mais grosso; demais regressores aparecem
+com traço fino para não poluir a leitura.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.85\linewidth]{figures/fig3_regressor_depth_comparison}
   \caption{Trilha de profundidade comparativa: \Vp{} sônico, Gassmann e híbrido
-           OOF por regressor (depth-block CV, 87 linhas). RF e Ridge aproximam-se
-           da referência sônica; Gassmann permanece sistematicamente acima.}
+           OOF por regressor (depth-block CV, 87 linhas). RF, regressão linear
+           e os dois \emph{boostings} colam na referência sônica; MLP e Ridge
+           oscilam; Gassmann permanece sistematicamente acima.}
   \label{fig:regressor_depth_compare}
 \end{figure}
 
 Na Figura~\ref{fig:regressor_depth_compare}, todas as curvas híbridas deslocam
 a trilha Gassmann em direção ao sônico, confirmando visualmente o ganho
 da Tabela~\ref{tab:regressor_sensitivity}.
-Ridge e RF coincidem em boa parte do intervalo; XGBoost e regressão linear
-apresentam desvios locais maiores (coerente com MAPE 9,2\% e 12,2\%).
-A dispersão entre regressores reforça que a escolha do corretor importa,
-mas não invalida o padrão geral: o ML corrige o viés físico em escala local.
+RF, regressão linear, Gradient Boosting e XGBoost praticamente se sobrepõem à
+curva verde, inclusive nas excursões de baixa velocidade em torno de
+5218 e 5230~m onde o Gassmann erra por mais de 1~km/s.
+MLP (laranja) e Ridge (roxo) são os únicos que introduzem oscilações próprias,
+com excursões abaixo de 4,0~km/s ausentes do sônico---razão pela qual seus
+MAPE ficam no patamar de 6\%.
 
-Na Tabela~\ref{tab:regressor_sensitivity}, o \textbf{Ridge} alcança o menor
-MAPE híbrido (7,7\%) e o maior $R^2$ no resíduo (0,44), confirmando que
-parte do desvio pós-Gassmann é quase linear nas curvas e na baseline física.
-O \textbf{RF} mantém o melhor compromisso entre MAPE (8,1\%) e viés
-($+0{,}03$~km/s) entre os modelos de ensemble; adotamos o RF como corretor
+Na Tabela~\ref{tab:regressor_sensitivity}, a \textbf{regressão linear} alcança
+o menor MAPE híbrido (2,1\%) e o maior $R^2$ no resíduo (0,88): o desvio
+pós-Gassmann é, em boa medida, uma função quase linear da própria baseline
+física e das curvas de perfil.
+O \textbf{RF} vem logo atrás (MAPE 2,8\%, $R^2$ 0,79) com viés igualmente
+desprezível ($+0{,}01$~km/s); adotamos o RF como corretor
 oficial por consistência com a Etapa~1 e capacidade de interações não
-lineares, mas o Ridge é alternativa documentada.
-O \textbf{MLP} aproxima o viés de zero ($+0{,}01$~km/s), porém com MAPE
-ligeiramente superior (8,9\%) e risco de instabilidade com apenas 87 amostras.
-\textbf{XGBoost} e \textbf{Gradient Boosting} ficam atrás do RF (MAPE
-9,2--9,6\%), coerente com o histórico da Etapa~1 em alvos difíceis com
-poucos dados.
-A \textbf{regressão linear} sem penalização falha ($R^2$ negativo no
-resíduo, MAPE 12,2\%), como na Etapa~1.
+lineares, mas a regressão linear é alternativa documentada e mais simples.
+\textbf{Gradient Boosting} e \textbf{XGBoost} acompanham de perto
+(MAPE 3,0\% e 3,6\%), o que mostra que o resultado não depende de um
+algoritmo específico.
+O \textbf{Ridge} ($\alpha = 1$) fica bem atrás da regressão linear que ele
+penaliza (MAPE 6,1\% versus 2,1\%): como as \emph{features} não são
+padronizadas antes do ajuste, a penalidade $L_2$ encolhe desproporcionalmente
+os coeficientes das variáveis de menor escala e produz subajuste---efeito de
+configuração, não evidência contra métodos regularizados.
+O \textbf{MLP} é o pior do conjunto ($R^2$ residual levemente negativo, MAPE
+6,5\%), coerente com o risco de instabilidade de redes com apenas 87 amostras.
 Nenhum resultado altera a conclusão de que o corretor empírico reduz o gap
 frente ao Gassmann; apenas refinam a escolha do algoritmo dentro do espectro
 linear--não linear testado.
@@ -539,14 +564,21 @@ no plano observado versus predito do resíduo.
   \label{fig:residual_scatter}
 \end{figure}
 
-Na Figura~\ref{fig:residual_scatter}, a nuvem de pontos concentra-se próximo à
-diagonal 1:1, com dispersão residual compatível com $R^2_{\mathrm{OOF}} \approx 0{,}32$.
-Resíduos observados positivos (sônico acima de Gassmann) predominam em parte
-da amostra, coerente com o viés físico $+0{,}59$~km/s; o RF aprende a
+Na Figura~\ref{fig:residual_scatter}, a nuvem de pontos acompanha a diagonal
+1:1 ao longo de toda a faixa, compatível com
+$R^2_{\mathrm{OOF}} \approx 0{,}79$.
+Resíduos observados \emph{negativos} (Gassmann acima do sônico) predominam,
+coerente com o viés físico $+0{,}27$~km/s; o RF aprende a
 atribuir correções negativas onde a física superestima \Vp{}.
-Pontos afastados da diagonal correspondem a profundidades onde nem a física nem
-as curvas fecham completamente o comportamento elástico---casos para inspeção
-qualitativa na trilha de profundidade.
+A nuvem separa-se em dois regimes: um agrupamento denso entre $-0{,}6$ e
+$+0{,}3$~km/s, que corresponde à maior parte do intervalo, e um punhado de
+cinco pontos entre $-1{,}6$ e $-1{,}0$~km/s---as profundidades de HFU~4, onde
+a calibração \emph{fallback} da Etapa~2 mais superestima \Vp{}.
+O corretor recupera esses extremos com erro de 0,1--0,3~km/s, o que explica a
+queda de MAPE concentrada naquela unidade
+(Tabela~\ref{tab:hfu_compare}), mas cinco pontos não sustentam extrapolação:
+qualquer profundidade nova com resíduo dessa magnitude estaria fora do suporte
+efetivo de treino.
 
 \subsection{Trilhas em profundidade: antes e depois do corretor ML}
 
@@ -566,28 +598,33 @@ Figura~\ref{fig:gassmann_depth_ref}) e \Vp{} híbrida OOF (produto desta etapa).
 \end{figure}
 
 A Figura~\ref{fig:hybrid_ridge_depth} repete o mesmo painel para o
-\textbf{Ridge} ($\alpha = 1$), alternativa com menor MAPE híbrido (7,7\%)
-e viés ligeiramente maior ($+0{,}07$~km/s) que o RF oficial.
+\textbf{Ridge} ($\alpha = 1$), variante penalizada com MAPE híbrido de 6,1\%
+e viés $+0{,}04$~km/s.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.78\linewidth]{figures/fig3_vp_hybrid_ridge_depth}
   \caption{Trilha de profundidade pós-Etapa~3 (Ridge OOF): \Vp{} sônico (DSI),
-           Gassmann (Etapa~2b) e híbrido Ridge. MAPE 7,7\% e viés $+0{,}07$~km/s
-           versus DSI; comparar com a Figura~\ref{fig:hybrid_depth} (RF, MAPE 8,1\%,
-           viés $+0{,}03$~km/s).}
+           Gassmann (Etapa~2b) e híbrido Ridge. MAPE 6,1\% e viés $+0{,}04$~km/s
+           versus DSI; comparar com a Figura~\ref{fig:hybrid_depth} (RF, MAPE 2,8\%,
+           viés $+0{,}01$~km/s).}
   \label{fig:hybrid_ridge_depth}
 \end{figure}
 
-Na Figura~\ref{fig:hybrid_depth}, a linha Gassmann (azul) reproduz o viés
-positivo já visível na Figura~\ref{fig:gassmann_depth_ref}.
-A trilha híbrida (vermelha) aproxima-se da sônica (verde), especialmente nos
-trechos de maior desvio físico; em segmentos onde as três curvas ainda
-divergem, recomenda-se revisão geológica (facies, fraturas, qualidade do
+Na Figura~\ref{fig:hybrid_depth}, a linha Gassmann (azul tracejada) reproduz o
+viés positivo já visível na Figura~\ref{fig:gassmann_depth_ref}, com picos
+acima de 6~km/s em torno de 5214 e 5219~m que não têm contrapartida no sônico.
+A trilha híbrida (vermelha) acompanha a sônica (verde) ao longo de quase todo o
+intervalo, inclusive nesses picos.
+As discrepâncias remanescentes concentram-se em 5228--5232~m, onde o sônico
+desce a 4,2~km/s e o híbrido para em torno de 4,7~km/s: nesses segmentos
+recomenda-se revisão geológica (facies, fraturas, qualidade do
 casamento DSI) antes de exportar \Vp{} híbrida para produto de perfil.
-Na Figura~\ref{fig:hybrid_ridge_depth}, a curva híbrida (roxa) segue o mesmo
-padrão, com ajuste marginalmente mais próximo do sônico em alguns trechos
-e viés residual um pouco mais positivo que o RF.
+Na Figura~\ref{fig:hybrid_ridge_depth}, a curva híbrida Ridge (roxa) mostra o
+padrão oposto ao desejado nos extremos: subcorrige na base do intervalo e
+sobrecorrige no topo (5205--5210~m), afastando-se do sônico para valores
+abaixo de 4,5~km/s---assinatura visual do subajuste discutido na
+Tabela~\ref{tab:regressor_sensitivity}.
 A leitura conjunta das duas figuras de profundidade---Etapa~2b como diagnóstico,
 Etapa~3 como correção---evita interpretar o ganho do ML como substituição
 da cadeia física.
@@ -608,27 +645,33 @@ a análise é \emph{pós-hoc}, não influencia o treino.
     \toprule
     HFU & $n$ & MAPE Gass. (\%) & MAPE híbr. (\%) & Viés Gass. / híbr. (km/s) \\
     \midrule
-    1 & 42 & 18,6 & 9,7 & $+0{,}76$ / $-0{,}01$ \\
-    2 & 29 & 8,1 & 7,1 & $+0{,}15$ / $+0{,}03$ \\
-    3 & 10 & 11,1 & 6,2 & $+0{,}50$ / $+0{,}10$ \\
-    4 & 6  & 34,9 & 5,2 & $+1{,}56$ / $+0{,}13$ \\
+    1 & 42 & 6,8 & 2,2 & $+0{,}33$ / $+0{,}02$ \\
+    2 & 29 & 2,2 & 2,3 & $-0{,}11$ / $-0{,}09$ \\
+    3 & 10 & 11,5 & 5,4 & $+0{,}51$ / $+0{,}15$ \\
+    4 & 6  & 28,1 & 4,8 & $+1{,}31$ / $+0{,}17$ \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Na Tabela~\ref{tab:hfu_compare}, o ganho mais expressivo ocorre na HFU~1
-(MAPE 18,6\% $\rightarrow$ 9,7\%; viés $+0{,}76 \rightarrow -0{,}01$~km/s) e na
-HFU~4 (MAPE 34,9\% $\rightarrow$ 5,2\%; viés $+1{,}56 \rightarrow +0{,}13$~km/s).
-A HFU~1 concentra 42 das 87 amostras e era a principal portadora do viés
-positivo médio na Etapa~2; o ML residual absorve boa parte desse deslocamento.
+Na Tabela~\ref{tab:hfu_compare}, o ganho mais expressivo ocorre na
+HFU~4 (MAPE 28,1\% $\rightarrow$ 4,8\%; viés
+$+1{,}31 \rightarrow +0{,}17$~km/s) e na HFU~3
+(11,5\% $\rightarrow$ 5,4\%; viés $+0{,}51 \rightarrow +0{,}15$~km/s).
 A HFU~4, calibrada por \emph{fallback} na Etapa~2 (sem plugs), superestimava
-\Vp{} em mais de 1,5~km/s em média (predição $\approx 6{,}07$ versus
-sônica $\approx 4{,}50$~km/s); o híbrido recalibra essa faixa para perto do
+\Vp{} em mais de 1,3~km/s em média (predição $\approx 6{,}08$ versus
+sônica $\approx 4{,}77$~km/s); o híbrido recalibra essa faixa para perto do
 DSI, mas o suporte de apenas seis pontos e a validação OOF no mesmo
 intervalo impõem cautela---o resultado é \emph{promissor}, não definitivo.
-A HFU~2 permanece a classe mais estável: já apresentava $\approx 8\%$ MAPE
-na física pura e melhora marginalmente para 7,1\%, confirmando que o ML
-refina onde a física falha, sem degradar onde já funcionava.
+A HFU~1 concentra 42 das 87 amostras e, com MAPE físico já moderado (6,8\%),
+cai para 2,2\% com viés praticamente nulo; por ser a classe majoritária, é ela
+que puxa o MAPE global para 2,8\%.
+A HFU~2 é o contraexemplo instrutivo: a física pura já entregava 2,2\% de MAPE
+com viés levemente \emph{negativo} ($-0{,}11$~km/s), e o corretor não melhora
+nada---passa a 2,3\%.
+Ou seja, o ML não degrada onde a física já fecha, mas também não tem o que
+extrair ali; o ganho vem inteiramente das unidades mal calibradas.
+Essa leitura reforça que o corretor está compensando deficiência de
+calibração DEM/SC por HFU, não descobrindo física nova.
 
 \subsection{CLP-CSGM sobre resíduo \Vp{} (Etapa~3b)}
 \label{sec:clp_vp_residual}
@@ -644,8 +687,8 @@ três variantes que modelam o resíduo em \textbf{janelas deslizantes}
 
 onde $G$ é o decoder do autoencoder treinado em janelas de
 $\Delta V_{\mathrm{p}} = V_{\mathrm{p,sonic}} - V_{\mathrm{p,Gassmann}}$,
-e $\hat{\mathbf{z}}$ provém do prior Ridge $h(\mathbf{u})$ sobre os nove
-canais densos da janela (oito wireline mais \Vp{} Gassmann) ou de
+e $\hat{\mathbf{z}}$ provém do prior Ridge $h(\mathbf{u})$ sobre os oito
+canais densos da janela (sete wireline mais \Vp{} Gassmann) ou de
 refinamento com medidas esparsas nos dez plugs CT (análogo à variante~B
 residual de \philab{} na Etapa~1f, mas com baseline Gassmann em vez de RF).
 
@@ -675,27 +718,35 @@ três variantes CLP contra o DSI (87/87).
     \toprule
     Modelo & MAPE (\%) & RMSE (km/s) & Viés (km/s) \\
     \midrule
-    Gassmann (baseline) & 15,4 & 0,81 & $+0{,}59$ \\
-    RF híbrido OOF & 8,1 & 0,46 & $+0{,}03$ \\
-    CLP Ridge prior ($m{=}0$) & 14,0 & 0,75 & $+0{,}25$ \\
-    CLP zero residual ($m{=}0$) & 12,4 & 0,66 & $+0{,}34$ \\
-    CLP plug sparse $b$ & 11,4 & 0,63 & $+0{,}31$ \\
+    Gassmann (baseline) & 7,3 & 0,48 & $+0{,}27$ \\
+    RF híbrido OOF & 2,8 & 0,18 & $+0{,}01$ \\
+    CLP Ridge prior ($m{=}0$) & 6,5 & 0,44 & $+0{,}06$ \\
+    CLP zero residual ($m{=}0$) & 6,7 & 0,44 & $+0{,}19$ \\
+    CLP plug sparse $b$ & 6,3 & 0,43 & $+0{,}18$ \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 Na Tabela~\ref{tab:clp_compare_global}, \textbf{nenhuma variante CLP supera o RF}
-pontual (8,1\% MAPE).
-A melhor CLP---plug sparse $b$---reduz o MAPE em relação ao Gassmann
-(15,4\% $\rightarrow$ 11,4\%), mas permanece $\approx 3$ pontos percentuais
-acima do RF e preserva viés positivo residual ($+0{,}31$~km/s).
-O prior Ridge em janelas ($m{=}0$) performa pior (14,0\% MAPE), sugerindo
-que o AE em $\Delta V_{\mathrm{p}}$ com stitch por sobreposição não captura
-a mesma informação local que o RF nas nove \emph{features} pontuais.
-A variante plug sparse aproxima-se do RF na HFU~3
+pontual (2,8\% MAPE).
+As três ficam agrupadas em 6,3--6,7\%, ou seja, batem o Gassmann por menos de
+um ponto percentual e perdem do RF por cerca de 3,6 pontos.
+O agrupamento é informativo: a variante que usa medidas esparsas nos plugs
+(6,3\%) e a que simplesmente assume resíduo nulo (6,7\%) praticamente empatam,
+o que indica que o ganho das variantes CLP vem sobretudo do
+\emph{prior} do autoencoder e do stitch por sobreposição, não da informação
+esparsa injetada em $b$.
+O prior Ridge em janelas ($m{=}0$) é o que mais reduz o viés
+($+0{,}06$~km/s, o melhor entre as CLP), mas não converte isso em MAPE porque
+troca viés por dispersão: apesar do viés quase três vezes menor que o da variante
+plug sparse, seu RMSE é ligeiramente maior (0,442 contra 0,427~km/s).
+No conjunto, o AE em $\Delta V_{\mathrm{p}}$ com reconstrução por janelas não
+captura a mesma informação local que o RF nas oito \emph{features} pontuais.
+A variante plug sparse aproxima-se do RF na HFU~2
 (Tabela~\ref{tab:clp_hfu_compare}), mas falha na HFU~4
-(MAPE $\approx 27\%$ versus 5,2\% no RF), onde o suporte de seis amostras
-e a escassez de plugs na janela limitam o refinamento inverso.
+(MAPE $\approx 26\%$ versus 4,8\% no RF), onde o suporte de seis amostras
+e a escassez de plugs na janela limitam o refinamento inverso---na prática,
+a variante CLP herda quase intacto o erro físico daquela unidade.
 
 \begin{table}[H]
   \centering
@@ -706,13 +757,22 @@ e a escassez de plugs na janela limitam o refinamento inverso.
     HFU & $n$ & MAPE RF (\%) & MAPE CLP plug (\%) &
     Viés RF / CLP (km/s) \\
     \midrule
-    1 & 42 & 9,7 & 12,7 & $-0{,}01$ / $+0{,}45$ \\
-    2 & 29 & 7,1 & 7,7 & $+0{,}03$ / $-0{,}06$ \\
-    3 & 10 & 6,2 & 6,9 & $+0{,}10$ / $+0{,}25$ \\
-    4 & 6  & 5,2 & 27,0 & $+0{,}13$ / $+1{,}21$ \\
+    1 & 42 & 2,2 & 4,8 & $+0{,}02$ / $+0{,}21$ \\
+    2 & 29 & 2,3 & 3,3 & $-0{,}09$ / $-0{,}16$ \\
+    3 & 10 & 5,4 & 9,8 & $+0{,}15$ / $+0{,}43$ \\
+    4 & 6  & 4,8 & 25,9 & $+0{,}17$ / $+1{,}20$ \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+Na Tabela~\ref{tab:clp_hfu_compare}, o RF vence em todas as quatro unidades,
+mas a distância varia muito.
+Nas HFU~1 e~2, onde o baseline físico já era razoável, a diferença é de
+2--3 pontos percentuais; na HFU~4 ela salta para 21 pontos.
+Isto é, a desvantagem do CLP concentra-se exatamente onde o corretor precisa
+aplicar uma correção grande e localizada: a reconstrução por janelas
+suaviza o resíduo e não consegue reproduzir o degrau de mais de 1~km/s da
+HFU~4, enquanto o RF pontual o reproduz ponto a ponto.
 
 A Figura~\ref{fig:clp_mape} ordena os modelos por MAPE; a
 Figura~\ref{fig:clp_depth} confronta trilhas de profundidade RF versus CLP
@@ -752,7 +812,7 @@ sparse junto ao RF.
   \label{fig:clp_residual_scatter}
 \end{figure}
 
-\textbf{Recomendação Etapa~3b:} manter o RF (ou Ridge linear, 7,7\% MAPE)
+\textbf{Recomendação Etapa~3b:} manter o RF (ou a regressão linear, 2,1\% MAPE)
 como corretor residual principal quando o sônico supervisiona o treino em
 todo o intervalo; reservar CLP-CSGM para cenários com
 \textbf{medidas esparsas de calibração} em $b$ (Seção~\ref{sec:rho_sweep}).
@@ -770,23 +830,28 @@ número de pontos de calibração para CLP e RF sparse).
         calibrados; $\mathbf{z}_0 = \mathrm{encode}(\mathbf{0})$.
   \item \textbf{RF sparse:} treina \emph{somente} nas profundidades
         calibradas do bloco de treino; prediz todo o bloco de teste.
-  \item \textbf{Referência:} RF oracle (treino denso, 8,2\% MAPE) e Gassmann.
+  \item \textbf{Referência:} RF oracle (treino denso, 2,9\% MAPE) e Gassmann.
 \end{itemize}
 
-Em $\rho=10/87$ (dez plugs fixos), CLP e RF sparse empatam
-($\approx 11{,}0\%$ MAPE), ambos acima do oracle.
-O CLP cruza o oracle em $\rho \approx 0{,}3$
-($\approx 7{,}9\%$ MAPE; $\sim$14 pontos de calibração por fold em treino
-e $\sim$9 em teste).
-A partir de $\rho \geq 0{,}5$, o CLP domina claramente
-(5,7\% em $\rho=0{,}5$); em $\rho=1$ atinge 1,6\% MAPE porque $b$ usa o
+Em $\rho=10/87$ (dez plugs fixos), o CLP leva vantagem modesta sobre o RF
+sparse (6,5\% contra 7,5\% de MAPE), mas ambos ficam bem acima do oracle e
+mal se distinguem do próprio Gassmann (7,3\%): com dez pontos de ancoragem,
+nenhuma das duas abordagens esparsas entrega correção útil.
+O CLP só cruza o oracle em $\rho \approx 0{,}7$
+($2{,}5\%$ MAPE; $\sim$32 pontos de calibração por fold em treino
+e $\sim$20 em teste).
+Em $\rho=1$ atinge 1,0\% MAPE porque $b$ usa o
 resíduo sônico em \textbf{todos} os pontos do bloco de teste---cenário
 operacional distinto do oracle, que não ancora com sônico em teste.
 
-O RF sparse \textbf{nunca} alcança o oracle (mínimo 8,2\% em $\rho=0{,}5$):
+O RF sparse \textbf{nunca} alcança o oracle (mínimo 3,5\% em $\rho=1$):
 treinar em $\rho n$ pontos e extrapolar linearmente/não-linearmente o resto
 é inferior ao treino denso, mesmo com a mesma contagem de calibração em $b$
 para o CLP.
+Sua curva também é bem menos monotônica que a do CLP (7,5\% em
+$\rho=0{,}115$, 5,6\% em $\rho=0{,}2$, 6,2\% em $\rho=0{,}3$), o que reflete a
+sensibilidade de um RF treinado em poucas dezenas de amostras a qual
+profundidade específica entra no subconjunto de calibração.
 
 \begin{table}[H]
   \centering
@@ -797,14 +862,15 @@ para o CLP.
     \toprule
     $\rho$ & $n_{\mathrm{cal,test}}$ & CLP (\%) & RF sparse (\%) \\
     \midrule
-    0 & 0 & 12,2 & 15,4 \\
-    0,10 & 3 & 11,4 & 10,1 \\
-    0,115 (plugs) & 3 & 11,0 & 11,0 \\
-    0,30 & 9 & 7,9 & 10,9 \\
-    0,50 & 14 & 5,7 & 8,2 \\
-    1,00 & 29 & 1,6 & 9,0 \\
+    0 & 0 & 6,8 & 7,3 \\
+    0,10 & 3 & 6,2 & 7,1 \\
+    0,115 (plugs) & 3 & 6,5 & 7,5 \\
+    0,30 & 9 & 4,7 & 6,2 \\
+    0,50 & 14 & 4,0 & 3,7 \\
+    0,70 & 20 & 2,5 & 3,8 \\
+    1,00 & 29 & 1,0 & 3,5 \\
     \midrule
-    \multicolumn{2}{l}{RF oracle (treino denso)} & \multicolumn{2}{c}{8,2} \\
+    \multicolumn{2}{l}{RF oracle (treino denso)} & \multicolumn{2}{c}{2,9} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -813,16 +879,21 @@ para o CLP.
   \centering
   \includegraphics[width=0.85\linewidth]{figures/fig3_rho_sweep_mape}
   \caption{MAPE versus $\rho$: CLP sparse $b$ versus RF sparse. Linhas de
-           referência: RF oracle (treino completo) e Gassmann. O CLP cruza
-           o oracle em $\rho \approx 0{,}3$; com dez plugs ($\rho \approx 0{,}12$)
-           permanece no patamar $\approx 11\%$.}
+           referência: RF oracle (treino completo, tracejado verde) e Gassmann
+           (pontilhado azul). O CLP cruza
+           o oracle em $\rho \approx 0{,}7$; com dez plugs ($\rho \approx 0{,}12$)
+           permanece no patamar $\approx 6{,}5\%$, próximo do baseline físico.}
   \label{fig:rho_sweep}
 \end{figure}
 
-\textbf{Leitura operacional:} sem sônico denso no treino, prefira CLP quando
-houver calibração esparsa em $\gtrsim 30\%$ das profundidades; com apenas
-dez plugs, RF sparse e CLP são equivalentes e inferiores ao RF oracle;
+\textbf{Leitura operacional:} sem sônico denso no treino, o CLP só compensa a
+partir de calibração esparsa em $\gtrsim 70\%$ das profundidades---exigência
+alta o bastante para tornar o cenário pouco realista em poço novo; com apenas
+dez plugs, RF sparse e CLP são ambos próximos do Gassmann e muito
+inferiores ao RF oracle;
 com sônico em todo o intervalo de treino, mantenha o RF pontual da Etapa~3.
+A mensagem prática é que a densidade de calibração, não o algoritmo, é o
+fator limitante nesse regime.
 
 \subsection{Síntese das Etapas~1--3}
 \label{sec:sintese}
@@ -849,13 +920,13 @@ ataca esse viés sem abandonar DEM/SC.
     1 & \philab{} prevível com perfil? & depth-block OOF & $R^2$ (RF) & 0,15 & 87 \\
     1 & \fzilab{} prevível com perfil? & depth-block OOF & $R^2$ (RF) & $-0{,}82$ & 87 \\
     2 & \Vp{} DEM fecha laboratório? & LOO plugs & MAPE (\%) & 14,8 & 10 \\
-    2 & \Vp{} Gassmann fecha DSI? & casamento 87/87 & MAPE (\%) & 15,4 & 87 \\
-    2 & Gassmann reduz viés vs seco? & casamento 87/87 & Viés (km/s) & $+0{,}59$ & 87 \\
-    3 & Resíduo prevível com perfil? & depth-block OOF & $R^2$ resíduo & 0,32 & 87 \\
-    3 & Híbrido fecha DSI? & depth-block OOF & MAPE (\%) & 8,1 & 87 \\
-    3 & Híbrido elimina viés? & depth-block OOF & Viés (km/s) & $+0{,}03$ & 87 \\
-    3b & CLP residual fecha DSI? & depth-block OOF & MAPE (\%) & 11,4 & 87 \\
-    3b & CLP vs RF (melhor CLP) & depth-block OOF & $\Delta$MAPE (pp) & $+3{,}3$ & 87 \\
+    2 & \Vp{} Gassmann fecha DSI? & casamento 87/87 & MAPE (\%) & 7,3 & 87 \\
+    2 & Gassmann reduz viés vs seco? & casamento 87/87 & Viés (km/s) & $+0{,}27$ & 87 \\
+    3 & Resíduo prevível com perfil? & depth-block OOF & $R^2$ resíduo & 0,79 & 87 \\
+    3 & Híbrido fecha DSI? & depth-block OOF & MAPE (\%) & 2,8 & 87 \\
+    3 & Híbrido elimina viés? & depth-block OOF & Viés (km/s) & $+0{,}01$ & 87 \\
+    3b & CLP residual fecha DSI? & depth-block OOF & MAPE (\%) & 6,3 & 87 \\
+    3b & CLP vs RF (melhor CLP) & depth-block OOF & $\Delta$MAPE (pp) & $+3{,}6$ & 87 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -865,10 +936,15 @@ A Etapa~1 estabelece que porosidade é viável ($R^2 \approx 0{,}15$) e que FZI
 direto de perfil falha ($R^2 \approx -0{,}82$), orientando a Etapa~2 para DEM/SC
 com \phiND{} e HFU de laboratório em vez de ML perfil $\rightarrow$ \Vp{}.
 A Etapa~2 confirma viabilidade física no laboratório (LOO $\approx 15\%$ MAPE),
-mas deixa viés $+0{,}59$~km/s no DSI mesmo após Gassmann---linha que motiva
+mas deixa viés $+0{,}27$~km/s no DSI mesmo após Gassmann---linha que motiva
 a Etapa~3.
-O híbrido OOF reduz MAPE de \Vp{} para 8,1\% e viés para $+0{,}03$~km/s,
+O híbrido OOF reduz MAPE de \Vp{} para 2,8\% e viés para $+0{,}01$~km/s,
 fechando parcialmente o \emph{gap} identificado na síntese da Etapa~2.
+Vale contrastar as duas linhas de validação da Etapa~2: o LOO de plugs
+(14,8\%, $n=10$) é bem pior que o casamento com o perfil (7,3\%, $n=87$),
+porque cada plug retirado remove uma fração grande da informação de
+calibração da sua HFU---o perfil, ao contrário, é avaliado com todos os plugs
+dentro do ajuste.
 Os resultados demonstram \textbf{consistência local no poço~861} e indicam
 \emph{potencial} de generalização; validação interpoços permanece
 necessária.
@@ -908,19 +984,23 @@ da Etapa~2, não propõe substituir a física por caixa-preta.
 
 A Etapa~3b (Seção~\ref{sec:clp_vp_residual}) testou reconstrução CLP-CSGM
 em janelas sobre o mesmo resíduo.
-O melhor CLP (plug sparse $b$, 11,4\% MAPE) ficou $\approx 3$ pontos
-percentuais acima do RF (8,1\%), coerente com a escala fina do resíduo
+O melhor CLP (plug sparse $b$, 6,3\% MAPE) ficou $\approx 3{,}6$ pontos
+percentuais acima do RF (2,8\%), coerente com a escala fina do resíduo
 e com a disponibilidade do sônico em todo o intervalo como alvo de treino.
+O sweep $\rho$ (Seção~\ref{sec:rho_sweep}) quantifica a condição de virada:
+o CLP só supera o oracle com calibração esparsa acima de $\approx 70\%$ das
+profundidades, o que restringe bastante o cenário em que ele compensa.
 O CLP permanece relevante para cenários com \textbf{medidas esparsas} em $b$
 (análogo à Etapa~1f); para correção residual em perfil completo, o RF
 pontual é superior neste poço.
 
 \subsection{Limitações metodológicas}
 
-Três limitações devem acompanhar qualquer uso dos números desta etapa.
-\textbf{(i)} Amostra pequena (87 linhas, nove \emph{features}): complexidade do
-modelo foi mantida modesta (RF com 200 árvores, sem MLP) para reduzir risco de
-sobreajuste; mesmo assim, HFU~4 com $n=6$ permanece estatisticamente frágil.
+Quatro limitações devem acompanhar qualquer uso dos números desta etapa.
+\textbf{(i)} Amostra pequena (87 linhas, oito \emph{features}): complexidade do
+modelo foi mantida modesta (RF com 200 árvores) para reduzir risco de
+sobreajuste; mesmo assim, HFU~4 com $n=6$ permanece estatisticamente frágil,
+e é justamente ela que concentra o maior ganho reportado.
 \textbf{(ii)} Validação OOF no \emph{mesmo poço}: blocos de profundidade
 evitam vazamento espacial trivial, mas o sônico entra no alvo residual---a
 OOF não equivale a poço ou intervalo independente; extrapolação fora
@@ -928,16 +1008,25 @@ de campo Lapa não está demonstrada.
 \textbf{(iii)} PVT fixo: sensibilidade a $K_f$, saturação parcial e pressão
 não foi explorada; parte do resíduo ``aprendido'' pelo ML pode correlacionar-se
 com proxy litológicos de condições de fluido não modeladas explicitamente.
+\textbf{(iv)} O MAPE de 2,8\% é baixo em termos absolutos, mas mede
+interpolação em profundidade dentro de um intervalo de 28~m com amostragem
+densa; blocos vizinhos compartilham facies, de modo que o teste é menos severo
+do que a rotulação ``fora-da-amostra'' pode sugerir.
 
-\subsection{Random Forest versus Ridge e próximos passos}
+\subsection{Random Forest versus alternativas e próximos passos}
 
-A Tabela~\ref{tab:regressor_sensitivity} confirma que o Ridge poderia substituir
-o RF como corretor oficial (MAPE 7,7\% versus 8,1\%), com trade-off de viés
-($+0{,}07$ versus $+0{,}03$~km/s).
+A Tabela~\ref{tab:regressor_sensitivity} mostra que a regressão linear
+entregaria MAPE ainda menor que o RF (2,1\% versus 2,8\%), com viés
+igualmente desprezível.
+Isso é um argumento a favor da simplicidade: se o resíduo é aproximadamente
+linear nas curvas e na baseline física, um corretor linear é mais fácil de
+auditar, exportar e transferir para outro poço do que um ensemble.
 Mantemos o RF no produto documentado por alinhamento à Etapa~1; testes futuros
-podem exportar ambas as trilhas.
+podem exportar ambas as trilhas e comparar estabilidade interpoços, onde a
+vantagem do modelo mais simples tende a crescer.
 Para produção de perfil, o próximo passo natural é exportar a coluna
-$V_{\mathrm{p,hybrid}}$ (RF ou Ridge) ao produto integrado e repetir a validação
+$V_{\mathrm{p,hybrid}}$ (RF ou regressão linear) ao produto integrado e repetir
+a validação
 tripla da Etapa~2 (laboratório onde houver plugs, \phiND{} versus \phiS{}, DSI)
 com a nova trilha.
 Antes de inversão sísmica, recomenda-se validação em poço vizinho ou
@@ -949,25 +1038,34 @@ fluido.
 
 \begin{enumerate}
   \item \textbf{Viabilidade do híbrido:} no poço~861, ML sobre resíduos
-        pós-Gassmann reduz MAPE de \Vp{} de 15,4\% para 8,1\% e viés de
-        $+0{,}59$ para $+0{,}03$~km/s no OOF, alinhando a média predita ao
+        pós-Gassmann reduz MAPE de \Vp{} de 7,3\% para 2,8\% e viés de
+        $+0{,}27$ para $+0{,}01$~km/s no OOF, alinhando a média predita ao
         patamar sônico; parte do desvio DEM/Gassmann--DSI é modelável por
         variáveis de perfil em escala local.
   \item \textbf{Papel na cadeia:} o ML é \textbf{corretor empírico} da física
         DEM/SC + Gassmann, não substituto do sônico nem atalho perfil
         $\rightarrow$ \Vp{}; não constitui novo modelo físico.
-  \item \textbf{HFU:} maior ganho em HFU~1 (viés alto na física) e HFU~4
-        (sem plugs, MAPE $\approx 35\% \rightarrow 5\%$ no OOF, $n=6$); HFU~2
-        já era boa e permanece estável.
+  \item \textbf{HFU:} maior ganho em HFU~4 (sem plugs,
+        MAPE $\approx 28\% \rightarrow 5\%$ no OOF, $n=6$) e HFU~3
+        ($11{,}5\% \rightarrow 5{,}4\%$); a HFU~2 já era boa
+        ($\approx 2\%$) e permanece estável, sem ganho nem degradação---o
+        corretor compensa deficiência de calibração, não física ausente.
   \item \textbf{Validação:} depth-block OOF é honesta em profundidade no
         poço~861, mas o sônico entra no alvo---não equivale a poço cego;
         generalização interpoços permanece hipótese a testar.
-  \item \textbf{\phiS{}:} aceitável na calibração local com DSI; para
-        predição sem sônico, re-treinar sem \phiS{} e avaliar sensibilidade.
-  \item \textbf{Regressor:} RF oficial (MAPE 8,1\%, viés $+0{,}03$); Ridge
-        alternativa (MAPE 7,7\%); GB/XGB/MLP piores; LR falha---sensibilidade
-        alinhada à Etapa~1.
-  \item \textbf{Próximo passo:} exportar $V_{\mathrm{p,hybrid}}$ (RF ou Ridge)
+  \item \textbf{\phiS{}:} excluída de $X$ por ser transformada de Wyllie do
+        DTCO que define o alvo ($r = -0{,}993$ com $V_{\mathrm{p,sonic}}$);
+        admiti-la inflaria o MAPE aparente em $\approx 0{,}6$ ponto percentual
+        sem ganho preditivo real.
+  \item \textbf{Regressor:} RF oficial (MAPE 2,8\%, viés $+0{,}01$); regressão
+        linear ainda melhor (2,1\%), GB e XGB próximos (3,0--3,6\%), Ridge sem
+        padronização e MLP piores (6,1--6,5\%); o resultado não depende de um
+        algoritmo específico.
+  \item \textbf{CLP-CSGM:} as variantes por janelas (6,3--6,7\% MAPE) ficam
+        atrás do RF pontual e só superam o oracle com calibração esparsa em
+        $\gtrsim 70\%$ das profundidades.
+  \item \textbf{Próximo passo:} exportar $V_{\mathrm{p,hybrid}}$ (RF ou
+        regressão linear)
         ao perfil de produção e validar em poço ou intervalo independente
         antes de inversão sísmica.
 \end{enumerate}

@@ -326,15 +326,21 @@ def fit_hierarchical(
 
     res = minimize(objective, x0, method="L-BFGS-B", bounds=bounds)
     if not bool(res.success):
-        # One restart from CT median / unit scale if primary solve fails.
-        x1 = np.asarray(x0, dtype=np.float64).copy()
-        res2 = minimize(objective, x1 * 0.0 + x0, method="L-BFGS-B", bounds=bounds)
+        # One restart from a distinct physical point (mid-alpha, scale 0.8).
+        # x0 is already CT-median / unit scale; repeating it is not a restart.
+        alpha_mid = 0.5 * (ALPHA_BOUNDS[0] + ALPHA_BOUNDS[1])
+        x1 = _pack_hier_x(hfus, alpha_mid, 0.8, deltas_a0, deltas_s0)
+        res2 = minimize(objective, x1, method="L-BFGS-B", bounds=bounds)
         if bool(res2.success) or (
             np.isfinite(res2.fun) and (not np.isfinite(res.fun) or res2.fun < res.fun)
         ):
             res = res2
-    if not np.isfinite(float(res.fun)):
-        raise RuntimeError("hierarchical fit produced non-finite objective")
+    if not bool(res.success) or not np.isfinite(float(res.fun)):
+        raise RuntimeError(
+            "hierarchical fit failed to converge with finite objective: {}".format(
+                getattr(res, "message", "unknown")
+            )
+        )
     alpha0, s0, da, ds = _unpack_hier_x(res.x, hfus)
     params = _params_from_hier(alpha0, s0, da, ds)
     # Ensure global defaults exist for missing HFUs (e.g. held-out HFU3).

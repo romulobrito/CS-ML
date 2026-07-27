@@ -13,6 +13,7 @@ ASCII-only.
 from __future__ import annotations
 
 import json
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -48,6 +49,39 @@ VPVS_VALID: Tuple[float, float] = (1.2, 2.5)
 # Feet per meter constant for us/ft -> m/s conversion.
 USFT_TO_M_PER_S: float = 304800.0
 
+# TDEP storage units -> units per meter. The DLIS channel declares its own
+# unit, which is authoritative; the empirical search is kept only as a
+# cross-check and as a fallback for files with no declared unit.
+TDEP_UNITS_PER_METER: Dict[str, float] = {
+    "m": 1.0,
+    "cm": 100.0,
+    "mm": 1000.0,
+    "in": 39.37007874015748,
+    "0.1 in": 393.7007874015748,
+    "ft": 3.280839895013123,
+    "0.1 ft": 32.80839895013123,
+}
+
+# Relative disagreement above which the fitted scale is considered suspect.
+TDEP_SCALE_REL_TOL: float = 0.005
+
+
+def normalize_unit_label(units: str) -> str:
+    """Normalize a DLIS unit string for table lookup."""
+    return " ".join(str(units).strip().lower().replace("inch", "in").split())
+
+
+def declared_tdep_scale(units: str) -> Optional[float]:
+    """
+    Physical TDEP-per-meter factor from the unit declared in the DLIS.
+
+    Returns None when the unit is absent or unrecognized.
+    """
+    key = normalize_unit_label(units)
+    if not key:
+        return None
+    return TDEP_UNITS_PER_METER.get(key)
+
 
 @dataclass(frozen=True)
 class DepthCalibration:
@@ -62,6 +96,13 @@ class DepthCalibration:
     auddys_depth_min_m: float
     auddys_depth_max_m: float
     merge_matches: int
+    declared_units: str = ""
+    declared_scale: Optional[float] = None
+    fitted_scale: Optional[float] = None
+    fitted_merge_matches: Optional[int] = None
+    scale_source: str = "fitted"
+    scale_rel_diff: Optional[float] = None
+    scale_warning: str = ""
 
 
 @dataclass(frozen=True)
@@ -125,12 +166,13 @@ def extract_dsi_frame(
     dlis_path: Path,
     logical_file: int = DSI_LOGICAL_FILE,
     frame_index: int = DSI_FRAME_INDEX,
-) -> Tuple[pd.DataFrame, str, str]:
+) -> Tuple[pd.DataFrame, str, str, str]:
     """
     Read TDEP and sonic mnemonics from the DSI 60B frame.
 
-    Returns a DataFrame with columns: tdep, depth_m (NaN until calibrated),
-    dtco_usft, dtsm_usft, vpvs, sphi, itt.
+    Returns (frame_df, frame_name, source_name, tdep_units). The DataFrame has
+    columns: tdep, depth_m (NaN until calibrated), dtco_usft, dtsm_usft, vpvs,
+    sphi, itt.
     """
     files = dlisio.dlis.load(str(dlis_path))
     with files:
@@ -153,6 +195,12 @@ def extract_dsi_frame(
         names = list(curves.dtype.names)
         if "TDEP" not in names:
             raise KeyError("TDEP missing in {} frame {}".format(dlis_path.name, frame.name))
+
+        tdep_units = ""
+        for channel in frame.channels:
+            if channel.name == "TDEP":
+                tdep_units = str(channel.units or "")
+                break
 
         tdep = clean_array(np.asarray(curves["TDEP"], dtype=np.float64))
         rows: Dict[str, np.ndarray] = {"tdep": tdep, "depth_m": np.full_like(tdep, np.nan)}
@@ -186,7 +234,7 @@ def extract_dsi_frame(
         df = pd.DataFrame(rows)
         df = df[np.isfinite(df["tdep"])].copy()
         df = df.sort_values("tdep").reset_index(drop=True)
-        return df, frame.name, dlis_path.name
+        return df, frame.name, dlis_path.name, tdep_units
 
 
 def _count_merge_matches(
@@ -219,54 +267,96 @@ def calibrate_tdep_scale(
     scale_min: float = 370.0,
     scale_max: float = 410.0,
     scale_step: float = 0.1,
+    tdep_units: str = "",
+    rel_tol: float = TDEP_SCALE_REL_TOL,
 ) -> DepthCalibration:
     """
-    Find TDEP scale (depth_m = TDEP / scale) maximizing Auddys merge coverage.
+    Map TDEP to meters as depth_m = TDEP / scale.
 
-    The MOGNO window and Auddys anchor depths constrain the mapping because
-    run-8 TDEP is not stored directly in meters.
+    The empirical search maximizes Auddys merge coverage, but a scale fitted to
+    force overlap can silently invent a depth registration. When the DLIS
+    declares a TDEP unit, that unit is authoritative: the fitted scale is only
+    a cross-check, and a disagreement beyond rel_tol raises a warning.
     """
     tdep_arr = np.asarray(tdep, dtype=np.float64)
     aud = np.asarray(list(auddys_depths), dtype=np.float64)
     aud_min = float(np.min(aud))
     aud_max = float(np.max(aud))
 
-    best_scale = scale_min
-    best_matches = -1
-    best_n_window = -1
-
-    scale = scale_min
-    while scale <= scale_max + 1.0e-9:
+    def window_stats(scale: float) -> Tuple[int, int, float, float]:
         depth = tdep_arr / scale
         in_window = (depth >= depth_min_m) & (depth <= depth_max_m)
         n_window = int(in_window.sum())
         matches = _count_merge_matches(depth[in_window], aud, merge_tolerance_m)
+        depth_win = depth[in_window]
+        if len(depth_win) == 0:
+            return n_window, matches, float("nan"), float("nan")
+        return n_window, matches, float(np.min(depth_win)), float(np.max(depth_win))
+
+    best_scale = scale_min
+    best_matches = -1
+    best_n_window = -1
+    scale = scale_min
+    while scale <= scale_max + 1.0e-9:
+        n_window, matches, _, _ = window_stats(scale)
         if matches > best_matches or (matches == best_matches and n_window > best_n_window):
             best_matches = matches
             best_n_window = n_window
             best_scale = scale
         scale += scale_step
 
-    depth_cal = tdep_arr / best_scale
-    in_window = (depth_cal >= depth_min_m) & (depth_cal <= depth_max_m)
-    depth_win = depth_cal[in_window]
-    if len(depth_win) == 0:
-        dmin = float("nan")
-        dmax = float("nan")
+    declared = declared_tdep_scale(tdep_units)
+    scale_used = float(best_scale)
+    source = "fitted"
+    rel_diff: Optional[float] = None
+    warning_msg = ""
+
+    if declared is not None and declared > 0.0:
+        rel_diff = float(abs(best_scale - declared) / declared)
+        scale_used = float(declared)
+        source = "declared_units"
+        if rel_diff > rel_tol:
+            warning_msg = (
+                "TDEP scale fitted to Auddys depths ({:.4f}) disagrees with the "
+                "unit declared in the DLIS ({!r} -> {:.4f}) by {:.2%}. Using the "
+                "declared unit; the fitted value would shift depths by about "
+                "{:.1f} m at {:.0f} m."
+            ).format(
+                best_scale,
+                tdep_units,
+                declared,
+                rel_diff,
+                abs(aud_min * (declared / best_scale - 1.0)),
+                aud_min,
+            )
+            warnings.warn(warning_msg, RuntimeWarning, stacklevel=2)
     else:
-        dmin = float(np.min(depth_win))
-        dmax = float(np.max(depth_win))
+        warning_msg = (
+            "DLIS declares no usable TDEP unit ({!r}); falling back to the "
+            "scale fitted against Auddys depths ({:.4f}). Depth registration "
+            "is unverified."
+        ).format(tdep_units, best_scale)
+        warnings.warn(warning_msg, RuntimeWarning, stacklevel=2)
+
+    n_window_used, matches_used, dmin, dmax = window_stats(scale_used)
 
     return DepthCalibration(
         method="tdep_divide_scale",
-        tdep_scale=float(best_scale),
+        tdep_scale=scale_used,
         depth_formula="depth_m = TDEP / tdep_scale",
-        n_samples_in_window=best_n_window,
+        n_samples_in_window=n_window_used,
         depth_min_m=dmin,
         depth_max_m=dmax,
         auddys_depth_min_m=aud_min,
         auddys_depth_max_m=aud_max,
-        merge_matches=int(best_matches),
+        merge_matches=int(matches_used),
+        declared_units=str(tdep_units),
+        declared_scale=declared,
+        fitted_scale=float(best_scale),
+        fitted_merge_matches=int(best_matches),
+        scale_source=source,
+        scale_rel_diff=rel_diff,
+        scale_warning=warning_msg,
     )
 
 
@@ -315,13 +405,14 @@ def extract_sonic_log(
 ) -> SonicExtractResult:
     """Full sonic extraction pipeline for Well 861."""
     dlis_path = find_dsi_dlis_path(raw_dir, dlis_glob)
-    raw_df, frame_name, source_name = extract_dsi_frame(dlis_path)
+    raw_df, frame_name, source_name, tdep_units = extract_dsi_frame(dlis_path)
     calibration = calibrate_tdep_scale(
         raw_df["tdep"].to_numpy(),
         auddys_depths=auddys_depths,
         depth_min_m=depth_min_m,
         depth_max_m=depth_max_m,
         merge_tolerance_m=merge_tolerance_m,
+        tdep_units=tdep_units,
     )
     sonic = apply_depth_calibration(raw_df, calibration)
     sonic = crop_depth_window(sonic, depth_min_m, depth_max_m)
@@ -346,6 +437,13 @@ def calibration_to_dict(cal: DepthCalibration) -> Dict[str, float]:
         "auddys_depth_min_m": cal.auddys_depth_min_m,
         "auddys_depth_max_m": cal.auddys_depth_max_m,
         "merge_matches": cal.merge_matches,
+        "declared_units": cal.declared_units,
+        "declared_scale": cal.declared_scale,
+        "fitted_scale": cal.fitted_scale,
+        "fitted_merge_matches": cal.fitted_merge_matches,
+        "scale_source": cal.scale_source,
+        "scale_rel_diff": cal.scale_rel_diff,
+        "scale_warning": cal.scale_warning,
     }
 
 

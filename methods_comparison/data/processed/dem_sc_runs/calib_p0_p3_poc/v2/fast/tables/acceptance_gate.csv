@@ -1,5 +1,5 @@
-model,vp_le_p0,vs_or_vpvs_improved,majority_groups,bounds_le_p0,opt_success_rate_ge_0p8,n_groups_beats_p0_vp,opt_success_rate,accepted
-G_huber,1,1,1,1,1,5,1.000000,1
-P1,1,1,1,1,1,5,1.000000,1
-P2,1,1,1,1,1,5,1.000000,1
-P3,1,1,1,1,1,5,1.000000,1
+model,vp_within_p0_plus_0p5pp,vp_margin_vs_p0_pct,vs_or_vpvs_improved,majority_groups,bounds_le_p0,opt_success_rate_ge_0p8,n_groups_beats_p0_vp,opt_success_rate,accepted
+G_huber,1,-2.214289,1,1,1,1,5,1.000000,1
+P1,1,-1.260971,1,1,1,1,5,1.000000,1
+P2,1,-1.245186,1,1,1,1,5,1.000000,1
+P3,1,-1.394034,1,1,1,1,5,1.000000,1

@@ -68,18 +68,18 @@ $\approx 15\%$ e o RMSE em $\approx 0{,}85$~km/s.
 No perfil de 87 linhas, \VpVs{} médio $\approx 1{,}82$ e a correlação
 entre \phiND{} e \phiS{} permanece forte ($r \approx 0{,}94$).
 Contra o sónico de poço (87/87 profundidades casadas), o MAPE de \Vp{}
-a seco é $\approx 16\%$, com viés $+0{,}62$~km/s.
+a seco é $\approx 9\%$, com viés $+0{,}30$~km/s.
 A fase~2b aplica Gassmann com fluido de formação ($K_f \approx 2{,}2$~GPa,
-saturação total) e reduz parcialmente o viés para $+0{,}59$~km/s
-(MAPE $\approx 15\%$), sem fechar completamente o gap frente ao sónico;
+saturação total) e reduz o MAPE para $\approx 7\%$ e o viés para
+$+0{,}27$~km/s, sem eliminar completamente o gap frente ao sónico;
 \VpVs{} concorda melhor a seco (erro médio absoluto $\approx 0{,}07$) do que
-após Gassmann ($\approx 0{,}07$--0,08).
+após Gassmann ($\approx 0{,}08$).
 A fase~2g testa DEM multiescala sequencial com frações macro/micro do CMR
-ponto a ponto no perfil de 87 linhas; o ganho MAPE frente ao monoescala
-Gassmann é de apenas $\approx 1{,}3$~p.p. (abaixo do limiar pre-registrado de
-2~p.p.), confirmando manter o produto monoescala.
-A HFU~2 apresenta o melhor acordo ($\approx 8\%$); a HFU~4, sem plugs de
-calibração, diverge ($\approx 37\%$).
+ponto a ponto no perfil de 87 linhas; o M3 zera praticamente o viés
+($+0{,}04$~km/s), mas piora o MAPE em $\approx 1{,}2$~p.p.\ frente ao
+monoescala Gassmann, confirmando manter o produto monoescala.
+A HFU~2 apresenta o melhor acordo ($\approx 3\%$); a HFU~4, sem plugs de
+calibração, diverge ($\approx 30\%$).
 Recomenda-se a Etapa~3 (aprendizado sobre resíduos da física) para o
 desvio residual, em especial nas HFU~1 e~4.
 Os resultados demonstram \textbf{consistência local no poço~861}; a
@@ -162,7 +162,7 @@ fontes elásticas que fecham lacunas do relatório anterior
     ROCKPHYS (aba Velocity)
       & \Vp{}, \Vs{} de laboratório & 28 & Plugs e testemunhos \\
     Perfil sónico DSI (DLIS)
-      & DTCO, DTSM, \VpVs{} de perfil & 190 no poço~861 & Contínuo \\
+      & DTCO, DTSM, \VpVs{} de perfil & 182 no intervalo & Contínuo \\
     CMR/ECS (DLIS)
       & CMRP\_3MS, CMFF, BFV (frações macro/micro) & 152 & Contínuo \\
     \bottomrule
@@ -364,7 +364,7 @@ Para corrigir, otimizamos, \emph{separadamente para cada HFU com plugs em
 ROCKPHYS}:
 
 \begin{itemize}
-  \item $\alpha$ (razão de aspecto), limitada ao intervalo $[0{,}05,\,0{,}95]$;
+  \item $\alpha$ (razão de aspecto), limitada ao intervalo $[0{,}15,\,0{,}95]$;
   \item um fator multiplicativo comum aplicado a $K_m$ e $G_m$.
 \end{itemize}
 
@@ -374,9 +374,9 @@ porque não há plug de laboratório nessa classe.
 A calibração não ``inventa'' porosidade---ela ajusta a rigidez da
 matriz e a geometria dos poros para que o modelo físico reproduza o
 laboratório.
-Quando $\alpha$ calibrado cola no limite superior (0,95) ou inferior (0,19),
-isso indica que a mediana do microCT, sozinha, não descreve a elástica
-daquela unidade de fluxo.
+Quando $\alpha$ calibrado cola no limite superior (0,95) ou desce para perto
+do limite inferior (0,15), isso indica que a mediana do microCT, sozinha, não
+descreve a elástica daquela unidade de fluxo.
 
 O encadeamento operacional é, portanto, \textbf{aprender} nos plugs,
 \textbf{aplicar} nas 87 linhas e \textbf{validar} no sónico \emph{sem}
@@ -532,23 +532,38 @@ O RMSE (raiz do erro quadrático médio) penaliza erros grandes e tem
 unidade de km/s---útil para comparar escalas (laboratório versus perfil).
 O \textbf{viés} mede se o modelo superestima ou subestima sistematicamente:
 viés positivo indica \Vp{} predito maior que o observado.
-Um modelo pode ter MAPE moderado e viés alto se errar sempre na mesma
-direção---foi o que ocorreu no confronto com o sónico de perfil.
+Comparar viés e erro médio absoluto separa a parcela sistemática da
+dispersão: no confronto com o sónico de perfil, o viés responde por cerca de
+três quartos do erro médio absoluto, ou seja, o desvio é dominantemente
+direcional e não ruído.
 
 \subsection{Extração do perfil sónico (DLIS)}
 
 Do perfil sónico DSI extraímos lentidões compressional (DTCO) e
 cisalhante (DTSM) no conjunto de curvas processadas do poço, convertemos a
-profundidade do registro para metros (escala 408,1 ancorada nas profundidades
-do perfil integrado) e obtemos \Vp{} pela relação
+profundidade do registro para metros pela unidade declarada no próprio
+arquivo (canal TDEP em décimos de polegada, isto é, escala
+$\mathrm{TDEP}/393{,}7008$) e obtemos \Vp{} pela relação
 \begin{equation}
   \label{eq:vp_dlis}
   \Vp\;(\mathrm{m/s}) = \frac{304800}{\mathrm{DTCO}\;(\mu\mathrm{s/ft})}.
 \end{equation}
 A Equacao~\eqref{eq:vp_dlis} usa a convenção us/ft usual em perfis
 sónicos de poço.
-Cada uma das 87 linhas do perfil DEM foi casada com a amostra sónica mais
-próxima (tolerância 0,25~m).
+
+A escala de profundidade é um ponto crítico e recebe controle explícito.
+O pipeline ainda estima, por sobreposição com as profundidades do perfil
+integrado, um fator empírico de conversão do canal TDEP; esse valor serve
+apenas de verificação e \textbf{não} é usado no produto.
+A conversão adotada é sempre a unidade física declarada no arquivo DLIS.
+Quando as duas divergem além de 1\%, o pipeline emite alerta e registra
+ambos os valores em \texttt{depth\_calibration.json}, porque um erro de
+poucos por cento no fator de escala desloca o registro em dezenas ou
+centenas de metros na profundidade de interesse ($\approx 5200$~m) e
+invalidaria qualquer comparação elástica.
+Após o recorte ao intervalo 5205,9--5233,7~m restaram 182 amostras sónicas
+válidas em DTCO e DTSM; cada uma das 87 linhas do perfil DEM foi casada com
+a amostra sónica mais próxima (tolerância 0,25~m).
 Os valores numéricos desta rodada estão alinhados às métricas
 exportadas pelo pipeline de validação sónica (junho de 2026).
 
@@ -569,14 +584,14 @@ Todos os dez plugs processaram com sucesso.
     Grandeza & Valor & Unidade \\
     \midrule
     Plugs processados & 10/10 & -- \\
-    \Vp{} médio DEM & 6,26 & km/s \\
+    \Vp{} médio DEM & 6,27 & km/s \\
     \VpVs{} médio DEM & 1,84 & -- \\
-    Diferença relativa média DEM vs SC (\Vp) & 0,37 & \% \\
+    Diferença relativa média DEM vs SC (\Vp) & 0,42 & \% \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-A Tabela~\ref{tab:poc} confirma que o valor médio de \Vp{} $\approx 6{,}26$~km/s é alto para carbonatos do campo Lapa
+A Tabela~\ref{tab:poc} confirma que o valor médio de \Vp{} $\approx 6{,}27$~km/s é alto para carbonatos do campo Lapa
 \emph{antes} de qualquer calibração---antecipa o desvio sistemático
 visto na Seção~\ref{sec:lab}.
 A concordância DEM--SC ($<1\%$) na Tabela~\ref{tab:poc} confirma que o
@@ -601,8 +616,8 @@ e \Vp{} a seco.
 A Figura~\ref{fig:dem_rockphypy_crosscheck} resume as diferenças relativas
 plug a plug.
 No conjunto dos dez plugs, $K_{\mathrm{dry}}$ diverge em média 31\% (máximo
-75\%); $G_{\mathrm{dry}}$ diverge em média 8\% (máximo 17\%); \Vp{} a seco
-diverge em média 7\% (máximo 15\%).
+75\%); $G_{\mathrm{dry}}$ diverge em média 9\% (máximo 19\%); \Vp{} a seco
+diverge em média 7\% (máximo 14\%).
 Em contraste, a sensibilidade ao passo de integração da rotina local
 ($\Delta y = 0{,}001$--$0{,}02$) permanece abaixo de 3\% em $K_{\mathrm{dry}}$
 no plug de referência F2854H---a discrepância principal não vem da
@@ -667,11 +682,11 @@ A Figura~\ref{fig:vp_lab_uncal} mostra pontos sistematicamente acima da linha
     \toprule
     Métrica & Valor & Unidade \\
     \midrule
-    MAPE \Vp & 26,0 & \% \\
-    RMSE \Vp & 1,36 & km/s \\
-    Viés \Vp & $+1{,}20$ & km/s \\
+    MAPE \Vp & 26,3 & \% \\
+    RMSE \Vp & 1,37 & km/s \\
+    Viés \Vp & $+1{,}22$ & km/s \\
     \Vp{} médio laboratório & 5,05 & km/s \\
-    \Vp{} médio DEM & 6,26 & km/s \\
+    \Vp{} médio DEM & 6,27 & km/s \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -719,10 +734,10 @@ Figura~\ref{fig:alpha} contrasta $\alpha$ calibrado com a mediana do microCT.
     $K_m$ (GPa) & $G_m$ (GPa) & $\rho_m$ (g/cm$^3$) &
     Escala $K,G$ & Origem \\
     \midrule
-    1 & 4 & 0,950 & 0,554 & 58,6 & 25,8 & 2,774 & 0,698 & laboratório \\
-    2 & 4 & 0,191 & 0,554 & 58,7 & 25,6 & 2,766 & 0,706 & laboratório \\
+    1 & 4 & 0,950 & 0,554 & 58,6 & 25,7 & 2,774 & 0,697 & laboratório \\
+    2 & 4 & 0,182 & 0,554 & 59,0 & 25,8 & 2,766 & 0,709 & laboratório \\
     3 & 2 & 0,950 & 0,615 & 59,0 & 25,5 & 2,754 & 0,721 & laboratório \\
-    4 & 0 & 0,570 & -- & 82,5 & 35,8 & 2,760 & 1,000 & \emph{fallback} \\
+    4 & 0 & 0,566 & -- & 82,5 & 35,8 & 2,760 & 1,000 & \emph{fallback} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -731,7 +746,7 @@ Os parâmetros da Tabela~\ref{tab:hfu_params} mostram que, em HFU~1 e HFU~3, $\a
 mediana microCT ficou em $\approx 0{,}55$--0,62---sinal de que a geometria
 efetiva vista pela elástica de laboratório difere da morfologia local da
 imagem CT.
-A HFU~2 é a mais bem sustentada (quatro plugs, $\alpha$ calibrado 0,19).
+A HFU~2 é a mais bem sustentada (quatro plugs, $\alpha$ calibrado 0,18).
 A HFU~4 não tem suporte experimental: seus parâmetros são apenas uma
 aproximação.
 Com apenas dez plugs, a calibração é sensível a outliers: o plug
@@ -739,9 +754,9 @@ F2911V (laboratório F2911H, eixo~$Z$, 22,1~MPa) apresenta \Vp{} laboratorial
 anormalmente baixa ($\approx 3{,}8$~km/s) e distorce o ajuste da HFU~2 na
 configuração padrão.
 O pipeline oferece modo \emph{robust} (exclusão de F2911V), com MAPE
-\emph{in-sample} da HFU~2 caindo para $\approx 7{,}5\%$; a rodada de produção
-documentada aqui usa a configuração padrão com dez plugs, salvo análise
-de sensibilidade explícita.
+\emph{in-sample} global caindo de 9,1\% para $\approx 7{,}5\%$ e o LOO de
+14,8\% para $\approx 12{,}8\%$; a rodada de produção documentada aqui usa a
+configuração padrão com dez plugs, salvo análise de sensibilidade explícita.
 A calibração por HFU deve ser lida como \textbf{ajuste local ao poço~861},
 não como prova de transferência interpoços.
 
@@ -754,7 +769,7 @@ não como prova de transferência interpoços.
     \toprule
     & MAPE (\%) & RMSE (km/s) & Viés (km/s) \\
     \midrule
-    Antes & 26,0 & 1,36 & $+1{,}20$ \\
+    Antes & 26,3 & 1,37 & $+1{,}22$ \\
     Depois & 9,1 & 0,52 & $-0{,}01$ \\
     \bottomrule
   \end{tabular}
@@ -789,7 +804,7 @@ percentuais no LOO (Tabela~\ref{tab:loo}).
 \end{figure}
 
 Por sua vez, a Figura~\ref{fig:alpha} contrasta $\alpha$ calibrado com a mediana do microCT: a HFU~2 é o caso em que a geometria CT e a calibração laboratorial
-mais se aproximam ($\alpha$ calibrado 0,19 versus mediana CT $\approx 0{,}55$,
+mais se aproximam ($\alpha$ calibrado 0,18 versus mediana CT $\approx 0{,}55$,
 ainda distantes, porém com melhor fechamento elástico global).
 Nas HFU~1 e~3, $\alpha$ calibrado satura no teto (0,95), sinal de limite do
 modelo ou de poucos graus de liberdade com apenas dois a quatro plugs.
@@ -823,9 +838,13 @@ Comparando as colunas da Tabela~\ref{tab:loo}, o MAPE LOO ($\approx 15\%$) é ce
 O viés praticamente nulo no LOO indica que o modelo não está
 sistematicamente alto ou baixo no laboratório quando um plug é excluído
 entre os dez do poço~861---não implica extrapolação a outros poços.
-Este patamar ($\approx 15\%$, RMSE $\approx 0{,}85$~km/s) servirá de
-referência para julgar o confronto com o sónico de perfil
-(Seção~\ref{sec:dlis}).
+Este patamar ($\approx 15\%$, RMSE $\approx 0{,}85$~km/s) é o limite superior
+de erro esperado e serve de referência para julgar o confronto com o sónico
+de perfil (Seção~\ref{sec:dlis}).
+Convém antecipar que o LOO é a métrica mais severa do conjunto: com dez
+plugs distribuídos em três HFU, retirar uma amostra remove entre 25\% e 50\%
+do suporte experimental da sua unidade, o que penaliza mais do que a
+extrapolação de perfil, onde os parâmetros usam todos os plugs disponíveis.
 
 \subsection{Teste A/B: DEM multiescala sequencial}
 \label{sec:multiscale_ab}
@@ -862,10 +881,10 @@ O modo \emph{oracle} reduz o MAPE \emph{in-sample} para $\approx 3\%$,
 mas isso reflete um parametro livre por plug ajustado ao alvo---nao
 comparavel ao M1, que compartilha $\alpha$ entre plugs da mesma HFU.
 No modo \emph{forward}, relevante para o perfil, o MAPE \emph{in-sample}
-permanece $\approx 9{,}1\%$, praticamente identico ao M1
-($\Delta \approx 0{,}01$~p.p.).
+fica em $\approx 8{,}7\%$ contra $\approx 9{,}1\%$ do M1---ganho de apenas
+$\approx 0{,}4$~p.p., com RMSE ligeiramente pior (0,54 contra 0,52~km/s).
 No LOO \emph{forward}, o MAPE cai de $\approx 14{,}8\%$ (M1) para
-$\approx 12{,}3\%$ (M2b)---ganho de $\approx 2{,}5$~p.p., porém
+$\approx 12{,}0\%$ (M2b)---ganho de $\approx 2{,}9$~p.p., porém
 \textbf{sem} confirmacao \emph{in-sample}.
 Adotamos o criterio pre-registrado: manter monoescala quando o ganho LOO
 nao se acompanha de melhora \emph{in-sample} acima de 2~p.p.
@@ -885,10 +904,10 @@ permanecem documentadas para uso futuro, mas nao entram no produto atual.
     Modelo & Escopo & MAPE \Vp{} (\%) & RMSE (km/s) \\
     \midrule
     M1 monoescala calibrado & In-sample & 9,1 & 0,52 \\
-    M2a multiescala \emph{oracle} & In-sample & 3,0 & 0,38 \\
-    M2b multiescala \emph{forward} & In-sample & 9,1 & 0,55 \\
+    M2a multiescala \emph{oracle} & In-sample & 3,0 & 0,37 \\
+    M2b multiescala \emph{forward} & In-sample & 8,7 & 0,54 \\
     M1 monoescala calibrado & LOO & 14,8 & 0,85 \\
-    M2b multiescala \emph{forward} & LOO & 12,3 & 0,76 \\
+    M2b multiescala \emph{forward} & LOO & 12,0 & 0,78 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1017,12 +1036,12 @@ O casamento foi completo: 87/87 linhas.
 \subsection{Resultados globais}
 
 Como resumido na Tabela~\ref{tab:dlis_global} e na linha ``Perfil sónico DSI''
-da Tabela~\ref{tab:validation_summary}, o MAPE de \Vp{} ($\approx 16\%$)
-aproxima-se do LOO laboratorial (Tabela~\ref{tab:loo}), mas o viés é
-positivo ($+0{,}62$~km/s): o DEM calibrado a seco fica mais rápido que o
+da Tabela~\ref{tab:validation_summary}, o MAPE de \Vp{} ($\approx 9\%$) fica
+abaixo do LOO laboratorial (Tabela~\ref{tab:loo}), mas o viés é
+positivo ($+0{,}30$~km/s): o DEM calibrado a seco fica mais rápido que o
 sónico \emph{in-situ}.
-\VpVs{} apresenta acordo melhor na mesma tabela (erro médio absoluto
-$\approx 0{,}07$; médias 1,78 versus 1,82).
+\VpVs{} apresenta acordo comparável na mesma tabela (erro médio absoluto
+$\approx 0{,}07$; médias 1,77 versus 1,82).
 A Figura~\ref{fig:dlis_vp} ilustra o confronto em profundidade e no plano 1:1;
 a Figura~\ref{fig:dlis_vpvs} complementa com \VpVs{} e mapa de erro.
 
@@ -1036,24 +1055,32 @@ a Figura~\ref{fig:dlis_vpvs} complementa com \VpVs{} e mapa de erro.
     Métrica & Valor & Unidade \\
     \midrule
     Profundidades casadas & 87/87 & -- \\
-    MAPE \Vp & 16,2 & \% \\
-    RMSE \Vp & 0,85 & km/s \\
-    Viés \Vp (DEM $-$ sónico) & $+0{,}62$ & km/s \\
-    \Vp{} médio sónico & 4,58 & km/s \\
+    MAPE \Vp & 8,7 & \% \\
+    RMSE \Vp & 0,54 & km/s \\
+    Viés \Vp (DEM $-$ sónico) & $+0{,}30$ & km/s \\
+    Pearson $r$ (\Vp{} DEM vs sónico) & 0,34 & -- \\
+    \Vp{} médio sónico & 4,90 & km/s \\
     \Vp{} médio DEM & 5,20 & km/s \\
     Erro médio absoluto \VpVs & 0,07 & -- \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Os numeros da Tabela~\ref{tab:dlis_global} mostram que o MAPE de $\approx 16\%$ \emph{sozinho} poderia sugerir modelo aceitável---
-mas o viés de $+0{,}62$~km/s revela que o erro não é simétrico: o DEM
-superestima \Vp{} de forma consistente frente ao sónico saturado.
+Os numeros da Tabela~\ref{tab:dlis_global} pedem duas leituras.
+O MAPE de $\approx 9\%$ situa-se abaixo do LOO laboratorial, mas isso
+\textbf{não} significa que a extrapolação seja mais confiável que o
+laboratório: o LOO é uma métrica deliberadamente severa (Seção~\ref{sec:loo}),
+enquanto no perfil os parâmetros usam todos os plugs da HFU.
+Mais informativo é o viés de $+0{,}30$~km/s, que responde por cerca de três
+quartos do erro médio absoluto: o DEM superestima \Vp{} de forma consistente
+frente ao sónico saturado.
 Isso é fisicamente plausível: calibramos em plugs secos a 22,1~MPa e
-aplicamos ao perfil sem correção de fluido (Gassmann).
-O RMSE igual ao LOO ($\approx 0{,}85$~km/s) indica que a ordem de grandeza do
-erro se mantém entre laboratório e perfil, embora por mecanismos distintos
-(viés baixo no LOO, viés alto no sónico).
+aplicamos ao perfil sem correção de fluido, motivando a fase~2b
+(Seção~\ref{sec:gassmann}).
+A correlação positiva porém modesta ($r \approx 0{,}34$) mostra que o modelo
+acompanha apenas parcialmente a variabilidade fina do sónico---esperado,
+já que a única grandeza que varia ponto a ponto na cadeia é \phiND{}, com
+$\alpha$ e a matriz fixos por HFU.
 
 \subsection{Desempenho por HFU}
 
@@ -1067,21 +1094,26 @@ A Tabela~\ref{tab:dlis_hfu} detalha o erro por unidade de fluxo.
     \toprule
     HFU & $n$ & \Vp{} sónico médio & \Vp{} DEM médio & MAPE (\%) \\
     \midrule
-    1 & 42 & 4,55 & 5,38 & 19,7 \\
-    2 & 29 & 4,62 & 4,73 & 7,9 \\
-    3 & 10 & 4,60 & 5,20 & 13,1 \\
-    4 & 6  & 4,50 & 6,17 & 37,2 \\
+    1 & 42 & 5,00 & 5,38 & 8,0 \\
+    2 & 29 & 4,88 & 4,72 & 3,3 \\
+    3 & 10 & 4,61 & 5,22 & 13,6 \\
+    4 & 6  & 4,77 & 6,18 & 30,4 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Na Tabela~\ref{tab:dlis_hfu}, a HFU~2 ($\approx 8\%$) é a única com erro próximo ao patamar desejável
-para interpretação quantitativa---coerente com quatro plugs de
-calibração e viés baixo.
-A HFU~1 cobre quase metade do perfil (42 linhas) com MAPE $\approx 20\%$:
-utilizável com ressalvas.
-A HFU~4 ($\approx 37\%$) confirma que extrapolar sem laboratório é arriscado;
-não deve entrar em produto final sem novos dados.
+Na Tabela~\ref{tab:dlis_hfu}, a HFU~2 ($\approx 3\%$) atinge o patamar
+desejável para interpretação quantitativa---coerente com quatro plugs de
+calibração e com o único viés negativo do conjunto ($-0{,}16$~km/s).
+A HFU~1 cobre quase metade do perfil (42 linhas) com MAPE $\approx 8\%$:
+utilizável, ainda que com viés positivo de $+0{,}38$~km/s.
+A HFU~3 ($\approx 14\%$, dois plugs) e sobretudo a HFU~4 ($\approx 30\%$,
+nenhum plug) confirmam que a qualidade do resultado acompanha de perto o
+suporte experimental da unidade; a HFU~4 não deve entrar em produto final
+sem novos dados.
+O contraste é o achado central desta seção: o erro de perfil não é uma
+propriedade uniforme do modelo, e sim função direta de quantos plugs
+sustentam cada HFU.
 
 \begin{figure}[H]
   \centering
@@ -1104,14 +1136,16 @@ não deve entrar em produto final sem novos dados.
 
 A Figura~\ref{fig:dlis_vp} compara o confronto em dois painéis.
 \emph{Painel (a)---trilha de profundidade:}
-O sónico (verde) apresenta mais variabilidade fina que o DEM (azul), que
-tende a suavizar tendências locais após calibração por HFU.
-Ainda assim, as duas curvas permanecem na mesma faixa de km/s na maior parte do
-intervalo.
+As duas curvas permanecem na mesma faixa de km/s ao longo de todo o
+intervalo e compartilham as tendências de maior escala.
+O DEM (azul) oscila mais que o sónico (verde) porque a troca de HFU muda
+abruptamente $\alpha$ e a matriz entre linhas vizinhas: as excursões para
+6~km/s e acima correspondem, sem exceção, às seis linhas de HFU~4.
 
 \emph{Painel (b)---dispersograma:}
-A HFU~2 concentra-se próxima da diagonal; HFU~4 aparece sistematicamente
-acima da linha 1:1 (superestimação).
+A HFU~2 concentra-se logo abaixo da diagonal (única unidade com viés
+negativo) e a HFU~1 forma uma nuvem compacta pouco acima dela; a HFU~4
+destaca-se isolada no topo, com superestimação de mais de 1~km/s.
 
 \begin{figure}[H]
   \centering
@@ -1132,11 +1166,17 @@ acima da linha 1:1 (superestimação).
   \label{fig:dlis_vpvs}
 \end{figure}
 
-Na Figura~\ref{fig:dlis_vpvs}, o painel de \VpVs{} mostra trilhas próximas---confirmando que a razão
-elástica é melhor capturada que o módulo absoluto.
-O mapa de erro versus profundidade evidencia faixas onde a HFU~1 e a HFU~4
-concentram os maiores desvios, orientando onde a fase~2b (saturação) ou
-novos dados de laboratório teriam maior impacto.
+Na Figura~\ref{fig:dlis_vpvs}, o painel de \VpVs{} mostra trilhas próximas e
+com amplitudes semelhantes (1,70--1,90), ainda que o DEM fique
+sistematicamente cerca de 0,05 acima do sónico---a razão elástica é
+capturada em forma, com pequeno deslocamento de nível.
+O mapa de erro versus profundidade mostra que os desvios se organizam por
+unidade de fluxo, não por profundidade: a HFU~2 ocupa a faixa
+$-9\%$ a $+1\%$, a HFU~1 agrupa-se entre $+2\%$ e $+14\%$, a HFU~3 chega a
+$+19\%$ e as seis linhas de HFU~4 aparecem isoladas entre $+21\%$ e $+40\%$.
+A ausência de tendência com a profundidade descarta erro residual de
+alinhamento e orienta onde a fase~2b (saturação) ou novos dados de
+laboratório teriam maior impacto.
 
 \subsection{Síntese das validações de \Vp{}}
 
@@ -1155,24 +1195,34 @@ define \emph{o que} perguntamos; esta mostra \emph{quanto} erramos.
     \toprule
     Escala & MAPE (\%) & RMSE (km/s) & Viés (km/s) & $n$ \\
     \midrule
-    Lab, sem calibração & 26,0 & 1,36 & $+1{,}20$ & 10 \\
+    Lab, sem calibração & 26,3 & 1,37 & $+1{,}22$ & 10 \\
     Lab, in-sample & 9,1 & 0,52 & $-0{,}01$ & 10 \\
     Lab, LOO & 14,8 & 0,85 & $-0{,}07$ & 10 \\
-    Perfil sónico DSI (seco) & 16,2 & 0,85 & $+0{,}62$ & 87 \\
-    Perfil sónico DSI (Gassmann) & 15,4 & 0,81 & $+0{,}59$ & 87 \\
-    Perfil DSI (Gassmann + NMR M3) & 14,0 & 0,74 & $+0{,}30$ & 87 \\
+    Perfil sónico DSI (seco) & 8,7 & 0,54 & $+0{,}30$ & 87 \\
+    Perfil sónico DSI (Gassmann) & 7,3 & 0,48 & $+0{,}27$ & 87 \\
+    Perfil DSI (Gassmann + NMR M3) & 8,5 & 0,47 & $+0{,}04$ & 87 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-A leitura conjunta da Tabela~\ref{tab:validation_summary} revela que o MAPE permanece na faixa 14--16\% nas validações honestas (LOO e
-sónico), mas o \textbf{viés muda de sinal}: quase nulo no laboratório
-seco após calibração, positivo no perfil saturado.
-A linha Gassmann mostra redução modesta do viés ($+0{,}62 \rightarrow +0{,}59$~km/s);
-a linha M3 (NMR multiescala) reduz ainda mais o viés ($+0{,}30$~km/s), porém
-sem atingir o limiar de ganho MAPE pre-registrado (Seção~\ref{sec:multiscale_nmr}).
-Confirmando que a diferença seca/saturada explica \emph{parte}, mas não a
-totalidade, do desvio contra o DSI (Seção~\ref{sec:gassmann}).
+A leitura conjunta da Tabela~\ref{tab:validation_summary} revela dois regimes
+distintos de erro.
+Nos plugs, o LOO ($\approx 15\%$) tem viés praticamente nulo: o erro é
+dispersão, não deslocamento sistemático---o modelo acerta a média e erra a
+amostra individual, sintoma de dez pontos sustentando três conjuntos de
+parâmetros.
+No perfil, o MAPE é menor ($\approx 9\%$ a seco, $\approx 7\%$ após
+Gassmann), mas o viés é positivo e domina o erro.
+São falhas de natureza oposta e a segunda é a mais tratável: um desvio
+direcional pode ser modelado, ao passo que dispersão por falta de suporte
+experimental só se resolve com mais plugs.
+A linha Gassmann mostra redução modesta do viés
+($+0{,}30 \rightarrow +0{,}27$~km/s), confirmando que a diferença
+seca/saturada explica \emph{parte}, mas não a totalidade, do desvio contra o
+DSI (Seção~\ref{sec:gassmann}).
+A linha M3 (NMR multiescala) praticamente anula o viés ($+0{,}04$~km/s), mas
+ao custo de MAPE maior, ficando fora do critério pre-registrado
+(Seção~\ref{sec:multiscale_nmr}).
 
 \section{Correção de saturação por Gassmann (fase~2b)}
 \label{sec:gassmann}
@@ -1201,7 +1251,7 @@ $\rho_{\mathrm{eff}}$ na Equação~\eqref{eq:velocidades}.
 A Tabela~\ref{tab:gassmann_compare} resume o efeito de Gassmann sobre as
 métricas globais contra o DSI.
 O \Vp{} médio cai de 5,20 para 5,17~km/s; o viés positivo diminui, mas
-permanece material ($+0{,}59$~km/s).
+permanece material ($+0{,}27$~km/s).
 A Figura~\ref{fig:gassmann_depth} confronta as três trilhas (sónico, DEM
 seco e DEM saturado).
 
@@ -1214,11 +1264,11 @@ seco e DEM saturado).
     \toprule
     Condicao & MAPE (\%) & RMSE (km/s) & Viés (km/s) \\
     \midrule
-    DEM seco & 16,2 & 0,85 & $+0{,}62$ \\
-    DEM + Gassmann & 15,4 & 0,81 & $+0{,}59$ \\
+    DEM seco & 8,7 & 0,54 & $+0{,}30$ \\
+    DEM + Gassmann & 7,3 & 0,48 & $+0{,}27$ \\
     \Vp{} médio DEM seco & -- & 5,20 & -- \\
     \Vp{} médio DEM Gassmann & -- & 5,17 & -- \\
-    \Vp{} médio sónico & -- & 4,58 & -- \\
+    \Vp{} médio sónico & -- & 4,90 & -- \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1234,11 +1284,23 @@ seco e DEM saturado).
 
 A Tabela~\ref{tab:gassmann_compare} e a Figura~\ref{fig:gassmann_depth} indicam
 que Gassmann com $K_f$ default explica apenas uma fração do viés
-observado: o modelo permanece $\approx 0{,}6$~km/s mais rápido que o DSI em
+observado: o modelo permanece $\approx 0{,}27$~km/s mais rápido que o DSI em
 média.
+O efeito é pequeno pela própria física do problema: com porosidade média de
+$\approx 11\%$ e arcabouço rígido, o ganho de $K_{\mathrm{sat}}$ é quase
+compensado pelo aumento de densidade, e o saldo líquido em \Vp{} fica em
+poucos centésimos de km/s.
+Por HFU, a saturação melhora todas as unidades na mesma proporção
+(8,0\% $\rightarrow$ 6,8\% na HFU~1; 3,3\% $\rightarrow$ 2,2\% na HFU~2;
+13,6\% $\rightarrow$ 11,5\% na HFU~3; 30,4\% $\rightarrow$ 28,1\% na HFU~4),
+ou seja, não corrige o problema estrutural da HFU~4.
 Possíveis causas residuais incluem pressão efetiva distinta entre lab
 (22,1~MPa) e \emph{in-situ}, litologia local não capturada pela segmentação
 HFU (especialmente HFU~4) e ausência de PVT medido in situ para refinar $K_f$.
+Vale notar que \VpVs{} piora levemente após Gassmann (erro médio absoluto de
+0,073 para 0,084): a saturação afeta $K_{\mathrm{sat}}$ e deixa
+$G_{\mathrm{dry}}$ intacto, de modo que ganhos em \Vp{} absoluto vêm ao custo
+da razão elástica.
 
 \subsection{Validação tripla (lab, \phiS{}, DSI)}
 
@@ -1258,16 +1320,19 @@ adotadas nesta etapa: laboratório nos plugs, consistência de porosidade com
     \midrule
     Laboratório (LOO) & Fecha \Vp{} a seco nos plugs? & MAPE (\%) & 14,8 \\
     Entrada (\phiND{} vs \phiS) & Porosidade confiável? & Pearson $r$ & 0,94 \\
-    Saída DSI (seco) & Extrapola \Vp{} \emph{in-situ}? & Viés (km/s) & $+0{,}62$ \\
-    Saída DSI (Gassmann) & Fluido reduz o viés? & Viés (km/s) & $+0{,}59$ \\
+    Saída DSI (seco) & Extrapola \Vp{} \emph{in-situ}? & Viés (km/s) & $+0{,}30$ \\
+    Saída DSI (Gassmann) & Fluido reduz o viés? & Viés (km/s) & $+0{,}27$ \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 A validação tripla mostra que a \emph{entrada} petrofísica está sólida
-($r \approx 0{,}94$), a \emph{física} fecha o laboratório seco (LOO $\approx 15\%$),
-mas a \emph{saída} contra o DSI permanece com viés positivo mesmo após
-Gassmann---motivando a Etapa~3 sobre resíduos, não o abandono do DEM/SC.
+($r \approx 0{,}94$), a \emph{física} fecha o laboratório seco (LOO $\approx 15\%$)
+e a \emph{saída} contra o DSI fica em patamar utilizável ($\approx 7\%$ após
+Gassmann), porém com viés positivo persistente.
+Como esse viés é sistemático e concentrado nas unidades com pouco suporte de
+laboratório, ele é candidato natural a correção estatística---o que motiva a
+Etapa~3 sobre resíduos, e não o abandono do DEM/SC.
 
 \section{DEM multiescala com frações NMR/CMR (fase~2g)}
 \label{sec:multiscale_nmr}
@@ -1330,9 +1395,8 @@ resultado empírico confirma essa leitura.
   \end{tikzpicture}
   \caption{Desenho do experimento da fase~2g: apenas as frações
            macro/micro passam a variar com a profundidade via CMR; a
-           razão de aspecto permanece constante por HFU. O ganho
-           marginal de MAPE ($\approx 1{,}3$~p.p.) é coerente com esse
-           desenho.}
+           razão de aspecto permanece constante por HFU. A ausência de ganho
+           de MAPE é coerente com esse desenho.}
   \label{fig:nmr_knobs}
 \end{figure}
 
@@ -1367,7 +1431,7 @@ As frações de porosidade usadas no DEM sequencial são:
 A porosidade total de entrada permanece $\phiND{}$; CMRP\_3MS entra apenas
 no controle de qualidade e na validação cruzada com CT, não substitui
 $\phiND{}$ no forward (teste auxiliar com $\phi = \mathrm{CMRP\_3MS}$ no M1
-não melhorou o MAPE: 15,4\% versus 15,4\%).
+piorou o MAPE: 8,4\% contra 7,3\% com \phiND{}).
 
 \subsection{Validação CMR versus microCT}
 
@@ -1395,13 +1459,15 @@ A Figura~\ref{fig:multiscale_nmr_ct} resume o contraste nos dez plugs.
 
 A Tabela~\ref{tab:multiscale_nmr} resume as métricas contra o sónico DSI nas
 87 linhas com CMR casado.
-O M3 reduz o MAPE de 15,4\% (M1) para 14,0\% e o viés de $+0{,}59$ para
-$+0{,}30$~km/s, mas o ganho $\Delta \approx 1{,}3$~p.p. fica \textbf{abaixo}
-do limiar pre-registrado de 2~p.p.
-A correlação de Pearson entre \Vp{} predito e sónico permanece negativa e
-próxima de zero em ambos os modelos ($r \approx -0{,}17$ e $-0{,}13$),
-indicando que o particionamento NMR não reorganiza o padrão espacial do erro
-de forma material.
+O M3 praticamente elimina o viés, de $+0{,}27$ (M1) para $+0{,}04$~km/s, e
+reduz marginalmente o RMSE (0,48 para 0,47~km/s), mas \textbf{piora} o MAPE
+de 7,3\% para 8,5\%---$\Delta \approx -1{,}2$~p.p., no sentido oposto ao
+limiar pre-registrado de $+2$~p.p.
+A leitura é que o M3 troca acerto sistemático por dispersão: centra melhor a
+distribuição do erro, porém espalha mais os pontos individuais.
+A correlação de Pearson com o sónico é semelhante nos dois modelos
+($r \approx 0{,}42$ e $0{,}45$), indicando que o particionamento NMR não
+reorganiza o padrão espacial do erro de forma material.
 
 \begin{table}[H]
   \centering
@@ -1414,8 +1480,8 @@ de forma material.
     \toprule
     Modelo & MAPE (\%) & RMSE (km/s) & Viés (km/s) & Pearson $r$ \\
     \midrule
-    M1 monoescala Gassmann & 15,4 & 0,81 & $+0{,}59$ & $-0{,}17$ \\
-    M3 multiescala NMR + Gassmann & 14,0 & 0,74 & $+0{,}30$ & $-0{,}13$ \\
+    M1 monoescala Gassmann & 7,3 & 0,48 & $+0{,}27$ & $+0{,}42$ \\
+    M3 multiescala NMR + Gassmann & 8,5 & 0,47 & $+0{,}04$ & $+0{,}45$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1536,12 +1602,16 @@ transferência a outros poços carbonáticos exige novos plugs e recalibração.
 
 \subsection{\Vp{} absoluto versus \VpVs{}}
 
-\VpVs{} concorda melhor com o sónico (erro médio absoluto $\approx 0{,}07$)
-do que \Vp{} isolado (viés $+0{,}62$~km/s).
+\VpVs{} concorda com o sónico dentro de um erro médio absoluto de
+$\approx 0{,}07$ (cerca de 4\% da razão média), enquanto \Vp{} isolado
+carrega viés de $+0{,}30$~km/s.
 Em termos práticos, o produto desta etapa é mais confiável para
 discriminar unidades de fluxo e tendências litológicas do que para
 estimar módulos absolutos prontos para inversão sísmica sem correção
 de fluido.
+Reforça essa leitura o fato de \VpVs{} degradar levemente após Gassmann,
+enquanto \Vp{} melhora: as duas grandezas respondem a mecanismos diferentes e
+não devem ser otimizadas pelo mesmo critério.
 
 \subsection{Por que o sónico diverge do laboratório calibrado}
 
@@ -1550,21 +1620,26 @@ apresenta viés positivo sistemático.
 A diferença não contradiz o pipeline---aponta para \textbf{condições
 físicas distintas}: laboratório (seco, 22,1~MPa, escala de plug) versus
 sónico (saturado, \emph{in-situ}, escala de investigação maior).
-A fase~2b com Gassmann e $K_f$ default reduziu o viés de $+0{,}62$ para
-$+0{,}59$~km/s (Tabela~\ref{tab:gassmann_compare}), confirmando que parte do
+A fase~2b com Gassmann e $K_f$ default reduziu o viés de $+0{,}30$ para
+$+0{,}27$~km/s (Tabela~\ref{tab:gassmann_compare}), confirmando que parte do
 desvio seca/saturada é real---mas não suficiente para alinhar o perfil ao
 DSI.
-Etapa~3 deve focar resíduos locais (HFU~1, HFU~4) e não substituir a cadeia
+Etapa~3 deve focar resíduos locais (HFU~3, HFU~4) e não substituir a cadeia
 física por ML direto.
 
 \subsection{HFU~4 e HFU~3: zonas de cautela}
 
-A HFU~4 não possui plug de calibração e apresenta MAPE $\approx 37\%$
+A HFU~4 não possui plug de calibração e apresenta MAPE $\approx 30\%$
 contra o sónico; não deve ser usada em entregas interpretativas sem novos
 dados.
 A HFU~3 tem apenas dois plugs: o LOO é instável e o erro de perfil
-($\approx 13\%$) é aceitável, mas não robusto.
-A HFU~2 é o \emph{benchmark} interno do poço nesta etapa.
+($\approx 14\%$) é aceitável, mas não robusto.
+A HFU~2 é o \emph{benchmark} interno do poço nesta etapa, com
+$\approx 3\%$ contra o sónico.
+A gradação 3\%, 8\%, 14\%, 30\% acompanha exatamente a ordem de suporte
+experimental (quatro, quatro, dois e zero plugs), com a HFU~1 penalizada por
+$\alpha$ saturado no teto: é a evidência mais direta de que o gargalo desta
+etapa é amostragem de laboratório, não formulação física.
 
 \subsection{Multiescala sequencial: sem ganho para o perfil}
 
@@ -1575,13 +1650,13 @@ as fracoes vem de medianas CT por HFU.
 O modo \emph{oracle}---ajustar $\alpha_{\mathrm{micro}}$ plug a plug ao
 laboratório---reduz o MAPE para $\approx 3\%$, mas isso e diagnostico de
 ajustabilidade, nao previsao.
-O modo \emph{forward} (medianas HFU, sem inversao no plug avaliado) replica
-o MAPE \emph{in-sample} do M1 ($\approx 9\%$); o LOO melhora apenas
-$\approx 2{,}5$~p.p., sem confirmacao \emph{in-sample}.
+O modo \emph{forward} (medianas HFU, sem inversao no plug avaliado)
+praticamente replica o MAPE \emph{in-sample} do M1 (8,7\% contra 9,1\%); o LOO
+melhora $\approx 2{,}9$~p.p., sem confirmacao \emph{in-sample}.
 A fase~2g (Seção~\ref{sec:multiscale_nmr}) repete o exercicio com fracoes NMR
-ponto a ponto no perfil de 87 linhas: o ganho MAPE frente ao M1 Gassmann e
-de apenas $\approx 1{,}3$~p.p., abaixo do limiar de 2~p.p., e a validacao
-CMR versus CT nos dez plugs mostra correlacao fraca ($r \approx -0{,}30$).
+ponto a ponto no perfil de 87 linhas: o M3 nao melhora o MAPE frente ao M1
+Gassmann---piora $\approx 1{,}2$~p.p.---e a validacao CMR versus CT nos dez
+plugs mostra correlacao fraca ($r \approx -0{,}30$).
 Esse resultado e coerente com o desenho do experimento
 (Figura~\ref{fig:nmr_knobs}): as fracoes variam com a profundidade, mas a
 razao de aspecto do micro---que controla grande parte da resposta
@@ -1604,32 +1679,41 @@ físico), após a fase~2b documentada na Seção~\ref{sec:gassmann}.
 
 \begin{enumerate}
   \item \textbf{Viabilidade:} a modelagem DEM/SC calibrada por HFU é
-        \emph{parcialmente consistente} com laboratório (LOO $\approx 15\%$
-        nos dez plugs) e com sónico de perfil no poço~861 ($\approx 16\%$),
-        com melhor desempenho em \VpVs{} do que em \Vp{} absoluto.
+        \emph{consistente} com o sónico de perfil no poço~861
+        ($\approx 9\%$ a seco, $\approx 7\%$ após Gassmann) e
+        \emph{parcialmente consistente} com o laboratório sob a métrica mais
+        severa (LOO $\approx 15\%$ nos dez plugs).
         Trata-se de \textbf{prova de conceito física local}, não de
         validação interpoços.
-  \item \textbf{Uso por HFU:} confiar principalmente na HFU~2; usar HFU~1 e
-        HFU~3 com ressalvas documentadas; evitar HFU~4 até obter plugs ou
+  \item \textbf{Uso por HFU:} confiar na HFU~2 ($\approx 3\%$) e na HFU~1
+        ($\approx 8\%$); usar HFU~3 ($\approx 14\%$) com ressalvas
+        documentadas; evitar HFU~4 ($\approx 30\%$) até obter plugs ou
         calibração independente.
+        O erro por unidade acompanha o número de plugs de calibração, o que
+        torna a aquisição de plugs na HFU~4 a intervenção de maior retorno.
   \item \textbf{Entrada de porosidade:} manter \phiND{} (correlação
         $r \approx 0{,}94$ com \phiS{}) como default; RF de \philab{} permanece
         alternativa documentada da Etapa~1.
   \item \textbf{Multiescala (fase~2f):} DEM sequencial meso-macro + micro
         nao supera o monoescala calibrado no modo \emph{forward} relevante
-        ao perfil (MAPE \emph{in-sample} $\approx 9{,}1\%$ em ambos); manter
-        $\alpha$ efetivo por HFU (Seção~\ref{sec:multiscale_ab}).
+        ao perfil (MAPE \emph{in-sample} 8,7\% contra 9,1\%, dentro do ruído
+        de dez plugs); manter $\alpha$ efetivo por HFU
+        (Seção~\ref{sec:multiscale_ab}).
   \item \textbf{Multiescala NMR (fase~2g):} fracoes CMR ponto a ponto no
-        perfil reduzem MAPE de 15,4\% para 14,0\% e viés de $+0{,}59$ para
-        $+0{,}30$~km/s, mas o ganho ($\approx 1{,}3$~p.p.) fica abaixo do
-        limiar de 2~p.p.; manter monoescala Gassmann
+        perfil reduzem o viés de $+0{,}27$ para $+0{,}04$~km/s, mas elevam o
+        MAPE de 7,3\% para 8,5\%; o critério pre-registrado exige ganho de
+        2~p.p.\ em MAPE, logo manter monoescala Gassmann
         (Seção~\ref{sec:multiscale_nmr}).
   \item \textbf{Fase~2b (Gassmann):} com $K_f \approx 2{,}2$~GPa e $S_w=1$, o
-        viés contra o DSI cai de $+0{,}62$ para $+0{,}59$~km/s (MAPE 16,2\%
-        $\rightarrow$ 15,4\%)---melhora parcial, não fechamento completo.
+        MAPE contra o DSI cai de 8,7\% para 7,3\% e o viés de $+0{,}30$ para
+        $+0{,}27$~km/s---melhora consistente, porém sem eliminar o desvio
+        sistemático.
   \item \textbf{Etapa~3:} considerar aprendizado sobre resíduos da física
-        (HFU~1 e HFU~4 prioritárias), não substituição da cadeia
+        (HFU~3 e HFU~4 prioritárias), não substituição da cadeia
         DEM/SC por ML de perfil.
+        Como o resíduo é dominado por uma componente sistemática por unidade
+        de fluxo, o alvo natural é um corretor de baixa complexidade, com
+        validação por blocos de profundidade para não superestimar o ganho.
 \end{enumerate}
 
 \section*{Disponibilidade dos dados e reprodutibilidade}
@@ -1829,10 +1913,10 @@ cada plug ou da extrapolação por unidade hidrodinamica de fluxo (HFU).
     $K_m^{\mathrm{calib}}$ & $G_m^{\mathrm{calib}}$ &
   $\rho_m$ & $s_{K,G}$ \\
     \midrule
-    1 & 4 & 0,554 & 0,950 & 84,0 & 36,9 & 58,6 & 25,8 & 2,774 & 0,698 \\
-    2 & 4 & 0,554 & 0,191 & 83,2 & 36,3 & 58,7 & 25,6 & 2,766 & 0,706 \\
+    1 & 4 & 0,554 & 0,950 & 84,0 & 36,9 & 58,6 & 25,7 & 2,774 & 0,697 \\
+    2 & 4 & 0,554 & 0,182 & 83,2 & 36,3 & 59,0 & 25,8 & 2,766 & 0,709 \\
     3 & 2 & 0,615 & 0,950 & 81,8 & 35,3 & 59,0 & 25,5 & 2,754 & 0,721 \\
-    4 & 0 & --    & 0,570 & 82,5 & 35,8 & 82,5 & 35,8 & 2,760 & 1,000 \\
+    4 & 0 & --    & 0,566 & 82,5 & 35,8 & 82,5 & 35,8 & 2,760 & 1,000 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1866,7 +1950,7 @@ cada plug ou da extrapolação por unidade hidrodinamica de fluxo (HFU).
     Porosidade $\phi$ (entrada DEM) & \philab{} nos plugs; \phiND{} no perfil \\
     Limite inferior de $\phi$ & $10^{-4}$ \\
     Limite superior de $\phi$ & 0,95 \\
-    $\alpha$ na calibração & $[0{,}05,\,0{,}95]$ \\
+    $\alpha$ na calibração & $[0{,}15,\,0{,}95]$ \\
     Iterações SC & 80 \\
     Inclusões de poro & $K_i = G_i = 0$ (arcabouço seco) \\
     \bottomrule
@@ -1933,13 +2017,19 @@ Berryman (1992) escreve o sistema acoplado em $y \in [0,\phi]$:
 onde $P^*$ é e $Q^*$ sao recalculados a cada passo com os módulos efetivos
 instantaneos $(K_{\mathrm{eff}}, G_{\mathrm{eff}})$---a não linearidade do
 problema reside precisamente nessa atualização.
-O sistema é resolvido numericamente com passo uniforme $\Delta y = 0{,}005$;
-$(K_{\mathrm{dry}}, G_{\mathrm{dry}})$ correspondem ao ultimo ponto da
-trajetoria em $y=\phi$.
+O sistema é resolvido numericamente sobre uma malha uniforme de passo
+$\Delta y \approx 0{,}005$, construída de modo que o ultimo no coincida
+\emph{exatamente} com $y = \phi$;
+$(K_{\mathrm{dry}}, G_{\mathrm{dry}})$ correspondem a esse ultimo ponto da
+trajetoria.
+A ancoragem do no final é essencial: uma malha que ultrapasse $\phi$ congela
+os modulos em intervalos curtos de porosidade enquanto a densidade continua
+variando, o que inverteria localmente a relação \Vp{}--$\phi$ e introduziria
+artefato de serrilhado no perfil.
 
 Um teste de sensibilidade ao passo de integração, documentado na
 Seção~\ref{sec:crosscheck_rockphypy} e na
-Figura~\ref{fig:dem_rockphypy_crosscheck}, mostra variação inferior a 3\%
+Figura~\ref{fig:dem_rockphypy_crosscheck}, mostra variação de 2,7\%
 em $K_{\mathrm{dry}}$ para $\Delta y \in [0{,}001,\,0{,}02]$ no plug F2854H.
 O confronto com a biblioteca aberta RockPhysicsPy (v0.0.2) confirma que os
 fatores $P$ e $Q$ locais seguem Berryman na ordem correta $(K, G)$, enquanto a

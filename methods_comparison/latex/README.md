@@ -34,18 +34,18 @@ O Beamer (`poco861_etapa1_beamer.tex`) le as PNGs direto do pipeline via
 
 | Nome no LaTeX (relatorio `figures/`) | Origem no pipeline |
 |--------------------------------------|--------------------|
-| `fig_fzi_log_correlations` | `ml_runs/diagnostics_861/figures/log_features_vs_FZI_lab_corr.png` |
-| `fig_fzi_oracle_vs_logs` | `ml_runs/diagnostics_861/figures/FZI_oracle_vs_logs_r2_by_fold.png` |
-| `fig_target_comparison_r2` | `ml_runs/diagnostics_861/figures/target_comparison_mean_r2.png` |
-| `fig_phi_rf_pred_vs_obs` | `ml_runs/well_profile/phi_lab/rf/phi_pred_vs_obs.png` |
-| `fig_phi_shap_bar` | `ml_runs/well_profile/phi_lab/rf/shap_bar.png` |
+| `fig1_fzi_log_correlations` | `ml_runs/diagnostics_861/figures/log_features_vs_FZI_lab_corr.png` |
+| `fig1_fzi_oracle_vs_logs` | `ml_runs/diagnostics_861/figures/FZI_oracle_vs_logs_r2_by_fold.png` |
+| `fig1_target_comparison_r2` | `ml_runs/diagnostics_861/figures/target_comparison_mean_r2.png` |
+| `fig1_phi_rf_pred_vs_obs` | `ml_runs/well_profile/phi_lab/rf/phi_pred_vs_obs.png` |
+| `fig1_phi_shap_bar` | `ml_runs/well_profile/phi_lab/rf/shap_bar.png` |
 | `phi_lab_oof_depth_panels.png` | `ml_runs/well_profile/phi_lab/compare/figures/` |
 | `phi_lab_oof_rmse_by_depth_fold.png` | `ml_runs/well_profile/phi_lab/compare/figures/` |
-| `fig_phi_model_comparison` | `ml_runs/well_profile/phi_lab/alternatives/phi_model_comparison_mean_r2.png` |
-| `fig_hfu_classifier_oof` | `ml_runs/well_profile/hfu/classifier/hfu_model_comparison_oof.png` |
-| `fig_ct_plugs_fzi_wireline` | `ml_runs/ct_plugs/by_target/FZI_lab/wireline_only/plug_out_pred_vs_obs_rf.png` |
+| `fig1_phi_model_comparison` | `ml_runs/well_profile/phi_lab/alternatives/phi_model_comparison_mean_r2.png` |
+| `fig1_hfu_classifier_oof` | `ml_runs/well_profile/hfu/classifier/hfu_model_comparison_oof.png` |
+| `fig1_ct_plugs_fzi_wireline` | `ml_runs/ct_plugs/by_target/FZI_lab/wireline_only/plug_out_pred_vs_obs_rf.png` |
 
-Opcional: copiar com os nomes `fig_*` para `latex/figures/` (relatorio PDF).
+Opcional: copiar com os nomes `fig1_*` para `latex/figures/` (relatorio PDF).
 
 ## Figuras Etapa 2 (`figures/fig2_*`)
 
