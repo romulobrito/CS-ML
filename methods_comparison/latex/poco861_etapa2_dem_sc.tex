@@ -1108,12 +1108,17 @@ calibração e com o único viés negativo do conjunto ($-0{,}16$~km/s).
 A HFU~1 cobre quase metade do perfil (42 linhas) com MAPE $\approx 8\%$:
 utilizável, ainda que com viés positivo de $+0{,}38$~km/s.
 A HFU~3 ($\approx 14\%$, dois plugs) e sobretudo a HFU~4 ($\approx 30\%$,
-nenhum plug) confirmam que a qualidade do resultado acompanha de perto o
-suporte experimental da unidade; a HFU~4 não deve entrar em produto final
-sem novos dados.
+nenhum plug) indicam que os maiores erros se concentram nas unidades com
+menor ou nenhum suporte experimental; a HFU~4 não deve entrar em produto
+final sem novos dados.
 O contraste é o achado central desta seção: o erro de perfil não é uma
-propriedade uniforme do modelo, e sim função direta de quantos plugs
-sustentam cada HFU.
+propriedade uniforme do modelo, e sim uma função da unidade avaliada.
+O número de plugs, isoladamente, não explica toda a variação---HFU~1 e
+HFU~2 têm quatro plugs cada e diferem por um fator de 2,4 no MAPE
+(8,0\% contra 3,3\%).
+A Seção~\ref{sec:hfu_cautela} retoma esse ponto e discute o segundo fator
+associado ao contraste, a saturação de $\alpha$ no teto do intervalo de
+calibração.
 
 \begin{figure}[H]
   \centering
@@ -1628,6 +1633,7 @@ Etapa~3 deve focar resíduos locais (HFU~3, HFU~4) e não substituir a cadeia
 física por ML direto.
 
 \subsection{HFU~4 e HFU~3: zonas de cautela}
+\label{sec:hfu_cautela}
 
 A HFU~4 não possui plug de calibração e apresenta MAPE $\approx 30\%$
 contra o sónico; não deve ser usada em entregas interpretativas sem novos
@@ -1636,10 +1642,30 @@ A HFU~3 tem apenas dois plugs: o LOO é instável e o erro de perfil
 ($\approx 14\%$) é aceitável, mas não robusto.
 A HFU~2 é o \emph{benchmark} interno do poço nesta etapa, com
 $\approx 3\%$ contra o sónico.
-A gradação 3\%, 8\%, 14\%, 30\% acompanha exatamente a ordem de suporte
-experimental (quatro, quatro, dois e zero plugs), com a HFU~1 penalizada por
-$\alpha$ saturado no teto: é a evidência mais direta de que o gargalo desta
-etapa é amostragem de laboratório, não formulação física.
+
+Os dois extremos da gradação 3\%, 8\%, 14\%, 30\% são consistentes com o
+suporte experimental: a HFU~2, com quatro plugs, é a melhor, e a HFU~4, sem
+nenhum, é a pior.
+A ordenação completa, porém, \textbf{não} é explicada pelo número de plugs:
+HFU~1 e HFU~2 dispõem de quatro plugs cada e diferem por um fator de 2,4 no
+MAPE de perfil.
+O que separa essas duas unidades é a saturação de $\alpha$.
+Na Tabela~\ref{tab:hfu_params}, a HFU~1 e a HFU~3 têm $\alpha$ calibrado no
+teto do intervalo (0,950), enquanto a HFU~2 fica no interior (0,182); no
+laboratório pós-calibração as duas unidades saturadas ficam em 11,0\% e
+10,2\% de MAPE contra 6,8\% da unidade não saturada.
+Com o número de plugs controlado em quatro, portanto, o discriminante
+observado é a saturação do parâmetro---um limite de \emph{parametrização} do
+DEM, e não escassez amostral.
+
+A leitura defensável é que os erros maiores se concentram nas unidades com
+menor ou nenhum suporte experimental, mas que esta etapa \textbf{não separa}
+as contribuições de amostragem, litologia e limitação de formulação.
+Com quatro HFUs, contagens de plugs confundidas (quatro, quatro, dois e zero)
+e dois casos de $\alpha$ no teto, não há graus de liberdade para atribuir o
+erro a uma única causa.
+Afirmar que o gargalo é exclusivamente amostral seria mais forte do que os
+dados sustentam, e a saturação de $\alpha$ é evidência direta em contrário.
 
 \subsection{Multiescala sequencial: sem ganho para o perfil}
 
@@ -1689,8 +1715,11 @@ físico), após a fase~2b documentada na Seção~\ref{sec:gassmann}.
         ($\approx 8\%$); usar HFU~3 ($\approx 14\%$) com ressalvas
         documentadas; evitar HFU~4 ($\approx 30\%$) até obter plugs ou
         calibração independente.
-        O erro por unidade acompanha o número de plugs de calibração, o que
-        torna a aquisição de plugs na HFU~4 a intervenção de maior retorno.
+        Os maiores erros concentram-se nas unidades com menor ou nenhum
+        suporte experimental, o que torna a aquisição de plugs na HFU~4 a
+        intervenção de maior retorno esperado; o número de plugs,
+        isoladamente, não explica toda a variação
+        (Seção~\ref{sec:hfu_cautela}).
   \item \textbf{Entrada de porosidade:} manter \phiND{} (correlação
         $r \approx 0{,}94$ com \phiS{}) como default; RF de \philab{} permanece
         alternativa documentada da Etapa~1.

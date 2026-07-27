@@ -737,6 +737,7 @@
       MAPE \Vp{} & 8,7\% \\
       RMSE & 0,54~km/s \\
       Viés & $+0{,}30$~km/s \\
+      Pearson $r$ & 0,34 \\
       \Vp{} DEM médio & 5,20~km/s \\
       \Vp{} sónico médio & 4,90~km/s \\
       \bottomrule
@@ -752,29 +753,35 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Por HFU: o erro segue o número de plugs de calibração}
+\begin{frame}{Por HFU: os maiores erros concentram-se onde há menos suporte}
   \footnotesize
   O erro global esconde heterogeneidade forte entre unidades.
   \vspace{0.08cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.48\textwidth}
-    \centering
+    {\centering
     \scriptsize
+    \setlength{\tabcolsep}{3pt}
     \begin{tabular}{ccccc}
       \toprule
-      HFU & $n$ & Plugs & MAPE (\%) & Nota \\
+      HFU & $n$ & Plugs & $\alpha_{\mathrm{cal}}$ & MAPE (\%) \\
       \midrule
-      1 & 42 & 4 & 8,0 & utilizável \\
-      2 & 29 & 4 & 3,3 & \textbf{benchmark} \\
-      3 & 10 & 2 & 13,6 & ressalvas \\
-      4 & 6 & 0 & 30,4 & sem calibração \\
+      1 & 42 & 4 & 0,95$^\star$ & 8,0 \\
+      2 & 29 & 4 & 0,18 & \textbf{3,3} \\
+      3 & 10 & 2 & 0,95$^\star$ & 13,6 \\
+      4 & 6 & 0 & \emph{fallback} & 30,4 \\
       \bottomrule
     \end{tabular}
-    \vspace{0.10cm}
+    \par}
+    \vspace{0.06cm}
+    {\scriptsize $^\star$ saturado no teto do intervalo de calibração.}
+    \vspace{0.08cm}
     \begin{block}{Uso interpretativo}
       \scriptsize
-      A gradação 3\%--30\% acompanha o suporte experimental:
-      o gargalo é amostragem de laboratório, não formulação física.
+      Plugs não explicam tudo: HFU~1 e~2 têm quatro cada e diferem
+      $2{,}4\times$. O que as separa é $\alpha$ no teto --- limite de
+      parametrização, não de amostra.
+      Com quatro HFUs não se separam amostragem, litologia e formulação.
       HFU~4: não entregar sem novos plugs.
     \end{block}
     \column{0.50\textwidth}
@@ -985,8 +992,9 @@
           ($\approx 9\%$ seco, $\approx 7\%$ com Gassmann) e o lab sob a
           métrica mais severa (LOO $\approx 15\%$).
     \item \textbf{Uso por HFU:} 3\% (HFU~2), 8\% (HFU~1), 14\% (HFU~3),
-          30\% (HFU~4) --- o erro segue o número de plugs; evitar HFU~4
-          sem novos dados.
+          30\% (HFU~4) --- os maiores erros concentram-se onde há menos
+          suporte experimental, sem que o número de plugs explique toda a
+          variação; evitar HFU~4 sem novos dados.
     \item \textbf{Entrada:} manter \phiND{}; microCT na geometria, não no ML.
     \item \textbf{Multiescala (2f/2g):} CT forward e NMR ponto a ponto não
           superam o limiar de 2~p.p.\ --- manter monoescala Gassmann.
