@@ -103,7 +103,7 @@
 \newcommand{\VpVs}{\ensuremath{V_{\mathrm{p}}/V_{\mathrm{s}}}}
 
 \newlength{\drpbodyheight}
-\setlength{\drpbodyheight}{0.62\textheight}
+\setlength{\drpbodyheight}{0.80\textheight}
 
 \newcommand{\slidefig}[2][0.75]{%
   \includegraphics[width=\linewidth,height=#1\drpbodyheight,keepaspectratio]{#2}%
@@ -163,7 +163,7 @@
     \item Herança da Etapa~1: o que entra e o que fica de fora.
     \item Cadeia física, CT vs lab, premissas e ordem das inclusões.
     \item Como medimos o erro (lab $\neq$ poço) e calibração por HFU.
-    \item Resultados nos plugs (linha de base $\rightarrow$ LOO; multiescala 2f).
+    \item Resultados nos plugs (linha de base $\rightarrow$ LOO; multiescala CT).
     \item Extrapolação ao perfil e confronto com o sónico DSI.
     \item Gassmann; NMR (o que mudou / o que ficou fixo); decisão.
     \item Conclusões e caminho para a Etapa~3.
@@ -232,22 +232,44 @@
 \begin{frame}{Fontes elásticas que fecham a Etapa~2}
   \footnotesize
   Além do perfil enriquecido da Etapa~1, entram velocidades de lab e de poço.
-  \vspace{0.08cm}
+  \vspace{0.06cm}
   \centering
   \scriptsize
-  \setlength{\tabcolsep}{4pt}
-  \begin{tabular}{llrc}
+  \setlength{\tabcolsep}{2.5pt}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}p{0.42\textwidth}p{0.34\textwidth}rc@{}}
     \toprule
     Fonte & Papel & $n$ & Escala \\
     \midrule
-    Perfil integrado & \phiND{}, HFU, profundidade & 87 & $\sim$28~m \\
-    Plugs microCT & geometria de poros, \philab{} & 10 & pontual \\
-    ROCKPHYS (Velocity) & \Vp{}, \Vs{} de laboratório & 28 & plugs \\
-    Sónico DSI (DLIS) & DTCO/DTSM \emph{in situ} & 182 & contínuo \\
-    CMR/ECS (DLIS) & CMFF, BFV (macro/micro) & 152 & contínuo \\
+    Perfil integrado
+      & porosidade neutrão-densidade (\phiND{}),
+        unidade de fluxo hidrodinâmico (HFU),
+        profundidade
+      & 87 & $\sim$28~m \\
+    Plugs de microtomografia
+        computadorizada (microCT)
+      & geometria de poros, porosidade de
+        laboratório (\philab{})
+      & 10 & pontual \\
+    Planilha ROCKPHYS (Velocity)
+      & velocidades compressional e
+        cisalhante (\Vp{}, \Vs{}) de laboratório
+      & 28 & plugs \\
+    Sónico Dipole Shear Sonic Imager (DSI)
+        em Digital Log Interchange
+        Standard (DLIS)
+      & lentidões compressional e
+        cisalhante (DTCO/DTSM) \emph{in situ}
+      & 182 & contínuo \\
+    Combinable Magnetic Resonance (CMR) /
+        Elemental Capture Spectroscopy (ECS)
+        em DLIS
+      & fluido livre (CMFF) e fluido ligado
+        (BFV): frações macro/micro
+      & 152 & contínuo \\
     \bottomrule
   \end{tabular}
-  \vspace{0.14cm}
+  \vspace{0.10cm}
   \begin{block}{Distribuição de HFU no perfil}
     \scriptsize
     HFU1 $=42$, HFU2 $=29$, HFU3 $=10$, HFU4 $=6$.
@@ -283,13 +305,14 @@
     \column{0.48\textwidth}
     \begin{itemize}
       \item Entrada de porosidade: \phiND{} (perfil) ou \philab{} (plugs).
-      \item $\alpha$ inicial: mediana microCT por HFU.
-      \item Calibração inversa: $\alpha$, $K_{\mathrm{scale}}$, $G_{\mathrm{scale}}$.
+      \item $\alpha$ inicial: mediana microCT por HFU ($\bar{\alpha}$).
+      \item Calibração inversa: $\alpha^\star$ e fator $s^\star$
+            (comum a $K_m$ e $G_m$).
     \end{itemize}
     \column{0.48\textwidth}
     \begin{itemize}
       \item Inclusões secas ($K_i=G_i=0$) até $\phi$ alvo.
-      \item Fase~2b: saturação total ($S_w=1$).
+      \item Gassmann: saturação total ($S_w=1$).
       \item Sem reajuste ao sónico na calibração.
     \end{itemize}
   \end{columns}
@@ -336,7 +359,6 @@
     };
     \node[resultbox] (cmp) at (2.4,-3.10) {%
       Compara com \Vp{} \textbf{lab}
-      (não com ``\Vp{} da imagem'')
     };
     \draw[arr] (ct.south) -- ++(0,-0.24) -| (dem.north);
     \draw[arr] (lab.south) -- ++(0,-0.24) -| (dem.north);
@@ -380,7 +402,7 @@
         \item Inclusões vazias ($K_i = G_i = 0$).
         \item Gassmann \emph{depois} do arcabouço seco
               ($K_f \approx 2{,}2$~GPa, $S_w = 1$).
-        \item $K_{\mathrm{scale}}$, $G_{\mathrm{scale}}$ e $\alpha$
+        \item $\alpha^\star$ e fator $s^\star$ (comum a $K_m$, $G_m$)
               calibrados no \textbf{lab}, não no DSI.
         \item Limiar A/B multiescala: ganho MAPE $\geq 2$~p.p.
               (in-sample \emph{e} LOO / perfil).
@@ -467,9 +489,9 @@
     \midrule
     Lab (linha de base) & 10 plugs CT & DEM cru vs \Vp{} lab? \\
     Lab in-sample / LOO & 10 plugs / 10 folds & Fecha o lab? Generaliza? \\
-    Multiescala A/B (2f) & 10 plugs CT & DEM sequencial ganha vs M1? \\
+    Multiescala CT (A/B) & 10 plugs CT & DEM sequencial ganha vs M1? \\
     Perfil sónico DSI & 87 linhas & Extrapolação \emph{in situ}? \\
-    Multiescala NMR (2g) & 87 linhas & Frações CMR melhoram M1? \\
+    Multiescala NMR & 87 linhas & Frações CMR melhoram M1? \\
     \bottomrule
   \end{tabular}
   \vspace{0.12cm}
@@ -554,13 +576,13 @@
     \node[box] (a) {%
       \textbf{1. Aprender (10 plugs)}\\
       \philab{} + \Vp{} lab + microCT\\
-      $\rightarrow$ ajusta $\alpha$, $K_{\mathrm{scale}}$, $G_{\mathrm{scale}}$
+      $\rightarrow$ ajusta $\alpha^\star$ e fator $s^\star$
       \textbf{por HFU}
     };
     \node[box, below=0.45cm of a, fill=po861green!12, draw=po861green] (b) {%
       \textbf{2. Aplicar (87 linhas)}\\
       $\phi=\phiND{}$ + HFU lab\\
-      $\rightarrow$ usa os parâmetros daquela HFU
+      $\rightarrow$ usa $(\alpha^\star,s^\star)$ daquela HFU
     };
     \node[box, below=0.45cm of b, fill=orange!12, draw=orange!70!black] (c) {%
       \textbf{3. Validar no poço}\\
@@ -577,12 +599,73 @@
   \end{tikzpicture}
 \end{frame}
 
+\begin{frame}{Esquema por HFU: de $\bar{\alpha}$ a \Vp{} DEM}
+  \footnotesize
+  $\bar{\alpha}_i$ é só o ponto de partida (mediana CT). O produto usa
+  $(\alpha_i^\star,s_i^\star)$ calibrados contra \Vp{} de laboratório.
+  \vspace{0.04cm}
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!12,
+      align=center, text width=10.6cm, inner sep=3.5pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.2mm]}, thick, po861blue},
+  ]
+    \node[box] (a) {%
+      \textbf{1. Partida (microCT)}\\[0.03cm]
+      $\displaystyle
+        \bar{\alpha}_i
+        =\mathrm{mediana}\{\alpha_{\mathrm{CT},j}:j\in\mathrm{HFU}_i\}
+      $\quad;\quad
+      matriz VRH $\rightarrow (K_m,G_m)_i$
+    };
+    \node[box, below=0.26cm of a, fill=po861green!12, draw=po861green] (b) {%
+      \textbf{2. Calibração inversa (plugs, vs \Vp{} lab)}\\[0.03cm]
+      $\displaystyle
+        (\alpha_i^\star,s_i^\star)
+        =\arg\min_{\alpha,s}\;
+        \mathrm{erro}\!\big(
+          V_p^{\mathrm{DEM}}(\phi_{\mathrm{lab}},\alpha,sK_m,sG_m),\;
+          V_p^{\mathrm{lab}}
+        \big)
+      $\\[0.02cm]
+      {\tiny partida: $\alpha=\bar{\alpha}_i$, $s=1$;\quad
+       fator comum: $K_m^\star=s^\star K_m$, $G_m^\star=s^\star G_m$}
+    };
+    \node[box, below=0.26cm of b] (c) {%
+      \textbf{3. Forward DEM (já calibrado)}\\[0.03cm]
+      $\displaystyle
+        (\alpha_i^\star,s_i^\star)
+        \;\rightarrow\;
+        \mathrm{DEM}(\phi,\alpha_i^\star,s_i^\star K_m,s_i^\star G_m)
+        \;\rightarrow\;
+        (K,G)_{\mathrm{dry}}
+        \;\rightarrow\;
+        (V_p,V_s)^{\mathrm{DEM}}
+      $\\[0.02cm]
+      {\tiny $\phi=\phi_{\mathrm{lab}}$ no plug;\quad
+       $\phi=\phiND{}$ no perfil (87 linhas)}
+    };
+    \node[box, below=0.26cm of c, fill=orange!12, draw=orange!70!black] (d) {%
+      \textbf{4. Validação (sem recalibrar)}\\[0.03cm]
+      lab: $V_p^{\mathrm{DEM,seco}}$ vs $V_p^{\mathrm{lab}}$
+      (ambos a seco)\\[0.02cm]
+      poço: $V_p^{\mathrm{DEM}}+\mathrm{Gassmann}$ vs $V_p^{\mathrm{DSI}}(z)$
+      (DSI é \emph{in situ} com fluido)
+    };
+    \draw[arr] (a) -- (b);
+    \draw[arr] (b) -- (c);
+    \draw[arr] (c) -- (d);
+  \end{tikzpicture}
+\end{frame}
+
 % ------------------------------------------------------------------
 \section{Calibração laboratorial}
 
 \begin{frame}{Sem calibração: MAPE $\approx 26\%$, viés $+1{,}2$~km/s}
   \begin{columns}[T,onlytextwidth]
-    \column{0.42\textwidth}
+    \column{0.38\textwidth}
     \footnotesize
     DEM a seco com $\alpha$ do microCT e matriz VRH
     \textbf{superestima} \Vp{} de laboratório.
@@ -601,17 +684,17 @@
     \vspace{0.10cm}
     {\scriptsize Um único $\alpha$ global não basta:
     a dispersão por HFU já aparece nesta linha de base.}
-    \column{0.56\textwidth}
-    \slidefigure[0.85]{fig2_vp_dem_vs_lab}{DEM cru versus \Vp{} de laboratório
+    \column{0.60\textwidth}
+    \slidefigure[0.86]{fig2_vp_dem_vs_lab}{DEM cru versus \Vp{} de laboratório
     (dez plugs CT, confinamento 22,1~MPa).}
   \end{columns}
 \end{frame}
 
 \begin{frame}{Calibração por HFU: MAPE in-sample cai para $\approx 9\%$}
   \begin{columns}[T,onlytextwidth]
-    \column{0.48\textwidth}
+    \column{0.42\textwidth}
     \footnotesize
-    Ajuste de $\alpha$, $K_{\mathrm{scale}}$ e $G_{\mathrm{scale}}$
+    Ajuste de $\alpha^\star$ e fator $s^\star$ (comum a $K_m$ e $G_m$)
     \textbf{por HFU} (limites $\alpha \in [0{,}15,\,0{,}95]$).
     \par
     \vspace{0.06cm}
@@ -631,15 +714,15 @@
     \vspace{0.08cm}
     {\scriptsize HFU~1 e~3 saturam no teto (0,95): limite do modelo,
     não geometria CT. HFU~2 é o caso mais sustentado.}
-    \column{0.50\textwidth}
-    \slidefigure[0.82]{fig2_alpha_by_hfu}{$\alpha$ calibrado versus mediana
+    \column{0.56\textwidth}
+    \slidefigure[0.88]{fig2_alpha_by_hfu}{$\alpha$ calibrado versus mediana
     microCT por HFU.}
   \end{columns}
 \end{frame}
 
 \begin{frame}{LOO: MAPE $\approx 15\%$ --- métrica honesta no laboratório}
   \begin{columns}[T,onlytextwidth]
-    \column{0.44\textwidth}
+    \column{0.40\textwidth}
     \footnotesize
     Leave-one-plug-out: recalibra sem o plug avaliado.
     \vspace{0.08cm}
@@ -662,19 +745,19 @@
       Métrica mais severa do conjunto --- retirar um plug remove
       25--50\% do suporte da sua HFU.
     \end{block}
-    \column{0.54\textwidth}
-    \slidefigure[0.82]{fig2_vp_calib_before_after}{Antes versus depois da
+    \column{0.58\textwidth}
+    \slidefigure[0.86]{fig2_vp_calib_before_after}{Antes versus depois da
     calibração (dez plugs).}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Multiescala CT (fase~2f): manter monoescala}
+\begin{frame}{Multiescala CT: manter monoescala}
   \footnotesize
   DEM sequencial meso-macro + micro (frações CT). Critério: ganho
   \emph{forward} $\geq 2$~p.p.\ com confirmação in-sample.
   \vspace{0.06cm}
   \begin{columns}[T,onlytextwidth]
-    \column{0.46\textwidth}
+    \column{0.40\textwidth}
     \scriptsize
     \begin{tabular}{llcc}
       \toprule
@@ -694,8 +777,8 @@
     \begin{exampleblock}{Decisão}
       \scriptsize Manter $\alpha$ efetivo por HFU no produto de 87 linhas.
     \end{exampleblock}
-    \column{0.52\textwidth}
-    \slidefigure[0.78]{fig2_multiscale_ab_crossplot}{M1 versus M2b
+    \column{0.58\textwidth}
+    \slidefigure[0.84]{fig2_multiscale_ab_crossplot}{M1 versus M2b
     \emph{forward} (in-sample).}
   \end{columns}
 \end{frame}
@@ -705,7 +788,7 @@
 
 \begin{frame}{Extrapolação: 87 linhas com parâmetros por HFU}
   \begin{columns}[T,onlytextwidth]
-    \column{0.40\textwidth}
+    \column{0.36\textwidth}
     \footnotesize
     \begin{itemize}
       \item Entrada: \phiND{} e HFU de laboratório.
@@ -716,41 +799,33 @@
     \vspace{0.06cm}
     {\scriptsize Entrada de porosidade sólida; a pergunta elástica
     vem no confronto com o DSI.}
-    \column{0.58\textwidth}
-    \slidefigure[0.85]{fig2_phi_nd_vs_phi_sonic}{\phiND{} versus porosidade
+    \column{0.62\textwidth}
+    \slidefigure[0.88]{fig2_phi_nd_vs_phi_sonic}{\phiND{} versus porosidade
     sónica no perfil ($n=87$).}
   \end{columns}
 \end{frame}
 
 \begin{frame}{Contra o DSI a seco: MAPE $\approx 9\%$, viés $+0{,}30$~km/s}
+  \footnotesize
+  87/87 profundidades casadas.
+  {\scriptsize\quad
+  MAPE 8,7\% $\cdot$
+  RMSE 0,54~km/s $\cdot$
+  viés $+0{,}30$~km/s $\cdot$
+  Pearson $r=0{,}34$ $\cdot$
+  \Vp{} DEM 5,20 vs sónico 4,90~km/s.}
+  \vspace{0.06cm}
   \begin{columns}[T,onlytextwidth]
-    \column{0.40\textwidth}
-    \footnotesize
-    87/87 profundidades casadas (DTCO $\rightarrow$ \Vp{}).
-    \vspace{0.06cm}
-    \centering
-    \scriptsize
-    \begin{tabular}{lr}
-      \toprule
-      Métrica & Valor \\
-      \midrule
-      MAPE \Vp{} & 8,7\% \\
-      RMSE & 0,54~km/s \\
-      Viés & $+0{,}30$~km/s \\
-      Pearson $r$ & 0,34 \\
-      \Vp{} DEM médio & 5,20~km/s \\
-      \Vp{} sónico médio & 4,90~km/s \\
-      \bottomrule
-    \end{tabular}
-    \par
-    \vspace{0.08cm}
-    {\scriptsize O viés responde por $\approx 3/4$ do erro absoluto:
-    o modelo é sistematicamente mais rápido que o sónico \emph{in situ},
-    não apenas ruidoso.}
-    \column{0.58\textwidth}
-    \slidefigure[0.82]{fig2_vp_dem_vs_sonic_depth}{Trilha de profundidade:
-    DEM seco versus sónico DSI.}
+    \column{0.48\textwidth}
+    \slidefigure[0.80]{fig2_vp_dem_vs_sonic_depth}{Trilha: DEM seco versus
+    sónico DSI.}
+    \column{0.50\textwidth}
+    \slidefigure[0.80]{fig2_vp_dem_vs_sonic_scatter}{Dispersograma 1:1 por HFU
+    (monoescala seco).}
   \end{columns}
+  \vspace{0.04cm}
+  {\scriptsize O viés responde por $\approx 3/4$ do erro absoluto: o modelo é
+  sistematicamente mais rápido que o sónico \emph{in situ}, não apenas ruidoso.}
 \end{frame}
 
 \begin{frame}{Por HFU: os maiores erros concentram-se onde há menos suporte}
@@ -758,10 +833,10 @@
   O erro global esconde heterogeneidade forte entre unidades.
   \vspace{0.08cm}
   \begin{columns}[T,onlytextwidth]
-    \column{0.48\textwidth}
+    \column{0.42\textwidth}
     {\centering
     \scriptsize
-    \setlength{\tabcolsep}{3pt}
+    \setlength{\tabcolsep}{2.5pt}
     \begin{tabular}{ccccc}
       \toprule
       HFU & $n$ & Plugs & $\alpha_{\mathrm{cal}}$ & MAPE (\%) \\
@@ -773,9 +848,9 @@
       \bottomrule
     \end{tabular}
     \par}
-    \vspace{0.06cm}
+    \vspace{0.04cm}
     {\scriptsize $^\star$ saturado no teto do intervalo de calibração.}
-    \vspace{0.08cm}
+    \vspace{0.06cm}
     \begin{block}{Uso interpretativo}
       \scriptsize
       Plugs não explicam tudo: HFU~1 e~2 têm quatro cada e diferem
@@ -784,8 +859,8 @@
       Com quatro HFUs não se separam amostragem, litologia e formulação.
       HFU~4: não entregar sem novos plugs.
     \end{block}
-    \column{0.50\textwidth}
-    \slidefigure[0.78]{fig2_vp_error_vs_depth}{Erro de \Vp{} versus
+    \column{0.56\textwidth}
+    \slidefigure[0.80]{fig2_vp_error_vs_depth}{Erro de \Vp{} versus
     profundidade (DEM seco vs DSI).}
   \end{columns}
 \end{frame}
@@ -793,9 +868,9 @@
 % ------------------------------------------------------------------
 \section{Gassmann e multiescala NMR}
 
-\begin{frame}{Fase~2b: Gassmann leva o MAPE a $\approx 7\%$, viés persiste}
+\begin{frame}{Gassmann leva o MAPE a $\approx 7\%$, viés persiste}
   \begin{columns}[T,onlytextwidth]
-    \column{0.42\textwidth}
+    \column{0.36\textwidth}
     \footnotesize
     Fluido default: $K_f \approx 2{,}2$~GPa, $S_w=1$.
     \vspace{0.06cm}
@@ -815,23 +890,23 @@
     $K_{\mathrm{sat}}$ é quase anulado pelo aumento de densidade.
     O fluido explica \emph{parte} do gap, não o fecha ---
     motivação para o resíduo (Etapa~3).}
-    \column{0.56\textwidth}
-    \slidefigure[0.82]{fig2_vp_dry_gassmann_sonic_depth}{Sónico, DEM seco e
+    \column{0.62\textwidth}
+    \slidefigure[0.86]{fig2_vp_dry_gassmann_sonic_depth}{Sónico, DEM seco e
     DEM + Gassmann ao longo da profundidade.}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Fase~2g: NMR ponto a ponto --- centra o erro, mas o espalha}
+\begin{frame}{NMR ponto a ponto --- centra o erro, mas o espalha}
   \footnotesize
   Hipótese: frações CMR (CMFF/BFV) resolvem a fragilidade das medianas CT por HFU.
   \vspace{0.04cm}
   \begin{columns}[T,onlytextwidth]
-    \column{0.46\textwidth}
+    \column{0.40\textwidth}
     \scriptsize
     \begin{itemize}
       \item Merge CMR + perfil: \textbf{87/87}.
       \item M3 = DEM sequencial + Gassmann.
-      \item $\alpha_{\mathrm{meso/micro}}$ fixos por HFU (2f).
+      \item $\alpha_{\mathrm{meso/micro}}$ fixos por HFU (teste CT).
     \end{itemize}
     \vspace{0.04cm}
     \centering
@@ -851,8 +926,8 @@
     \begin{exampleblock}{Decisão}
       \scriptsize Manter monoescala Gassmann no produto de 87 linhas.
     \end{exampleblock}
-    \column{0.52\textwidth}
-    \slidefigure[0.72]{fig2_multiscale_nmr_crossplot_vp}{M1 versus M3 no
+    \column{0.58\textwidth}
+    \slidefigure[0.82]{fig2_multiscale_nmr_crossplot_vp}{M1 versus M3 no
     plano 1:1 (sónico no eixo $y$).}
   \end{columns}
 \end{frame}
@@ -934,8 +1009,8 @@
     arr/.style={-{Stealth[length=2.4mm]}, thick, po861blue},
   ]
     \node[box] (m1) at (0,1.35) {M1 monoescala\\(baseline)};
-    \node[box] (m2) at (3.3,1.35) {M2b CT\\(fase 2f)};
-    \node[box] (m3) at (6.6,1.35) {M3 NMR\\(fase 2g)};
+    \node[box] (m2) at (3.3,1.35) {M2b\\multiescala CT};
+    \node[box] (m3) at (6.6,1.35) {M3\\multiescala NMR};
     \node[q] (q) at (3.3,0.0) {Ganho MAPE $\geq 2$~p.p.\ vs M1?};
     \node[yes] (y) at (0.6,-1.45) {Sim $\rightarrow$\\adotar multi};
     \node[no] (n) at (5.6,-1.45) {Não $\rightarrow$\\
@@ -949,8 +1024,8 @@
   \vspace{0.08cm}
   \begin{exampleblock}{No 861}
     \scriptsize
-    2f: forward ganha 0,4~p.p.\ in-sample.
-    2g: MAPE piora 1,2~p.p.
+    Multiescala CT: forward ganha 0,4~p.p.\ in-sample.
+    Multiescala NMR: MAPE piora 1,2~p.p.
     Produto: monoescala Gassmann + $\alpha$ efetivo por HFU.
   \end{exampleblock}
 \end{frame}
@@ -996,7 +1071,7 @@
           suporte experimental, sem que o número de plugs explique toda a
           variação; evitar HFU~4 sem novos dados.
     \item \textbf{Entrada:} manter \phiND{}; microCT na geometria, não no ML.
-    \item \textbf{Multiescala (2f/2g):} CT forward e NMR ponto a ponto não
+    \item \textbf{Multiescala CT e NMR:} forward CT e NMR ponto a ponto não
           superam o limiar de 2~p.p.\ --- manter monoescala Gassmann.
     \item \textbf{Gassmann:} MAPE 8,7\% $\rightarrow$ 7,3\%, viés
           $+0{,}30 \rightarrow +0{,}27$~km/s; melhora consistente,
