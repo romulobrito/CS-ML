@@ -1,0 +1,399 @@
+% Beamer -- Poco 861 Etapa 3, Entrega 3
+% Robustez: HFU, plugs e regressores (sem CLP nem produto travado).
+% Compilar (a partir desta pasta):
+%   pdflatex poco861_etapa3_entrega3.tex
+%   pdflatex poco861_etapa3_entrega3.tex
+
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../_common.tex}
+
+\title{Poço~861 (campo Lapa): corretor residual de \Vp{}}
+\subtitle{Etapa~3 --- desempenho por HFU e por regressor}
+\author{Romulo Brito da Silva}
+\institute{UENF / LENEP}
+\date{Agosto de 2026}
+
+\begin{document}
+
+{%
+\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{drp_title_bg.png}}%
+\begin{frame}[plain]
+  \vspace*{0.40cm}
+  \begin{center}
+    {\huge\bfseries Poço~861\\[0.04cm]
+    (campo Lapa)}\\[0.18cm]
+    {\usebeamerfont{subtitle}\bfseries Etapa~3 --- HFU e regressores}\\[0.12cm]
+    {\large Onde o corretor reduz o erro e se o algoritmo muda o resultado}\\[0.22cm]
+    {\usebeamerfont{author} Romulo Brito da Silva}\\[0.08cm]
+    {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
+    {\usebeamerfont{date} Agosto de 2026}\\[0.18cm]
+    {\footnotesize
+    Mesmo residual OOF da apresentação anterior ($R^2\approx 0{,}79$)\\
+    Foco: estratificação por HFU e comparação entre regressores}
+  \end{center}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.15cm]current page.south east) {\insertframenumber};
+  \end{tikzpicture}
+\end{frame}
+}%
+\usebackgroundtemplate{}
+
+\begin{frame}{Roteiro}
+  \footnotesize
+  \begin{enumerate}\setlength{\itemsep}{0.22em}
+    \item Nos slides anteriores, o residual $\dVp$ mostrou-se previsível
+          em profundidade. Aqui: \emph{onde} o ganho aparece e
+          \emph{com qual} algoritmo.
+    \item MAPE e viés por HFU (rótulos de amostra intercalados;
+          não zonas contíguas de profundidade).
+    \item O que os plugs da calibração DEM/SC explicam no Gassmann
+          e o que não explicam no híbrido.
+    \item Seis regressores: mesmo $\dVp$, mesmas oito entradas em $X$.
+    \item Hiperparâmetros fixados e justificativa.
+    \item Linear versus Ridge; RF versus linear em profundidade.
+  \end{enumerate}
+\end{frame}
+
+\section{Contexto}
+
+\begin{frame}{Da apresentação anterior para esta}
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{O que já ficou definido}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.14em}
+          \item Cadeia elástica (DEM/SC + Gassmann) \textbf{fixa};
+                o sônico entra apenas no alvo.
+          \item Residual
+                $\dVp=\Vpsonsub-V_{\mathrm{p,Gassmann}}$;
+                o modelo estima
+                $g(X)\approx\mathbb{E}[\dVp\mid X]$.
+          \item OOF em três blocos de profundidade:
+                $R^2\approx 0{,}79$,
+                RMSE residual $\approx 0{,}18$~km/s.
+          \item Produto híbrido:
+                $V_{\mathrm{p,hibrido}}
+                =V_{\mathrm{p,Gassmann}}+\widehat{\dVp}$.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \begin{exampleblock}{Perguntas desta apresentação}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.14em}
+          \item Em quais HFUs o híbrido reduz mais o erro?
+          \item A falta de plugs explica o desvio do Gassmann
+                --- ou também o erro que sobra no híbrido?
+          \item O RF oficial (Etapa~1) continua competitivo
+                diante dos demais regressores?
+          \item CLP, janelas e transferência a outro poço
+                ficam para depois.
+        \end{itemize}
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+  \vspace{0.10cm}
+  {\scriptsize
+  Métrica usada aqui:
+  $\mathrm{MAPE}
+  =\frac{1}{n}\sum_i
+  |V_{\mathrm{p,hibrido},i}-V_{\mathrm{p,sonico},i}|
+  /V_{\mathrm{p,sonico},i}$
+  (híbrido OOF em relação ao DSI).}
+\end{frame}
+
+\section{HFU e plugs}
+
+\begin{frame}[shrink=5]
+  \frametitle{Erro por HFU, depois do corretor}
+  \footnotesize
+  A HFU de laboratório \textbf{não} entra em $X$: serve só para
+  agrupar as 87 predições OOF. Em profundidade, os rótulos estão
+  \textbf{intercalados} --- não formam intervalos contíguos
+  $z_a$--$z_b$.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \centering
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{cccccc}
+      \toprule
+      \multirow{2}{*}{HFU} & \multirow{2}{*}{$n$} &
+      \multicolumn{2}{c}{MAPE (\%)} & \multicolumn{2}{c}{Viés (km/s)} \\
+      \cmidrule(lr){3-4}\cmidrule(lr){5-6}
+       & & Gass. & Híbr. & Gass. & Híbr. \\
+      \midrule
+      1 & 42 & 6,8 & 2,2 & $+0{,}33$ & $+0{,}02$ \\
+      2 & 29 & 2,2 & 2,3 & $-0{,}11$ & $-0{,}09$ \\
+      3 & 10 & 11,5 & 5,4 & $+0{,}51$ & $+0{,}15$ \\
+      4 & 6  & 28,1 & 4,8 & $+1{,}31$ & $+0{,}17$ \\
+      \bottomrule
+    \end{tabular}
+    \vspace{0.10cm}
+    \begin{exampleblock}{HFU~2}
+      \scriptsize
+      Gassmann já estava em 2,2\%; o híbrido fica em 2,3\%.
+      Quando a física já fecha, o corretor quase não altera
+      o resultado --- e não piora.
+    \end{exampleblock}
+    \column{0.48\textwidth}
+    \begin{block}{Onde o corretor reduz o erro}
+      \scriptsize
+      \begin{itemize}\setlength{\itemsep}{0.12em}
+        \item \textbf{HFU~4} ($n=6$, sem plugs / fallback):
+              28,1\% $\rightarrow$ 4,8\%.
+        \item \textbf{HFU~3} (dois plugs):
+              11,5\% $\rightarrow$ 5,4\%.
+        \item \textbf{HFU~1} (42/87 amostras):
+              6,8\% $\rightarrow$ 2,2\%;
+              puxa o MAPE global (2,8\%).
+      \end{itemize}
+    \end{block}
+    \vspace{0.06cm}
+    {\scriptsize
+    Esse padrão é compatível com calibração DEM/SC mais fraca
+    em parte das HFUs. Não indica um mecanismo elástico novo
+    aprendido pelo ML.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Plugs explicam o gap da física, não o residual do híbrido}
+  \footnotesize
+  Perfil OOF dos slides anteriores; faixa lateral $=$ HFU lab
+  intercalada em profundidade.
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \centering
+      \scriptsize
+      \setlength{\tabcolsep}{2.8pt}
+      \begin{tabular}{ccccc}
+        \toprule
+        HFU & $n$ & Plugs & MAPE gas. & MAPE híb. \\
+        \midrule
+        1 & 42 & 4 & 6,8 & 2,2 \\
+        2 & 29 & 4 & 2,2 & 2,3 \\
+        3 & 10 & 2 & 11,5 & 5,4 \\
+        4 & 6 & \textbf{0} & 28,1 & 4,8 \\
+        \bottomrule
+      \end{tabular}
+      \vspace{0.08cm}
+      \begin{block}{Separar dois efeitos}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.10em}
+          \item \textbf{Gap Gassmann:} na HFU~4, sem plug
+                (fallback na calibração), o viés físico chega a
+                $+1{,}31$~km/s.
+          \item \textbf{Erro que sobra no híbrido:} os $\approx 5\%$
+                de MAPE em HFU~3/4 não vêm da falta de plug;
+                são o erro OOF do corretor, com $n$ pequeno.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]%
+        {fig3_vp_hybrid_depth_hfu}\\[0.06cm]
+      {\scriptsize Perfil OOF: sônico, Gassmann e híbrido RF;
+       faixa $=$ HFU lab intercalada.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Regressores}
+
+\begin{frame}[shrink=5]
+  \frametitle{Seis regressores, mesmo alvo e mesmo protocolo}
+  \footnotesize
+  Cinco regressores da Etapa~1 mais Ridge. Alvo $\dVp$, oito
+  entradas em $X$ e OOF por blocos de profundidade são os mesmos;
+  muda apenas o modelo.
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \centering
+      \scriptsize
+      \setlength{\tabcolsep}{3.2pt}
+      \begin{tabular}{lcccc}
+        \toprule
+        Regressor & $R^2$ res. & MAPE & RMSE & Viés \\
+        \midrule
+        Regressão linear & 0,88 & 2,1 & 0,14 & $+0{,}00$ \\
+        Random Forest & 0,79 & 2,8 & 0,18 & $+0{,}01$ \\
+        Gradient Boosting & 0,69 & 3,0 & 0,22 & $+0{,}01$ \\
+        XGBoost & 0,52 & 3,6 & 0,27 & $+0{,}02$ \\
+        Ridge ($\alpha=1$) & 0,14 & 6,1 & 0,36 & $+0{,}04$ \\
+        MLP & $-0{,}04$ & 6,5 & 0,40 & $+0{,}01$ \\
+        \midrule
+        Gassmann & --- & 7,3 & 0,48 & $+0{,}27$ \\
+        \bottomrule
+      \end{tabular}
+      \vspace{0.08cm}
+      \begin{block}{Em resumo}
+        \scriptsize
+        MAPE, RMSE e viés medem o erro do híbrido OOF frente ao
+        sônico; $R^2$ mede o ajuste do residual.
+        Todos ficam abaixo do Gassmann puro (7,3\%).
+        Melhor MAPE: linear (2,1\%); RF oficial: 2,8\%.
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]%
+        {fig3_regressor_sensitivity_mape}\\[0.06cm]
+      {\scriptsize MAPE de $\Vp$ híbrida por regressor;
+       tracejado $=$ Gassmann (7,3\%); RF em destaque.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Hiperparâmetros: o que foi fixado e por quê}
+  \scriptsize
+  Configuração alinhada à Etapa~1; semente $42$ em todos.
+  Não houve varredura fina de profundidade máxima nem de taxa de
+  aprendizado: com $n=87$, o ponto é comparar famílias de modelos,
+  não otimizar hiperparâmetros.
+  \vspace{0.06cm}
+  {\centering
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{llp{5.6cm}}
+    \toprule
+    Modelo & Hiperparâmetros & Motivo \\
+    \midrule
+    RF (oficial) &
+    $200$ árvores; sem scaler &
+    Mesma escolha da Etapa~1; complexidade limitada para reduzir sobreajuste \\
+    Grad.\ Boost. &
+    $200$ árvores; sem scaler &
+    Mesma família ensemble; comparação direta com RF \\
+    XGBoost &
+    $200$ árvores;
+    \texttt{reg:squarederror}; $n_{\mathrm{jobs}}=1$ &
+    Mesmo número de árvores; uma thread para reprodutibilidade \\
+    Linear &
+    OLS + \texttt{StandardScaler} &
+    Referência interpretável; escala evita coeficientes dominados pela unidade \\
+    Ridge &
+    $\alpha=1$; \textbf{sem} scaler &
+    Contraste com penalidade $L_2$; $\alpha=1$ é o valor default \\
+    MLP &
+    $(128,64)$;
+    $500$ épocas; early stop $15\%$ val.;
+    + scaler &
+    Rede com capacidade alta; com $n=87$, tende a instabilidade \\
+    \bottomrule
+  \end{tabular}
+  \par}
+  \vspace{0.08cm}
+  \begin{exampleblock}{Observação}
+    \scriptsize
+    O RF oficial permanece estável no OOF (MAPE $2{,}8\%$).
+    A linear ($2{,}1\%$) tem coeficientes legíveis.
+    O Ridge perde porque $\alpha=1$ atua sem padronizar $X$ ---
+    não porque regularização $L_2$ seja inadequada em geral.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Linear e Ridge: efeito da escala das variáveis}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    \begin{itemize}\setlength{\itemsep}{0.16em}
+      \item A \textbf{regressão linear} (OLS + scaler) tem o menor MAPE
+            (2,1\%) e o maior $R^2$ residual (0,88). Ou seja, o desvio
+            pós-Gassmann acompanha de forma
+            \textbf{aproximadamente linear}
+            $V_{\mathrm{p,Gassmann}}$ e os perfis de entrada.
+      \item O \textbf{Ridge} ($\alpha=1$) minimiza
+            $\|y-Xw\|_{2}^{2}+\alpha\|w\|_{2}^{2}$
+            \emph{sem} padronizar $X$. Variáveis de escala grande
+            (resistividades, por exemplo) incham $\|w\|$; a
+            penalidade $L_2$ reduz os demais coeficientes e o modelo
+            subajusta.
+      \item O \textbf{MLP} fica por último ($R^2$ levemente negativo).
+            Com $n=87$ e capacidade alta, a instabilidade é esperada.
+    \end{itemize}
+    \vspace{0.06cm}
+    \begin{block}{Hipótese de bom desempenho}
+      \scriptsize
+      Se a linear compete com o RF, a parte previsível do residual
+      --- $h(X)$ em
+      $\dVp=\mu_{\Delta}+h(X)+\varepsilon$ ---
+      é, neste poço, quase linear nas entradas.
+      Há o que aprender, mas sem necessidade de um modelo
+      fortemente não linear.
+    \end{block}
+    \column{0.46\textwidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]%
+      {fig3_regressor_depth_comparison}\\[0.04cm]
+    {\scriptsize Perfis por regressor. MLP e Ridge oscilam;
+     linear e RF acompanham o sônico.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{RF versus linear em profundidade}
+  \footnotesize
+  Mesmo OOF; faixa lateral $=$ HFU lab intercalada.
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]%
+        {fig3_vp_sonic_rf_lr_depth_hfu}\\[0.04cm]
+      {\scriptsize Sônico, híbrido RF (MAPE 2,8\%) e híbrido linear
+       (MAPE 2,1\%).}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \begin{block}{Dois caminhos possíveis}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.12em}
+          \item \textbf{RF (oficial):} mesma linha da Etapa~1;
+                admite não linearidades locais; MAPE 2,8\%.
+          \item \textbf{Linear:} coeficientes legíveis; MAPE 2,1\%.
+          \item Os dois acompanham o sônico na coluna.
+                Ridge e MLP ficam de fora.
+        \end{itemize}
+      \end{block}
+      \vspace{0.06cm}
+      \begin{exampleblock}{Sobre $h(X)$}
+        \scriptsize
+        Nos slides anteriores escrevemos
+        $\dVp=\mu_{\Delta}+h(X)+\varepsilon$,
+        com $h(X)$ previsível e $\varepsilon$ residual.
+        Como a linear compete com o RF, $h(X)$ parece
+        \textbf{aproximadamente linear} neste intervalo:
+        há estrutura, mas não é preciso árvore para aproveitá-la.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Conclusões}
+  \footnotesize
+  \begin{enumerate}\setlength{\itemsep}{0.20em}
+    \item \textbf{HFU:} o ganho do híbrido está onde a física falhava
+          (HFU~3/4). Na HFU~2 ($\approx 2\%$) o corretor quase não
+          muda o erro. Rótulos intercalados, não zonas contíguas.
+    \item \textbf{Plugs:} explicam o gap do Gassmann (em especial
+          HFU~4). Não explicam os $\approx 5\%$ de MAPE que restam
+          no híbrido.
+    \item \textbf{Algoritmo:} RF ($200$ árvores, semente $42$) e
+          regressão linear (+ scaler) são os dois caminhos viáveis.
+          Hiperparâmetros da Etapa~1; sem otimização agressiva
+          em $n=87$.
+    \item \textbf{Alcance:} resultado para este poço, sob OOF.
+          Não demonstra transferência a outro poço e não substitui
+          a cadeia DEM--Gassmann.
+  \end{enumerate}
+\end{frame}
+
+\end{document}

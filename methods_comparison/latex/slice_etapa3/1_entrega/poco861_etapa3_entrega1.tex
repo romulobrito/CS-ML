@@ -1,0 +1,422 @@
+% Beamer -- Poco 861 Etapa 3, Entrega 1
+% Contrato metodologico do corretor residual (sem produto hibrido).
+% Compilar (a partir desta pasta):
+%   pdflatex poco861_etapa3_entrega1.tex
+%   pdflatex poco861_etapa3_entrega1.tex
+% ASCII-only in source comments.
+
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../_common.tex}
+
+\title{Poço~861 (campo Lapa): corretor residual de \Vp{}}
+\subtitle{Etapa~3 --- alvo, variáveis e validação}
+\author{Romulo Brito da Silva}
+\institute{UENF / LENEP}
+\date{Agosto de 2026}
+
+\begin{document}
+
+{%
+\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{drp_title_bg.png}}%
+\begin{frame}[plain]
+  \vspace*{0.40cm}
+  \begin{center}
+    {\huge\bfseries Poço~861\\[0.04cm]
+    (campo Lapa)}\\[0.18cm]
+    {\usebeamerfont{subtitle}\bfseries Etapa~3 --- modelo híbrido}\\[0.12cm]
+    {\large Alvo, variáveis de entrada e validação por profundidade}\\[0.22cm]
+    {\usebeamerfont{author} Romulo Brito da Silva}\\[0.08cm]
+    {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
+    {\usebeamerfont{date} Agosto de 2026}\\[0.18cm]
+    {\footnotesize
+    DEM/SC + Gassmann permanece como tendência física\\
+    O aprendizado de máquina corrige só o desvio em relação ao perfil sônico}
+  \end{center}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.15cm]current page.south east) {\insertframenumber};
+  \end{tikzpicture}
+\end{frame}
+}%
+\usebackgroundtemplate{}
+
+\begin{frame}{Roteiro}
+  \footnotesize
+  \begin{enumerate}
+    \item Escopo: o que entra e o que fica de fora na Etapa~3.
+    \item Por que aprender o resíduo $\dVp$, e não $\Vp$ direto dos perfis.
+    \item Quais variáveis entram em $X$ e quais ficam de fora, para não
+          copiar o perfil sônico no treino.
+    \item Corretor oficial (Random Forest): hiperparâmetros e por quê.
+    \item Como validamos: três blocos de profundidade neste poço
+          (e por que não sorteio aleatório).
+    \item O que essa validação cobre --- e o que ela \textbf{não} prova.
+  \end{enumerate}
+\end{frame}
+
+\section{Contexto}
+
+\begin{frame}[shrink=10]{Da Etapa~2: a física fecha a ordem de grandeza, não o perfil}
+  \footnotesize
+  DEM/SC + Gassmann permanece \textbf{fixo}. Resta o desvio pontual de $\Vp$
+  em relação ao perfil sônico (números e trilha: conjunto seguinte).
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+    \begin{block}{Incluído nesta etapa}
+      \scriptsize
+      \begin{itemize}
+        \item $V_{\mathrm{p,Gassmann}}$ por profundidade (Etapa~2), como
+              tendência física.
+        \item Perfis da Etapa~1 que \textbf{não} são o sônico.
+        \item Validação por blocos de profundidade, como na Etapa~1.
+        \item $\Vpsonsub$ do perfil sônico --- só no alvo $y$, nunca em $X$.
+      \end{itemize}
+    \end{block}
+    \begin{exampleblock}{Excluído nesta etapa}
+      \scriptsize
+      \begin{itemize}
+        \item Reabrir porosidade de entrada ou a calibração DEM/SC.
+        \item Prever $\Vp$ só com perfis (já descartado na Etapa~1).
+        \item \phiS{} e o tempo de trânsito $\Dt$ do sônico (e $\Vp$, $\Vs$
+              derivados deles) como entrada do modelo.
+      \end{itemize}
+    \end{exampleblock}
+    \column{0.46\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.55cm,
+      flowbox/.style={
+        draw, thick, rounded corners=4pt,
+        align=center, text width=5.2cm,
+        inner sep=4pt, font=\scriptsize
+      },
+      flowarr/.style={-{Stealth[length=2.8mm]}, thick, po861blue},
+      arrlabel/.style={
+        midway, fill=white, inner sep=2pt,
+        font=\tiny, text=po861blue, align=center
+      }
+    ]
+      \node[flowbox, fill=po861blue!18, draw=po861blue] (e1) {%
+        \textbf{1. Diagnóstico ML}\\
+        limites do perfil; protocolo
+      };
+      \node[flowbox, fill=po861green!18, draw=po861green, below=of e1] (e2) {%
+        \textbf{2. DEM/SC + Gassmann}\\
+        \Vp{} física calibrada por HFU
+      };
+      \node[flowbox, fill=orange!18, draw=orange!70!black, below=of e2] (e3) {%
+        \textbf{3. ML no resíduo}\\
+        \textbf{esta etapa}
+      };
+      \draw[flowarr] (e1.south) -- node[arrlabel] {$\phi$, HFU, CV} (e2.north);
+      \draw[flowarr] (e2.south) -- node[arrlabel] {resíduo} (e3.north);
+    \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\section{Alvo e entradas}
+
+\begin{frame}[shrink=8]{Por que resíduo e não ML direto perfil $\rightarrow$ \Vp{}}
+  \footnotesize
+  Aprendemos só o desvio $\dVp$. A física continua responsável pela tendência
+  de $\Vp$; o modelo estatístico corrige o que o DEM/Gassmann não captura.
+  \vspace{0.10cm}
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!12,
+      align=center, text width=3.5cm, inner sep=5pt, font=\scriptsize
+    },
+    mlbox/.style={
+      draw=orange!70!black, thick, rounded corners=3pt, fill=orange!12,
+      align=center, text width=3.5cm, inner sep=5pt, font=\scriptsize
+    },
+    outbox/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=3.5cm, inner sep=5pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.5mm]}, thick, po861blue},
+    note/.style={font=\tiny, text=drpgray, align=center}
+  ]
+    \node[box] (fis) at (0,0.95) {%
+      \textbf{Física (Etapa~2)}\\
+      $V_{\mathrm{p,Gassmann}}$\\
+      explica a tendência
+    };
+    \node[mlbox] (ml) at (0,-0.95) {%
+      \textbf{ML (Etapa~3)}\\
+      $\widehat{\dVp}$\\
+      explica o desvio local
+    };
+    \node[outbox] (out) at (5.4,0) {%
+      \textbf{Híbrido}\\
+      $V_{\mathrm{p,hybrid}} =
+       V_{\mathrm{p,Gassmann}} + \widehat{\dVp}$
+    };
+    \draw[arr] (fis.east) -| ([xshift=-0.8cm]out.north west) -- (out.west);
+    \draw[arr, orange!70!black] (ml.east) -| ([xshift=-0.8cm]out.south west) -- (out.west);
+    \node[note] at (2.7,-2.30) {%
+      Alvo de treino:
+      $\dVp = \Vpsonsub - V_{\mathrm{p,Gassmann}}$.\\
+      Se a física está acima do sônico, $\dVp < 0$.\\
+      O sônico entra só em $y$; \textbf{nunca} nas entradas $X$.
+    };
+  \end{tikzpicture}
+  \vspace{0.06cm}
+  \begin{exampleblock}{Modelo aditivo (física fixa)}
+    \scriptsize
+    \[
+      \Vpsonsub
+      = V_{\mathrm{p,Gassmann}} + \dVp,
+      \qquad
+      \dVp
+      = \Vpsonsub - V_{\mathrm{p,Gassmann}}.
+    \]
+    Aprendemos só \(\dVp\). Um regressor direto \(\mathrm{perfil}\to\Vp{}\)
+    misturaria escala de medida, condição \emph{in situ} e litologia, sem
+    modelo físico de referência. O teste de se \(\dVp\) tem estrutura nos
+    perfis fica para o conjunto seguinte.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[shrink=8]{Oito variáveis em $X$; \phiS{} e $\Dt$ ficam de fora}
+  \footnotesize
+  Sete perfis de poço e $V_{\mathrm{p,Gassmann}}$. A $\Vp$ física entra em $X$
+  porque o modelo corrige \emph{em torno} dela, não no lugar dela.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.47\textwidth}
+    \begin{block}{Entra em $X$ (oito)}
+      \scriptsize
+      \begin{itemize}
+        \item Raios gama (GR) e densidade.
+        \item Resistividade profunda e rasa.
+        \item Porosidade nêutron e \phiND{}.
+        \item Litotipo (categórica).
+        \item $V_{\mathrm{p,Gassmann}}$ (Etapa~2).
+      \end{itemize}
+    \end{block}
+    \column{0.51\textwidth}
+    \begin{exampleblock}{Não entra em $X$}
+      \scriptsize
+      \begin{itemize}
+        \item $\Vpsonsub$, $\Vs$ do sônico, tempo de trânsito $\Dt$
+              (compressional e cisalhante) e o resíduo observado $\dVp$.
+        \item \textbf{\phiS{}}: porosidade sônica de Wyllie, calculada a
+              partir de $\Dtc$. Correlação $r = 0{,}995$ com $\Dtc$ e
+              $r = -0{,}993$ com $\Vpsonsub$.
+        \item HFU de laboratório (já usada na calibração da Etapa~2);
+              só na análise \emph{depois} do treino.
+      \end{itemize}
+    \end{exampleblock}
+  \end{columns}
+  \vspace{0.08cm}
+  \begin{block}{Por que \phiS{} e $\Dt$ não podem entrar}
+    \scriptsize
+    A porosidade sônica de Wyllie é o tempo de trânsito compressional
+    reescrito:
+    \[
+      \phiS
+      = \frac{\Dtc - \Delta t_{\mathrm{ma}}}{\Delta t_{f}-\Delta t_{\mathrm{ma}}},
+      \qquad
+      \Vpsonsub \propto \frac{1}{\Dtc}.
+    \]
+    Incluir \phiS{} ou $\Dt$ em $X$ copiaria $\Vpsonsub$. O ganho aparente
+    seria vazamento de informação, não previsão.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Corretor oficial: hiperparâmetros do Random Forest}
+  \footnotesize
+  Produto documentado da Etapa~3: Random Forest no alvo $\dVp$
+  (mesma família da Etapa~1; demais regressores na entrega de robustez).
+  \vspace{0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Valores usados}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.12em}
+          \item \texttt{n\_estimators}${}=200$
+          \item \texttt{random\_state}${}=42$
+          \item Demais: defaults do
+                \texttt{sklearn.ensemble.RandomForestRegressor}
+                (ex.: \texttt{max\_depth=None},
+                \texttt{min\_samples\_split=2})
+          \item Sem padronização de $X$ (árvores são invariantes a escala)
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \begin{exampleblock}{Por que esses valores}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.12em}
+          \item \textbf{Herdado da Etapa~1}: comparação justa com o
+                protocolo já documentado.
+          \item \textbf{$n=87$ linhas}: 200 árvores é complexo o bastante
+                para capturar $h(X)$, mas modesto o bastante para conter
+                sobreajuste (não fizemos varredura fina de
+                \texttt{max\_depth}).
+          \item \textbf{Semente fixa}: reprodutibilidade do OOF e do
+                artefato serializado.
+          \item Alternativa auditável: regressão linear (entrega~3);
+                Ridge ($\alpha=1$) como contraste penalizado.
+        \end{itemize}
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Protocolo}
+
+\begin{frame}{Validação por blocos de profundidade}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    Mesmo protocolo da Etapa~1. Em cada rodada, dois blocos treinam e um testa.
+    Juntando as três rodadas, as 87 profundidades recebem uma predição feita
+    \textbf{sem} ter visto aquele bloco no treino.
+    \vspace{0.10cm}
+    \begin{block}{Definição dos blocos}
+      \scriptsize
+      \begin{itemize}
+        \item Três blocos contíguos, cerca de 29 linhas cada.
+        \item O bloco de teste da rodada não entra no treino.
+        \item As predições de teste, juntas, cobrem as 87 linhas.
+      \end{itemize}
+    \end{block}
+    \column{0.52\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      tr/.style={
+        draw=po861blue, thick, rounded corners=2pt, fill=po861blue!10,
+        align=center, text width=1.55cm, minimum height=0.85cm,
+        inner sep=2pt, font=\tiny
+      },
+      te/.style={
+        draw=orange!70!black, thick, rounded corners=2pt, fill=orange!22,
+        align=center, text width=1.55cm, minimum height=0.85cm,
+        inner sep=2pt, font=\tiny
+      },
+      lbl/.style={font=\tiny, text=drpgray, align=center},
+    ]
+      \node[lbl] at (0,0.95) {topo\\5205,9~m};
+      \node[lbl] at (1.9,0.95) {meio};
+      \node[lbl] at (3.8,0.95) {base\\5233,7~m};
+
+      \node[lbl] at (-1.45,0.0) {Bloco 0};
+      \node[te] at (0.0,0.0) {\textbf{teste}};
+      \node[tr] at (1.9,0.0) {treino};
+      \node[tr] at (3.8,0.0) {treino};
+
+      \node[lbl] at (-1.45,-1.15) {Bloco 1};
+      \node[tr] at (0.0,-1.15) {treino};
+      \node[te] at (1.9,-1.15) {\textbf{teste}};
+      \node[tr] at (3.8,-1.15) {treino};
+
+      \node[lbl] at (-1.45,-2.30) {Bloco 2};
+      \node[tr] at (0.0,-2.30) {treino};
+      \node[tr] at (1.9,-2.30) {treino};
+      \node[te] at (3.8,-2.30) {\textbf{teste}};
+
+      \node[lbl] at (1.9,-3.05) {29 linhas por bloco};
+    \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Por que blocos de profundidade, e não sorteio aleatório}
+  \footnotesize
+  Amostras vizinhas no poço não são independentes: fácies, porosidade e o
+  próprio erro de Gassmann variam suavemente com \(z\).
+  \vspace{0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \begin{block}{Dependência espacial}
+      \scriptsize
+      \begin{itemize}
+        \item Sortear linhas mistura vizinhos de treino e teste.
+        \item O modelo ``vê'' o mesmo trecho duas vezes e o \(R^2\)
+              fica otimista.
+        \item Bloco contíguo: o teste é um intervalo que aquela rodada
+              \textbf{não} viu.
+      \end{itemize}
+    \end{block}
+    \column{0.48\textwidth}
+    \begin{exampleblock}{Critério de validação}
+      \scriptsize
+      Em profundidades próximas,
+      \[
+        \mathrm{Corr}\bigl(\dVp(z),\dVp(z+\Delta z)\bigr)
+        \ \text{alta para }\Delta z\text{ pequeno.}
+      \]
+      Validação i.i.d.\ ignora isso. O protocolo em três blocos mede
+      generalização \textbf{em profundidade} neste poço --- não
+      independência entre poços.
+    \end{exampleblock}
+  \end{columns}
+  \vspace{0.08cm}
+  {\scriptsize Fluxo de uma rodada: dois blocos treinam $\rightarrow$ um
+  testa $\rightarrow$ as três predições de teste cobrem as 87 linhas,
+  cada profundidade uma vez.}
+\end{frame}
+
+\begin{frame}{Fora da amostra neste poço: alcance e limite}
+  \footnotesize
+  ``Fora da amostra'' aqui significa outro \textbf{trecho de profundidade} do
+  mesmo poço, não outro poço.
+  \vspace{0.10cm}
+  \centering
+  \begin{tikzpicture}[
+    okbox/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=5.6cm, inner sep=5pt, font=\scriptsize
+    },
+    warn/.style={
+      draw=drpred, thick, rounded corners=3pt, fill=red!6,
+      align=center, text width=5.6cm, inner sep=5pt, font=\scriptsize
+    },
+    note/.style={font=\tiny, text=drpgray, align=center}
+  ]
+    \node[okbox] (a) at (-3.1,0) {%
+      \textbf{Alcance}\\
+      Generalização \textbf{em profundidade} no poço~861:
+      o bloco de teste não entra no treino daquela rodada.
+    };
+    \node[warn] (b) at (3.1,0) {%
+      \textbf{Limitações}\\
+      O sônico entra na construção do alvo.
+      Isso não é poço cego nem prova de
+      transferência para outro poço.
+    };
+    \node[note] at (0,-1.75) {%
+      Parte do desvio DEM/Gassmann--sônico pode ser ligada aos perfis
+      \emph{neste} intervalo.\\
+      Isso não autoriza ``\Vp{} prevista em qualquer poço''.
+      Transferência (A) e repetição do método (B) exigem outro poço.
+    };
+  \end{tikzpicture}
+  \vspace{0.10cm}
+  \begin{exampleblock}{Intervalo curto}
+    \scriptsize
+    São só 28~m, com amostragem densa e fácies que se repetem entre blocos.
+    Essa validação é mais branda do que o nome ``fora da amostra'' sugere:
+    o modelo interpola em profundidade no mesmo poço.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Conclusões}
+  \footnotesize
+  Mantemos $V_{\mathrm{p,Gassmann}}$ como tendência física e aprendemos o
+  resíduo
+  $\dVp = \Vpsonsub - V_{\mathrm{p,Gassmann}}$.
+  \vspace{0.08cm}
+  As entradas $X$ são sete perfis não acústicos mais a própria $\Vp$ de
+  Gassmann. \textbf{Não} entram em $X$: a porosidade sônica \phiS{}, o tempo
+  de trânsito $\Dt$ do perfil sônico, nem $\Vp$ e $\Vs$ derivados dele ---
+  isso copiaria o alvo.
+  \vspace{0.08cm}
+  A validação usa três blocos de profundidade neste poço. A pergunta empírica
+  é se esse residual tem estrutura nos logs --- ainda sem tratar a $\Vp$
+  híbrida como produto fechado.
+\end{frame}
+
+\end{document}

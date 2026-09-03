@@ -1,0 +1,173 @@
+{
+  "generated_utc": "2026-09-03T23:56:07Z",
+  "well_id": "861",
+  "study_interval_m": [
+    5205.91,
+    5233.72
+  ],
+  "pvt_default": {
+    "kf_gpa": 2.2,
+    "rho_fluid_gcc": 1.03,
+    "sw": 1.0,
+    "fluid_name": "formation_brine"
+  },
+  "kf_well_median_gpa": 2.8258349576073636,
+  "rho_well_median_gcc": 1.01320034642699,
+  "kf_nmr_wood_median_gpa": 1.2408600510599217,
+  "rho_nmr_wood_median_gcc": 0.8017605596438482,
+  "n_blocks_oof": 3,
+  "n_estimators_rf": 200,
+  "random_state": 42,
+  "scenarios": {
+    "kf_adopted_2p2": {
+      "fluid_name": "pvt_default_2p2",
+      "kf_median_gpa": 2.2,
+      "rho_median_gcc": 1.03,
+      "gassmann": {
+        "mape_pct": 7.2845485308780304,
+        "bias_km_s": 0.2711140098342218,
+        "rmse_km_s": 0.47700865076668214,
+        "n": 87.0
+      },
+      "hybrid_rf": {
+        "mape_pct": 2.778207392700059,
+        "bias_km_s": 0.013529739339271901,
+        "rmse_km_s": 0.17835291659347827,
+        "n": 87.0
+      },
+      "hybrid_lr": {
+        "mape_pct": 2.1016277081388024,
+        "bias_km_s": 0.0020256196107014514,
+        "rmse_km_s": 0.13595892120587955,
+        "n": 87.0
+      }
+    },
+    "kf_well_median": {
+      "fluid_name": "rock_KFluid_median",
+      "kf_median_gpa": 2.8258349576073636,
+      "rho_median_gcc": 1.01320034642699,
+      "gassmann": {
+        "mape_pct": 7.28336099260878,
+        "bias_km_s": 0.2947453122317825,
+        "rmse_km_s": 0.4856118598280708,
+        "n": 87.0
+      },
+      "hybrid_rf": {
+        "mape_pct": 2.8109659637213316,
+        "bias_km_s": 0.016727797089864327,
+        "rmse_km_s": 0.18388524537591747,
+        "n": 87.0
+      },
+      "hybrid_lr": {
+        "mape_pct": 2.1006756660353996,
+        "bias_km_s": 0.0019762186798840996,
+        "rmse_km_s": 0.1359120720391174,
+        "n": 87.0
+      }
+    },
+    "nmr_wood_z": {
+      "fluid_name": "wood_SWIRR_depth",
+      "kf_median_gpa": 1.2408600510599217,
+      "rho_median_gcc": 0.8017605596438482,
+      "gassmann": {
+        "mape_pct": 7.654806258388818,
+        "bias_km_s": 0.26098681841156973,
+        "rmse_km_s": 0.4860762173313564,
+        "n": 87.0
+      },
+      "hybrid_rf": {
+        "mape_pct": 2.965618903610201,
+        "bias_km_s": 0.025645011660221918,
+        "rmse_km_s": 0.1895709772907003,
+        "n": 87.0
+      },
+      "hybrid_lr": {
+        "mape_pct": 2.1024379772064865,
+        "bias_km_s": 0.0020417174800370047,
+        "rmse_km_s": 0.135988526207812,
+        "n": 87.0
+      }
+    },
+    "nmr_wood_median": {
+      "fluid_name": "wood_SWIRR_median",
+      "kf_median_gpa": 1.2408600510599217,
+      "rho_median_gcc": 0.8017605596438482,
+      "gassmann": {
+        "mape_pct": 7.646443450427618,
+        "bias_km_s": 0.26096488478308577,
+        "rmse_km_s": 0.48574117611338313,
+        "n": 87.0
+      },
+      "hybrid_rf": {
+        "mape_pct": 2.9548491163469404,
+        "bias_km_s": 0.025629899208948977,
+        "rmse_km_s": 0.18964861896827134,
+        "n": 87.0
+      },
+      "hybrid_lr": {
+        "mape_pct": 2.1028164218074843,
+        "bias_km_s": 0.0020906798960564884,
+        "rmse_km_s": 0.1360179026606624,
+        "n": 87.0
+      }
+    }
+  },
+  "reference_slide": {
+    "kf_adopted_2p2": {
+      "gassmann": {
+        "mape_pct": 7.28,
+        "bias_km_s": 0.271
+      },
+      "hybrid_rf": {
+        "mape_pct": 2.78,
+        "bias_km_s": 0.014
+      },
+      "hybrid_lr": {
+        "mape_pct": 2.1,
+        "bias_km_s": 0.002
+      }
+    },
+    "kf_well_median": {
+      "gassmann": {
+        "mape_pct": 7.26,
+        "bias_km_s": 0.293
+      },
+      "hybrid_rf": {
+        "mape_pct": 2.82,
+        "bias_km_s": 0.018
+      },
+      "hybrid_lr": {
+        "mape_pct": 2.1,
+        "bias_km_s": 0.002
+      }
+    },
+    "nmr_wood_z": {
+      "gassmann": {
+        "mape_pct": 7.65,
+        "bias_km_s": 0.26
+      },
+      "hybrid_rf": {
+        "mape_pct": 2.97,
+        "bias_km_s": 0.03
+      },
+      "hybrid_lr": {
+        "mape_pct": 2.1,
+        "bias_km_s": 0.0
+      }
+    },
+    "nmr_wood_median": {
+      "gassmann": {
+        "mape_pct": 7.65,
+        "bias_km_s": 0.26
+      },
+      "hybrid_rf": {
+        "mape_pct": 2.95,
+        "bias_km_s": 0.03
+      },
+      "hybrid_lr": {
+        "mape_pct": 2.1,
+        "bias_km_s": 0.0
+      }
+    }
+  }
+}

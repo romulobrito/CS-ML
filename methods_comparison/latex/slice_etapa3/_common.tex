@@ -1,0 +1,121 @@
+% Shared DRP layout for Etapa 3 sliced deliveries.
+% Input after \documentclass. Compile from each  N_entrega/ folder.
+% Paths are relative to slice_etapa3/<entrega>/.
+% ASCII-only.
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, calc}
+\usepackage[sfdefault]{carlito}
+\usefonttheme{professionalfonts}
+
+\graphicspath{%
+  {../../poco861_beamer_DRP_layout_package/poco861_drp_assets/}%
+  {../../poco861_beamer_DRP_layout_package/poco861_drp_assets/figures/}%
+  {../../figures/}%
+  {../../../data/processed/ml_runs/residual_vp/figures/}%
+  {../../../data/processed/ml_runs/residual_vp/clp_csgm/figures/}%
+  {../../../data/processed/ml_runs/residual_vp/clp_csgm/rho_subsample/figures/}%
+}
+
+\definecolor{drpblue}{RGB}{29,55,113}
+\definecolor{drporange}{RGB}{255,145,39}
+\definecolor{drpyellow}{RGB}{250,238,0}
+\definecolor{drpred}{RGB}{220,0,0}
+\definecolor{drpgray}{RGB}{70,70,70}
+\definecolor{po861blue}{RGB}{0,74,127}
+\definecolor{po861green}{RGB}{0,128,96}
+
+\usecolortheme{default}
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=drpblue}
+\setbeamercolor{frametitle}{fg=black,bg=}
+\setbeamercolor{title}{fg=black,bg=}
+\setbeamercolor{subtitle}{fg=drpgray,bg=}
+\setbeamercolor{block title}{fg=white,bg=drpblue}
+\setbeamercolor{block body}{fg=black,bg=drpblue!5}
+\setbeamercolor{block title example}{fg=black,bg=drpyellow}
+\setbeamercolor{block body example}{fg=black,bg=drpyellow!12}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamersize{text margin left=7mm, text margin right=7mm}
+
+\setbeamerfont{normal text}{size=\small}
+\setbeamerfont{itemize/enumerate body}{size=\small}
+\setbeamerfont{itemize/enumerate subbody}{size=\footnotesize}
+\setbeamerfont{block title}{size=\small,series=\bfseries}
+\setbeamerfont{block body}{size=\footnotesize}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{title}{size=\Huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{institute}{size=\small}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{page number in head/foot}{size=\scriptsize,series=\mdseries}
+
+\setlength{\parskip}{2pt}
+\setlength{\itemsep}{2pt}
+\setbeamertemplate{itemize item}{\raise0.2ex\hbox{\large\textbullet}}
+\setbeamertemplate{itemize subitem}{\raise0.2ex\hbox{\small\textbullet}}
+\setbeamercolor{itemize item}{fg=drpblue}
+\setbeamercolor{itemize subitem}{fg=drpblue}
+
+\usebackgroundtemplate{}
+
+\setbeamertemplate{frametitle}{%
+  \vspace*{0.18cm}%
+  \hspace*{0.12cm}{\usebeamerfont{frametitle}\insertframetitle}\par%
+  \vspace*{0.20cm}%
+}
+
+\newlength{\drpfooterheight}
+\setlength{\drpfooterheight}{1.12cm}
+\setbeamertemplate{footline}{%
+  \begin{tikzpicture}[baseline=(base.base)]
+    \node[inner sep=0pt,anchor=south west] (base) at (0,0)
+      {\includegraphics[width=\paperwidth,height=\drpfooterheight]{drp_footer.png}};
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.13cm]base.south east) {\insertframenumber};
+  \end{tikzpicture}%
+}
+
+\newcommand{\philab}{\ensuremath{\phi_{\mathrm{lab}}}}
+\newcommand{\fzilab}{\ensuremath{\mathrm{FZI}_{\mathrm{lab}}}}
+\newcommand{\phiND}{\ensuremath{\phi_{\mathrm{ND}}}}
+\newcommand{\phiS}{\ensuremath{\phi_{\mathrm{S}}}}
+\newcommand{\Vp}{\ensuremath{V_{\mathrm{p}}}}
+\newcommand{\Vs}{\ensuremath{V_{\mathrm{s}}}}
+\newcommand{\dVp}{\ensuremath{\Delta V_{\mathrm{p}}}}
+\newcommand{\Dt}{\ensuremath{\Delta t}}
+\newcommand{\Dtc}{\ensuremath{\Delta t_{\mathrm{c}}}}
+\newcommand{\Dts}{\ensuremath{\Delta t_{\mathrm{s}}}}
+\newcommand{\Vpson}{\ensuremath{V_{\mathrm{p}}^{\text{sônico}}}}
+\newcommand{\Vpsonsub}{\ensuremath{V_{\mathrm{p,}\text{sônico}}}}
+
+\newlength{\drpbodyheight}
+\setlength{\drpbodyheight}{0.86\textheight}
+
+\newcommand{\slidefig}[2][0.75]{%
+  \includegraphics[width=\linewidth,height=#1\drpbodyheight,keepaspectratio]{#2}%
+}
+\newcommand{\slidecaption}[1]{%
+  \par\vspace{0.05cm}%
+  \begin{minipage}{\linewidth}%
+    \centering\scriptsize #1%
+  \end{minipage}%
+}
+\newcommand{\slidefigure}[3][0.72]{%
+  \begin{minipage}[t]{\linewidth}%
+    \centering
+    \slidefig[#1]{#2}%
+    \slidecaption{#3}%
+  \end{minipage}%
+}

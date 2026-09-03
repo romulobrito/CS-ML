@@ -1,0 +1,531 @@
+% Beamer -- Poco 861 Etapa 3, Entrega 4
+% Alternativas CLP, limites e decisao operacional.
+% Compilar (a partir desta pasta):
+%   pdflatex poco861_etapa3_entrega4.tex
+%   pdflatex poco861_etapa3_entrega4.tex
+
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../_common.tex}
+
+\title{Poço~861 (campo Lapa): corretor residual de \Vp{}}
+\subtitle{Etapa~3 --- alternativas, limites e uso operacional}
+\author{Romulo Brito da Silva}
+\institute{UENF / LENEP}
+\date{Agosto de 2026}
+
+\begin{document}
+
+{%
+\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{drp_title_bg.png}}%
+\begin{frame}[plain]
+  \vspace*{0.40cm}
+  \begin{center}
+    {\huge\bfseries Poço~861\\[0.04cm]
+    (campo Lapa)}\\[0.18cm]
+    {\usebeamerfont{subtitle}\bfseries Etapa~3 --- CLP, limites e uso}\\[0.12cm]
+    {\large Alternativas, restrições da validação neste poço}\\[0.22cm]
+    {\usebeamerfont{author} Romulo Brito da Silva}\\[0.08cm]
+    {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
+    {\usebeamerfont{date} Agosto de 2026}\\[0.18cm]
+    {\footnotesize
+    Híbrido fora da amostra no 861 (MAPE 2,8\%; viés $\approx 0$)\\
+    Validação intra-poço; o ML não substitui o DEM/Gassmann}
+  \end{center}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.15cm]current page.south east) {\insertframenumber};
+  \end{tikzpicture}
+\end{frame}
+}%
+\usebackgroundtemplate{}
+
+\begin{frame}{Roteiro}
+  \footnotesize
+  \begin{enumerate}
+    \item Métrica do híbrido nos blocos de teste versus Gassmann (87 profundidades).
+    \item Modelo em janelas (CLP): montagem, hiperparâmetros e variantes.
+    \item Limites da validação fora da amostra neste poço.
+    \item Quando usar só a física versus o híbrido neste poço.
+    \item Dois testes futuros de generalização (A/B, poço \#1045).
+  \end{enumerate}
+\end{frame}
+
+\section{Candidato no poço~861}
+
+\begin{frame}{Híbrido fora da amostra: MAPE $7{,}3\% \rightarrow 2{,}8\%$, viés eliminado}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    87 profundidades. Em cada uma,
+    $V_{\mathrm{p,híbrido}} = V_{\mathrm{p,Gassmann}} + \widehat{\dVp}$,
+    com o resíduo predito no bloco que não entrou no treino
+    (Random Forest: $200$ árvores, semente $42$).
+    \vspace{0.04cm}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{3.2pt}
+    \begin{tabular}{lcccc}
+      \toprule
+      Modelo & MAPE & RMSE & Viés & $\bar{V}_{\mathrm{p}}$ \\
+      \midrule
+      Gassmann & 7,3 & 0,48 & $+0{,}27$ & 5,17 \\
+      Híbrido RF & \textbf{2,8} & \textbf{0,18} & $+0{,}01$ & 4,91 \\
+      Perfil sônico (ref.) & --- & --- & --- & 4,90 \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.08cm}
+    {\scriptsize RF alinhado à Etapa~1; linear (2,1\%) fica como trilha
+    auditável alternativa.}
+    \column{0.48\textwidth}
+    \slidefigure[0.78]{fig3_vp_hybrid_depth_hfu}{Trilha: sônico, Gassmann,
+    híbrido fora da amostra; faixa = HFU lab (intercalada).}
+  \end{columns}
+\end{frame}
+
+\section{Modelo em janelas (CLP)}
+
+\begin{frame}{Fluxo do modelo em janelas (CLP)}
+  \footnotesize
+  Não é regressão ponto a ponto. Cada janela vê 16 profundidades; o
+  autoencoder reconstrói o resíduo da janela; onde elas se sobrepõem,
+  toma-se a média.
+  \vspace{0.12cm}
+  \centering
+  \begin{tikzpicture}[
+    box/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!10,
+      align=center, text width=2.15cm, inner sep=3.5pt, font=\tiny
+    },
+    ml/.style={
+      draw=orange!70!black, thick, rounded corners=3pt, fill=orange!12,
+      align=center, text width=2.15cm, inner sep=3.5pt, font=\tiny
+    },
+    outbox/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=2.15cm, inner sep=3.5pt, font=\tiny
+    },
+    arr/.style={-{Stealth[length=2.2mm]}, thick, po861blue},
+  ]
+    \node[box] (a) at (0,0) {\textbf{1}\\Perfis $+V_{\mathrm{p,Gassmann}}$};
+    \node[box] (b) at (2.7,0) {\textbf{2}\\Janelas $L=16$\\passo $1$};
+    \node[ml] (c) at (5.4,0) {\textbf{3}\\Autoencoder\\do resíduo};
+    \node[box] (d) at (8.1,0) {\textbf{4}\\Média nas\\sobreposições};
+    \node[outbox] (e) at (10.8,0) {\textbf{5}\\$V_{\mathrm{p,hibrido}}$};
+    \draw[arr] (a) -- (b);
+    \draw[arr] (b) -- (c);
+    \draw[arr] (c) -- (d);
+    \draw[arr] (d) -- (e);
+  \end{tikzpicture}
+  \vspace{0.14cm}
+  \begin{exampleblock}{Reconstrução em profundidade}
+    \scriptsize
+    Várias janelas cobrem $z$. O resíduo costurado é a média dessas
+    reconstruções; depois
+    $V_{\mathrm{p,hibrido}}(z)=V_{\mathrm{p,Gassmann}}(z)+\widehat{\dVp}(z)$.
+    O Random Forest, por comparação, prevê $\dVp$ em cada profundidade
+    isolada.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[shrink=5]{CLP: hiperparâmetros e por que esses valores}
+  \scriptsize
+  Defaults de \texttt{clp\_861\_vp\_residual.py} (análogo à Etapa~1f em
+  janelas; sem tuning fino em $n=87$).
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Janela e costura}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.08em}
+          \item Comprimento $L=16$; passo $1$
+                (cobertura densa ao longo de 87 linhas).
+          \item Costura: média uniforme nas sobreposições
+                (\texttt{uniform\_mean}).
+        \end{itemize}
+      \end{block}
+      \vspace{0.06cm}
+      \begin{block}{Autoencoder / CSGM}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.08em}
+          \item Latente $d_z=16$; oculto $128$
+          \item Épocas AE: $200$;
+                iterações CSGM: $400$;
+                restarts: $3$;
+                $\mathrm{lr}=0{,}05$
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \begin{block}{Prior e consistência}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.08em}
+          \item Prior Ridge $h(\mathbf{u})\to\mathbf{z}$ com
+                $\alpha=1$ (mesmo $\alpha$ do Ridge pontual).
+          \item Grade de $\lambda$ de consistência no protocolo
+                esparso (seleção por RMSE em validação).
+        \end{itemize}
+      \end{block}
+      \vspace{0.06cm}
+      \begin{exampleblock}{Por quê}
+        \scriptsize
+        $L=16$ e AE $(16,128)$ repetem a escala da Etapa~1f:
+        comparar CLP vs.\ RF no \emph{mesmo} espírito de janela,
+        não otimizar CLP até empatar o RF.
+        Com sônico denso, o RF pontual ($200$ árvores) permanece o
+        corretor oficial.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Modelo em janelas (CLP) não supera o Random Forest}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    O MAPE abaixo compara as três variantes CLP com Gassmann e com o
+    Random Forest ponto a ponto (mesmo alvo $\dVp$).
+    \par
+    \vspace{0.06cm}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{lccc}
+      \toprule
+      Modelo & MAPE & RMSE & Viés \\
+      \midrule
+      Gassmann & 7,3 & 0,48 & $+0{,}27$ \\
+      \textbf{Híbrido Random Forest} & \textbf{2,8} & 0,18 & $+0{,}01$ \\
+      CLP com prior Ridge & 6,5 & 0,44 & $+0{,}06$ \\
+      CLP sem rótulo residual & 6,7 & 0,44 & $+0{,}19$ \\
+      CLP com plugs esparsos & 6,3 & 0,43 & $+0{,}18$ \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.08cm}
+    {\scriptsize As três CLP ficam agrupadas em 6,3--6,7\%: batem o Gassmann
+    por menos de 1~p.p.\ e perdem do RF por 3,6~p.p.}
+    \column{0.52\textwidth}
+    \slidefigure[0.80]{fig3_clp_comparison_mape}{MAPE de \Vp{} versus sônico:
+    Gassmann, RF híbrido e as três variantes CLP.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Onde o CLP perde: a janela suaviza o degrau da HFU~4}
+  \footnotesize
+  O agrupamento das três variantes já é um diagnóstico.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.54\textwidth}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{ccccc}
+      \toprule
+      HFU & $n$ & MAPE RF & MAPE CLP & Viés RF / CLP \\
+      \midrule
+      1 & 42 & 2,2 & 4,8 & $+0{,}02$ / $+0{,}21$ \\
+      2 & 29 & 2,3 & 3,3 & $-0{,}09$ / $-0{,}16$ \\
+      3 & 10 & 5,4 & 9,8 & $+0{,}15$ / $+0{,}43$ \\
+      4 & 6  & 4,8 & \textbf{25,9} & $+0{,}17$ / $+1{,}20$ \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.10cm}
+    {\scriptsize CLP $=$ melhor variante (plugs esparsos).
+    Na HFU~4 a diferença salta para 21~p.p.: a janela herda o erro físico.}
+    \column{0.44\textwidth}
+    \slidefigure[0.77]{fig3_clp_three_methods_depth}{Perfil sônico, Gassmann,
+    Random Forest híbrido e as duas melhores CLP em profundidade.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Quanta calibração esparsa o modelo em janelas exige}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \footnotesize
+    $\rho$ é a fração das profundidades de \textbf{teste} em que o resíduo
+    $\dVp$ é conhecido:
+    \[
+      \rho = \frac{n_{\mathrm{cal,teste}}}{n_{\mathrm{teste}}}.
+    \]
+    $\rho=0$ é o caso operacional: poço novo, nenhum rótulo residual.
+    \par
+    \vspace{0.06cm}
+    {\centering
+    \scriptsize
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{cccc}
+      \toprule
+      $\rho$ & $n_{\mathrm{cal,test}}$ & CLP & RF esparso \\
+      \midrule
+      0 & 0 & 6,8 & 7,3 \\
+      0,115 (plugs) & 3 & 6,5 & 7,5 \\
+      0,30 & 9 & 4,7 & 6,2 \\
+      0,50 & 14 & 4,0 & 3,7 \\
+      0,70 & 20 & \textbf{2,5} & 3,8 \\
+      1,00 & 29 & 1,0 & 3,5 \\
+      \midrule
+      \multicolumn{2}{l}{Random Forest denso} & \multicolumn{2}{c}{2,9} \\
+      \bottomrule
+    \end{tabular}
+    \par}
+    \vspace{0.08cm}
+    {\scriptsize Com dez plugs ($\rho \approx 0{,}12$) as duas abordagens
+    esparsas mal se distinguem do próprio Gassmann.}
+    \column{0.52\textwidth}
+    \slidefigure[0.80]{fig3_rho_sweep_mape}{MAPE versus $\rho$: CLP e
+    Random Forest com calibração esparsa, contra Random Forest denso e Gassmann.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Quando o modelo em janelas compensaria o Random Forest}
+  \footnotesize
+  Na prática, o modelo em janelas (CLP) só passa o Random Forest com
+  calibração densa demais para um poço novo.
+  \vspace{0.10cm}
+  \centering
+  \begin{tikzpicture}[
+    q/.style={
+      draw=orange!70!black, thick, rounded corners=3pt, fill=orange!12,
+      align=center, text width=3.6cm, inner sep=4pt, font=\scriptsize
+    },
+    opt/.style={
+      draw=po861blue, thick, rounded corners=3pt, fill=po861blue!10,
+      align=center, text width=3.5cm, inner sep=4pt, font=\scriptsize
+    },
+    good/.style={
+      draw=po861green, thick, rounded corners=3pt, fill=po861green!12,
+      align=center, text width=3.5cm, inner sep=4pt, font=\scriptsize
+    },
+    bad/.style={
+      draw=drpred, thick, rounded corners=3pt, fill=red!6,
+      align=center, text width=3.5cm, inner sep=4pt, font=\scriptsize
+    },
+    arr/.style={-{Stealth[length=2.4mm]}, thick, po861blue},
+  ]
+    \node[q] (q) at (0,0) {Há perfil sônico denso no intervalo de treino?};
+    \node[good] (rf) at (5.2,1.15) {%
+      \textbf{Sim} $\rightarrow$ Random Forest\\
+      2,8\% MAPE neste poço
+    };
+    \node[opt] (sp) at (5.2,-1.15) {%
+      \textbf{Não} $\rightarrow$ depende de $\rho$
+    };
+    \node[bad] (lo) at (10.4,-0.15) {%
+      $\rho \lesssim 0{,}5$: CLP e RF esparso\\
+      empatam com o Gassmann
+    };
+    \node[good] (hi) at (10.4,-2.15) {%
+      $\rho \gtrsim 0{,}7$: CLP cruza\\
+      o Random Forest denso (2,5\% vs 2,9\%)
+    };
+    \draw[arr] (q.east) |- (rf.west);
+    \draw[arr] (q.east) |- (sp.west);
+    \draw[arr] (sp.east) |- (lo.west);
+    \draw[arr] (sp.east) |- (hi.west);
+  \end{tikzpicture}
+  \vspace{0.10cm}
+  {\scriptsize Calibração em $\gtrsim 70\%$ das profundidades é pouco
+  realista fora deste intervalo. O que limita é a densidade de rótulos, não
+  a escolha entre CLP e RF.}
+\end{frame}
+
+\section{Limites e decisão}
+
+\begin{frame}[shrink=5]{Limites destes números}
+  \footnotesize
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.49\textwidth}
+    \begin{block}{Amostragem}
+      \scriptsize
+      \begin{itemize}
+        \item 87 profundidades e oito entradas; Random Forest mantido
+              modesto ($200$ árvores, semente $42$; defaults sklearn no
+              restante) para conter sobreajuste --- escolha herdada da
+              Etapa~1, não resultado de grid search.
+        \item HFU~4 com $n=6$ é estatisticamente frágil --- e é justamente ela
+              que concentra o maior ganho reportado.
+      \end{itemize}
+    \end{block}
+    \begin{block}{Validação}
+      \scriptsize
+      \begin{itemize}
+        \item O sônico entra no alvo: validação fora da amostra
+              neste poço não é poço cego.
+        \item 28~m com facies que se repetem entre blocos: interpolação
+              em profundidade.
+      \end{itemize}
+    \end{block}
+    \column{0.49\textwidth}
+    \begin{exampleblock}{Fontes de incerteza no residual}
+      \scriptsize
+      \begin{itemize}
+        \item PVT fixo ($K_f$, $S_w=1$, pressão): sem varredura.
+        \item Pressão efetiva, limite de Gassmann, HFU, anisotropia e
+              condição de medida do sônico podem estar no mesmo desvio.
+        \item Não substitui um modelo físico nem aponta um único mecanismo.
+      \end{itemize}
+    \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Quando usar só Gassmann versus o híbrido no poço~861}
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \begin{block}{Só física (Gassmann)}
+      \scriptsize
+      \begin{itemize}
+        \item HFU~2 (já $\approx 2\%$ MAPE).
+        \item Intervalos sem perfil sônico denso e sem rótulo residual.
+        \item Quando se exige interpretabilidade pura do DEM/SC.
+      \end{itemize}
+    \end{block}
+    \column{0.50\textwidth}
+    \begin{exampleblock}{Híbrido RF}
+      \scriptsize
+      \begin{itemize}
+        \item Mesmo poço e intervalo, com sônico no alvo.
+        \item HFU~3/4: correção empírica local.
+        \item Reportar também a trilha linear, mais fácil de auditar.
+      \end{itemize}
+    \end{exampleblock}
+  \end{columns}
+  \vspace{0.10cm}
+  {\scriptsize Antes de inversão sísmica: os dois testes de generalização
+  abaixo --- não a validação intra-poço do 861.}
+\end{frame}
+
+\begin{frame}{Dois testes em outro poço (ainda não feitos)}
+  \footnotesize
+  A validação do 861 interpola em profundidade. Sair deste poço pede dois
+  experimentos distintos --- o modelo \textbf{não} é retreinado no sônico
+  do poço novo.
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      n/.style={
+        draw=po861blue, thick, rounded corners=2pt, fill=po861blue!10,
+        align=center, text width=4.4cm, inner sep=2.5pt, font=\tiny
+      },
+      ev/.style={
+        draw=po861green, thick, rounded corners=2pt, fill=po861green!12,
+        align=center, text width=4.4cm, inner sep=2.5pt, font=\tiny
+      },
+      arr/.style={-{Stealth[length=2.0mm]}, thick, po861blue},
+    ]
+      \node[n] (a1) at (0,1.55) {\textbf{A --- transfere o corretor?}};
+      \node[n] (a2) at (0,0.85) {Treina no 861 (Gassmann $+$ residual)};
+      \node[n] (a3) at (0,0.15) {Aplica em \#1045: perfis $+$ Gassmann local};
+      \node[ev] (a4) at (0,-0.55) {Sônico do 1045: só avaliação};
+      \draw[arr] (a1) -- (a2);
+      \draw[arr] (a2) -- (a3);
+      \draw[arr] (a3) -- (a4);
+    \end{tikzpicture}
+    \column{0.49\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      n/.style={
+        draw=orange!70!black, thick, rounded corners=2pt, fill=orange!12,
+        align=center, text width=4.4cm, inner sep=2.5pt, font=\tiny
+      },
+      ev/.style={
+        draw=po861green, thick, rounded corners=2pt, fill=po861green!12,
+        align=center, text width=4.4cm, inner sep=2.5pt, font=\tiny
+      },
+      arr/.style={-{Stealth[length=2.0mm]}, thick, orange!70!black},
+    ]
+      \node[n] (b1) at (0,1.55) {\textbf{B --- o método se reproduz?}};
+      \node[n] (b2) at (0,0.85) {Gassmann local no poço novo};
+      \node[n] (b3) at (0,0.15) {Residual em blocos \emph{desse} poço};
+      \node[ev] (b4) at (0,-0.55) {Sônico: alvo local, nunca em $X$};
+      \draw[arr] (b1) -- (b2);
+      \draw[arr] (b2) -- (b3);
+      \draw[arr] (b3) -- (b4);
+    \end{tikzpicture}
+  \end{columns}
+  \vspace{0.10cm}
+  {\scriptsize Nos dois: Gassmann local; \phiS{} e $\Dt$ fora de $X$.
+  A testa se o 861 exporta o corretor; B, se o fluxo se reproduz.
+  A é o pré-requisito para inversão.}
+\end{frame}
+
+\begin{frame}{Conclusões}
+  \footnotesize
+  \begin{enumerate}
+    \item \textbf{Viabilidade:} MAPE de \Vp{} cai de 7,3\% para 2,8\% e o viés
+          de $+0{,}27$ para $+0{,}01$~km/s fora da amostra neste poço.
+    \item \textbf{Papel:} ML é corretor empírico da física --- não substitui o
+          sônico nem é atalho perfil $\rightarrow$ \Vp{}.
+    \item \textbf{HFU:} ganho em HFU~4 e~3; HFU~2 estável.
+    \item \textbf{Regressor:} RF de referência (2,8\%); linear ainda melhor (2,1\%).
+    \item \textbf{CLP:} 6,3--6,7\%; só supera o Random Forest denso com
+          $\rho \gtrsim 0{,}7$.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Próximos passos}
+  \vspace{-0.08cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+    \footnotesize
+    \textbf{No 861}
+    \begin{itemize}
+      \item Coluna híbrida nas 87 linhas (fora da amostra neste poço).
+      \item Corretor RF e trilha linear.
+      \item \phiS{} e o tempo de trânsito $\Dt$ do sônico
+            \textbf{não} entram nas variáveis de entrada $X$.
+    \end{itemize}
+    \textbf{Próximos passos}
+    \begin{itemize}
+      \item Teste~B no \#1045: o residual é aprendível lá?
+      \item Teste~A: corretor do 861 $\rightarrow$ \#1045 (cego no sônico).
+      \item Só então exportar híbrido a perfil / inversão.
+    \end{itemize}
+    \column{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.58cm,
+      flowbox/.style={
+        draw, thick, rounded corners=4pt,
+        align=center, text width=5.2cm,
+        inner sep=3pt, font=\scriptsize
+      },
+      flowarr/.style={-{Stealth[length=2.4mm]}, thick, po861blue},
+      arrlabel/.style={
+        midway, fill=white, inner sep=1pt,
+        font=\tiny, text=po861blue, align=center
+      }
+    ]
+      \node[flowbox, fill=po861blue!18, draw=po861blue] (e1) {%
+        \textbf{1. Diagnóstico ML}\\
+        Limites do perfil
+      };
+      \node[flowbox, fill=po861green!18, draw=po861green, below=of e1] (e2) {%
+        \textbf{2. DEM/SC + Gassmann}\\
+        \Vp{} física calibrada
+      };
+      \node[flowbox, fill=orange!18, draw=orange!70!black, below=of e2] (e3) {%
+        \textbf{3. Física + ML residual}\\
+        \textbf{corretor residual no 861}
+      };
+      \node[flowbox, fill=drpgray!12, draw=drpgray, below=of e3] (e4) {%
+        \textbf{4. Testes A/B (\#1045)}\\
+        transferir 861; repetir o método
+      };
+      \draw[flowarr] (e1.south) -- node[arrlabel] {$\phi$, HFU} (e2.north);
+      \draw[flowarr] (e2.south) -- node[arrlabel] {resíduo} (e3.north);
+      \draw[flowarr] (e3.south) -- node[arrlabel] {transferência} (e4.north);
+    \end{tikzpicture}
+  \end{columns}
+  \vspace{0.04cm}
+  \begin{center}
+    {\small Obrigado.}
+  \end{center}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,833 @@
+% Beamer -- Poco 861 Etapa 3, Entrega 2
+% Primeiro sinal de viabilidade (sem travar o produto).
+% Compilar (a partir desta pasta):
+%   pdflatex poco861_etapa3_entrega2.tex
+%   pdflatex poco861_etapa3_entrega2.tex
+
+\documentclass[aspectratio=169,10pt]{beamer}
+\input{../_common.tex}
+
+\title{Poço~861 (campo Lapa): corretor residual de \Vp{}}
+\subtitle{Etapa~3 --- aprendizado do residual ao longo da profundidade}
+\author{Romulo Brito da Silva}
+\institute{UENF / LENEP}
+\date{Agosto de 2026}
+
+\begin{document}
+
+{%
+\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{drp_title_bg.png}}%
+\begin{frame}[plain]
+  \vspace*{0.40cm}
+  \begin{center}
+    {\huge\bfseries Poço~861\\[0.04cm]
+    (campo Lapa)}\\[0.18cm]
+    {\usebeamerfont{subtitle}\bfseries Etapa~3 --- residual em profundidade}\\[0.12cm]
+    {\large Estrutura do desvio Gassmann--sônico no poço~861}\\[0.22cm]
+    {\usebeamerfont{author} Romulo Brito da Silva}\\[0.08cm]
+    {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
+    {\usebeamerfont{date} Agosto de 2026}\\[0.18cm]
+    {\footnotesize
+    Física Gassmann fixa; perfil sônico apenas no alvo\\
+    Foco: $R^2$ e RMSE do residual em profundidade}
+  \end{center}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, font=\scriptsize, text=drpgray]
+      at ([xshift=-0.27cm,yshift=0.15cm]current page.south east) {\insertframenumber};
+  \end{tikzpicture}
+\end{frame}
+}%
+\usebackgroundtemplate{}
+
+\section{Da Etapa~2}
+
+\begin{frame}[shrink=5]{Etapa~2 em duas linhas: abordagem}
+  \footnotesize
+  A física elástica ficou \textbf{definida} antes do corretor residual.
+  \vspace{0.10cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+    \begin{block}{Cadeia adotada}
+      \scriptsize
+      \begin{itemize}
+        \item Porosidade de entrada: \phiND{} --- porosidade
+              \textbf{total} de perfil; usada de forma \textbf{consistente}
+              no DEM e no Gassmann (modelo de porosidade única).
+        \item DEM/SC calibrado por HFU de laboratório.
+        \item Fluido (PVT): água de formação com $S_w=1$ e
+              $K_f=2{,}2$~GPa fixo no Gassmann.
+        \item Produto: $V_{\mathrm{p,Gassmann}}$ nas 87 profundidades
+              (5205,9--5233,7~m).
+      \end{itemize}
+    \end{block}
+    \begin{exampleblock}{Mantido fixo na Etapa~3}
+      \scriptsize
+      Não recalibramos a porosidade, o DEM/SC nem o fluido.
+      O aprendizado de máquina corrige apenas o desvio em relação
+      ao perfil sônico.
+    \end{exampleblock}
+    \column{0.46\textwidth}
+    \centering
+    \begin{tikzpicture}[
+      node distance=0.55cm,
+      flowbox/.style={
+        draw, thick, rounded corners=4pt,
+        align=center, text width=5.0cm,
+        inner sep=4pt, font=\scriptsize
+      },
+      flowarr/.style={-{Stealth[length=2.8mm]}, thick, po861blue},
+      arrlabel/.style={
+        midway, fill=white, inner sep=2pt,
+        font=\tiny, text=po861blue, align=center
+      }
+    ]
+      \node[flowbox, fill=po861blue!18, draw=po861blue] (e1) {%
+        \textbf{1. Diagnóstico ML}\\
+        limites do perfil
+      };
+      \node[flowbox, fill=po861green!18, draw=po861green, below=of e1] (e2) {%
+        \textbf{2. DEM/SC + Gassmann}\\
+        \Vp{} física por HFU
+      };
+      \node[flowbox, fill=orange!18, draw=orange!70!black, below=of e2] (e3) {%
+        \textbf{3. ML no resíduo}\\
+        \textbf{esta apresentação}
+      };
+      \draw[flowarr] (e1.south) -- node[arrlabel] {$\phi$, HFU} (e2.north);
+      \draw[flowarr] (e2.south) -- node[arrlabel] {$\dVp$} (e3.north);
+    \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=8]{Etapa~2: resultado que motiva o residual}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \footnotesize
+    Depois de Gassmann, $V_{\mathrm{p,Gassmann}}$ fica
+    \textbf{predominantemente acima} do perfil sônico ao longo do
+    intervalo (viés $+0{,}27$~km/s).
+    \par
+    \vspace{0.04cm}
+    \centering
+    \scriptsize
+    \begin{tabular}{lr}
+      \toprule
+      Etapa~2 (87 linhas) & Valor \\
+      \midrule
+      MAPE \Vp{} & 7,3\% \\
+      RMSE & 0,48~km/s \\
+      Viés & $+0{,}27$~km/s \\
+      $\bar{V}_{\mathrm{p,Gassmann}}$ & 5,17~km/s \\
+      $\bar{V}_{\mathrm{p,sonico}}$ & 4,90~km/s \\
+      \bottomrule
+    \end{tabular}
+    \par
+    \vspace{0.04cm}
+    \raggedright
+    {\scriptsize
+    Com $e_i=V_{\mathrm{p,Gassmann},i}-V_{\mathrm{p,sonico},i}$ e
+    $\bar{e}=+0{,}27$~km/s:
+    \[
+      \mathrm{MAPE}
+      =\tfrac{1}{n}\sum_i
+      \tfrac{|e_i|}{V_{\mathrm{p,sonico},i}},
+      \quad
+      e_i = \bar{e} + (e_i-\bar{e}),
+    \]
+    \[
+      \mathrm{RMSE}^{2}
+      = \bar{e}^{2}
+      + \tfrac{1}{n}\sum_i(e_i-\bar{e})^{2}.
+    \]
+    Dispersão após o viés:
+    $\sqrt{0{,}48^{2}-0{,}27^{2}}\approx 0{,}40$~km/s.
+    Só subtrair a constante não fecha o gap.
+    A Etapa~3 pergunta se essa parcela \textbf{variável} tem
+    estrutura previsível nos perfis.}
+    \column{0.50\textwidth}
+    \slidefigure[0.78]{fig2_vp_dry_gassmann_sonic_depth}{Etapa~2: sônico,
+    DEM a seco e DEM + Gassmann em profundidade.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=15]{Premissas da Etapa~3 (neste intervalo)}
+  \scriptsize
+  \begin{itemize}\setlength{\itemsep}{0.12em}\setlength{\parsep}{0pt}\setlength{\topsep}{0.1em}
+    \item Tendência física fixa: $V_{\mathrm{p,Gassmann}}$ da Etapa~2
+          (sem reajuste ao perfil sônico).
+    \item Alvo: $\dVp = \Vpsonsub - V_{\mathrm{p,Gassmann}}$.
+    \item Validação: três blocos de profundidade ($\approx 29$ linhas cada).
+    \item Corretor oficial: RF com
+          \texttt{n\_estimators}${}=200$, \texttt{random\_state}${}=42$
+          (defaults sklearn; sem padronizar $X$) ---
+          Etapa~1; complexidade modesta para $n=87$.
+  \end{itemize}
+  \vspace{0.02cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Oito entradas em $X$}
+        \scriptsize
+        \begin{enumerate}\setlength{\itemsep}{0.02em}\setlength{\parsep}{0pt}\setlength{\topsep}{0.05em}
+          \item GR (API)
+          \item Densidade (g/cc)
+          \item Resistividade profunda (Res\_Deep)
+          \item Resistividade rasa (Res\_Shallow)
+          \item Phi\_Neutron (pu)
+          \item \phiND{} (pu)
+          \item Lithotype
+          \item $V_{\mathrm{p,Gassmann}}$ (km/s)
+        \end{enumerate}
+      \end{block}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{exampleblock}{Fora de $X$}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.04em}\setlength{\parsep}{0pt}\setlength{\topsep}{0.05em}
+          \item \phiS{} (vazamento com o sônico)
+          \item Tempo de trânsito $\Dt$: DTCO e DTSM
+          \item $\Vp$ e $\Vs$ sónicas
+          \item HFU e microCT
+        \end{itemize}
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]{Justificativa física e formulação estatística}
+  \footnotesize
+  Não há fórmula de Gassmann que forneça \(\dVp\) a partir dos perfis.
+  O teste é empírico: além da média, o residual ainda depende de $X$?
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.46\textwidth}
+    \begin{block}{Justificativa física (Etapa~2)}
+      \scriptsize
+      \begin{itemize}
+        \item PVT fixo ($K_f=2{,}2$~GPa, $S_w=1$) e calibração DEM/SC
+              por HFU (fraca onde faltam plugs).
+        \item Gassmann é o limite de baixa frequência; o perfil sônico
+              mede outra escala.
+        \item Isso produz um viés \textbf{sistemático}
+              (\(+0{,}27\)~km/s) e levanta a hipótese de que parte do
+              erro tenha estrutura nos perfis --- a previsibilidade
+              só se demonstra nos blocos de teste.
+      \end{itemize}
+    \end{block}
+    \column{0.52\textwidth}
+    \begin{exampleblock}{Formulação estatística}
+      \scriptsize
+      Decomposição do residual
+      ($\mu_{\Delta}\approx -0{,}27$~km/s):
+      \[
+        \dVp = \mu_{\Delta} + h(X) + \varepsilon,
+      \]
+      \(\mu_{\Delta}\): deslocamento médio;
+      \(h(X)\): variação previsível em torno da média;
+      \(\varepsilon\): não previsível com $X$.
+      Equivalente a reunir \(g(X)=\mu_{\Delta}+h(X)\):
+      \[
+        \Vpsonsub
+        = V_{\mathrm{p,Gassmann}} + g(X) + \varepsilon,
+      \]
+      com \(g(X)\approx\mathbb{E}[\dVp\mid X]\)
+      (o RF aproxima \(\widehat{g}(X)\)).
+      Hipótese nula: \(H_0:\ h\equiv 0\)
+      (só a média; sem estrutura em $X$).
+      Preditor nulo:
+      \(\widehat{\dVp}=\mu_{\Delta,\mathrm{treino}}
+      \Rightarrow R^{2}_{\mathrm{teste}}\approx 0\).
+      Este conjunto testa se \(h(X)\) é detectável ---
+      não o mecanismo físico de \(h\).
+      (No slide seguinte: decomposição física de \(g\) via Taylor.)
+    \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Isolando o efeito da porosidade}
+  \scriptsize
+  \setlength{\abovedisplayskip}{1.5pt}
+  \setlength{\belowdisplayskip}{1.5pt}
+  \setlength{\abovedisplayshortskip}{0.5pt}
+  \setlength{\belowdisplayshortskip}{0.5pt}
+  Modelo completo: $V_p=F(\phi,\theta,h)$
+  ($\phi$: porosidade; $\theta$: mineralogia, $\alpha$, $S_w$, $K_f$,
+  pressão,\ldots; $h$: HFU).
+  Fixamos HFU e $\theta$ para a parcial
+  $F_\phi=\partial F/\partial\phi$:
+  na mesma HFU e mesmos parâmetros, o que ocorre se
+  trocarmos só \phiND{} por $\phi^{*}$ menor?
+  \vspace{0.03cm}
+
+  $\delta\phi=\phiND{}-\phi^{*}$,
+  $\dVp=\Vpsonsub-F(\phiND{},\theta,h)$.
+  Com $\Vpsonsub=F(\phi^{*},\theta,h)+r_{\mathrm{outros}}+\varepsilon$:
+  \[
+    \dVp = F(\phi^{*},\theta,h)-F(\phiND{},\theta,h)
+    +r_{\mathrm{outros}}+\varepsilon.
+  \]
+  Taylor em \phiND{} (incremento $-\delta\phi$),
+  desprezando $O(\delta\phi^{2})$:
+  \[
+    F(\phi^{*},\theta,h)
+    \approx F(\phiND{},\theta,h)
+    -F_\phi(\phiND{},\theta,h)\,\delta\phi.
+  \]
+  Cancelando $F(\phiND{},\theta,h)$:
+  \[
+    \dVp
+    \approx
+    \underbrace{-F_\phi(\phiND{},\theta,h)\,\delta\phi}
+      _{\text{efeito isolado de }\phi}
+    + r_{\mathrm{outros}} + \varepsilon.
+  \]
+  \vspace{0.04cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Valor esperado condicional}
+        \scriptsize
+        O residual $\dVp$ é o alvo.
+        Definimos
+        $g(X)\approx\mathbb{E}[\dVp\mid X]$:
+        a parte de $\dVp$ \textbf{previsível}
+        a partir das features $X$.
+        O RF aproxima $\widehat{g}$.
+        Com $\mathbb{E}[\varepsilon\mid X]=0$,
+        \(\varepsilon\) sai da esperança e
+        \[
+          g(X)\approx
+          \mathbb{E}\bigl[
+            -F_\phi\,\delta\phi
+            +r_{\mathrm{outros}}
+            \bigm| X\bigr].
+        \]
+        Ou seja: $g$ \textbf{não} aprende $F_\phi$;
+        aprende a contribuição previsível
+        (parcela de $\phi$ + outros fatores
+        correlacionados com $X$).
+      \end{block}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{O que entra em $r_{\mathrm{outros}}$}
+        \scriptsize
+        Diferenças físicas além de $\phi$:
+        $S_w$, $K_f$, frequência (Gassmann
+        vs.\ sônico), pressão, anisotropia,
+        mineralogia, geometria ($\alpha$),
+        HFU mal atribuída, heterogeneidade
+        abaixo da resolução do perfil,
+        interações entre esses mecanismos.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dedução do sinal via Taylor}
+  \scriptsize
+  Da expansão (slide anterior):
+  $\dVp\approx -F_\phi\,\delta\phi + r_{\mathrm{outros}}+\varepsilon$.
+  Se $F_\phi<0$ e $\delta\phi\ge 0$ ($\phi^{*}\le\phiND{}$), então
+  $-F_\phi\delta\phi\ge 0$:
+  isoladamente, $\phi^{*}$ menor \textbf{aumenta} $V_p$ e empurra
+  $\dVp$ para cima.
+  Observamos $\dVp=\Vpsonsub-V_{\mathrm{p,Gassmann}}<0$
+  ($\mu_\Delta\approx -0{,}27$~km/s) --- sinal \textbf{contrário}.
+  \vspace{0.06cm}
+
+  \begin{exampleblock}{Conclusão cuidadosa}
+    \scriptsize
+    Fixados HFU e $\theta$, trocar \phiND{} por $\phi^{*}$ menor
+    tem sinal contrário ao residual observado.
+    Logo: $\phi$ efetiva menor \textbf{não é causa isolada}
+    do viés negativo ---
+    \textbf{não} implica $\delta\phi=0$ nem \phiND{} ``correta'';
+    outros mecanismos precisam de contribuição negativa dominante.
+  \end{exampleblock}
+  \vspace{0.05cm}
+
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{$r_{\mathrm{outros}}$ pode dominar}
+        \scriptsize
+        Ex.: $-F_\phi\delta\phi=+0{,}10$ e
+        $r_{\mathrm{outros}}=-0{,}40$
+        $\Rightarrow$ $\dVp\approx -0{,}30$~km/s.
+        Em média, com $\mu_\Delta\approx -0{,}27$ e
+        $\mathbb{E}[-F_\phi\delta\phi]\ge 0$,
+        necessariamente $\mathbb{E}[r_{\mathrm{outros}}]<0$.
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \begin{block}{Próximo slide}
+        \scriptsize
+        Taylor é local (exige $\delta\phi$ pequeno).
+        A seguir: evidência \textbf{numérica} ---
+        curvas $F(\phi)$ por HFU, sem depender da 1ª ordem.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Evidência numérica: $F(\phi)$ monótona decrescente}
+  \scriptsize
+  Fixados HFU e $\theta$ (cadeia DEM--Gassmann do poço~861).
+  Pontos $=$ \phiND{} observadas em cada HFU.
+  Confirma a dedução de Taylor \textbf{sem} exigir $\delta\phi$ pequeno.
+  \vspace{0.02cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+      \slidefigure[0.92]{fig3_vp_gassmann_phi_monotonicity_by_hfu}{%
+        $\phi\mapsto V_{\mathrm{p,Gassmann}}(\phi)$ por HFU;
+        $F_\phi<0$ em 87/87 profundidades.}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Mesma conclusão, via monotonicidade}
+        \scriptsize
+        \[
+          \phi^{*}\le\phiND{}
+          \;\Rightarrow\;
+          F(\phi^{*})\ge F(\phiND{})
+        \]
+        \[
+          \Delta V_p^{(\phi)}
+          =
+          F(\phi^{*})-F(\phiND{})
+          \ge 0.
+        \]
+        Observado:
+        \(\dVp^{\mathrm{obs}}
+        =\Vpsonsub-V_{\mathrm{p,Gassmann}}<0\),
+        com $\mu_\Delta\approx -0{,}27$~km/s.
+      \end{block}
+      \vspace{0.04cm}
+      \begin{exampleblock}{Mensagem}
+        \scriptsize
+        Uma $\phi$ efetiva menor \textbf{elevaria} $V_p$
+        na cadeia DEM--Gassmann; o sônico está
+        \textbf{abaixo} da previsão.
+        Logo essa hipótese \textbf{não explica isoladamente}
+        o sinal do residual.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Viabilidade}
+
+\begin{frame}[shrink=5]
+  \frametitle{Como se formam as 87 previsões de teste (OOF)}
+  \scriptsize
+  Na formulação anterior, $g(X)\approx\mathbb{E}[\dVp\mid X]$ e o RF
+  aproxima $\widehat{g}(X)$.
+  Aqui, \textbf{OOF}: três estimativas
+  $\widehat{g}^{(-k)}$ ($k=0,1,2$), cada uma sem o bloco $B_k$.
+  \vspace{0.06cm}
+
+  \textbf{1.~Blocos.}
+  $B_0$ topo, $B_1$ meio, $B_2$ base;
+  $\lvert B_k\rvert\approx 29$;
+  $B_0\cup B_1\cup B_2=\{1,\ldots,87\}$ (sem sobreposição).
+  Em cada $i$: $(X_i,\Delta V_{\mathrm{p},i})$,
+  $\Delta V_{\mathrm{p},i}
+  =V_{\mathrm{p,sonico},i}-V_{\mathrm{p,Gassmann},i}$.
+  \vspace{0.05cm}
+
+  \textbf{2.~Rodada $k$.}
+  $\widehat{g}^{(-k)}$ = versão de $\widehat{g}$ treinada \textbf{sem}
+  $B_k$; prediz só em $B_k$.
+  \vspace{0.03cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.46\textwidth}
+      \centering
+      \setlength{\tabcolsep}{3pt}
+      \begin{tabular}{cccc}
+        \toprule
+        $k$ & Treino & Teste & Modelo \\
+        \midrule
+        0 & $B_1\cup B_2$ & $B_0$ & $\widehat{g}^{(-0)}$ \\
+        1 & $B_0\cup B_2$ & $B_1$ & $\widehat{g}^{(-1)}$ \\
+        2 & $B_0\cup B_1$ & $B_2$ & $\widehat{g}^{(-2)}$ \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \[
+        \widehat{g}^{(-k)}
+        =\mathrm{RF}\bigl(
+          \{(X_i,\Delta V_{\mathrm{p},i}):i\notin B_k\}
+        \bigr)
+      \]
+      \[
+        \widehat{\Delta V}_{\mathrm{p},i}
+        =\widehat{g}^{(-k)}(X_i),\quad i\in B_k
+      \]
+    \end{column}
+  \end{columns}
+  \vspace{0.03cm}
+
+  \textbf{3.~Reunião.}
+  $29+29+29=87$ previsões (todas fora da amostra):
+  \[
+    \widehat{\Delta V}_{\mathrm{p}}^{\mathrm{OOF}}
+    =
+    \bigl[
+      \widehat{\Delta V}_{\mathrm{p},B_0};\,
+      \widehat{\Delta V}_{\mathrm{p},B_1};\,
+      \widehat{\Delta V}_{\mathrm{p},B_2}
+    \bigr].
+  \]
+  \vspace{0.02cm}
+  \begin{exampleblock}{}
+    \scriptsize
+    Cada profundidade é teste \textbf{uma} vez;
+    $\widehat{\Delta V}_{\mathrm{p},i}=\widehat{g}^{(-k)}(X_i)$ vem de um
+    $\widehat{g}$ que \textbf{não} treinou no bloco de $i$.
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}[t]
+  \frametitle{O residual é previsível entre blocos de profundidade do poço~861}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.50\textwidth}
+      \footnotesize
+      Três rodadas. Em cada uma, \textbf{um} bloco testa e os
+      \textbf{outros dois} treinam. O gráfico reúne as 87 predições de
+      teste (cada profundidade aparece uma vez).
+      \vspace{0.06cm}
+
+      \centering
+      \scriptsize
+      \setlength{\tabcolsep}{2.6pt}
+      \begin{tabular}{cll}
+        \toprule
+        Rodada & Treino & Teste \\
+        \midrule
+        0 & meio + base & topo (5205,9--5214,5~m) \\
+        1 & topo + base & meio (5214,7--5223,6~m) \\
+        2 & topo + meio & base (5224,4--5233,7~m) \\
+        \bottomrule
+      \end{tabular}
+
+      \vspace{0.08cm}
+      \raggedright
+      \footnotesize
+      \begin{itemize}
+        \item Predominam resíduos \textbf{negativos}: Gassmann acima do
+              sônico (viés $+0{,}27$~km/s).
+        \item Nuvem densa entre $-0{,}6$ e $+0{,}3$~km/s; extremos
+              negativos nos trechos de maior desvio físico.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \slidefigure[0.78]{fig3_residual_oof_scatter}{Resíduo $\dVp$ observado
+      versus predito: as três rodadas de teste reunidas (Random Forest).}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Perfil sônico, Gassmann e corretor ao longo da coluna}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.40\textwidth}
+    \footnotesize
+    Em cada profundidade,
+    $V_{\mathrm{p,hibrido}} = V_{\mathrm{p,Gassmann}} + \widehat{\dVp}$,
+    com $\widehat{\dVp}$ predito na rodada em que aquele trecho foi o
+    de teste (Random Forest; 87 profundidades).
+    \vspace{0.08cm}
+    \begin{itemize}
+      \item Verde: $\Vpsonsub$ (perfil sônico).
+      \item Azul: $V_{\mathrm{p,Gassmann}}$ (ainda acima do sônico).
+      \item Vermelho: $\Vp$ híbrida (Gassmann + correção).
+    \end{itemize}
+    \vspace{0.08cm}
+    {\scriptsize A figura mostra o residual, não o MAPE por HFU nem a
+    comparação entre regressores.}
+    \column{0.58\textwidth}
+    \slidefigure[0.82]{fig3_vp_hybrid_depth_hfu}{Perfil sônico, Gassmann e
+    corretor; faixa lateral = HFU de laboratório (intercalada).}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Erro do resíduo em cada bloco de profundidade}
+  \footnotesize
+  O modelo treina três vezes, uma por rodada --- não há uma quarta
+  execução chamada ``Junto''. Cada profundidade já tem uma predição
+  de teste; a linha Junto apenas agrega essas 87 predições.
+  \vspace{0.10cm}
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3.6pt}
+  \begin{tabular}{cllcc}
+    \toprule
+    Rodada & Teste (m) & Treino & RMSE & $R^2$ \\
+    \midrule
+    0 & 5205,91--5214,48 (topo) & meio + base & 0,12 & 0,87 \\
+    1 & 5214,67--5223,63 (meio) & topo + base & 0,16 & 0,82 \\
+    2 & 5224,39--5233,72 (base) & topo + meio & 0,24 & 0,74 \\
+    \midrule
+    Junto & 5205,91--5233,72 (87 pts) & --- & 0,18 & 0,79 \\
+    \bottomrule
+  \end{tabular}
+  \par
+  \vspace{0.12cm}
+  \begin{minipage}{0.94\textwidth}
+    \begin{exampleblock}{Agregação das métricas}
+      \scriptsize
+      \textbf{RMSE:} com 29 pontos em cada bloco, basta combinar os três
+      RMSE já calculados:
+      \[
+        \mathrm{RMSE}
+        = \sqrt{\frac{0{,}12^{2}+0{,}16^{2}+0{,}24^{2}}{3}}
+        = 0{,}18.
+      \]
+      \textbf{$R^2$:} usa o vetor completo $(y,\hat{y})$ das 87 profundidades:
+      \[
+        R^{2}
+        = 1 - \frac{\sum_{i=1}^{87}(y_i-\hat{y}_i)^{2}}
+                  {\sum_{i=1}^{87}(y_i-\bar{y})^{2}}
+        = 0{,}79.
+      \]
+    \end{exampleblock}
+  \end{minipage}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Fluido no intervalo: como $S_w$ e $K_f$ foram obtidos}
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.60\textheight,keepaspectratio]%
+        {fig3_kf_sw_study_interval}\\[0.04cm]
+      {\scriptsize Intervalo 5205,9--5233,7~m (tracejado).
+       $S_w$ (perfil LAS), $K_f$ e $C_f=1/K_f$.
+       Verde: $K_f=2{,}2$~GPa adotado;
+       laranja: mediana do perfil no intervalo.}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Como foi calculado}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.10em}
+          \item \textbf{$S_w$}: curva de saturação do arquivo
+                LAS do poço (interpretação de campo).
+                No intervalo: $S_w=1$ ponto a ponto.
+          \item \textbf{$K_f$}: calculado pela petrofísica do
+                poço a partir de PVT (pressão, temperatura,
+                salinidade) com $S_w=1$. Resultado:
+                $K_f\approx 2{,}83$~GPa, quase constante.
+          \item \textbf{$C_f=1/K_f$}: compressibilidade do
+                fluido, inverso do módulo volumétrico.
+        \end{itemize}
+      \end{block}
+      \begin{exampleblock}{O que isso implica}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.08em}
+          \item Saturação uniforme $\Rightarrow$ fluido
+                constante em $z$ e razoável.
+          \item $K_f=2{,}2$~GPa adotado está abaixo do
+                calculado: teste de sensibilidade a seguir.
+        \end{itemize}
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Sensibilidade a $K_f$: valor adotado versus estimativa de poço}
+  \footnotesize
+  Mesmo DEM seco; só troca o $K_f$ no Gassmann.
+  Híbrido re-treinado em OOF (3 blocos) com o novo
+  $V_{\mathrm{p,Gassmann}}$.
+  \vspace{0.06cm}
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lcccc}
+    \toprule
+    & \multicolumn{2}{c}{$K_f=2{,}2$~GPa (adotado)} &
+      \multicolumn{2}{c}{$K_f\approx 2{,}83$~GPa (poço)} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    Etapa & MAPE & Viés (km/s) & MAPE & Viés (km/s) \\
+    \midrule
+    Gassmann & 7,28\% & $+0{,}271$ & 7,26\% & $+0{,}293$ \\
+    Híbrido RF (OOF) & 2,78\% & $+0{,}014$ & 2,82\% & $+0{,}018$ \\
+    Híbrido linear (OOF) & 2,10\% & $+0{,}002$ & 2,10\% & $+0{,}002$ \\
+    \bottomrule
+  \end{tabular}
+  \par
+  \vspace{0.10cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Gassmann}
+        \scriptsize
+        Com $K_f$ menor, o fluido entra mais compressível e o
+        $V_{\mathrm{p}}$ cai um pouco. Como o modelo já fica acima
+        do sônico, o viés parece um pouco melhor --- efeito de
+        compensação, não de fluido ``mais certo''.
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \begin{exampleblock}{Híbrido}
+        \scriptsize
+        Depois do corretor residual, a diferença some na prática
+        (RF: $+0{,}04$~p.p.\ de MAPE; linear: igual).
+        Mantemos $K_f=2{,}2$~GPa no produto; o valor de poço
+        (~2,83~GPa) fica como referência física do intervalo.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Alternativa NMR: como $S_w$ e $K_f$ foram calculados}
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.60\textheight,keepaspectratio]%
+        {fig3_kf_sw_nmr_study_interval}\\[0.04cm]
+      {\scriptsize NMR: $S_w$/$S_o$, $K_f$ Wood e $C_f=1/K_f$.
+       Verde: $K_f=2{,}2$~GPa; laranja: mediana Wood+NMR
+       ($\approx 1{,}24$~GPa).}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Como foi calculado}
+        \scriptsize
+        \begin{itemize}\setlength{\itemsep}{0.10em}
+          \item \textbf{$S_w$ NMR}: curva \texttt{SWIRR}
+                (saturação de água irredutível do NMR).
+                Mediana no intervalo $\approx 0{,}31$
+                $\Rightarrow$ fração de óleo relevante.
+          \item \textbf{$S_o = 1 - S_w$}: fração de óleo
+                complementar.
+          \item \textbf{$K_f$ Wood}: mistura água + óleo pela
+                equação de Wood (Reuss):
+                $1/K_f = S_w/K_{\mathrm{brine}} +
+                S_o/K_{\mathrm{oil}}$.
+                Resultado: $K_f\approx 1{,}0$--$1{,}6$~GPa.
+          \item \textbf{\phiND{} inalterada}: porosidade de
+                entrada no DEM não muda --- papel distinto
+                de $S_w$.
+          \item \texttt{SWIRR} pode superestimar óleo
+                (saturação irredutível $\leq$ saturação real).
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]
+  \frametitle{Sensibilidade a $K_f$: adotado versus Wood+NMR}
+  \footnotesize
+  Mesmo DEM seco e mesma \phiND{}; só muda o fluido no Gassmann
+  ($K_f$, $\rho_f$). Híbrido re-treinado em OOF (3 blocos).
+  Testamos \textbf{duas} formas Wood+NMR: perfil $K_f(z)$ e
+  mediana constante ($\approx 1{,}24$~GPa).
+  \vspace{0.04cm}
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{2.8pt}
+  \begin{tabular}{lcccccccc}
+    \toprule
+    & \multicolumn{2}{c}{$K_f=2{,}2$} &
+      \multicolumn{2}{c}{$K_f\approx 2{,}83$} &
+      \multicolumn{2}{c}{NMR $K_f(z)$} &
+      \multicolumn{2}{c}{NMR mediana} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+    Etapa & MAPE & Viés & MAPE & Viés & MAPE & Viés & MAPE & Viés \\
+    \midrule
+    Gassmann & 7,28 & $+0{,}27$ & 7,26 & $+0{,}29$ &
+      7,65 & $+0{,}26$ & 7,65 & $+0{,}26$ \\
+    Híbr.\ RF & 2,78 & $+0{,}01$ & 2,82 & $+0{,}02$ &
+      2,97 & $+0{,}03$ & 2,95 & $+0{,}03$ \\
+    Híbr.\ lin. & 2,10 & $+0{,}00$ & 2,10 & $+0{,}00$ &
+      2,10 & $+0{,}00$ & 2,10 & $+0{,}00$ \\
+    \bottomrule
+  \end{tabular}
+  \par
+  {\scriptsize Viés em km/s.}
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{$K_f(z)$ versus mediana}
+        \scriptsize
+        No intervalo do modelo, $K_f$ NMR varia pouco
+        ($\approx 1{,}0$--$1{,}6$~GPa).
+        Por isso $K_f(z)$ e a mediana dão o
+        \textbf{mesmo} MAPE/viés no Gassmann
+        (e quase o mesmo no híbrido RF).
+        A mediana serve só como resumo; não esconde
+        ganho de variar em profundidade --- aqui esse
+        ganho não aparece.
+      \end{block}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \begin{exampleblock}{Leitura do produto}
+        \scriptsize
+        Com óleo via NMR, o MAPE sobe um pouco
+        (Gassmann $\approx +0{,}4$~p.p.; RF
+        $\approx +0{,}2$~p.p.).
+        A linear fica igual.
+        Neste intervalo, NMR não melhora o produto
+        vs.\ sônico; mantemos $K_f=2{,}2$~GPa no
+        fluxo oficial.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Alcance da validação neste poço}
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \begin{block}{Resultados neste poço}
+      \scriptsize
+      \begin{itemize}
+        \item O residual tem estrutura ao longo da profundidade.
+        \item O corretor reduz o afastamento visual ao sônico.
+        \item Os três blocos de teste reproduzem o padrão.
+      \end{itemize}
+    \end{block}
+    \column{0.50\textwidth}
+    \begin{exampleblock}{Fora do escopo}
+      \scriptsize
+      \begin{itemize}
+        \item MAPE da $\Vp$ híbrida, separado por HFU.
+        \item Comparação entre regressores.
+        \item Transferência para outro poço ou repetição do método
+              fora do 861.
+      \end{itemize}
+    \end{exampleblock}
+  \end{columns}
+  \vspace{0.10cm}
+  {\scriptsize
+  Produto híbrido (definição):
+  $V_{\mathrm{p,hibrido}}=V_{\mathrm{p,Gassmann}}+\widehat{\dVp}$,
+  confrontado ao sônico por
+  $\mathrm{MAPE}=\frac{1}{n}\sum_i
+  |V_{\mathrm{p,hibrido},i}-V_{\mathrm{p,sonico},i}|
+  /V_{\mathrm{p,sonico},i}$.
+  Nesta apresentação o foco permanece no residual.}
+\end{frame}
+
+\begin{frame}{Conclusões}
+  \footnotesize
+  \begin{enumerate}\setlength{\itemsep}{0.18em}
+    \item Parte do desvio entre $V_{\mathrm{p,Gassmann}}$ e $\Vpsonsub$
+          acompanha os perfis ao longo da profundidade no poço~861
+          ($R^2 \approx 0{,}79$ nos blocos de teste).
+    \item Isso justifica seguir com o corretor residual \textbf{neste}
+          intervalo; não substitui um teste em outro poço.
+    \item Fluido: no intervalo, a leitura $S_w=1$ / $K_f\approx 2{,}83$~GPa
+          sustenta $K_f$ fixo; o valor 2,2~GPa deixa o Gassmann um pouco
+          mais otimista. Com Wood+NMR (\texttt{SWIRR}), $K_f$ cai
+          (~1,24~GPa). $K_f(z)$ e mediana NMR equivalem neste
+          intervalo; o MAPE piora um pouco --- não substitui o
+          $K_f=2{,}2$~GPa no produto; \phiND{} permanece a porosidade
+          de entrada.
+  \end{enumerate}
+\end{frame}
+
+\end{document}
