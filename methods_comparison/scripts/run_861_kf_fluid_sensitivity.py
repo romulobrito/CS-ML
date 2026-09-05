@@ -6,8 +6,8 @@ Well 861: fluid Kf sensitivity for Gassmann + hybrid residual (Entrega 2).
 Scenarios (same DEM dry frame and Phi_ND; only fluid in Gassmann changes):
   1) kf_adopted_2p2     -- PVT default Kf=2.2 GPa, rho=1.03, Sw=1
   2) kf_well_median     -- median KFluid/RhoFluid from rock861 in study interval
-  3) nmr_wood_z         -- Wood mix with SWIRR(z), KBrine, KOil (depth-varying)
-  4) nmr_wood_median    -- constant median of Wood Kf/rho from scenario 3
+  3) nmr_vrh_z          -- VRH fluid mix with SWIRR(z), KBrine, KOil (depth-varying)
+  4) nmr_vrh_median     -- constant median of VRH Kf/rho from scenario 3
 
 Also regenerates depth-track figures used in Entrega 2 slides:
   fig3_kf_sw_study_interval.png
@@ -16,6 +16,7 @@ Also regenerates depth-track figures used in Entrega 2 slides:
 Outputs:
   methods_comparison/data/processed/kf_fluid_sensitivity_861/
   methods_comparison/latex/figures/fig3_kf_sw_*.png  (when --write-latex-figures)
+  methods_comparison/results/kf_fluid_sensitivity_861/  (versionable summary)
 
 ASCII-only.
 """
@@ -106,15 +107,15 @@ REFERENCE_SLIDE: Dict[str, Dict[str, Dict[str, float]]] = {
         "hybrid_rf": {"mape_pct": 2.82, "bias_km_s": 0.018},
         "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
     },
-    "nmr_wood_z": {
-        "gassmann": {"mape_pct": 7.65, "bias_km_s": 0.26},
-        "hybrid_rf": {"mape_pct": 2.97, "bias_km_s": 0.03},
-        "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.00},
+    "nmr_vrh_z": {
+        "gassmann": {"mape_pct": 7.63, "bias_km_s": 0.266},
+        "hybrid_rf": {"mape_pct": 2.91, "bias_km_s": 0.016},
+        "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
     },
-    "nmr_wood_median": {
-        "gassmann": {"mape_pct": 7.65, "bias_km_s": 0.26},
-        "hybrid_rf": {"mape_pct": 2.95, "bias_km_s": 0.03},
-        "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.00},
+    "nmr_vrh_median": {
+        "gassmann": {"mape_pct": 7.62, "bias_km_s": 0.267},
+        "hybrid_rf": {"mape_pct": 2.92, "bias_km_s": 0.020},
+        "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
     },
 }
 
@@ -129,27 +130,58 @@ def _clip01(x: np.ndarray) -> np.ndarray:
     return np.clip(x.astype(np.float64), 0.0, 1.0)
 
 
-def wood_kf(
+def reuss_kf(
     sw: np.ndarray,
     k_brine: np.ndarray,
     k_oil: np.ndarray,
 ) -> np.ndarray:
-    """Wood / Reuss fluid bulk modulus mix (GPa)."""
+    """Reuss / Wood fluid bulk modulus (iso-stress, GPa)."""
     sw_u = _clip01(sw)
     so = 1.0 - sw_u
     inv = sw_u / k_brine + so / k_oil
     return 1.0 / inv
 
 
-def wood_rho(
+def voigt_kf(
+    sw: np.ndarray,
+    k_brine: np.ndarray,
+    k_oil: np.ndarray,
+) -> np.ndarray:
+    """Voigt fluid bulk modulus (iso-strain, GPa)."""
+    sw_u = _clip01(sw)
+    so = 1.0 - sw_u
+    return sw_u * k_brine + so * k_oil
+
+
+def vrh_kf(
+    sw: np.ndarray,
+    k_brine: np.ndarray,
+    k_oil: np.ndarray,
+) -> np.ndarray:
+    """Voigt-Reuss-Hill fluid bulk modulus (GPa).
+
+    K_VRH = (K_V + K_R) / 2, with K_R = Wood (harmonic) and
+    K_V = arithmetic saturation-weighted mix.
+    """
+    return 0.5 * (
+        voigt_kf(sw, k_brine, k_oil) + reuss_kf(sw, k_brine, k_oil)
+    )
+
+
+def mix_rho(
     sw: np.ndarray,
     rho_brine: np.ndarray,
     rho_oil: np.ndarray,
 ) -> np.ndarray:
-    """Linear density mix (g/cc)."""
+    """Volume-weighted fluid density mix (g/cc)."""
     sw_u = _clip01(sw)
     so = 1.0 - sw_u
     return sw_u * rho_brine + so * rho_oil
+
+
+# Backward-compatible aliases used by older call sites / notebooks.
+wood_kf = reuss_kf
+wood_rho = mix_rho
 
 
 def study_interval_from_logs(logs: pd.DataFrame) -> Tuple[float, float]:
@@ -210,12 +242,12 @@ def attach_fluid_to_profile(
     merged = merged.rename(columns={"depth_m": DEPTH_COL})
     merged["sw_nmr"] = _clip01(merged["SWIRR"].to_numpy(dtype=np.float64))
     merged["so_nmr"] = 1.0 - merged["sw_nmr"]
-    merged["kf_wood_gpa"] = wood_kf(
+    merged["kf_vrh_gpa"] = vrh_kf(
         merged["sw_nmr"].to_numpy(dtype=np.float64),
         merged["KBrine"].to_numpy(dtype=np.float64),
         merged["KOil"].to_numpy(dtype=np.float64),
     )
-    merged["rho_wood_gcc"] = wood_rho(
+    merged["rho_mix_gcc"] = mix_rho(
         merged["sw_nmr"].to_numpy(dtype=np.float64),
         merged["RhoBrine"].to_numpy(dtype=np.float64),
         merged["RhoOil"].to_numpy(dtype=np.float64),
@@ -440,7 +472,14 @@ def plot_las_interval(
     fig, axes = plt.subplots(1, 3, figsize=(9.2, 8.0), sharey=True)
     ax0, ax1, ax2 = axes
 
-    ax0.plot(lsub["SW"], lsub["MD"], color="#1f77b4", linewidth=1.2, label="Sw LAS")
+    ax0.fill_betweenx(
+        lsub["MD"].to_numpy(dtype=np.float64),
+        0.0,
+        lsub["SW"].to_numpy(dtype=np.float64),
+        color="#1f77b4",
+        alpha=0.85,
+        label="Sw LAS",
+    )
     ax0.set_xlabel("Saturation")
     ax0.set_xlim(0.0, 1.05)
     ax0.set_title("Sw (LAS)")
@@ -448,12 +487,13 @@ def plot_las_interval(
     ax0.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
     ax0.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
     ax0.grid(True, alpha=0.25)
+    ax0.legend(fontsize=7, loc="best")
 
-    ax1.plot(r["KFluid"], r["MD"], color="#d62728", linewidth=1.2, label="Kf poço")
-    ax1.axvline(kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="Kf=2.2")
-    ax1.axvline(kf_well_med, color="#ff7f0e", linestyle=":", linewidth=1.4, label="mediana")
+    ax1.plot(r["KFluid"], r["MD"], color="#d62728", linewidth=1.2, label="Kf well")
+    ax1.axvline(kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="Kf=2.2 adopted")
+    ax1.axvline(kf_well_med, color="#ff7f0e", linestyle=":", linewidth=1.4, label="Kf median")
     ax1.set_xlabel("Kf (GPa)")
-    ax1.set_title("Modulo do fluido")
+    ax1.set_title("Fluid bulk modulus")
     ax1.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
     ax1.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
     ax1.grid(True, alpha=0.25)
@@ -463,7 +503,7 @@ def plot_las_interval(
     ax2.plot(cf, r["MD"], color="#9467bd", linewidth=1.2, label="Cf")
     ax2.axvline(1.0 / kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="1/2.2")
     ax2.set_xlabel("Cf = 1/Kf (1/GPa)")
-    ax2.set_title("Compressibilidade")
+    ax2.set_title("Compressibility")
     ax2.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
     ax2.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
     ax2.grid(True, alpha=0.25)
@@ -471,7 +511,7 @@ def plot_las_interval(
 
     ax0.set_ylabel("Depth (m)")
     fig.suptitle(
-        "Poco 861: Sw LAS e Kf no intervalo [{:.1f}, {:.1f}] m".format(z0, z1),
+        "Well 861: LAS Sw and Kf in [{:.1f}, {:.1f}] m".format(z0, z1),
         fontsize=11,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.97))
@@ -488,12 +528,12 @@ def plot_nmr_interval(
     kf_nmr_med: float,
     out_path: Path,
 ) -> None:
-    """Depth tracks: SWIRR/So, Wood Kf, Cf in study interval."""
+    """Depth tracks: SWIRR/So, VRH Kf, Cf in study interval."""
     m = (rock["MD"] >= z0) & (rock["MD"] <= z1)
     r = rock.loc[m].copy()
     sw = _clip01(r["SWIRR"].to_numpy(dtype=np.float64))
     so = 1.0 - sw
-    kf = wood_kf(
+    kf = vrh_kf(
         sw,
         r["KBrine"].to_numpy(dtype=np.float64),
         r["KOil"].to_numpy(dtype=np.float64),
@@ -505,7 +545,7 @@ def plot_nmr_interval(
     ax0, ax1, ax2 = axes
 
     ax0.fill_betweenx(md, 0.0, sw, color="#1f77b4", alpha=0.85, label="Sw NMR")
-    ax0.fill_betweenx(md, sw, 1.0, color="#2ca02c", alpha=0.75, label="So=1-Sw")
+    ax0.fill_betweenx(md, sw, 1.0, color="#2ca02c", alpha=0.75, label="So = 1 - Sw")
     ax0.set_xlim(0.0, 1.0)
     ax0.set_xlabel("Saturation")
     ax0.set_title("NMR (SWIRR)")
@@ -515,11 +555,11 @@ def plot_nmr_interval(
     ax0.grid(True, alpha=0.25)
     ax0.legend(fontsize=7, loc="best")
 
-    ax1.plot(kf, md, color="#d62728", linewidth=1.2, label="Kf Wood+NMR")
-    ax1.axvline(kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="Kf=2.2")
-    ax1.axvline(kf_nmr_med, color="#ff7f0e", linestyle=":", linewidth=1.4, label="mediana NMR")
+    ax1.plot(kf, md, color="#d62728", linewidth=1.2, label="Kf VRH+NMR")
+    ax1.axvline(kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="Kf=2.2 adopted")
+    ax1.axvline(kf_nmr_med, color="#ff7f0e", linestyle=":", linewidth=1.4, label="Kf NMR median")
     ax1.set_xlabel("Kf (GPa)")
-    ax1.set_title("Modulo do fluido")
+    ax1.set_title("Fluid bulk modulus")
     ax1.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
     ax1.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
     ax1.grid(True, alpha=0.25)
@@ -528,7 +568,7 @@ def plot_nmr_interval(
     ax2.plot(cf, md, color="#9467bd", linewidth=1.2, label="Cf")
     ax2.axvline(1.0 / kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="1/2.2")
     ax2.set_xlabel("Cf = 1/Kf (1/GPa)")
-    ax2.set_title("Compressibilidade")
+    ax2.set_title("Compressibility")
     ax2.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
     ax2.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
     ax2.grid(True, alpha=0.25)
@@ -536,7 +576,7 @@ def plot_nmr_interval(
 
     ax0.set_ylabel("Depth (m)")
     fig.suptitle(
-        "Poco 861: Wood+NMR (SWIRR) no intervalo [{:.1f}, {:.1f}] m".format(z0, z1),
+        "Well 861: VRH+NMR (SWIRR) in [{:.1f}, {:.1f}] m".format(z0, z1),
         fontsize=11,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.97))
@@ -645,22 +685,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "rock_KFluid_median",
         ),
         (
-            "nmr_wood_z",
-            profile["kf_wood_gpa"].to_numpy(dtype=np.float64),
-            profile["rho_wood_gcc"].to_numpy(dtype=np.float64),
+            "nmr_vrh_z",
+            profile["kf_vrh_gpa"].to_numpy(dtype=np.float64),
+            profile["rho_mix_gcc"].to_numpy(dtype=np.float64),
             ones * 1.0,
-            "wood_SWIRR_depth",
+            "vrh_SWIRR_depth",
         ),
     ]
-    kf_nmr_med = float(np.nanmedian(profile["kf_wood_gpa"].to_numpy(dtype=np.float64)))
-    rho_nmr_med = float(np.nanmedian(profile["rho_wood_gcc"].to_numpy(dtype=np.float64)))
+    kf_nmr_med = float(np.nanmedian(profile["kf_vrh_gpa"].to_numpy(dtype=np.float64)))
+    rho_nmr_med = float(np.nanmedian(profile["rho_mix_gcc"].to_numpy(dtype=np.float64)))
     scenarios.append(
         (
-            "nmr_wood_median",
+            "nmr_vrh_median",
             ones * kf_nmr_med,
             ones * rho_nmr_med,
             ones * 1.0,
-            "wood_SWIRR_median",
+            "vrh_SWIRR_median",
         )
     )
 
@@ -754,8 +794,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "pvt_default": pvt,
         "kf_well_median_gpa": kf_well,
         "rho_well_median_gcc": rho_well,
-        "kf_nmr_wood_median_gpa": kf_nmr_med,
-        "rho_nmr_wood_median_gcc": rho_nmr_med,
+        "kf_nmr_vrh_median_gpa": kf_nmr_med,
+        "rho_nmr_mix_median_gcc": rho_nmr_med,
         "n_blocks_oof": N_BLOCKS,
         "n_estimators_rf": N_ESTIMATORS,
         "random_state": int(args.random_state),

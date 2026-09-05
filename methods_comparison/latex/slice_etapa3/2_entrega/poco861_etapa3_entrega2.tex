@@ -593,138 +593,168 @@
   \end{minipage}
 \end{frame}
 
-\begin{frame}[shrink=5]
+\begin{frame}[shrink=10]
   \frametitle{Fluido no intervalo: como $S_w$ e $K_f$ foram obtidos}
-  \footnotesize
+  \scriptsize
   \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.52\textwidth}
+    \begin{column}{0.54\textwidth}
       \centering
-      \includegraphics[width=\linewidth,height=0.60\textheight,keepaspectratio]%
-        {fig3_kf_sw_study_interval}\\[0.04cm]
-      {\scriptsize Intervalo 5205,9--5233,7~m (tracejado).
+      \includegraphics[width=\linewidth,height=0.66\textheight,keepaspectratio]%
+        {fig3_kf_sw_study_interval}\\[0.02cm]
+      {\tiny Intervalo 5205,9--5233,7~m (tracejado).
        $S_w$ (perfil LAS), $K_f$ e $C_f=1/K_f$.
        Verde: $K_f=2{,}2$~GPa adotado;
        laranja: mediana do perfil no intervalo.}
     \end{column}
-    \begin{column}{0.46\textwidth}
-      \begin{block}{Como foi calculado}
-        \scriptsize
-        \begin{itemize}\setlength{\itemsep}{0.10em}
-          \item \textbf{$S_w$}: curva de saturação do arquivo
-                LAS do poço (interpretação de campo).
-                No intervalo: $S_w=1$ ponto a ponto.
-          \item \textbf{$K_f$}: calculado pela petrofísica do
-                poço a partir de PVT (pressão, temperatura,
-                salinidade) com $S_w=1$. Resultado:
-                $K_f\approx 2{,}83$~GPa, quase constante.
-          \item \textbf{$C_f=1/K_f$}: compressibilidade do
-                fluido, inverso do módulo volumétrico.
+    \begin{column}{0.44\textwidth}
+      \begin{block}{Adotado no Gassmann (produto)}
+        \tiny
+        Valores \textbf{constantes} na cadeia oficial:
+        \begin{itemize}\setlength{\itemsep}{0.04em}\setlength{\parsep}{0pt}
+          \item $S_w = 1$ (água de formação)
+          \item $K_f = 2{,}2$~GPa (fixo PVT)
+          \item $\rho_f = 1{,}03$~g/cc
+          \item Fluido fixo em $z$ --- sem perfil $K_f(z)$
         \end{itemize}
       \end{block}
-      \begin{exampleblock}{O que isso implica}
-        \scriptsize
-        \begin{itemize}\setlength{\itemsep}{0.08em}
-          \item Saturação uniforme $\Rightarrow$ fluido
-                constante em $z$ e razoável.
-          \item $K_f=2{,}2$~GPa adotado está abaixo do
-                calculado: teste de sensibilidade a seguir.
+      \vspace{-0.08cm}
+      \begin{block}{O que o poço mostra neste intervalo}
+        \tiny
+        \begin{itemize}\setlength{\itemsep}{0.04em}\setlength{\parsep}{0pt}
+          \item \textbf{$S_w$}: curva LAS; aqui $S_w=1$
+                ponto a ponto.
+          \item \textbf{$K_f$}: curva \texttt{KFluid} do
+                processamento petrofísico/PVT.
+                Mediana $\approx 2{,}83$~GPa; variação
+                com a profundidade é pequena.
+          \item \textbf{$C_f=1/K_f$}: compressibilidade
+                (inverso do módulo volumétrico).
         \end{itemize}
+      \end{block}
+      \vspace{-0.08cm}
+      \begin{exampleblock}{Leitura}
+        \tiny
+        O $K_f=2{,}2$~GPa adotado fica abaixo da mediana
+        de poço (~2,83~GPa). O próximo slide testa se
+        atualizar esse valor melhora o produto.
       \end{exampleblock}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}[shrink=5]
+\begin{frame}[shrink=8]
   \frametitle{Sensibilidade a $K_f$: valor adotado versus estimativa de poço}
-  \footnotesize
-  Mesmo DEM seco; só troca o $K_f$ no Gassmann.
-  Híbrido re-treinado em OOF (3 blocos) com o novo
-  $V_{\mathrm{p,Gassmann}}$.
-  \vspace{0.06cm}
-  \centering
   \scriptsize
-  \setlength{\tabcolsep}{4pt}
-  \begin{tabular}{lcccc}
-    \toprule
-    & \multicolumn{2}{c}{$K_f=2{,}2$~GPa (adotado)} &
-      \multicolumn{2}{c}{$K_f\approx 2{,}83$~GPa (poço)} \\
-    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
-    Etapa & MAPE & Viés (km/s) & MAPE & Viés (km/s) \\
-    \midrule
-    Gassmann & 7,28\% & $+0{,}271$ & 7,26\% & $+0{,}293$ \\
-    Híbrido RF (OOF) & 2,78\% & $+0{,}014$ & 2,82\% & $+0{,}018$ \\
-    Híbrido linear (OOF) & 2,10\% & $+0{,}002$ & 2,10\% & $+0{,}002$ \\
-    \bottomrule
-  \end{tabular}
-  \par
-  \vspace{0.10cm}
+  Só troca o fluido no Gassmann ($K_f$ e $\rho_f$);
+  híbrido re-treinado em OOF (3 blocos) com o novo
+  $V_{\mathrm{p,Gassmann}}$.
+  \vspace{0.04cm}
   \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Gassmann}
-        \scriptsize
-        Com $K_f$ menor, o fluido entra mais compressível e o
-        $V_{\mathrm{p}}$ cai um pouco. Como o modelo já fica acima
-        do sônico, o viés parece um pouco melhor --- efeito de
-        compensação, não de fluido ``mais certo''.
+    \begin{column}{0.46\textwidth}
+      \begin{block}{O que permanece fixo}
+        \tiny
+        Nos dois cenários mantemos:
+        \begin{itemize}\setlength{\itemsep}{0.05em}\setlength{\parsep}{0pt}
+          \item o mesmo arcabouço seco do DEM;
+          \item a mesma porosidade \phiND{};
+          \item a mesma HFU em cada profundidade;
+          \item os mesmos parâmetros calibrados por HFU;
+          \item os mesmos módulos da matriz mineral;
+          \item as mesmas 87 profundidades;
+          \item os mesmos três blocos OOF.
+        \end{itemize}
+        \vspace{0.04cm}
+        Portanto, \textbf{não há nova calibração} do DEM:
+        o modelo seco permanece exatamente igual.
       \end{block}
     \end{column}
-    \begin{column}{0.50\textwidth}
-      \begin{exampleblock}{Híbrido}
-        \scriptsize
-        Depois do corretor residual, a diferença some na prática
-        (RF: $+0{,}04$~p.p.\ de MAPE; linear: igual).
-        Mantemos $K_f=2{,}2$~GPa no produto; o valor de poço
-        (~2,83~GPa) fica como referência física do intervalo.
-      \end{exampleblock}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}[shrink=5]
-  \frametitle{Alternativa NMR: como $S_w$ e $K_f$ foram calculados}
-  \footnotesize
-  \begin{columns}[T,onlytextwidth]
     \begin{column}{0.52\textwidth}
       \centering
-      \includegraphics[width=\linewidth,height=0.60\textheight,keepaspectratio]%
-        {fig3_kf_sw_nmr_study_interval}\\[0.04cm]
-      {\scriptsize NMR: $S_w$/$S_o$, $K_f$ Wood e $C_f=1/K_f$.
-       Verde: $K_f=2{,}2$~GPa; laranja: mediana Wood+NMR
-       ($\approx 1{,}24$~GPa).}
+      \scriptsize
+      \setlength{\tabcolsep}{3.2pt}
+      \begin{tabular}{lcccc}
+        \toprule
+        & \multicolumn{2}{c}{$K_f=2{,}2$ (adotado)} &
+          \multicolumn{2}{c}{$K_f\approx 2{,}83$ (poço)} \\
+        \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+        Etapa & MAPE & Viés & MAPE & Viés \\
+        \midrule
+        Gassmann & 7,28\% & $+0{,}271$ & 7,28\% & $+0{,}295$ \\
+        Híbr.\ RF & 2,78\% & $+0{,}014$ & 2,81\% & $+0{,}017$ \\
+        Híbr.\ lin. & 2,10\% & $+0{,}002$ & 2,10\% & $+0{,}002$ \\
+        \bottomrule
+      \end{tabular}
+      \par{\tiny Viés em km/s.}
+      \vspace{0.08cm}
+      \begin{block}{Gassmann}
+        \tiny
+        Com $K_f$ menor, o fluido fica mais compressível e
+        $V_{\mathrm{p}}$ cai um pouco. O viés parece melhor por
+        compensação, não por fluido ``mais certo''.
+      \end{block}
+      \vspace{-0.06cm}
+      \begin{exampleblock}{Híbrido}
+        \tiny
+        Depois do corretor, a diferença some (RF:
+        $+0{,}04$~p.p.; linear: igual). Mantemos
+        $K_f=2{,}2$~GPa no produto; $\approx 2{,}83$~GPa
+        fica como referência física do intervalo.
+      \end{exampleblock}
     \end{column}
-    \begin{column}{0.46\textwidth}
-      \begin{block}{Como foi calculado}
-        \scriptsize
-        \begin{itemize}\setlength{\itemsep}{0.10em}
-          \item \textbf{$S_w$ NMR}: curva \texttt{SWIRR}
-                (saturação de água irredutível do NMR).
-                Mediana no intervalo $\approx 0{,}31$
-                $\Rightarrow$ fração de óleo relevante.
-          \item \textbf{$S_o = 1 - S_w$}: fração de óleo
-                complementar.
-          \item \textbf{$K_f$ Wood}: mistura água + óleo pela
-                equação de Wood (Reuss):
-                $1/K_f = S_w/K_{\mathrm{brine}} +
-                S_o/K_{\mathrm{oil}}$.
-                Resultado: $K_f\approx 1{,}0$--$1{,}6$~GPa.
-          \item \textbf{\phiND{} inalterada}: porosidade de
-                entrada no DEM não muda --- papel distinto
-                de $S_w$.
-          \item \texttt{SWIRR} pode superestimar óleo
-                (saturação irredutível $\leq$ saturação real).
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=8]
+  \frametitle{Alternativa NMR: como $S_w$ e $K_f$ foram calculados}
+  \scriptsize
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.56\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.74\textheight,keepaspectratio]%
+        {fig3_kf_sw_nmr_study_interval}\\[0.02cm]
+      {\tiny NMR: $S_w$/$S_o$, $K_f$ VRH e $C_f=1/K_f$.
+       Verde: $K_f=2{,}2$~GPa adotado; laranja: mediana
+       VRH+NMR ($\approx 1{,}40$~GPa).}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{Alternativa VRH+NMR --- o que mudou}
+        \tiny
+        \begin{itemize}\setlength{\itemsep}{0.02em}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
+          \item \textbf{$S_w$}: $1\to$~\texttt{SWIRR}
+                (mediana $\approx 0{,}31$);
+                $S_o\approx 0{,}69$.
+          \item \textbf{$K_f$} VRH:
+                $K_V=S_w K_{\mathrm{brine}}+S_o K_{\mathrm{oil}}$,
+                $1/K_R=S_w/K_{\mathrm{brine}}+S_o/K_{\mathrm{oil}}$,
+                $K_f=(K_V+K_R)/2$
+                $\Rightarrow$ $\approx 1{,}0$--$2{,}1$~GPa
+                (mediana $\approx 1{,}40$).
+          \item \textbf{$\rho_f$}: $1{,}03\to$
+                $S_w\rho_{\mathrm{brine}}+S_o\rho_{\mathrm{oil}}$
+                (mediana $\approx 0{,}80$~g/cc).
+          \item \textbf{Formas}: $K_f(z),\rho_f(z)$ e mediana
+                (quase iguais neste intervalo).
+          \item \textbf{Inalterado}: DEM seco e \phiND{}.
+          \item Ressalva: \texttt{SWIRR} pode superestimar óleo.
         \end{itemize}
       \end{block}
+      \vspace{-0.12cm}
+      \begin{exampleblock}{Leitura}
+        {\fontsize{6.5}{7.5}\selectfont
+        Fluido mais compressível e mais leve que o adotado;
+        o próximo slide compara o impacto no produto.\par}
+      \end{exampleblock}
     \end{column}
   \end{columns}
 \end{frame}
 
 \begin{frame}[shrink=5]
-  \frametitle{Sensibilidade a $K_f$: adotado versus Wood+NMR}
+  \frametitle{Sensibilidade a $K_f$: adotado versus VRH+NMR}
   \footnotesize
   Mesmo DEM seco e mesma \phiND{}; só muda o fluido no Gassmann
   ($K_f$, $\rho_f$). Híbrido re-treinado em OOF (3 blocos).
-  Testamos \textbf{duas} formas Wood+NMR: perfil $K_f(z)$ e
-  mediana constante ($\approx 1{,}24$~GPa).
+  Testamos \textbf{duas} formas VRH+NMR: perfil $K_f(z)$ e
+  mediana constante ($\approx 1{,}40$~GPa).
   \vspace{0.04cm}
   \centering
   \scriptsize
@@ -738,10 +768,10 @@
     \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
     Etapa & MAPE & Viés & MAPE & Viés & MAPE & Viés & MAPE & Viés \\
     \midrule
-    Gassmann & 7,28 & $+0{,}27$ & 7,26 & $+0{,}29$ &
-      7,65 & $+0{,}26$ & 7,65 & $+0{,}26$ \\
-    Híbr.\ RF & 2,78 & $+0{,}01$ & 2,82 & $+0{,}02$ &
-      2,97 & $+0{,}03$ & 2,95 & $+0{,}03$ \\
+    Gassmann & 7,28 & $+0{,}27$ & 7,28 & $+0{,}29$ &
+      7,63 & $+0{,}27$ & 7,62 & $+0{,}27$ \\
+    Híbr.\ RF & 2,78 & $+0{,}01$ & 2,81 & $+0{,}02$ &
+      2,91 & $+0{,}02$ & 2,92 & $+0{,}02$ \\
     Híbr.\ lin. & 2,10 & $+0{,}00$ & 2,10 & $+0{,}00$ &
       2,10 & $+0{,}00$ & 2,10 & $+0{,}00$ \\
     \bottomrule
@@ -753,8 +783,8 @@
     \begin{column}{0.48\textwidth}
       \begin{block}{$K_f(z)$ versus mediana}
         \scriptsize
-        No intervalo do modelo, $K_f$ NMR varia pouco
-        ($\approx 1{,}0$--$1{,}6$~GPa).
+        No intervalo do modelo, $K_f$ VRH+NMR varia pouco
+        ($\approx 1{,}0$--$2{,}1$~GPa).
         Por isso $K_f(z)$ e a mediana dão o
         \textbf{mesmo} MAPE/viés no Gassmann
         (e quase o mesmo no híbrido RF).
@@ -766,9 +796,9 @@
     \begin{column}{0.50\textwidth}
       \begin{exampleblock}{Leitura do produto}
         \scriptsize
-        Com óleo via NMR, o MAPE sobe um pouco
-        (Gassmann $\approx +0{,}4$~p.p.; RF
-        $\approx +0{,}2$~p.p.).
+        Com óleo via NMR+VRH, o MAPE sobe um pouco
+        (Gassmann $\approx +0{,}35$~p.p.; RF
+        $\approx +0{,}14$~p.p.).
         A linear fica igual.
         Neste intervalo, NMR não melhora o produto
         vs.\ sônico; mantemos $K_f=2{,}2$~GPa no
@@ -822,8 +852,8 @@
           intervalo; não substitui um teste em outro poço.
     \item Fluido: no intervalo, a leitura $S_w=1$ / $K_f\approx 2{,}83$~GPa
           sustenta $K_f$ fixo; o valor 2,2~GPa deixa o Gassmann um pouco
-          mais otimista. Com Wood+NMR (\texttt{SWIRR}), $K_f$ cai
-          (~1,24~GPa). $K_f(z)$ e mediana NMR equivalem neste
+          mais otimista. Com VRH+NMR (\texttt{SWIRR}), $K_f$ cai
+          (~1,40~GPa). $K_f(z)$ e mediana NMR equivalem neste
           intervalo; o MAPE piora um pouco --- não substitui o
           $K_f=2{,}2$~GPa no produto; \phiND{} permanece a porosidade
           de entrada.
