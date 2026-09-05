@@ -146,7 +146,7 @@
     {\footnotesize
     Intervalo 5205,91--5233,72~m $\cdot$ 87 linhas de perfil\\
     10 plugs microCT $\cdot$ ROCKPHYS $\cdot$ DSI (DLIS) $\cdot$ CMR}\\[0.08cm]
-    {\footnotesize Prova de conceito física \emph{local} --- não é validação interpoços}
+    {\footnotesize Prova de conceito física \emph{local}}
   \end{center}
   \begin{tikzpicture}[remember picture,overlay]
     \node[anchor=south east, font=\scriptsize, text=drpgray]
@@ -160,12 +160,13 @@
 \begin{frame}{Roteiro}
   \footnotesize
   \begin{enumerate}
-    \item Herança da Etapa~1: o que entra e o que fica de fora.
-    \item Cadeia física, CT vs lab, premissas e ordem das inclusões.
-    \item Como medimos o erro (lab $\neq$ poço) e calibração por HFU.
-    \item Resultados nos plugs (linha de base $\rightarrow$ LOO; multiescala CT).
+    \item Insumos da Etapa~1 que alimentam a física.
+    \item Cadeia DEM/SC, papéis do microCT e do laboratório, premissas,
+          partição de poros e ordem das inclusões.
+    \item Duas escalas de erro e calibração por HFU.
+    \item Resultados nos plugs (linha de base, LOO e multiescala CT).
     \item Extrapolação ao perfil e confronto com o sónico DSI.
-    \item Gassmann; NMR (o que mudou / o que ficou fixo); decisão.
+    \item Saturação (Gassmann), teste NMR e decisão de produto.
     \item Conclusões e caminho para a Etapa~3.
   \end{enumerate}
 \end{frame}
@@ -175,8 +176,7 @@
 
 \begin{frame}{Da Etapa~1: insumos fixos para a física}
   \footnotesize
-  A Etapa~1 mostrou o limite informacional do perfil. Aqui usamos só o que
-  passou nesse filtro.
+  A Etapa~1 definiu quais grandezas do perfil alimentam a física desta etapa.
   \vspace{0.08cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.52\textwidth}
@@ -273,13 +273,15 @@
   \begin{block}{Distribuição de HFU no perfil}
     \scriptsize
     HFU1 $=42$, HFU2 $=29$, HFU3 $=10$, HFU4 $=6$.
-    HFU4 \textbf{não tem plug} de calibração --- usa fallback das HFU~2 e~3.
+    A HFU~4 não tem plug: herda a média das HFU~2 e~3.
   \end{block}
 \end{frame}
 
 \begin{frame}{Cadeia física: da matriz ao \Vp{} saturado}
   \footnotesize
-  Ordem fixa; parâmetros elásticos calibrados \textbf{por HFU}, não globalmente.
+  Ordem da cadeia: matriz $\rightarrow$ geometria $\rightarrow$ DEM seco
+  $\rightarrow$ Gassmann. Os parâmetros elásticos são um conjunto
+  \textbf{por HFU}.
   \vspace{0.06cm}
   \centering
   \begin{tikzpicture}[
@@ -313,15 +315,15 @@
     \begin{itemize}
       \item Inclusões secas ($K_i=G_i=0$) até $\phi$ alvo.
       \item Gassmann: saturação total ($S_w=1$).
-      \item Sem reajuste ao sónico na calibração.
+      \item O sónico DSI entra só na validação.
     \end{itemize}
   \end{columns}
 \end{frame}
 
-\begin{frame}{O que entra no plug: imagem $\neq$ porosidade do DEM}
+\begin{frame}{Dois papéis no plug: imagem e laboratório}
   \footnotesize
-  MicroCT alimenta \textbf{geometria e minerais}; $\phi$ do DEM no plug é
-  \philab{} --- não a porosidade da imagem.
+  O microCT descreve \textbf{forma e minerais}. A porosidade de entrada do
+  DEM no plug é a medida de laboratório \philab{}.
   \vspace{0.02cm}
   \centering
   \begin{tikzpicture}[
@@ -365,20 +367,20 @@
     \draw[arr] (dem) -- (cmp);
     \node[note] at (2.4,-3.75) {%
       No \textbf{perfil} (87 linhas): $\phi=\phiND{}$;
-      do CT herdam-se só parâmetros \textbf{por HFU}.
+      do CT herdam-se parâmetros \textbf{por HFU}.
     };
   \end{tikzpicture}
   \vspace{0.02cm}
   \begin{exampleblock}{Mensagem}
     \scriptsize
-    Populamos o plug com imagem para \textbf{forma e composição};
+    A imagem informa \textbf{forma e composição};
     a porosidade do modelo vem do \textbf{laboratório}.
   \end{exampleblock}
 \end{frame}
 
 \begin{frame}{Premissas da modelagem física}
   \footnotesize
-  Decisões fixadas \emph{antes} dos testes A/B --- não ajustadas ao sónico.
+  Regras fixadas a priori. O sónico DSI só entra na validação.
   \vspace{0.06cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.49\textwidth}
@@ -389,9 +391,10 @@
         \item Segmentação por \textbf{HFU de laboratório}.
         \item Solido~1 $\rightarrow$ calcita; Solido~2 $\rightarrow$ dolomita
               (VRH; normalizado no CT).
-        \item $\alpha$ inicial $=$ mediana microCT por HFU;
-              depois calibração em $[0{,}15,\,0{,}95]$.
-        \item HFU~4 sem plugs: \emph{fallback} (média HFU~2 e~3).
+        \item $\alpha$: achatamento do poro ($1=$ esfera).
+              Calibração em $[0{,}15,\,0{,}95]$ (piso: evita fendas;
+              teto: quase esfera).
+        \item HFU~4 sem plugs: herda a média das HFU~2 e~3.
       \end{itemize}
     \end{block}
     \column{0.49\textwidth}
@@ -403,42 +406,98 @@
         \item Gassmann \emph{depois} do arcabouço seco
               ($K_f \approx 2{,}2$~GPa, $S_w = 1$).
         \item $\alpha^\star$ e fator $s^\star$ (comum a $K_m$, $G_m$)
-              calibrados no \textbf{lab}, não no DSI.
-        \item Limiar A/B multiescala: ganho MAPE $\geq 2$~p.p.
-              (in-sample \emph{e} LOO / perfil).
+              ajustados nos \textbf{plugs} de laboratório.
+        \item Limiar para adotar multiescala: ganho de MAPE $\geq 2$~p.p.
+              no laboratório \emph{e} no perfil.
       \end{itemize}
     \end{block}
   \end{columns}
-  \vspace{0.08cm}
+  \vspace{0.04cm}
   \begin{exampleblock}{Escopo}
     \scriptsize
-    Prova de conceito \textbf{local} no poço~861 --- não implica transferência
-    interpoços. ML direto perfil~$\rightarrow$\Vp{} fica fora desta etapa.
+    Prova de conceito \textbf{local} no poço~861.
+    A etapa seguinte trata o resíduo frente ao sónico.
   \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Porosidade total e partição NMR}
+  \footnotesize
+  $\phiND{}$ diz \textbf{quanto} poro existe. O NMR diz \textbf{como}
+  esse volume se reparte entre famílias (meso--macro e micro).
+  \vspace{0.06cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \begin{block}{1.\ $\phiND{}$ --- porosidade total}
+      \scriptsize
+      $\phi_{\mathrm{total}}(z)=\phiND{}(z)$ (perfil);
+      nos plugs, $\philab{}$.
+      Ex.: $\phiND{}=0{,}20$ $\Rightarrow$ o DEM introduz 20\% de poro.
+    \end{block}
+    \vspace{0.08cm}
+    \begin{block}{2.\ NMR --- partição (CMFF/BFV)}
+      \scriptsize
+      $f_{\mathrm{meso}}=\dfrac{\mathrm{CMFF}}{\mathrm{CMFF}+\mathrm{BFV}}$,
+      $f_{\mathrm{micro}}=\dfrac{\mathrm{BFV}}{\mathrm{CMFF}+\mathrm{BFV}}$,
+      com $f_{\mathrm{meso}}+f_{\mathrm{micro}}=1$.
+      No CT: frações GeoDict no lugar de CMFF/BFV.
+    \end{block}
+    \column{0.50\textwidth}
+    \begin{exampleblock}{3.\ Combinação no DEM}
+      \scriptsize
+      $\phi_{\mathrm{meso}}=\phiND{}f_{\mathrm{meso}}$,
+      $\phi_{\mathrm{micro}}=\phiND{}f_{\mathrm{micro}}$;
+      a soma recupera $\phiND{}$.
+      \vspace{0.06cm}
+      Ex.: BFV$=0{,}06$, CMFF$=0{,}10$
+      ($\phi_{\mathrm{NMR}}=0{,}16\neq 0{,}20$)
+      $\Rightarrow$ $f_{\mathrm{micro}}=0{,}375$,
+      $f_{\mathrm{meso}}=0{,}625$
+      $\Rightarrow$ $\phi_{\mathrm{micro}}=0{,}075$,
+      $\phi_{\mathrm{meso}}=0{,}125$.
+      \vspace{0.06cm}
+      Cada inclusão leva seu $\alpha$ (CT por HFU).
+      Próximo slide: \emph{ordem} dessas inclusões.
+    \end{exampleblock}
+  \end{columns}
+  \vspace{0.10cm}
+  {\centering
+  \tiny
+  \textbf{Legenda.}
+  CMFF $=$ FFI (fluido livre, curva CMR).
+  BFV $=$ BVI (fluido ligado / irredutível, curva CMR).
+  \phiND{} $=$ porosidade neutrão--densidade (perfil).
+  \philab{} $=$ porosidade de laboratório (plugs).
+  \par}
 \end{frame}
 
 \begin{frame}{Ordem das inclusões: volume decrescente (literatura)}
   \footnotesize
-  DEM sequencial é \emph{path-dependent}; a ordem precisa ser explícita.
+  Com $\phi_{\mathrm{inc}}=f_{\mathrm{pore}}\times\phi_{\mathrm{total}}$ já definido
+  (slide anterior), o DEM sequencial é \emph{path-dependent}: a ordem
+  precisa ser explícita.
   \vspace{0.06cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.52\textwidth}
     \begin{block}{Convenção adotada}
       \scriptsize
       \begin{enumerate}
-        \item $\phi_{\mathrm{inc}} = f_{\mathrm{pore}}\times\phi_{\mathrm{total}}$
-              (meso--macro e micro).
-        \item Inclusões aplicadas em ordem de
-              $\phi_{\mathrm{inc}}$ \textbf{decrescente}
-              (maior volume $\rightarrow$ menor).
+        \item Calcular $\phi_{\mathrm{inc}}$ para meso--macro e micro.
+        \item Aplicar inclusões em ordem de $\phi_{\mathrm{inc}}$
+              \textbf{decrescente} (maior volume $\rightarrow$ menor).
         \item Mesma regra da referência Equinor/Berryman do projeto.
       \end{enumerate}
     \end{block}
-    \vspace{0.04cm}
+    \vspace{0.06cm}
     {\scriptsize
-    \textbf{Não} é ``maior impacto elástico primeiro'': poros achatados
-    (baixo $\alpha$) amolecem mais por unidade de volume do que poros
-    arredondados. Volume $\neq$ impacto elástico.}
+    A ordem segue o \textbf{volume} de cada família (Equinor/Berryman).
+    Poros mais achatados (baixo $\alpha$) amolecem mais por unidade de
+    volume; esse efeito entra em $\alpha$, não na ordem.}
+    \vspace{0.08cm}
+    \begin{block}{Boas práticas}
+      \scriptsize
+      Carbonatos: $\alpha$ meso/macro do microCT; micro via CT ou CMR.
+      No poço~861 o produto permanece monoescala (ganho abaixo do limiar).
+    \end{block}
     \column{0.46\textwidth}
     \centering
     \begin{tikzpicture}[
@@ -465,13 +524,6 @@
       \draw[arr] (b) -- (o);
     \end{tikzpicture}
   \end{columns}
-  \vspace{0.06cm}
-  \begin{block}{Boas práticas}
-    \scriptsize
-    Carbonatos: AR meso/macro do microCT (ou frações NMR);
-    micro como inclusão crítica (abaixo da resolução ou via CMR).
-    Produto monoescala quando o forward multiescala não supera o limiar.
-  \end{block}
 \end{frame}
 
 % ------------------------------------------------------------------
@@ -503,7 +555,7 @@
   \end{block}
 \end{frame}
 
-\begin{frame}{Como medimos a divergência: lab $\neq$ poço}
+\begin{frame}{Como medimos a divergência: laboratório e poço}
   \footnotesize
   O DEM gera um \Vp{} \textbf{previsto}. A divergência é sempre
   previsto $-$ observado --- mas o observado muda de escala.
@@ -545,14 +597,14 @@
     \draw[arr] (dem.east) -- ++(0.55,0) |- (well.west)
       node[pos=0.75, below, font=\tiny, text=po861green] {erro poço};
     \node[note] at (2.6,-2.45) {%
-      \textbf{Não} usamos $(V_{p,\mathrm{lab}}-V_{p,\mathrm{poco}})$ como nota do DEM.\\
-      São duas validações independentes.
+      Cada escala tem o seu observado: plugs no laboratório, sónico no poço.
     };
   \end{tikzpicture}
   \vspace{0.08cm}
   \begin{exampleblock}{Mensagem}
     \scriptsize
-    Dois erros, duas perguntas: fecha o laboratório? Extrapolação fecha o sónico?
+    Dois erros, duas perguntas: o modelo fecha o laboratório?
+    Fecha o sónico no perfil?
   \end{exampleblock}
 \end{frame}
 
@@ -587,11 +639,11 @@
     \node[box, below=0.45cm of b, fill=orange!12, draw=orange!70!black] (c) {%
       \textbf{3. Validar no poço}\\
       compara \Vp{} DEM com sónico DSI\\
-      (\textbf{sem} recalibrar no DSI)
+      (o DSI não entra no ajuste)
     };
     \node[warn, below=0.45cm of c] (d) {%
-      HFU~4: sem plugs $\rightarrow$ \emph{fallback} (média HFU~2 e~3)\\
-      confiança menor --- não tratar como HFU~2
+      HFU~4: sem plugs $\rightarrow$ herda a média das HFU~2 e~3\\
+      confiança menor do que na HFU~2
     };
     \draw[arr] (a) -- (b);
     \draw[arr] (b) -- (c);
@@ -682,8 +734,8 @@
     \end{tabular}
     \par
     \vspace{0.10cm}
-    {\scriptsize Um único $\alpha$ global não basta:
-    a dispersão por HFU já aparece nesta linha de base.}
+    {\scriptsize A dispersão por HFU nesta linha de base motiva
+    um $\alpha$ \textbf{por unidade}, em vez de um valor único para o poço.}
     \column{0.60\textwidth}
     \slidefigure[0.86]{fig2_vp_dem_vs_lab}{DEM cru versus \Vp{} de laboratório
     (dez plugs CT, confinamento 22,1~MPa).}
@@ -695,7 +747,9 @@
     \column{0.42\textwidth}
     \footnotesize
     Ajuste de $\alpha^\star$ e fator $s^\star$ (comum a $K_m$ e $G_m$)
-    \textbf{por HFU} (limites $\alpha \in [0{,}15,\,0{,}95]$).
+    \textbf{por HFU}.
+    $\alpha\in[0{,}15,\,0{,}95]$: piso de poros ainda arredondados
+    (evita fendas); teto quase esférico.
     \par
     \vspace{0.06cm}
     \scriptsize
@@ -712,8 +766,9 @@
     \end{tabular}
     \par
     \vspace{0.08cm}
-    {\scriptsize HFU~1 e~3 saturam no teto (0,95): limite do modelo,
-    não geometria CT. HFU~2 é o caso mais sustentado.}
+    {\scriptsize HFU~1 e~3 colam no teto (0,95): o ajuste pede poros
+    quase esféricos. HFU~2 fica no interior (0,18) e é a unidade
+    mais bem apoiada.}
     \column{0.56\textwidth}
     \slidefigure[0.88]{fig2_alpha_by_hfu}{$\alpha$ calibrado versus mediana
     microCT por HFU.}
@@ -739,11 +794,11 @@
     \vspace{0.10cm}
     \begin{block}{Leitura}
       \scriptsize
-      Gap $\approx 6$~p.p.\ entre in-sample e LOO:
-      diferença esperada com $n=10$.
-      Viés LOO quase nulo: o erro é dispersão, não deslocamento.
-      Métrica mais severa do conjunto --- retirar um plug remove
-      25--50\% do suporte da sua HFU.
+      Gap $\approx 6$~p.p.\ entre ajuste conjunto e LOO:
+      esperado com $n=10$.
+      Viés LOO quase nulo: o modelo acerta a média e dispersa
+      entre plugs. Retirar um plug remove 25--50\% do suporte
+      da sua HFU.
     \end{block}
     \column{0.58\textwidth}
     \slidefigure[0.86]{fig2_vp_calib_before_after}{Antes versus depois da
@@ -771,9 +826,10 @@
     \end{tabular}
     \par
     \vspace{0.08cm}
-    {\scriptsize Oracle ($\approx 3\%$) é teto diagnóstico, não previsão.
-    Forward LOO ganha 2,9~p.p., mas in-sample melhora só 0,4~p.p.\ e o
-    RMSE piora.}
+    {\scriptsize O modo livre ($\approx 3\%$) mostra o teto se
+    $\alpha_{\mathrm{micro}}$ pudesse variar por plug.
+    No modo operacional (forward) o ganho in-sample é 0,4~p.p.\ e o
+    RMSE aumenta.}
     \begin{exampleblock}{Decisão}
       \scriptsize Manter $\alpha$ efetivo por HFU no produto de 87 linhas.
     \end{exampleblock}
@@ -824,8 +880,8 @@
     (monoescala seco).}
   \end{columns}
   \vspace{0.04cm}
-  {\scriptsize O viés responde por $\approx 3/4$ do erro absoluto: o modelo é
-  sistematicamente mais rápido que o sónico \emph{in situ}, não apenas ruidoso.}
+  {\scriptsize O viés responde por $\approx 3/4$ do erro absoluto: o modelo
+  fica sistematicamente mais rápido que o sónico \emph{in situ}.}
 \end{frame}
 
 \begin{frame}{Por HFU: os maiores erros concentram-se onde há menos suporte}
@@ -853,11 +909,9 @@
     \vspace{0.06cm}
     \begin{block}{Uso interpretativo}
       \scriptsize
-      Plugs não explicam tudo: HFU~1 e~2 têm quatro cada e diferem
-      $2{,}4\times$. O que as separa é $\alpha$ no teto --- limite de
-      parametrização, não de amostra.
-      Com quatro HFUs não se separam amostragem, litologia e formulação.
-      HFU~4: não entregar sem novos plugs.
+      HFU~1 e~2 têm o mesmo número de plugs (4) e MAPE muito diferente
+      ($8{,}0\%$ vs $3{,}3\%$): o que as separa é $\alpha$ no teto.
+      A HFU~4 (sem plug) fica em 30\% --- prioridade para novos dados.
     \end{block}
     \column{0.56\textwidth}
     \slidefigure[0.80]{fig2_vp_error_vs_depth}{Erro de \Vp{} versus
@@ -888,8 +942,8 @@
     \vspace{0.10cm}
     {\scriptsize Com $\phi \approx 11\%$ e arcabouço rígido, o ganho em
     $K_{\mathrm{sat}}$ é quase anulado pelo aumento de densidade.
-    O fluido explica \emph{parte} do gap, não o fecha ---
-    motivação para o resíduo (Etapa~3).}
+    O fluido reduz parte do afastamento; o restante alimenta o
+    residual da Etapa~3.}
     \column{0.62\textwidth}
     \slidefigure[0.86]{fig2_vp_dry_gassmann_sonic_depth}{Sónico, DEM seco e
     DEM + Gassmann ao longo da profundidade.}
@@ -898,7 +952,8 @@
 
 \begin{frame}{NMR ponto a ponto --- centra o erro, mas o espalha}
   \footnotesize
-  Hipótese: frações CMR (CMFF/BFV) resolvem a fragilidade das medianas CT por HFU.
+  As frações CMR (CMFF/BFV) variam em cada profundidade e podem
+  substituir a mediana CT por HFU.
   \vspace{0.04cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.40\textwidth}
@@ -920,8 +975,8 @@
     \end{tabular}
     \par
     \vspace{0.06cm}
-    {\scriptsize M3 quase zera o viés, mas o MAPE \textbf{piora}
-    1,2~p.p.\ --- troca acerto sistemático por dispersão.
+    {\scriptsize M3 quase zera o viés, e o MAPE sobe
+    1,2~p.p.: o acerto médio melhora e a dispersão aumenta.
     CMR vs CT nos plugs: $r \approx -0{,}30$.}
     \begin{exampleblock}{Decisão}
       \scriptsize Manter monoescala Gassmann no produto de 87 linhas.
@@ -932,9 +987,11 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Por que o NMR não ganhou: só um ``botão'' mudou}
+\begin{frame}{O que o teste NMR isolou}
   \footnotesize
-  Teste A/B: liberar \textbf{apenas} as frações contínuas; manter o resto igual ao M1.
+  Comparação controlada: só as frações de poro passam a variar com a
+  profundidade (CMFF/BFV). $\phiND{}$, $\alpha$ e a matriz permanecem
+  como no M1.
   \vspace{0.08cm}
   \centering
   \begin{tikzpicture}[
@@ -973,20 +1030,21 @@
       \textbf{em cada profundidade}.
     \end{block}
     \column{0.48\textwidth}
-    \begin{exampleblock}{O que ficou travado}
+    \begin{exampleblock}{O que permaneceu constante}
       \scriptsize
       Quão achatado é o poro ($\alpha$)\\
-      --- ainda constante por HFU.
+      --- ainda um valor por HFU.
     \end{exampleblock}
   \end{columns}
   \vspace{0.06cm}
-  {\scriptsize Centro: $\alpha$ manda na ``moleza'' elástica; mudar só frações
-  redistribui o \Vp{} sem reduzir o erro $\Rightarrow$ MAPE piora 1,2~p.p.}
+  {\scriptsize $\alpha$ controla a moleza elástica. Redistribuir só as
+  frações desloca o \Vp{} médio (o viés cai), mas o MAPE sobe 1,2~p.p.}
 \end{frame}
 
 \begin{frame}{Decisão multiescala: limiar de 2~p.p.}
   \footnotesize
-  Critério pré-registrado: só troca o produto se o ganho for claro e consistente.
+  Critério definido a priori: adotar multiescala se o ganho de MAPE for
+  de pelo menos 2~p.p.\ e aparecer no laboratório e no perfil.
   \vspace{0.08cm}
   \centering
   \begin{tikzpicture}[
@@ -1051,9 +1109,9 @@
   \vspace{0.12cm}
   \begin{block}{Mensagem}
     \scriptsize
-    No lab o erro é dispersão com viés nulo (dez plugs, três conjuntos de
-    parâmetros); no perfil é viés positivo dominante. A segunda falha é a
-    mais tratável --- alvo da Etapa~3, não motivo para abandonar DEM/SC.
+    No laboratório o erro é dispersão (viés nulo em dez plugs).
+    No perfil o erro é sobretudo um deslocamento positivo --- alvo da
+    correção residual na Etapa~3.
   \end{block}
 \end{frame}
 
@@ -1067,17 +1125,17 @@
           ($\approx 9\%$ seco, $\approx 7\%$ com Gassmann) e o lab sob a
           métrica mais severa (LOO $\approx 15\%$).
     \item \textbf{Uso por HFU:} 3\% (HFU~2), 8\% (HFU~1), 14\% (HFU~3),
-          30\% (HFU~4) --- os maiores erros concentram-se onde há menos
-          suporte experimental, sem que o número de plugs explique toda a
-          variação; evitar HFU~4 sem novos dados.
-    \item \textbf{Entrada:} manter \phiND{}; microCT na geometria, não no ML.
-    \item \textbf{Multiescala CT e NMR:} forward CT e NMR ponto a ponto não
-          superam o limiar de 2~p.p.\ --- manter monoescala Gassmann.
+          30\% (HFU~4). Os erros maiores coincidem com menos plugs
+          e com $\alpha$ no teto; a HFU~4 pede novos dados.
+    \item \textbf{Entrada:} \phiND{} no perfil; microCT na geometria e nos
+          minerais da física.
+    \item \textbf{Multiescala CT e NMR:} o ganho fica abaixo de 2~p.p.\ ---
+          produto monoescala com Gassmann.
     \item \textbf{Gassmann:} MAPE 8,7\% $\rightarrow$ 7,3\%, viés
-          $+0{,}30 \rightarrow +0{,}27$~km/s; melhora consistente,
-          sem fechar o gap.
-    \item \textbf{Etapa~3:} ML sobre o \emph{resíduo} (sónico $-$ física),
-          com prioridade nas HFU~3 e~4 --- sem substituir a cadeia DEM/SC.
+          $+0{,}30 \rightarrow +0{,}27$~km/s; reduz o afastamento e deixa
+          um residual estruturado.
+    \item \textbf{Etapa~3:} ML sobre o resíduo
+          (sónico $-$ física), com prioridade nas HFU~3 e~4.
   \end{enumerate}
 \end{frame}
 
@@ -1096,7 +1154,7 @@
     \begin{itemize}
       \item Alvo: resíduo $= \Vp^{\mathrm{sonico}} - \Vp^{\mathrm{fisica}}$.
       \item Validação: blocos de profundidade (protocolo Etapa~1).
-      \item Híbrido: física + correção ML --- não end-to-end.
+      \item Híbrido: física + correção residual pontual.
     \end{itemize}
     \column{0.48\textwidth}
     \centering
