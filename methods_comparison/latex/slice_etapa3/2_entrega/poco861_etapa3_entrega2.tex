@@ -689,7 +689,7 @@
 \end{frame}
 
 \begin{frame}[t]
-  \frametitle{Alternativa NMR: mistura VHR}
+  \frametitle{Alternativa NMR: mistura VRH}
   \vspace{-0.20cm}
   \begin{columns}[T,onlytextwidth]
     \begin{column}{0.72\textwidth}
@@ -698,7 +698,7 @@
         {fig3_kf_sw_nmr_study_interval}\\[0.03cm]
       {\scriptsize Vermelho: \texttt{SWIRR}$<0$ recortado para 0
        (3 amostras; 2 nas 87 linhas) --- bound numérico, não óleo puro.
-       Laranja: mediana VHR $\approx 1{,}40$~GPa.
+       Laranja: mediana VRH $\approx 1{,}40$~GPa.
        Verde: $K_f=2{,}2$~GPa adotado.
        Gassmann usa $S_w=1$ após a mistura; DEM seco e \phiND{} inalterados.}
     \end{column}
@@ -708,7 +708,7 @@
         \begin{itemize}\setlength{\itemsep}{0.14em}\setlength{\parsep}{0pt}
           \item $S_w$: $1\to$~\texttt{SWIRR}
                 ($\approx 0{,}31$); proxy, não $S_w$ in situ.
-          \item \textbf{VHR:}
+          \item \textbf{VRH:}
                 $K_V=S_w K_w+S_o K_o$,
                 $K_R^{-1}=S_w K_w^{-1}+S_o K_o^{-1}$,
                 $K_f=(K_V+K_R)/2\approx 1{,}40$~GPa.
@@ -721,11 +721,12 @@
 \end{frame}
 
 \begin{frame}[t]
-  \frametitle{Sensibilidade a $K_f$: adotado, poço e VHR}
+  \frametitle{Sensibilidade a $K_f$: adotado, poço e VRH}
   \scriptsize
   Mesmo DEM seco e mesma \phiND{}; só muda o fluido no Gassmann
   ($K_f$, $\rho_f$). Híbrido re-treinado em OOF (3 blocos).
-  NMR usa o perfil $K_f(z)$ VHR (figura anterior).
+  NMR usa o perfil $K_f(z)$ VRH (figura anterior).
+  \par
   \vspace{0.08cm}
   \centering
   \setlength{\tabcolsep}{4pt}
@@ -733,7 +734,7 @@
     \toprule
     & \multicolumn{2}{c}{$K_f=2{,}2$} &
       \multicolumn{2}{c}{$K_f\approx 2{,}83$} &
-      \multicolumn{2}{c}{VHR NMR} \\
+      \multicolumn{2}{c}{VRH NMR} \\
     \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
     Etapa & MAPE & Viés & MAPE & Viés & MAPE & Viés \\
     \midrule
@@ -748,17 +749,17 @@
   \par
   {\tiny MAPE (\%) e viés (km/s) no intervalo modelado (87 linhas).
    As três colunas compartilham o DEM seco e a \phiND{};
-   só o fluido no Gassmann muda. NMR = mistura VHR no perfil.}
+   só o fluido no Gassmann muda. NMR = mistura VRH no perfil.}
   \vspace{0.10cm}
   \begin{columns}[T,onlytextwidth]
     \begin{column}{0.48\textwidth}
       \begin{block}{Perfil versus mediana}
         {\fontsize{6.5}{7.6}\selectfont
-        Perfil $K_f(z)$ e mediana VHR dão métricas
+        Perfil $K_f(z)$ e mediana VRH dão métricas
         \textbf{próximas, não iguais}
         (7,63\% vs 7,62\%).
         Isso não prova que $K_f$ varie pouco
-        (VHR $\approx 1{,}0$--$2{,}1$~GPa):
+        (VRH $\approx 1{,}0$--$2{,}1$~GPa):
         o produto (MAPE/viés) é pouco sensível
         a usar o perfil ou a mediana neste intervalo.\par}
       \end{block}
@@ -766,7 +767,7 @@
     \begin{column}{0.50\textwidth}
       \begin{exampleblock}{Leitura do produto}
         {\fontsize{6.5}{7.6}\selectfont
-        VHR piora um pouco o MAPE
+        VRH piora um pouco o MAPE
         (Gassmann $\approx +0{,}35$~p.p.;
         RF $\approx +0{,}14$~p.p.).
         A linear fica igual.
@@ -822,7 +823,7 @@
           intervalo; não substitui um teste em outro poço.
     \item Fluido: $S_w=1$ / mediana \texttt{KFluid}$\approx 2{,}83$~GPa
           sustentam $K_f$ fixo; 2,2~GPa deixa o Gassmann um pouco mais
-          otimista. NMR+\texttt{SWIRR} (VHR, $\approx 1{,}40$~GPa)
+          otimista. NMR+\texttt{SWIRR} (VRH, $\approx 1{,}40$~GPa)
           piora o MAPE --- não substitui $K_f=2{,}2$~GPa.
           \phiND{} permanece a porosidade de entrada.
   \end{enumerate}

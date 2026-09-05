@@ -1,18 +1,18 @@
-kf_adopted_2p2   gassmann   MAPE got= 7.285 ref=  7.28 d=0.005 | bias got=+0.2711 ref=+0.271 d=0.0001 OK
-kf_adopted_2p2   hybrid_rf  MAPE got= 2.778 ref=  2.78 d=0.002 | bias got=+0.0135 ref=+0.014 d=0.0005 OK
-kf_adopted_2p2   hybrid_lr  MAPE got= 2.102 ref=  2.10 d=0.002 | bias got=+0.0020 ref=+0.002 d=0.0000 OK
-kf_well_median   gassmann   MAPE got= 7.283 ref=  7.28 d=0.003 | bias got=+0.2947 ref=+0.295 d=0.0003 OK
-kf_well_median   hybrid_rf  MAPE got= 2.811 ref=  2.81 d=0.001 | bias got=+0.0167 ref=+0.017 d=0.0003 OK
-kf_well_median   hybrid_lr  MAPE got= 2.101 ref=  2.10 d=0.001 | bias got=+0.0020 ref=+0.002 d=0.0000 OK
-nmr_wood_z       gassmann   MAPE got= 7.655 ref=  7.66 d=0.005 | bias got=+0.2610 ref=+0.261 d=0.0000 OK
-nmr_wood_z       hybrid_rf  MAPE got= 2.966 ref=  2.97 d=0.004 | bias got=+0.0256 ref=+0.026 d=0.0004 OK
-nmr_wood_z       hybrid_lr  MAPE got= 2.102 ref=  2.10 d=0.002 | bias got=+0.0020 ref=+0.002 d=0.0000 OK
-nmr_wood_median  gassmann   MAPE got= 7.646 ref=  7.65 d=0.004 | bias got=+0.2610 ref=+0.261 d=0.0000 OK
-nmr_wood_median  hybrid_rf  MAPE got= 2.955 ref=  2.95 d=0.005 | bias got=+0.0256 ref=+0.026 d=0.0004 OK
-nmr_wood_median  hybrid_lr  MAPE got= 2.103 ref=  2.10 d=0.003 | bias got=+0.0021 ref=+0.002 d=0.0001 OK
-nmr_vrh_z        gassmann   MAPE got= 7.634 ref=  7.63 d=0.004 | bias got=+0.2664 ref=+0.266 d=0.0004 OK
-nmr_vrh_z        hybrid_rf  MAPE got= 2.913 ref=  2.91 d=0.003 | bias got=+0.0163 ref=+0.016 d=0.0003 OK
-nmr_vrh_z        hybrid_lr  MAPE got= 2.102 ref=  2.10 d=0.002 | bias got=+0.0020 ref=+0.002 d=0.0000 OK
-nmr_vrh_median   gassmann   MAPE got= 7.615 ref=  7.62 d=0.005 | bias got=+0.2671 ref=+0.267 d=0.0001 OK
-nmr_vrh_median   hybrid_rf  MAPE got= 2.925 ref=  2.92 d=0.005 | bias got=+0.0199 ref=+0.020 d=0.0001 OK
-nmr_vrh_median   hybrid_lr  MAPE got= 2.103 ref=  2.10 d=0.003 | bias got=+0.0021 ref=+0.002 d=0.0001 OK
+kf_adopted_2p2   gassmann   MAPE got=7.28 ref=7.28 | bias got=+0.271 ref=+0.271 OK
+kf_adopted_2p2   hybrid_rf  MAPE got=2.78 ref=2.78 | bias got=+0.014 ref=+0.014 OK
+kf_adopted_2p2   hybrid_lr  MAPE got=2.10 ref=2.10 | bias got=+0.002 ref=+0.002 OK
+kf_well_median   gassmann   MAPE got=7.28 ref=7.28 | bias got=+0.295 ref=+0.295 OK
+kf_well_median   hybrid_rf  MAPE got=2.81 ref=2.81 | bias got=+0.017 ref=+0.017 OK
+kf_well_median   hybrid_lr  MAPE got=2.10 ref=2.10 | bias got=+0.002 ref=+0.002 OK
+nmr_wood_z       gassmann   MAPE got=7.65 ref=7.65 | bias got=+0.261 ref=+0.261 OK
+nmr_wood_z       hybrid_rf  MAPE got=2.97 ref=2.97 | bias got=+0.026 ref=+0.026 OK
+nmr_wood_z       hybrid_lr  MAPE got=2.10 ref=2.10 | bias got=+0.002 ref=+0.002 OK
+nmr_wood_median  gassmann   MAPE got=7.65 ref=7.65 | bias got=+0.261 ref=+0.261 OK
+nmr_wood_median  hybrid_rf  MAPE got=2.95 ref=2.95 | bias got=+0.026 ref=+0.026 OK
+nmr_wood_median  hybrid_lr  MAPE got=2.10 ref=2.10 | bias got=+0.002 ref=+0.002 OK
+nmr_vrh_z        gassmann   MAPE got=7.63 ref=7.63 | bias got=+0.266 ref=+0.266 OK
+nmr_vrh_z        hybrid_rf  MAPE got=2.91 ref=2.91 | bias got=+0.016 ref=+0.016 OK
+nmr_vrh_z        hybrid_lr  MAPE got=2.10 ref=2.10 | bias got=+0.002 ref=+0.002 OK
+nmr_vrh_median   gassmann   MAPE got=7.62 ref=7.62 | bias got=+0.267 ref=+0.267 OK
+nmr_vrh_median   hybrid_rf  MAPE got=2.92 ref=2.92 | bias got=+0.020 ref=+0.020 OK
+nmr_vrh_median   hybrid_lr  MAPE got=2.10 ref=2.10 | bias got=+0.002 ref=+0.002 OK

@@ -1239,7 +1239,7 @@ Gassmann, e o híbrido é re-treinado em OOF.
 \end{figure}
 
 A Tabela~\ref{tab:kf_sensitivity} resume o default, a mediana de poço
-e o cenário NMR VHR (perfil $K_f(z)$).
+e o cenário NMR VRH (perfil $K_f(z)$).
 Atualizar o default para a mediana de poço ($\approx 2{,}83$~GPa) quase não
 altera o MAPE Gassmann (7,28\% em ambos) e deixa o híbrido RF praticamente
 igual (2,78\% $\rightarrow$ 2,81\%, $+0{,}03$~p.p.); a linear permanece em 2,10\%.
@@ -1249,7 +1249,7 @@ $V_{\mathrm{p}}$ um pouco mais baixo, o que \emph{compensa} parcialmente o
 viés positivo---efeito de nível, não de fluido ``mais certo''.
 
 Como cenário NMR, misturamos água e óleo via \texttt{SWIRR} com a média
-de Voigt--Reuss--Hill (VHR). Não é correção física da mistura iso-tensão
+de Voigt--Reuss--Hill (VRH). Não é correção física da mistura iso-tensão
 nem modelo de saturação heterogênea/patchy:
 \begin{equation}
   \label{eq:kf_vrh}
@@ -1261,7 +1261,7 @@ nem modelo de saturação heterogênea/patchy:
   +
   \frac{S_o}{K_{\mathrm{oil}}},
   \qquad
-  K_{\mathrm{VHR}} = \frac{K_V + K_R}{2}.
+  K_{\mathrm{VRH}} = \frac{K_V + K_R}{2}.
 \end{equation}
 A densidade é volumétrica,
 $\rho_f = S_w\rho_{\mathrm{brine}}+S_o\rho_{\mathrm{oil}}$.
@@ -1269,7 +1269,7 @@ Após a mistura, o Gassmann é chamado com $S_w=1$: $K_f$ e $\rho_f$ já
 representam o fluido que ocupa o poro; passar \texttt{SWIRR} de novo
 multiplicaria indevidamente a densidade.
 No intervalo, a mediana de $S_w^{\mathrm{NMR}}$ (após recorte) é
-$\approx 0{,}31$ ($S_o\approx 0{,}69$), $K_f$ VHR $\approx 1{,}40$~GPa
+$\approx 0{,}31$ ($S_o\approx 0{,}69$), $K_f$ VRH $\approx 1{,}40$~GPa
 e $\rho_f\approx 0{,}80$~g/cc (Figura~\ref{fig:kf_sw_nmr}).
 Três amostras LAS/rock no intervalo têm \texttt{SWIRR}$<0$
 (5205,984; 5206,136; 5206,289~m) e foram recortadas para $0$;
@@ -1282,9 +1282,9 @@ A porosidade de entrada permanece \phiND{}: papéis distintos
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{figures/fig3_kf_sw_nmr_study_interval}
-  \caption{Alternativa NMR com mistura VHR: $S_w$/\texttt{SWIRR}
-  (recortes em vermelho), $K_f$ VHR e $C_f=1/K_f$.
-  Verde: $K_f=2{,}2$~GPa adotado; laranja: mediana VHR
+  \caption{Alternativa NMR com mistura VRH: $S_w$/\texttt{SWIRR}
+  (recortes em vermelho), $K_f$ VRH e $C_f=1/K_f$.
+  Verde: $K_f=2{,}2$~GPa adotado; laranja: mediana VRH
   ($\approx 1{,}40$~GPa).}
   \label{fig:kf_sw_nmr}
 \end{figure}
@@ -1294,7 +1294,7 @@ A porosidade de entrada permanece \phiND{}: papéis distintos
   \caption{MAPE (\%) e viés (km/s) no intervalo modelado
   (87 linhas, OOF em 3~blocos).
   As três colunas compartilham o DEM seco e a \phiND{};
-  só o fluido no Gassmann muda. NMR = mistura VHR no perfil $K_f(z)$.}
+  só o fluido no Gassmann muda. NMR = mistura VRH no perfil $K_f(z)$.}
   \label{tab:kf_sensitivity}
   \scriptsize
   \setlength{\tabcolsep}{4pt}
@@ -1302,7 +1302,7 @@ A porosidade de entrada permanece \phiND{}: papéis distintos
     \toprule
     & \multicolumn{2}{c}{$K_f=2{,}2$} &
       \multicolumn{2}{c}{$K_f\approx 2{,}83$} &
-      \multicolumn{2}{c}{VHR NMR} \\
+      \multicolumn{2}{c}{VRH NMR} \\
     \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
     Etapa & MAPE & Viés & MAPE & Viés & MAPE & Viés \\
     \midrule
@@ -1316,15 +1316,15 @@ A porosidade de entrada permanece \phiND{}: papéis distintos
   \end{tabular}
 \end{table}
 
-VHR piora um pouco o MAPE frente ao adotado (Gassmann
+VRH piora um pouco o MAPE frente ao adotado (Gassmann
 $\approx +0{,}35$~p.p.; RF $\approx +0{,}14$~p.p.); a linear fica igual.
-Perfil $K_f(z)$ e mediana VHR produzem métricas \emph{próximas, não iguais}
+Perfil $K_f(z)$ e mediana VRH produzem métricas \emph{próximas, não iguais}
 (7,63\% vs 7,62\%).
 Isso não demonstra que $K_f$ varie pouco
-(VHR $\approx 1{,}0$--$2{,}1$~GPa neste intervalo):
+(VRH $\approx 1{,}0$--$2{,}1$~GPa neste intervalo):
 o produto (MAPE/viés) é pouco sensível a usar o perfil ou a mediana.
 \textbf{Decisão:} mantemos $K_f=2{,}2$~GPa no fluxo oficial; mediana de
-poço e VHR+\texttt{SWIRR} ficam como testes de sensibilidade.
+poço e VRH+\texttt{SWIRR} ficam como testes de sensibilidade.
 O script \texttt{run\_861\_kf\_fluid\_sensitivity.py} regenera figuras e
 tabelas sob
 \texttt{methods\_comparison/results/kf\_fluid\_sensitivity\_861/}.
@@ -1343,7 +1343,7 @@ de campo Lapa não está demonstrada.
 \textbf{(iii)} Fluido no Gassmann: o produto usa PVT fixo
 ($K_f=2{,}2$~GPa, $S_w=1$, $\rho_f=1{,}03$~g/cc).
 A Seção~\ref{sec:kf_sensitivity} explorou a mediana de poço
-($\approx 2{,}83$~GPa) e VHR+\texttt{SWIRR} (figura NMR).
+($\approx 2{,}83$~GPa) e VRH+\texttt{SWIRR} (figura NMR).
 Nenhuma melhorou o produto frente ao sônico neste intervalo, mas pressão efetiva e
 outras condições in situ continuam fora do escopo.
 \textbf{(iv)} O MAPE de 2,8\% é baixo em termos absolutos, mas mede
@@ -1395,7 +1395,7 @@ integrado e repetir a validação tripla da Etapa~2 (laboratório onde houver
 plugs, \phiND{} versus \phiS{}, DSI) com a nova trilha.
 Recomenda-se também refinamento de PVT onde houver amostras de fluido
 (a Seção~\ref{sec:kf_sensitivity} já quantifica que mediana de poço e
-VHR+\texttt{SWIRR} não melhoram o produto neste intervalo).
+VRH+\texttt{SWIRR} não melhoram o produto neste intervalo).
 
 \section{Conclusões}
 \label{sec:conclusoes}
@@ -1437,7 +1437,7 @@ VHR+\texttt{SWIRR} não melhoram o produto neste intervalo).
         observado ($\Delta V_{\mathrm{p}}<0$); outros mecanismos
         ($r_{\mathrm{outros}}$) precisam dominar o sinal em média.
   \item \textbf{Fluido:} $K_f=2{,}2$~GPa ($S_w=1$) permanece no produto;
-        mediana de poço ($\approx 2{,}83$~GPa) e VHR+\texttt{SWIRR}
+        mediana de poço ($\approx 2{,}83$~GPa) e VRH+\texttt{SWIRR}
         ($\approx 1{,}40$~GPa) não melhoram Gassmann nem o híbrido
         OOF frente ao sônico neste intervalo
         (Seção~\ref{sec:kf_sensitivity}).
@@ -1459,7 +1459,7 @@ física versus híbrido, sensibilidade aos seis regressores
 \texttt{regressor\_oof\_vp\_depth.csv}), figuras de profundidade (RF e comparativa
 por regressor) e \emph{scatter} do resíduo, modelo Random Forest serializado e manifesto com métricas da
 rodada de junho de 2026.
-A sensibilidade a fluido ($K_f$, $S_w$, VHR+\texttt{SWIRR}) é regenerada por
+A sensibilidade a fluido ($K_f$, $S_w$, VRH+\texttt{SWIRR}) é regenerada por
 \texttt{scripts/run\_861\_kf\_fluid\_sensitivity.py}, com métricas, recortes de
 \texttt{SWIRR} e manifesto em
 \texttt{results/kf\_fluid\_sensitivity\_861/} e figuras

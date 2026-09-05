@@ -28,7 +28,7 @@ SWIRR clip:
 
 Also regenerates depth-track figures used in Entrega 2 slides:
   fig3_kf_sw_study_interval.png
-  fig3_kf_sw_nmr_study_interval.png  (VHR mix only; Wood is table-only)
+  fig3_kf_sw_nmr_study_interval.png  (VRH mix only; Wood is computed, not plotted)
 
 Outputs:
   methods_comparison/data/processed/kf_fluid_sensitivity_861/
@@ -113,8 +113,9 @@ N_BLOCKS = 3
 N_ESTIMATORS = 200
 RANDOM_STATE = 42
 
-# Rounded values published in poco861_etapa3_entrega2.tex (slides 14/16).
-# Tolerances must be tighter than slide rounding so a stale table fails.
+# Rounded values for --check-slides. Adopted / well / VRH match Entrega 2
+# slides 14 and 16 (MAPE 2 dp, bias 3 dp). Wood is computed internally
+# (not shown on the slides); those entries follow the same formatting.
 REFERENCE_SLIDE: Dict[str, Dict[str, Dict[str, float]]] = {
     "kf_adopted_2p2": {
         "gassmann": {"mape_pct": 7.28, "bias_km_s": 0.271},
@@ -127,7 +128,7 @@ REFERENCE_SLIDE: Dict[str, Dict[str, Dict[str, float]]] = {
         "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
     },
     "nmr_wood_z": {
-        "gassmann": {"mape_pct": 7.66, "bias_km_s": 0.261},
+        "gassmann": {"mape_pct": 7.65, "bias_km_s": 0.261},
         "hybrid_rf": {"mape_pct": 2.97, "bias_km_s": 0.026},
         "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
     },
@@ -148,8 +149,8 @@ REFERENCE_SLIDE: Dict[str, Dict[str, Dict[str, float]]] = {
     },
 }
 
-MAPE_TOL_PP = 0.015
-BIAS_TOL_KM_S = 0.002
+MAPE_PUBLISHED_DECIMALS = 2
+BIAS_PUBLISHED_DECIMALS = 3
 
 
 @dataclass(frozen=True)
@@ -168,6 +169,52 @@ class FluidScenario:
 def utc_now_iso() -> str:
     """UTC timestamp."""
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def format_mape_pct(value: float) -> str:
+    """MAPE as published on the slides (two decimal places)."""
+    return "{:.{n}f}".format(float(value), n=MAPE_PUBLISHED_DECIMALS)
+
+
+def format_bias_km_s(value: float) -> str:
+    """Bias as published on the slides (three decimal places, km/s)."""
+    return "{:.{n}f}".format(float(value), n=BIAS_PUBLISHED_DECIMALS)
+
+
+def published_mape_matches(got: float, ref: float) -> bool:
+    """True when MAPE matches the published two-decimal string."""
+    return format_mape_pct(got) == format_mape_pct(ref)
+
+
+def published_bias_matches(got: float, ref: float) -> bool:
+    """True when bias matches the published three-decimal string."""
+    return format_bias_km_s(got) == format_bias_km_s(ref)
+
+
+def jsonable(value: Any) -> Any:
+    """Replace non-finite floats with None so strict JSON stays valid."""
+    if isinstance(value, dict):
+        return {str(key): jsonable(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [jsonable(item) for item in value]
+    if isinstance(value, (np.floating, float)):
+        number = float(value)
+        if not np.isfinite(number):
+            return None
+        return number
+    if isinstance(value, (np.integer,)):
+        return int(value)
+    if isinstance(value, np.bool_):
+        return bool(value)
+    return value
+
+
+def write_json(path: Path, payload: Any) -> None:
+    """Write JSON with allow_nan=False after mapping NaN to null."""
+    path.write_text(
+        json.dumps(jsonable(payload), indent=2, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
 
 
 def _clip01(x: np.ndarray) -> np.ndarray:
@@ -257,6 +304,41 @@ def self_check_mix_laws() -> List[str]:
     if np.any(np.abs(rho - expect) > 1e-12):
         fails.append("Density mix must be volume-weighted")
     return fails
+
+
+def self_check_slide_rounding() -> List[str]:
+    """Formatted slide check must reject stale one-tick rounding errors."""
+    fails: List[str] = []
+    if format_mape_pct(2.8109659637213316) != "2.81":
+        fails.append("well-median RF MAPE must round to 2.81")
+    if format_bias_km_s(0.016727797089864327) != "0.017":
+        fails.append("well-median RF bias must round to 0.017")
+    if published_mape_matches(2.82, 2.81):
+        fails.append("stale MAPE 2.82 must not match published 2.81")
+    if published_bias_matches(0.018, 0.017):
+        fails.append("stale bias 0.018 must not match published 0.017")
+    if not published_mape_matches(2.8109659637213316, 2.81):
+        fails.append("2.81096 must match published MAPE 2.81")
+    if not published_bias_matches(0.016727797089864327, 0.017):
+        fails.append("0.01673 must match published bias 0.017")
+    return fails
+
+
+def self_check_json_nan() -> List[str]:
+    """NaN must serialize as JSON null, not the token NaN."""
+    payload = {"sw_mix_median": float("nan"), "ok": 1.0}
+    try:
+        text = json.dumps(jsonable(payload), allow_nan=False)
+    except ValueError as exc:
+        return ["jsonable failed to drop NaN: {}".format(exc)]
+    if "NaN" in text:
+        return ["strict JSON still contains NaN"]
+    loaded = json.loads(text)
+    if loaded["sw_mix_median"] is not None:
+        return ["missing mix median must be JSON null"]
+    if loaded["ok"] != 1.0:
+        return ["finite floats must be preserved"]
+    return []
 
 
 def study_interval_from_logs(logs: pd.DataFrame) -> Tuple[float, float]:
@@ -541,7 +623,7 @@ def run_scenario(
     residual_df = build_residual_from_validation(validation, logs)
     hybrid = oof_hybrid_metrics(residual_df)
     sw_mix_median = (
-        float("nan")
+        None
         if scenario.sw_mix is None
         else float(np.nanmedian(scenario.sw_mix))
     )
@@ -657,7 +739,7 @@ def plot_nmr_interval(
     kf_vrh_med: float,
     out_path: Path,
 ) -> None:
-    """Depth tracks: SWIRR/So and VHR Kf/Cf in study interval."""
+    """Depth tracks: SWIRR/So and VRH Kf/Cf in study interval."""
     m = (rock["MD"] >= z0) & (rock["MD"] <= z1)
     r = rock.loc[m].copy()
     sw_raw = r["SWIRR"].to_numpy(dtype=np.float64)
@@ -687,7 +769,7 @@ def plot_nmr_interval(
     ax0.invert_yaxis()
     _style_depth_track(ax0, "Saturation", "NMR (SWIRR)", z0, z1)
 
-    ax1.plot(kf_v, md, color="#d62728", linewidth=1.8, label="VHR")
+    ax1.plot(kf_v, md, color="#d62728", linewidth=1.8, label="VRH")
     ax1.axvline(
         kf_adopted,
         color="#2ca02c",
@@ -700,11 +782,11 @@ def plot_nmr_interval(
         color="#ff7f0e",
         linestyle=":",
         linewidth=2.0,
-        label="VHR med. 1.40",
+        label="VRH med. 1.40",
     )
     _style_depth_track(ax1, "Kf (GPa)", "Fluid bulk modulus", z0, z1, legend_fs=10.0)
 
-    ax2.plot(1.0 / kf_v, md, color="#9467bd", linewidth=1.8, label="Cf VHR")
+    ax2.plot(1.0 / kf_v, md, color="#9467bd", linewidth=1.8, label="Cf VRH")
     ax2.axvline(
         1.0 / kf_adopted,
         color="#2ca02c",
@@ -716,7 +798,7 @@ def plot_nmr_interval(
 
     ax0.set_ylabel("Depth (m)", fontsize=14)
     fig.suptitle(
-        "Well 861: NMR VHR mix in [{:.1f}, {:.1f}] m".format(z0, z1),
+        "Well 861: NMR VRH mix in [{:.1f}, {:.1f}] m".format(z0, z1),
         fontsize=15,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.97))
@@ -727,10 +809,12 @@ def plot_nmr_interval(
 
 def compare_to_reference(
     results: Dict[str, Dict[str, Any]],
-    mape_tol: float = MAPE_TOL_PP,
-    bias_tol: float = BIAS_TOL_KM_S,
 ) -> Tuple[bool, List[str]]:
-    """Check computed metrics against published slide rounding."""
+    """Check computed metrics against published slide rounding.
+
+    Pass/fail uses formatted MAPE (2 dp) and bias (3 dp). Raw deltas are
+    logged only for diagnosis; they are not a tolerance window.
+    """
     lines: List[str] = []
     ok_all = True
     for sid, ref_stages in REFERENCE_SLIDE.items():
@@ -740,21 +824,20 @@ def compare_to_reference(
             continue
         for stage, ref in ref_stages.items():
             got = results[sid][stage]
-            dm = abs(got["mape_pct"] - ref["mape_pct"])
-            db = abs(got["bias_km_s"] - ref["bias_km_s"])
-            stage_ok = (dm <= mape_tol) and (db <= bias_tol)
+            mape_got = format_mape_pct(got["mape_pct"])
+            mape_ref = format_mape_pct(ref["mape_pct"])
+            bias_got = format_bias_km_s(got["bias_km_s"])
+            bias_ref = format_bias_km_s(ref["bias_km_s"])
+            stage_ok = (mape_got == mape_ref) and (bias_got == bias_ref)
             ok_all = ok_all and stage_ok
             lines.append(
-                "{:16s} {:10s} MAPE got={:6.3f} ref={:6.2f} d={:.3f} | "
-                "bias got={:+.4f} ref={:+.3f} d={:.4f} {}".format(
+                "{:16s} {:10s} MAPE got={} ref={} | bias got={:+.3f} ref={:+.3f} {}".format(
                     sid,
                     stage,
-                    got["mape_pct"],
-                    ref["mape_pct"],
-                    dm,
+                    mape_got,
+                    mape_ref,
                     got["bias_km_s"],
                     ref["bias_km_s"],
-                    db,
                     "OK" if stage_ok else "FAIL",
                 )
             )
@@ -786,8 +869,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     """Entry point."""
     args = parse_args(argv)
     mix_fails = self_check_mix_laws()
+    mix_fails.extend(self_check_slide_rounding())
+    mix_fails.extend(self_check_json_nan())
     if mix_fails:
-        raise RuntimeError("mix-law self-check failed: {}".format("; ".join(mix_fails)))
+        raise RuntimeError("self-check failed: {}".format("; ".join(mix_fails)))
 
     out_root = args.out_root.resolve()
     tables = out_root / "tables"
@@ -1002,8 +1087,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "n_blocks_oof": N_BLOCKS,
         "n_estimators_rf": N_ESTIMATORS,
         "random_state": int(args.random_state),
-        "mape_tol_pp": MAPE_TOL_PP,
-        "bias_tol_km_s": BIAS_TOL_KM_S,
+        "published_rounding": {
+            "mape_decimals": MAPE_PUBLISHED_DECIMALS,
+            "bias_decimals": BIAS_PUBLISHED_DECIMALS,
+            "note": (
+                "Slide check compares formatted MAPE (2 dp) and bias (3 dp) "
+                "to REFERENCE_SLIDE. It does not parse the LaTeX table."
+            ),
+        },
         "scenarios": {
             sid: {
                 "fluid_name": results[sid]["fluid_name"],
@@ -1020,10 +1111,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         },
         "reference_slide": REFERENCE_SLIDE,
     }
-    (out_root / "MANIFEST.json").write_text(
-        json.dumps(manifest, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    write_json(out_root / "MANIFEST.json", manifest)
 
     ok, lines = compare_to_reference(results)
     check_path = tables / "slide_check.txt"
@@ -1036,10 +1124,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         tables / "swirr_clip_rock_interval.csv",
         RESULTS_ROOT / "swirr_clip_rock_interval.csv",
     )
-    (RESULTS_ROOT / "MANIFEST.json").write_text(
-        json.dumps(manifest, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    write_json(RESULTS_ROOT / "MANIFEST.json", manifest)
 
     print("--- slide check ---")
     for line in lines:
@@ -1055,7 +1140,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print("FAIL: metrics disagree with Entrega 2 slide table")
         return 1
     if ok:
-        print("OK: metrics match Entrega 2 slide table within tolerance")
+        print("OK: metrics match Entrega 2 published rounding")
     else:
         print("WARN: metrics differ from slide table (see slide_check.txt)")
     return 0

@@ -29,8 +29,6 @@
   "n_blocks_oof": 3,
   "n_estimators_rf": 200,
   "random_state": 42,
-  "mape_tol_pp": 0.015,
-  "bias_tol_km_s": 0.002,
   "scenarios": {
     "kf_adopted_2p2": {
       "fluid_name": "pvt_default_2p2",
@@ -38,7 +36,7 @@
       "kf_median_gpa": 2.2,
       "rho_median_gcc": 1.03,
       "sw_gassmann_median": 1.0,
-      "sw_mix_median": NaN,
+      "sw_mix_median": null,
       "gassmann": {
         "mape_pct": 7.2845485308780304,
         "bias_km_s": 0.2711140098342218,
@@ -64,7 +62,7 @@
       "kf_median_gpa": 2.8258349576073636,
       "rho_median_gcc": 1.01320034642699,
       "sw_gassmann_median": 1.0,
-      "sw_mix_median": NaN,
+      "sw_mix_median": null,
       "gassmann": {
         "mape_pct": 7.28336099260878,
         "bias_km_s": 0.2947453122317825,
@@ -220,7 +218,7 @@
     },
     "nmr_wood_z": {
       "gassmann": {
-        "mape_pct": 7.66,
+        "mape_pct": 7.65,
         "bias_km_s": 0.261
       },
       "hybrid_rf": {
@@ -274,5 +272,10 @@
         "bias_km_s": 0.002
       }
     }
+  },
+  "published_rounding": {
+    "mape_decimals": 2,
+    "bias_decimals": 3,
+    "note": "Slide check compares formatted MAPE (2 dp) and bias (3 dp) to REFERENCE_SLIDE. It does not parse the LaTeX table."
   }
 }
