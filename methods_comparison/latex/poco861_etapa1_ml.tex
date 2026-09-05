@@ -135,7 +135,7 @@ Seção~\ref{sec:conclusoes} resume as recomendações.
 \section{Dados e integração (Etapa~1)}
 \label{sec:dados}
 
-\subsection{Fontes e produtos}
+\subsection{Fontes e resultados}
 
 Um fluxo automatizado de integração unificou perfis, resultados
 de laboratório e descritores de microCT em dois conjuntos analíticos
@@ -386,14 +386,12 @@ Não houve busca automática de hiperparâmetros nesta fase.
 O RF de produção usa 200 árvores de decisão e semente fixa para
 reprodutibilidade.
 
-\subsection{Como ler o $R^2$}
+\subsection{O que o $R^2$ informa}
 
-O coeficiente de determinação $R^2$ mede o quanto o modelo explica a
-variação do alvo em relação a simplesmente prever a média.
-Valores próximos de 1 indicam bom ajuste; valores próximos de 0 indicam
-desempenho semelhante à média; valores \textbf{negativos} significam
-que o modelo erra \emph{mais} do que usar apenas a média do treino---um
-sinal claro de falha preditiva.
+O $R^2$ compara o modelo com a média do treino.
+Perto de 1, acompanha a variação do alvo; perto de 0, equivale a
+prever essa média. Valor negativo não é ``ajuste fraco'': o modelo
+erra \emph{mais} do que a média --- falha preditiva.
 
 \section{Diagnóstico: o que os perfis conseguem explicar? (Etapa~1c)}
 \label{sec:diagnostico}
@@ -1702,7 +1700,7 @@ discutido na Seção~\ref{sec:discussao} (Tabela~\ref{tab:corr_phi}):
         distinta no intervalo mais permeável.
 \end{enumerate}
 
-\paragraph{Leitura para o produto petrofísico.}
+\paragraph{Leitura para o modelo petrofísico.}
 Se o critério de sucesso for \emph{replicar visualmente} a curva de
 \philab{} em todas as 87 amostras, os resultados da Etapa~1f são
 \textbf{insatisfatórios} em todos os casos---incluindo a variante~B, que
@@ -1935,7 +1933,7 @@ A cadeia recomendada, em ordem, é:
         sem ganho global decisivo; usar apenas se amarras esparsas de
         laboratório forem obrigatórias na entrega de curva.
   \item \textbf{FZI:} não usar previsão direta a partir de perfis como
-        produto final. O perfil não carrega informação suficiente.
+        modelo final. O perfil não carrega informação suficiente.
   \item \textbf{HFU:} priorizar classificação de laboratório;
         a predição automática (36\% de acurácia) serve apenas como
         recurso auxiliar (\emph{fallback}).

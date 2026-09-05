@@ -1,5 +1,5 @@
 % Beamer -- Poco 861 Etapa 3, Entrega 2
-% Primeiro sinal de viabilidade (sem travar o produto).
+% Primeiro sinal de viabilidade (sem fechar a abordagem).
 % Compilar (a partir desta pasta):
 %   pdflatex poco861_etapa3_entrega2.tex
 %   pdflatex poco861_etapa3_entrega2.tex
@@ -56,7 +56,7 @@
         \item DEM/SC calibrado por HFU de laboratório.
         \item Fluido (PVT): água de formação com $S_w=1$ e
               $K_f=2{,}2$~GPa fixo no Gassmann.
-        \item Produto: $V_{\mathrm{p,Gassmann}}$ nas 87 profundidades
+        \item Saída: $V_{\mathrm{p,Gassmann}}$ nas 87 profundidades
               (5205,9--5233,7~m).
       \end{itemize}
     \end{block}
@@ -402,7 +402,7 @@
         com $\mu_\Delta\approx -0{,}27$~km/s.
       \end{block}
       \vspace{0.04cm}
-      \begin{exampleblock}{Mensagem}
+      \begin{exampleblock}{O que isso informa}
         \scriptsize
         Uma $\phi$ efetiva menor \textbf{elevaria} $V_p$
         na cadeia DEM--Gassmann; o sônico está
@@ -602,13 +602,13 @@
       \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]%
         {fig3_kf_sw_study_interval}\\[0.05cm]
       {\footnotesize Intervalo 5205,9--5233,7~m.
-       Verde: $K_f=2{,}2$~GPa (produto);
+       Verde: $K_f=2{,}2$~GPa (adotado);
        laranja: mediana \texttt{KFluid} $\approx 2{,}83$~GPa.}
     \end{column}
     \begin{column}{0.28\textwidth}
       \footnotesize
       \begin{block}{Adotado vs poço}
-        \textbf{Produto:} $S_w=1$, $K_f=2{,}2$~GPa,
+        \textbf{Adotado:} $S_w=1$, $K_f=2{,}2$~GPa,
         $\rho_f=1{,}03$~g/cc; fluido constante em $z$.
         \vspace{0.12cm}
 
@@ -617,7 +617,7 @@
         mediana $\approx 2{,}83$~GPa; $C_f=1/K_f$.
       \end{block}
       \vspace{-0.08cm}
-      \begin{exampleblock}{Leitura}
+      \begin{exampleblock}{O que isso informa}
         2,2~GPa $<$ mediana do poço.
         O próximo slide testa $K_f$ e $\rho_f$.
         DEM seco e \phiND{} ficam fixos.
@@ -681,7 +681,7 @@
         \tiny
         Depois do corretor, a diferença some (RF:
         $+0{,}03$~p.p.; linear: igual). Mantemos
-        $K_f=2{,}2$~GPa no produto; $\approx 2{,}83$~GPa
+        $K_f=2{,}2$~GPa no modelo adotado; $\approx 2{,}83$~GPa
         fica como referência física do intervalo.
       \end{exampleblock}
     \end{column}
@@ -760,18 +760,18 @@
         (7,63\% vs 7,62\%).
         Isso não prova que $K_f$ varie pouco
         (VRH $\approx 1{,}0$--$2{,}1$~GPa):
-        o produto (MAPE/viés) é pouco sensível
+        o resultado (MAPE/viés) é pouco sensível
         a usar o perfil ou a mediana neste intervalo.\par}
       \end{block}
     \end{column}
     \begin{column}{0.50\textwidth}
-      \begin{exampleblock}{Leitura do produto}
+      \begin{exampleblock}{O que a tabela informa}
         {\fontsize{6.5}{7.6}\selectfont
         VRH piora um pouco o MAPE
         (Gassmann $\approx +0{,}35$~p.p.;
         RF $\approx +0{,}14$~p.p.).
         A linear fica igual.
-        Neste intervalo, NMR não melhora o produto
+        Neste intervalo, NMR não melhora o acordo
         vs.\ sônico; mantemos $K_f=2{,}2$~GPa no
         fluxo oficial.\par}
       \end{exampleblock}
@@ -804,7 +804,7 @@
   \end{columns}
   \vspace{0.10cm}
   {\scriptsize
-  Produto híbrido (definição):
+  Modelo híbrido (definição):
   $V_{\mathrm{p,hibrido}}=V_{\mathrm{p,Gassmann}}+\widehat{\dVp}$,
   confrontado ao sônico por
   $\mathrm{MAPE}=\frac{1}{n}\sum_i

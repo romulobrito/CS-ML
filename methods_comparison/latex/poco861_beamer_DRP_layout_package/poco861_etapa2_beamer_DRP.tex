@@ -165,8 +165,9 @@
           partição de poros e ordem das inclusões.
     \item Duas escalas de erro e calibração por HFU.
     \item Resultados nos plugs (linha de base, LOO e multiescala CT).
-    \item Extrapolação ao perfil e confronto com o sónico DSI.
-    \item Saturação (Gassmann), teste NMR e decisão de produto.
+    \item Extrapolação ao perfil: a porosidade de entrada versus o
+          sónico de porosidade; depois o \Vp{} do DEM versus o DSI.
+    \item Saturação (Gassmann), teste NMR e decisão da abordagem.
     \item Conclusões e caminho para a Etapa~3.
   \end{enumerate}
 \end{frame}
@@ -272,8 +273,9 @@
   \vspace{0.10cm}
   \begin{block}{Distribuição de HFU no perfil}
     \scriptsize
-    HFU1 $=42$, HFU2 $=29$, HFU3 $=10$, HFU4 $=6$.
-    A HFU~4 não tem plug: herda a média das HFU~2 e~3.
+    HFU1 $=42$ linhas, HFU2 $=29$, HFU3 $=10$, HFU4 $=6$.
+    A HFU~4 não tem plug de laboratório; os parâmetros elásticos
+    dessa unidade são a média das HFU~2 e~3 (aproximação, não medida).
   \end{block}
 \end{frame}
 
@@ -371,7 +373,7 @@
     };
   \end{tikzpicture}
   \vspace{0.02cm}
-  \begin{exampleblock}{Mensagem}
+  \begin{exampleblock}{O que isso informa}
     \scriptsize
     A imagem informa \textbf{forma e composição};
     a porosidade do modelo vem do \textbf{laboratório}.
@@ -391,10 +393,10 @@
         \item Segmentação por \textbf{HFU de laboratório}.
         \item Solido~1 $\rightarrow$ calcita; Solido~2 $\rightarrow$ dolomita
               (VRH; normalizado no CT).
-        \item $\alpha$: achatamento do poro ($1=$ esfera).
-              Calibração em $[0{,}15,\,0{,}95]$ (piso: evita fendas;
-              teto: quase esfera).
-        \item HFU~4 sem plugs: herda a média das HFU~2 e~3.
+        \item $\alpha$: achatamento do poro ($1=$ esfera; baixo $=$ mais
+              achatado e mais mole). Ajuste só em $[0{,}15,\,0{,}95]$.
+        \item HFU~4 sem plugs: usa a média das HFU~2 e~3
+              (não há medida elástica nessa unidade).
       \end{itemize}
     \end{block}
     \column{0.49\textwidth}
@@ -412,12 +414,6 @@
       \end{itemize}
     \end{block}
   \end{columns}
-  \vspace{0.04cm}
-  \begin{exampleblock}{Escopo}
-    \scriptsize
-    Prova de conceito \textbf{local} no poço~861.
-    A etapa seguinte trata o resíduo frente ao sónico.
-  \end{exampleblock}
 \end{frame}
 
 \begin{frame}{Porosidade total e partição NMR}
@@ -496,7 +492,7 @@
     \begin{block}{Boas práticas}
       \scriptsize
       Carbonatos: $\alpha$ meso/macro do microCT; micro via CT ou CMR.
-      No poço~861 o produto permanece monoescala (ganho abaixo do limiar).
+      No poço~861 o modelo adotado permanece monoescala (ganho abaixo do limiar).
     \end{block}
     \column{0.46\textwidth}
     \centering
@@ -547,11 +543,11 @@
     \bottomrule
   \end{tabular}
   \vspace{0.12cm}
-  \begin{block}{Como ler as métricas}
+  \begin{block}{O que as métricas informam}
     \scriptsize
-    \textbf{MAPE:} erro relativo típico em \Vp{}.
-    \textbf{RMSE:} penaliza outliers (km/s).
-    \textbf{Viés:} sinal sistemático (positivo $=$ modelo mais rápido).
+    MAPE é o erro relativo típico em \Vp{}.
+    RMSE penaliza os erros grandes e vem em km/s.
+    Viés positivo: o modelo está mais rápido que o observado.
   \end{block}
 \end{frame}
 
@@ -601,9 +597,9 @@
     };
   \end{tikzpicture}
   \vspace{0.08cm}
-  \begin{exampleblock}{Mensagem}
+  \begin{exampleblock}{O que isso informa}
     \scriptsize
-    Dois erros, duas perguntas: o modelo fecha o laboratório?
+    São duas perguntas distintas: o modelo fecha o laboratório?
     Fecha o sónico no perfil?
   \end{exampleblock}
 \end{frame}
@@ -642,8 +638,8 @@
       (o DSI não entra no ajuste)
     };
     \node[warn, below=0.45cm of c] (d) {%
-      HFU~4: sem plugs $\rightarrow$ herda a média das HFU~2 e~3\\
-      confiança menor do que na HFU~2
+      HFU~4: sem plugs $\rightarrow$ usa a média das HFU~2 e~3\\
+      (aproximação; confiança menor do que na HFU~2)
     };
     \draw[arr] (a) -- (b);
     \draw[arr] (b) -- (c);
@@ -653,7 +649,7 @@
 
 \begin{frame}{Esquema por HFU: de $\bar{\alpha}$ a \Vp{} DEM}
   \footnotesize
-  $\bar{\alpha}_i$ é só o ponto de partida (mediana CT). O produto usa
+  $\bar{\alpha}_i$ é só o ponto de partida (mediana CT). O modelo adotado usa
   $(\alpha_i^\star,s_i^\star)$ calibrados contra \Vp{} de laboratório.
   \vspace{0.04cm}
   \centering
@@ -734,8 +730,9 @@
     \end{tabular}
     \par
     \vspace{0.10cm}
-    {\scriptsize A dispersão por HFU nesta linha de base motiva
-    um $\alpha$ \textbf{por unidade}, em vez de um valor único para o poço.}
+    {\scriptsize Sem um $\alpha$ por HFU o erro é grande e heterogêneo:
+    cada unidade precisa da sua geometria efetiva, não de um valor único
+    para o poço inteiro.}
     \column{0.60\textwidth}
     \slidefigure[0.86]{fig2_vp_dem_vs_lab}{DEM cru versus \Vp{} de laboratório
     (dez plugs CT, confinamento 22,1~MPa).}
@@ -746,10 +743,14 @@
   \begin{columns}[T,onlytextwidth]
     \column{0.42\textwidth}
     \footnotesize
-    Ajuste de $\alpha^\star$ e fator $s^\star$ (comum a $K_m$ e $G_m$)
-    \textbf{por HFU}.
-    $\alpha\in[0{,}15,\,0{,}95]$: piso de poros ainda arredondados
-    (evita fendas); teto quase esférico.
+    Ajuste de $\alpha^\star$ e do fator $s^\star$ (amolece $K_m$ e $G_m$
+    em conjunto) \textbf{por HFU}, contra o \Vp{} de laboratório.
+    \par
+    \vspace{0.05cm}
+    {\scriptsize
+    $\alpha=1$ seria um poro esférico; valores baixos são poros
+    achatados (mais moles). O ajuste só escolhe $\alpha$ em
+    $[0{,}15,\,0{,}95]$.}
     \par
     \vspace{0.06cm}
     \scriptsize
@@ -761,25 +762,27 @@
       1 & 4 & 0,95 & 0,55 \\
       2 & 4 & 0,18 & 0,55 \\
       3 & 2 & 0,95 & 0,61 \\
-      4 & 0 & fallback & --- \\
+      4 & 0 & média 2--3 & --- \\
       \bottomrule
     \end{tabular}
     \par
     \vspace{0.08cm}
-    {\scriptsize HFU~1 e~3 colam no teto (0,95): o ajuste pede poros
-    quase esféricos. HFU~2 fica no interior (0,18) e é a unidade
-    mais bem apoiada.}
+    {\scriptsize Nas HFU~1 e~3 o ótimo cola em 0,95: o modelo quer
+    poros ainda mais redondos do que o intervalo permite.
+    Na HFU~2 o ótimo é 0,18 (interior da faixa) --- unidade com
+    melhor apoio experimental.}
     \column{0.56\textwidth}
-    \slidefigure[0.88]{fig2_alpha_by_hfu}{$\alpha$ calibrado versus mediana
-    microCT por HFU.}
+    \slidefigure[0.72]{fig2_alpha_by_hfu}{$\alpha$ calibrado versus mediana
+    microCT por HFU. Barras afastadas: a geometria da imagem, sozinha,
+    não fecha o laboratório.}
   \end{columns}
 \end{frame}
 
-\begin{frame}{LOO: MAPE $\approx 15\%$ --- métrica honesta no laboratório}
+\begin{frame}{LOO: MAPE $\approx 15\%$ no laboratório}
   \begin{columns}[T,onlytextwidth]
     \column{0.40\textwidth}
     \footnotesize
-    Leave-one-plug-out: recalibra sem o plug avaliado.
+    A cada rodada um plug fica de fora do ajuste.
     \vspace{0.08cm}
     \centering
     \scriptsize
@@ -792,13 +795,16 @@
       \bottomrule
     \end{tabular}
     \vspace{0.10cm}
-    \begin{block}{Leitura}
+    \begin{block}{O que a tabela informa}
       \scriptsize
-      Gap $\approx 6$~p.p.\ entre ajuste conjunto e LOO:
-      esperado com $n=10$.
-      Viés LOO quase nulo: o modelo acerta a média e dispersa
-      entre plugs. Retirar um plug remove 25--50\% do suporte
-      da sua HFU.
+      Os 9\% são o ajuste: os mesmos plugs calibram e são avaliados.
+      No laboratório o número que vale é o LOO ($\approx 15\%$):
+      a cada rodada um plug fica de fora, o modelo recalibra e só
+      então se compara. Seis pontos a mais não surpreendem com
+      $n=10$ --- em HFU de dois ou quatro plugs, tirar um é perder
+      um quarto ou metade da amostra. O viés perto de zero indica
+      que o modelo não está alto nem baixo de forma sistemática;
+      o que resta é dispersão entre plugs.
     \end{block}
     \column{0.58\textwidth}
     \slidefigure[0.86]{fig2_vp_calib_before_after}{Antes versus depois da
@@ -826,12 +832,14 @@
     \end{tabular}
     \par
     \vspace{0.08cm}
-    {\scriptsize O modo livre ($\approx 3\%$) mostra o teto se
-    $\alpha_{\mathrm{micro}}$ pudesse variar por plug.
-    No modo operacional (forward) o ganho in-sample é 0,4~p.p.\ e o
-    RMSE aumenta.}
+    {\scriptsize Se cada plug tivesse o seu próprio
+    $\alpha_{\mathrm{micro}}$ (teste diagnóstico, não operacional),
+    o MAPE cairia até cerca de 3\%. No modo que pode ir ao perfil
+    (mesmo $\alpha$ da HFU para todos os plugs da unidade), o ganho
+    in-sample é só 0,4~p.p.\ e o RMSE piora.}
     \begin{exampleblock}{Decisão}
-      \scriptsize Manter $\alpha$ efetivo por HFU no produto de 87 linhas.
+      \scriptsize Permanecer com um $\alpha$ efetivo por HFU nas
+      87 linhas: a partição meso/micro do CT não paga o limiar de 2~p.p.
     \end{exampleblock}
     \column{0.58\textwidth}
     \slidefigure[0.84]{fig2_multiscale_ab_crossplot}{M1 versus M2b
@@ -842,22 +850,40 @@
 % ------------------------------------------------------------------
 \section{Perfil e sónico}
 
-\begin{frame}{Extrapolação: 87 linhas com parâmetros por HFU}
+\begin{frame}{A porosidade de entrada alinha-se ao sónico; \Vp{} ainda não}
   \begin{columns}[T,onlytextwidth]
-    \column{0.36\textwidth}
+    \column{0.42\textwidth}
     \footnotesize
-    \begin{itemize}
-      \item Entrada: \phiND{} e HFU de laboratório.
-      \item \Vp{} médio a seco $\approx 5{,}20$~km/s.
-      \item \VpVs{} médio $\approx 1{,}82$.
-      \item \phiND{} vs \phiS{}: $r \approx 0{,}94$.
-    \end{itemize}
-    \vspace{0.06cm}
-    {\scriptsize Entrada de porosidade sólida; a pergunta elástica
-    vem no confronto com o DSI.}
-    \column{0.62\textwidth}
-    \slidefigure[0.88]{fig2_phi_nd_vs_phi_sonic}{\phiND{} versus porosidade
-    sónica no perfil ($n=87$).}
+    Os parâmetros calibrados nos plugs são aplicados às 87 linhas
+    (\phiND{} + HFU de laboratório).
+    \par
+    \vspace{0.08cm}
+    A figura ao lado compara \textbf{duas porosidades}, não duas
+    velocidades: \phiND{} (entrada do DEM) versus \phiS{}
+    (porosidade inferida do sónico).
+    \par
+    \vspace{0.08cm}
+    {\scriptsize
+    Pontos junto à diagonal e $r \approx 0{,}94$ mostram que a
+    \textbf{entrada petrofísica} está consistente com o perfil.
+    Isso \textbf{não} prova que o \Vp{} do DEM está certo ---
+    essa pergunta é o confronto com o DSI, no próximo slide.}
+    \par
+    \vspace{0.10cm}
+    \scriptsize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{lr}
+      \toprule
+      Grandeza (DEM, 87 linhas) & Valor \\
+      \midrule
+      \Vp{} médio a seco & 5,20~km/s \\
+      \VpVs{} médio & 1,82 \\
+      $r$(\phiND{}, \phiS{}) & 0,94 \\
+      \bottomrule
+    \end{tabular}
+    \column{0.56\textwidth}
+    \slidefigure[0.80]{fig2_phi_nd_vs_phi_sonic}{\phiND{} versus porosidade
+    sónica \phiS{} ($n=87$). Acordo da \textbf{entrada}, não do \Vp{}.}
   \end{columns}
 \end{frame}
 
@@ -873,15 +899,17 @@
   \vspace{0.06cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.48\textwidth}
-    \slidefigure[0.80]{fig2_vp_dem_vs_sonic_depth}{Trilha: DEM seco versus
+    \slidefigure[0.72]{fig2_vp_dem_vs_sonic_depth}{Trilha: DEM seco versus
     sónico DSI.}
     \column{0.50\textwidth}
-    \slidefigure[0.80]{fig2_vp_dem_vs_sonic_scatter}{Dispersograma 1:1 por HFU
+    \slidefigure[0.72]{fig2_vp_dem_vs_sonic_scatter}{Dispersograma 1:1 por HFU
     (monoescala seco).}
   \end{columns}
   \vspace{0.04cm}
-  {\scriptsize O viés responde por $\approx 3/4$ do erro absoluto: o modelo
-  fica sistematicamente mais rápido que o sónico \emph{in situ}.}
+  {\scriptsize O DEM está, em média, 0,30~km/s mais rápido que o DSI.
+  Esse deslocamento sistemático responde por cerca de três quartos do
+  erro absoluto: não é só dispersão pontual --- é um viés que a Etapa~3
+  vai corrigir.}
 \end{frame}
 
 \begin{frame}{Por HFU: os maiores erros concentram-se onde há menos suporte}
@@ -900,22 +928,28 @@
       1 & 42 & 4 & 0,95$^\star$ & 8,0 \\
       2 & 29 & 4 & 0,18 & \textbf{3,3} \\
       3 & 10 & 2 & 0,95$^\star$ & 13,6 \\
-      4 & 6 & 0 & \emph{fallback} & 30,4 \\
+      4 & 6 & 0 & média 2--3 & 30,4 \\
       \bottomrule
     \end{tabular}
     \par}
     \vspace{0.04cm}
-    {\scriptsize $^\star$ saturado no teto do intervalo de calibração.}
-    \vspace{0.06cm}
-    \begin{block}{Uso interpretativo}
+    {\scriptsize $^\star$ $\alpha$ no máximo permitido (0,95): o ajuste
+    pediu poros ainda mais esféricos do que $[0{,}15,\,0{,}95]$ admite.}
+    \vspace{0.05cm}
+    \begin{block}{O que a tabela informa}
       \scriptsize
-      HFU~1 e~2 têm o mesmo número de plugs (4) e MAPE muito diferente
-      ($8{,}0\%$ vs $3{,}3\%$): o que as separa é $\alpha$ no teto.
-      A HFU~4 (sem plug) fica em 30\% --- prioridade para novos dados.
+      HFU~1 e HFU~2 têm \textbf{as mesmas} 4 plugs, mas MAPE 8,0\%
+      contra 3,3\%. O que muda é a geometria efetiva: na HFU~2
+      $\alpha=0{,}18$ (poro achatado, interior da faixa) e o DSI fecha
+      bem; na HFU~1 $\alpha$ cola em 0,95 (quase esfera) e o erro sobe.
+      \par
+      A HFU~4 não tem plug: herda a média das HFU~2 e~3.
+      MAPE de 30\% --- é a unidade em que novos plugs mais reduziriam
+      a incerteza.
     \end{block}
     \column{0.56\textwidth}
-    \slidefigure[0.80]{fig2_vp_error_vs_depth}{Erro de \Vp{} versus
-    profundidade (DEM seco vs DSI).}
+    \slidefigure[0.72]{fig2_vp_error_vs_depth}{Erro de \Vp{} versus
+    profundidade (DEM seco vs DSI). Os picos coincidem com a HFU~4.}
   \end{columns}
 \end{frame}
 
@@ -940,9 +974,10 @@
     \end{tabular}
     \par
     \vspace{0.10cm}
-    {\scriptsize Com $\phi \approx 11\%$ e arcabouço rígido, o ganho em
-    $K_{\mathrm{sat}}$ é quase anulado pelo aumento de densidade.
-    O fluido reduz parte do afastamento; o restante alimenta o
+    {\scriptsize Com porosidade média de cerca de 11\% e matriz rígida,
+    encher o poro aumenta $K$ (aceleraria \Vp{}) e a densidade
+    (desacelera). Os dois efeitos quase se cancelam: o MAPE cai pouco
+    (8,7\% $\rightarrow$ 7,3\%) e o viés permanece. O que resta é o
     residual da Etapa~3.}
     \column{0.62\textwidth}
     \slidefigure[0.86]{fig2_vp_dry_gassmann_sonic_depth}{Sónico, DEM seco e
@@ -950,7 +985,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{NMR ponto a ponto --- centra o erro, mas o espalha}
+\begin{frame}{NMR ponto a ponto: o \Vp{} médio acerta, a dispersão aumenta}
   \footnotesize
   As frações CMR (CMFF/BFV) variam em cada profundidade e podem
   substituir a mediana CT por HFU.
@@ -975,11 +1010,13 @@
     \end{tabular}
     \par
     \vspace{0.06cm}
-    {\scriptsize M3 quase zera o viés, e o MAPE sobe
-    1,2~p.p.: o acerto médio melhora e a dispersão aumenta.
+    {\scriptsize M3 quase zera o viés
+    ($+0{,}27 \rightarrow +0{,}04$~km/s): o \Vp{} médio cai no
+    lugar. O MAPE, porém, sobe de 7,3\% para 8,5\% --- o acerto
+    médio melhora e o ponto a ponto piora.
     CMR vs CT nos plugs: $r \approx -0{,}30$.}
     \begin{exampleblock}{Decisão}
-      \scriptsize Manter monoescala Gassmann no produto de 87 linhas.
+      \scriptsize Manter monoescala Gassmann nas 87 linhas.
     \end{exampleblock}
     \column{0.58\textwidth}
     \slidefigure[0.82]{fig2_multiscale_nmr_crossplot_vp}{M1 versus M3 no
@@ -1021,24 +1058,23 @@
       node[midway, right, font=\tiny, text=orange!80!black] {mudou};
     \draw[arr, gray] (m1b.south) -- ++(0,-0.35) -| (m3c.north);
   \end{tikzpicture}
-  \vspace{0.10cm}
+  \vspace{0.04cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.48\textwidth}
     \begin{block}{O que o NMR trouxe}
       \scriptsize
-      Quanto é macro vs micro\\
-      \textbf{em cada profundidade}.
+      Quanto é macro vs micro \textbf{em cada profundidade}.
     \end{block}
     \column{0.48\textwidth}
     \begin{exampleblock}{O que permaneceu constante}
       \scriptsize
-      Quão achatado é o poro ($\alpha$)\\
-      --- ainda um valor por HFU.
+      Quão achatado é o poro ($\alpha$) --- ainda um valor por HFU.
     \end{exampleblock}
   \end{columns}
-  \vspace{0.06cm}
-  {\scriptsize $\alpha$ controla a moleza elástica. Redistribuir só as
-  frações desloca o \Vp{} médio (o viés cai), mas o MAPE sobe 1,2~p.p.}
+  \vspace{0.04cm}
+  {\scriptsize $\alpha$ controla a moleza (poro achatado amolece mais).
+  Trocar só as frações desloca o \Vp{} médio (o viés cai), mas o MAPE
+  sobe 1,2~p.p.\ porque a forma do poro continua constante por HFU.}
 \end{frame}
 
 \begin{frame}{Decisão multiescala: limiar de 2~p.p.}
@@ -1084,7 +1120,7 @@
     \scriptsize
     Multiescala CT: forward ganha 0,4~p.p.\ in-sample.
     Multiescala NMR: MAPE piora 1,2~p.p.
-    Produto: monoescala Gassmann + $\alpha$ efetivo por HFU.
+    Abordagem adotada: monoescala Gassmann + $\alpha$ efetivo por HFU.
   \end{exampleblock}
 \end{frame}
 
@@ -1107,7 +1143,7 @@
     \bottomrule
   \end{tabular}
   \vspace{0.12cm}
-  \begin{block}{Mensagem}
+  \begin{block}{O que a tabela informa}
     \scriptsize
     No laboratório o erro é dispersão (viés nulo em dez plugs).
     No perfil o erro é sobretudo um deslocamento positivo --- alvo da
@@ -1124,13 +1160,16 @@
     \item \textbf{Viabilidade local:} DEM/SC por HFU fecha o perfil
           ($\approx 9\%$ seco, $\approx 7\%$ com Gassmann) e o lab sob a
           métrica mais severa (LOO $\approx 15\%$).
-    \item \textbf{Uso por HFU:} 3\% (HFU~2), 8\% (HFU~1), 14\% (HFU~3),
-          30\% (HFU~4). Os erros maiores coincidem com menos plugs
-          e com $\alpha$ no teto; a HFU~4 pede novos dados.
+    \item \textbf{Uso por HFU:} o acordo com o DSI não é uniforme.
+          HFU~2 ($\alpha=0{,}18$, 4 plugs): 3\%.
+          HFU~1 ($\alpha$ no máximo 0,95, 4 plugs): 8\%.
+          HFU~3 (2 plugs, $\alpha$ no máximo): 14\%.
+          HFU~4 (sem plug, parâmetros herdados): 30\% ---
+          unidade em que novos dados mais ajudariam.
     \item \textbf{Entrada:} \phiND{} no perfil; microCT na geometria e nos
           minerais da física.
     \item \textbf{Multiescala CT e NMR:} o ganho fica abaixo de 2~p.p.\ ---
-          produto monoescala com Gassmann.
+          modelo monoescala com Gassmann.
     \item \textbf{Gassmann:} MAPE 8,7\% $\rightarrow$ 7,3\%, viés
           $+0{,}30 \rightarrow +0{,}27$~km/s; reduz o afastamento e deixa
           um residual estruturado.
@@ -1144,7 +1183,7 @@
   \begin{columns}[T,onlytextwidth]
     \column{0.50\textwidth}
     \footnotesize
-    \textbf{Produto da Etapa~2}
+    \textbf{Resultado da Etapa~2}
     \begin{itemize}
       \item \Vp{}/\Vs{} teóricos por HFU (seco + Gassmann).
       \item Parâmetros calibrados rastreáveis.

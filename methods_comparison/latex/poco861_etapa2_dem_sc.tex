@@ -77,7 +77,7 @@ após Gassmann ($\approx 0{,}08$).
 A fase~2g testa DEM multiescala sequencial com frações macro/micro do CMR
 ponto a ponto no perfil de 87 linhas; o M3 zera praticamente o viés
 ($+0{,}04$~km/s), mas piora o MAPE em $\approx 1{,}2$~p.p.\ frente ao
-monoescala Gassmann, confirmando manter o produto monoescala.
+monoescala Gassmann, confirmando manter o modelo monoescala.
 A HFU~2 apresenta o melhor acordo ($\approx 3\%$); a HFU~4, sem plugs de
 calibração, diverge ($\approx 30\%$).
 Recomenda-se a Etapa~3 (aprendizado sobre resíduos da física) para o
@@ -140,7 +140,7 @@ recomendações e o caminho para a Etapa~3.
 \section{Dados e integração (Etapa~2)}
 \label{sec:dados}
 
-\subsection{Fontes e produtos}
+\subsection{Fontes e resultados}
 
 A Etapa~2 reutiliza os conjuntos integrados da Etapa~1 e acrescenta duas
 fontes elásticas que fecham lacunas do relatório anterior
@@ -469,7 +469,7 @@ A Tabela~\ref{tab:validation_scales} resume qual pergunta cada escala responde.
 Como indicado na Tabela~\ref{tab:validation_scales}, nenhuma linha isolada basta para aprovar o modelo.
 A linha de base quantifica o desvio antes do ajuste; o \emph{in-sample} mostra
 o melhor caso com dez pontos; o LOO penaliza memorização; o sónico
-testa o produto final ao longo do poço~861 em condições distintas do
+testa o modelo final ao longo do poço~861 em condições distintas do
 laboratório seco.
 
 A Figura~\ref{fig:error_scales} deixa explícito que a ``divergência do DEM''
@@ -522,7 +522,7 @@ extrapolar \emph{in situ}.
   \label{fig:error_scales}
 \end{figure}
 
-\subsection{Como ler MAPE, RMSE e viés}
+\subsection{O que MAPE, RMSE e viés informam}
 
 O MAPE (erro percentual absoluto médio) expressa o erro relativo típico em
 \Vp{}.
@@ -554,7 +554,7 @@ sónicos de poço.
 A escala de profundidade é um ponto crítico e recebe controle explícito.
 O pipeline ainda estima, por sobreposição com as profundidades do perfil
 integrado, um fator empírico de conversão do canal TDEP; esse valor serve
-apenas de verificação e \textbf{não} é usado no produto.
+apenas de verificação e \textbf{não} é usado no modelo adotado.
 A conversão adotada é sempre a unidade física declarada no arquivo DLIS.
 Quando as duas divergem além de 1\%, o pipeline emite alerta e registra
 ambos os valores em \texttt{depth\_calibration.json}, porque um erro de
@@ -890,7 +890,7 @@ Adotamos o criterio pre-registrado: manter monoescala quando o ganho LOO
 nao se acompanha de melhora \emph{in-sample} acima de 2~p.p.
 \textbf{Conclusao:} nao ha evidencia suficiente para substituir o perfil
 monoescala com $\alpha$ efetivo por HFU; as fracoes multiescala do CT
-permanecem documentadas para uso futuro, mas nao entram no produto atual.
+permanecem documentadas para uso futuro, mas nao entram no modelo atual.
 
 \begin{table}[H]
   \centering
@@ -1109,7 +1109,7 @@ A HFU~1 cobre quase metade do perfil (42 linhas) com MAPE $\approx 8\%$:
 utilizável, ainda que com viés positivo de $+0{,}38$~km/s.
 A HFU~3 ($\approx 14\%$, dois plugs) e sobretudo a HFU~4 ($\approx 30\%$,
 nenhum plug) indicam que os maiores erros se concentram nas unidades com
-menor ou nenhum suporte experimental; a HFU~4 não deve entrar em produto
+menor ou nenhum suporte experimental; a HFU~4 não deve entrar no modelo
 final sem novos dados.
 O contraste é o achado central desta seção: o erro de perfil não é uma
 propriedade uniforme do modelo, e sim uma função da unidade avaliada.
@@ -1210,12 +1210,10 @@ define \emph{o que} perguntamos; esta mostra \emph{quanto} erramos.
   \end{tabular}
 \end{table}
 
-A leitura conjunta da Tabela~\ref{tab:validation_summary} revela dois regimes
-distintos de erro.
-Nos plugs, o LOO ($\approx 15\%$) tem viés praticamente nulo: o erro é
-dispersão, não deslocamento sistemático---o modelo acerta a média e erra a
-amostra individual, sintoma de dez pontos sustentando três conjuntos de
-parâmetros.
+A Tabela~\ref{tab:validation_summary} mostra dois regimes de erro.
+Nos plugs, o LOO ($\approx 15\%$) tem viés praticamente nulo: o modelo
+não está alto nem baixo de forma sistemática; o que resta é dispersão
+entre dez pontos a sustentar três conjuntos de parâmetros.
 No perfil, o MAPE é menor ($\approx 9\%$ a seco, $\approx 7\%$ após
 Gassmann), mas o viés é positivo e domina o erro.
 São falhas de natureza oposta e a segunda é a mais tratável: um desvio
@@ -1311,7 +1309,7 @@ A Etapa~3 (relatório residual) reavaliou o default $K_f=2{,}2$~GPa frente à
 mediana de \texttt{KFluid} no intervalo ($\approx 2{,}83$~GPa) e à mistura
 NMR VRH com \texttt{SWIRR} (figura da Etapa~3).
 Nenhum desses cenários melhorou o acordo com o sónico nem o híbrido OOF
-neste poço; o produto mantém $K_f=2{,}2$~GPa e $S_w=1$.
+neste poço; o modelo adotado mantém $K_f=2{,}2$~GPa e $S_w=1$.
 
 \subsection{Validação tripla (lab, \phiS{}, DSI)}
 
@@ -1497,7 +1495,7 @@ reorganiza o padrão espacial do erro de forma material.
   \end{tabular}
 \end{table}
 
-\textbf{Conclusão:} manter o produto monoescala Gassmann no perfil de 87
+\textbf{Conclusão:} manter o modelo monoescala Gassmann no perfil de 87
 linhas; as frações CMR documentam variabilidade local de porosidade, mas não
 justificam substituir o encadeamento M1 com o limiar adotado.
 A Figura~\ref{fig:multiscale_decision} resume o critério pré-registrado
@@ -1538,7 +1536,7 @@ O experimento completo, scripts e \texttt{metrics.json} estão em
     \draw[arr] (m3) -- (q);
     \draw[arr] (q) -- (n);
   \end{tikzpicture}
-  \caption{Critério de decisão das fases~2f e~2g: o produto de 87 linhas
+  \caption{Critério de decisão das fases~2f e~2g: o modelo de 87 linhas
            só migra para multiescala se o ganho frente ao monoescala
            atingir o limiar pré-registrado de 2~p.p.}
   \label{fig:multiscale_decision}
@@ -1616,7 +1614,7 @@ transferência a outros poços carbonáticos exige novos plugs e recalibração.
 \VpVs{} concorda com o sónico dentro de um erro médio absoluto de
 $\approx 0{,}07$ (cerca de 4\% da razão média), enquanto \Vp{} isolado
 carrega viés de $+0{,}30$~km/s.
-Em termos práticos, o produto desta etapa é mais confiável para
+Em termos práticos, o modelo desta etapa é mais confiável para
 discriminar unidades de fluxo e tendências litológicas do que para
 estimar módulos absolutos prontos para inversão sísmica sem correção
 de fluido.
@@ -1693,7 +1691,7 @@ Esse resultado e coerente com o desenho do experimento
 (Figura~\ref{fig:nmr_knobs}): as fracoes variam com a profundidade, mas a
 razao de aspecto do micro---que controla grande parte da resposta
 elastica---permanece fixa por HFU.
-Mantemos $\alpha$ efetivo por HFU no produto de 87 linhas; as fracoes
+Mantemos $\alpha$ efetivo por HFU nas 87 linhas; as fracoes
 multiescala do CT e do CMR ficam arquivadas para estudos futuros (p.ex.\ poco~1045
 ou novos plugs).
 
@@ -2250,7 +2248,7 @@ Os parâmetros calibrados por HFU alimentam a extrapolacao ao perfil completo
 (87 linhas com \phiND{} e HFU de laboratório), primeiro a seco e depois com
 Gassmann na fase~2b.
 Um teste A/B multiescala (\emph{forward}, sem nova regressao global) nao
-justificou trocar o monoescala por inclusoes sequenciais no produto de perfil
+justificou trocar o monoescala por inclusoes sequenciais no perfil teórico
 (Seção~\ref{sec:multiscale_ab}); a extensao com fracoes NMR/CMR ponto a ponto
 tambem nao atingiu o limiar de ganho adotado (Seção~\ref{sec:multiscale_nmr}).
 As velocidades teóricas saturadas confrontam-se com o perfil sônico DSI; o

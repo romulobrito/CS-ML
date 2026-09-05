@@ -191,7 +191,7 @@
     \begin{block}{Entra na Etapa~3}
       \scriptsize
       \begin{itemize}
-        \item \Vp{} Gassmann por linha (produto 2b) como \emph{baseline}.
+        \item \Vp{} Gassmann por linha (modelo da Etapa~2b) como \emph{baseline}.
         \item Curvas wireline da Etapa~1 (não acústicas).
         \item Protocolo depth-block herdado da Etapa~1.
         \item \Vp{} sónico DSI --- apenas no alvo, nunca em $X$.
@@ -305,7 +305,7 @@
       explica o desvio local
     };
     \node[outbox] (out) at (5.4,0) {%
-      \textbf{Produto híbrido}\\
+      \textbf{Modelo híbrido}\\
       $V_{\mathrm{p,hybrid}} =
        V_{\mathrm{p,Gassmann}} + \widehat{\dVp}$
     };
@@ -318,11 +318,11 @@
     };
   \end{tikzpicture}
   \vspace{0.06cm}
-  \begin{exampleblock}{Mensagem}
+  \begin{exampleblock}{O que isso informa}
     \scriptsize
     ML direto perfil $\rightarrow$ \Vp{} misturaria escala de medida, condição
     \emph{in situ} e litologia sem âncora física. O resíduo mantém o DEM/SC
-    interpretável e delega ao ML só o que ele sobra.
+    interpretável e deixa ao ML só o que a física não fecha.
   \end{exampleblock}
 \end{frame}
 
@@ -585,7 +585,7 @@
     \par}
     \vspace{0.08cm}
     {\scriptsize Os \textbf{seis} ficam abaixo do baseline físico. O RF segue
-    como produto oficial por alinhamento à Etapa~1.}
+    como modelo adotado por alinhamento à Etapa~1.}
     \column{0.52\textwidth}
     \slidefigure[0.80]{fig3_regressor_sensitivity_mape}{MAPE de \Vp{} híbrida
     OOF por regressor; tracejado $=$ baseline Gassmann (7,3\%).}
@@ -607,10 +607,11 @@
             $n=87$ é instável.
     \end{itemize}
     \vspace{0.04cm}
-    \begin{block}{Leitura}
+    \begin{block}{O que isso informa}
       \scriptsize
-      Se o resíduo é aproximadamente linear, o corretor simples é mais fácil
-      de auditar e transferir. Vale exportar as duas trilhas.
+      Como o desvio depois do Gassmann é quase linear, um corretor simples
+      já fecha o perfil. As duas trilhas --- física e híbrida --- podem
+      ir juntas para o perfil teórico.
     \end{block}
     \column{0.46\textwidth}
     \slidefigure[0.82]{fig3_regressor_depth_comparison}{Trilhas OOF por
@@ -772,7 +773,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Leitura operacional do sweep $\rho$}
+\begin{frame}{O que o sweep $\rho$ informa na prática}
   \footnotesize
   A pergunta prática é: \emph{quando vale trocar o corretor pontual pelo CLP?}
   \vspace{0.10cm}
@@ -799,7 +800,7 @@
     \node[q] (q) at (0,0) {Há sónico denso no intervalo de treino?};
     \node[good] (rf) at (5.2,1.15) {%
       \textbf{Sim} $\rightarrow$ RF pontual\\
-      2,8\% MAPE (produto)
+      2,8\% MAPE (modelo adotado)
     };
     \node[opt] (sp) at (5.2,-1.15) {%
       \textbf{Não} $\rightarrow$ depende de $\rho$
@@ -818,11 +819,11 @@
     \draw[arr] (sp.east) |- (hi.west);
   \end{tikzpicture}
   \vspace{0.10cm}
-  \begin{exampleblock}{Mensagem}
+  \begin{exampleblock}{O que isso informa}
     \scriptsize
     Exigir calibração em $\gtrsim 70\%$ das profundidades é pouco realista em
-    poço novo. Neste regime, o fator limitante é a \textbf{densidade de
-    calibração}, não o algoritmo.
+    poço novo. Neste regime o que limita não é o algoritmo, e sim
+    \textbf{quantas} profundidades têm sónico no treino.
   \end{exampleblock}
 \end{frame}
 
@@ -854,11 +855,13 @@
     \bottomrule
   \end{tabular}
   \vspace{0.12cm}
-  \begin{block}{Como ler as duas linhas da Etapa~2}
+  \begin{block}{O que as duas linhas da Etapa~2 informam}
     \scriptsize
-    O LOO de plugs (14,8\%, $n=10$) é bem pior que o casamento com o perfil
-    (7,3\%, $n=87$): retirar um plug remove fração grande da calibração da sua
-    HFU, enquanto o perfil é avaliado com todos os plugs dentro do ajuste.
+    O 15\% nos plugs e o 7\% no perfil não medem a mesma coisa.
+    No LOO um plug sai do ajuste --- em HFU pequena isso é um quarto
+    ou metade da amostra. No perfil os parâmetros já usam os dez plugs.
+    Por isso o número do DSI é menor: não é que o modelo generalize
+    melhor no poço do que no laboratório.
   \end{block}
 \end{frame}
 
@@ -888,7 +891,7 @@
     \begin{exampleblock}{Física não identificada}
       \scriptsize
       \begin{itemize}
-        \item Fluido: produto com $K_f=2{,}2$~GPa e $S_w=1$; mediana de
+        \item Fluido: modelo adotado com $K_f=2{,}2$~GPa e $S_w=1$; mediana de
               poço ($\approx 2{,}83$~GPa) e VRH+\texttt{SWIRR} foram
               testadas e \textbf{não} melhoram vs.\ sónico
               (relatório residual, Seção de sensibilidade a $K_f$).
@@ -934,12 +937,12 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Caminho: do corretor local ao produto de perfil}
+\begin{frame}{Caminho: do corretor local ao perfil teórico}
   \vspace{-0.08cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.50\textwidth}
     \footnotesize
-    \textbf{Produto da Etapa~3}
+    \textbf{Resultado da Etapa~3}
     \begin{itemize}
       \item Coluna $V_{\mathrm{p,hybrid}}$ OOF nas 87 linhas.
       \item Corretor RF serializado e trilha alternativa linear.

@@ -84,7 +84,7 @@
     \footnotesize
     Intervalo 5205,91--5233,72~m $\cdot$ campo Lapa (pré-sal)\\
     87 amostras perfil+laboratório $\cdot$ 10 plugs com microtomografia (microCT)\\[0.12cm]
-    Etapa diagnóstica: ainda não há produto de $V_p$/$V_s$
+    Etapa diagnóstica: ainda não há $V_p$/$V_s$ teóricos
   \end{center}
 \end{frame}
 
@@ -342,9 +342,9 @@
 
   \vspace{0.04cm}
   {\scriptsize
-  Sem vazamento: lab não prediz lab.
-  OOF = cada bloco (ou plug) é testado sem ter participado do treino.
-  Evitamos sorteio 80/20, que infla $R^2$ neste tipo de dado.}
+  Sem vazamento: laboratório não prediz laboratório.
+  O número que vale é o OOF: o bloco (ou o plug) avaliado não entrou
+  no treino. Sorteio 80/20 infla o $R^2$ neste tipo de dado.}
 
   \vspace{0.04cm}
   \begin{block}{Falha no bloco~2 (Cenário~A)}
@@ -708,7 +708,7 @@
     \begin{enumerate}
       \item \phiND{} direto como porosidade para a física ($R^2 = 0{,}45$;
             RF OOF fica em 0,30).
-      \item FZI só com perfil: não usar como produto.
+      \item FZI só com perfil: não usar como modelo.
       \item HFU de laboratório na Etapa~2; classificador automático em segundo plano.
       \item microCT para DEM/SC, não para enriquecer RF de perfil.
       \item Física de rochas antes de mais \emph{tuning} perfil $\rightarrow$ $V_p$.
