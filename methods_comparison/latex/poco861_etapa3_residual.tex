@@ -151,14 +151,19 @@ sônico em vez de corrigir a física.
 A Seção~\ref{sec:dados} descreve fontes, casamento 87/87 e definição
 do alvo residual.
 A Seção~\ref{sec:protocolo} detalha \emph{features} (incluindo a exclusão
-de \phiS{}), regras de validação, escopo intra-poço e métricas.
+de \phiS{}), a formulação estatística $\Delta V_{\mathrm{p}}=\mu_{\Delta}+h(X)+\varepsilon$,
+o protocolo OOF por blocos, o escopo intra-poço e as métricas.
 A Seção~\ref{sec:resultados} apresenta o confronto global Gassmann versus
 híbrido, a referência visual da Etapa~2, sensibilidade aos regressores da
 Etapa~1, as trilhas em profundidade, o desempenho por HFU e a síntese das
 três etapas (Tabela~\ref{tab:project_summary}).
-A Seção~\ref{sec:discussao} interpreta o papel do ML na cadeia, as
-limitações metodológicas e os próximos passos.
+A Seção~\ref{sec:discussao} interpreta o papel do ML na cadeia, a hipótese
+de porosidade (\phiND{}) e o sinal do viés, a sensibilidade ao fluido
+($K_f$, $S_w$), as limitações metodológicas,
+a decisão operacional e os testes A/B no poço \#1045.
 A Seção~\ref{sec:conclusoes} sintetiza as conclusões operacionais.
+O Apêndice~\ref{app:phi_taylor} detalha a aproximação de primeira ordem
+do efeito de um erro de porosidade sobre $\Delta V_{\mathrm{p}}$.
 
 \section{Dados e definição do alvo}
 \label{sec:dados}
@@ -225,20 +230,29 @@ locais} em torno dela, não substituí-la.
 \end{table}
 
 Na Tabela~\ref{tab:features}, o alvo é o resíduo em km/s.
-Variáveis \textbf{proibidas} em $X$ incluem \Vp{} sônica, \Vs{} sônica,
-lentidões DTCO/DTSM, qualquer transformada dessas lentidões e o próprio
-resíduo observado---qualquer uma
-permitiria ao modelo reproduzir o sônico sem generalizar.
-A HFU de laboratório \textbf{não} entra em $X$ (evita circularidade com a
-segmentação usada na calibração DEM/SC); é usada apenas na
-análise pós-hoc por unidade de fluxo.
+Variáveis \textbf{proibidas} em $X$ incluem: \Vp{} e \Vs{} sônicas;
+lentidões DTCO/DTSM e qualquer transformada delas (incluindo \phiS{});
+o próprio resíduo observado; a HFU de laboratório (circularidade com a
+segmentação DEM/SC---a HFU entra só na análise pós-hoc); e atributos
+microCT/DRP (usados na Etapa~2 como prior de $\alpha$ e na calibração em
+plugs, não como entrada do corretor residual em perfil).
+Qualquer proxy direto do sônico permitiria ao modelo reproduzir o DSI
+sem generalizar.
 
 \subsection{Exclusão de \phiS{} (\texttt{Phi\_Sonic}) das features}
 \label{sec:phi_sonic}
 
 \phiS{} é a porosidade sônica obtida por tempo médio de Wyllie a partir de
-DTCO---exatamente a lentidão compressional que define
-$V_{\mathrm{p,sonic}} = 1/\mathrm{DTCO}$ e, portanto, o alvo residual.
+DTCO. Com $\Delta t_c=\mathrm{DTCO}$,
+\begin{equation}
+  \phiS{}
+  =
+  \frac{\Delta t_c-\Delta t_{\mathrm{ma}}}
+       {\Delta t_f-\Delta t_{\mathrm{ma}}},
+\end{equation}
+logo $\phiS{}$ é função monótona de $\Delta t_c$ e, em particular,
+depende de forma determinística da mesma lentidão que define
+$V_{\mathrm{p,sonic}}=1/\mathrm{DTCO}$---o alvo residual.
 No perfil de 87 linhas, a relação é praticamente determinística:
 $r = 0{,}995$ entre \phiS{} e DTCO ($R^2 = 0{,}99$ em ajuste linear) e
 $r = -0{,}993$ entre \phiS{} e $V_{\mathrm{p,sonic}}$.
@@ -304,14 +318,57 @@ de bulk modulus e porosidade; o ML captura desvios locais atribuíveis a
 heterogeneidade não resolvida, PVT incerto ou limitações da calibração
 HFU---em especial na HFU~4 sem plugs.
 
+\subsection{Formulação estatística do residual}
+\label{sec:form_estat}
+
+Escrevemos o residual como
+\begin{equation}
+  \label{eq:dvp_decomp}
+  \Delta V_{\mathrm{p}}
+  =
+  \mu_{\Delta} + h(X) + \varepsilon,
+\end{equation}
+onde $\mu_{\Delta}=\mathbb{E}[\Delta V_{\mathrm{p}}]$ é o deslocamento médio
+($\mu_{\Delta}\approx -0{,}27$~km/s no sentido
+sônico $-$ Gassmann; o viés Gassmann $-$ sônico da Etapa~2 é
+$+0{,}27$~km/s),
+$h(X)$ é a estrutura previsível a partir das features e
+$\varepsilon$ é o erro irredutível.
+Definimos $g(X)=\mu_{\Delta}+h(X)$, de modo que
+\begin{equation}
+  g(X)\approx\mathbb{E}[\Delta V_{\mathrm{p}}\mid X],
+\end{equation}
+com $\mathbb{E}[\varepsilon\mid X]=0$.
+O Random Forest aproxima $\widehat{g}$.
+A hipótese nula de interesse é $H_0:\ h\equiv 0$:
+se o residual fosse apenas uma constante mais ruído, o preditor nulo
+$\widehat{\Delta V_{\mathrm{p}}}=\mu_{\Delta,\mathrm{treino}}$
+daria $R^2_{\mathrm{teste}}\approx 0$.
+O $R^2$ OOF elevado ($\approx 0{,}79$) rejeita essa leitura e motiva
+aprender $h(X)$ além de corrigir o viés médio.
+
 \subsection{Validação por blocos de profundidade}
 
-Adotamos o mesmo protocolo da Etapa~1: \textbf{três blocos contíguos} ao
-longo de 5205,91--5233,72~m ($\sim$29 linhas por bloco).
-Em cada rodada, dois blocos treinam e um testa; as predições de teste
-compõem o conjunto \textbf{fora-da-amostra} (OOF) sobre as 87 linhas.
-Nenhuma profundidade de teste foi vista no treino daquela rodada---critério
-de honestidade espacial em poço único.
+Adotamos o mesmo protocolo da Etapa~1: \textbf{três blocos contíguos}
+$B_0$, $B_1$, $B_2$ ao longo de 5205,91--5233,72~m
+($\lvert B_k\rvert\approx 29$; união $\{1,\ldots,87\}$, sem sobreposição).
+A escolha de blocos (e não sorteio aleatório) respeita a dependência espacial
+ao longo do poço: profundidades vizinhas tendem a compartilhar facies e
+correlação local de $\Delta V_{\mathrm{p}}(z)$ com
+$\Delta V_{\mathrm{p}}(z+\Delta z)$.
+Em cada rodada $k\in\{0,1,2\}$, treina-se
+\begin{equation}
+  \widehat{g}^{(-k)}
+  =
+  \mathrm{RF}\bigl(
+    \{(X_i,\Delta V_{\mathrm{p},i}): i\notin B_k\}
+  \bigr)
+\end{equation}
+e avalia-se apenas em $B_k$.
+As predições de teste reunidas formam o vetor OOF
+$\widehat{\Delta V_{\mathrm{p}}}^{\mathrm{OOF}}$
+sobre as 87 linhas---nenhuma profundidade de teste foi vista no treino
+daquela rodada.
 
 A Tabela~\ref{tab:folds} registra os intervalos de profundidade e o desempenho
 do RF no \emph{alvo residual} por fold (RMSE e $R^2$ do resíduo, não de
@@ -341,6 +398,15 @@ A degradação é monotônica com a profundidade: o bloco superior (fold~0) é o
 mais previsível ($R^2 \approx 0{,}87$; RMSE 0,12~km/s) e o bloco inferior
 (fold~2) o mais difícil ($R^2 \approx 0{,}74$; RMSE 0,24~km/s), coerente com a
 maior heterogeneidade litológica na base do intervalo.
+O RMSE global OOF (0,18~km/s) coincide com a agregação
+\begin{equation}
+  \mathrm{RMSE}
+  =
+  \sqrt{\frac{0{,}12^{2}+0{,}16^{2}+0{,}24^{2}}{3}}
+  \approx 0{,}18~\mathrm{km/s},
+\end{equation}
+enquanto o $R^2$ global (0,79) é calculado no vetor completo das 87 linhas
+OOF (não é a média aritmética dos $R^2$ por bloco).
 Esses números referem-se ao ajuste de $\Delta V_{\mathrm{p}}$, não ao MAPE
 final de \Vp{} híbrida---métrica de negócio reportada na
 Seção~\ref{sec:resultados}.
@@ -352,9 +418,14 @@ para o teste na mesma rodada---adequado para poço único.
 Contudo, o sônico DSI entra na \textbf{construção do alvo}
 $\Delta V_{\mathrm{p}} = V_{\mathrm{p,sonic}} - V_{\mathrm{p,Gassmann}}$ durante
 o treino.
-A validação OOF mede se o corretor generaliza em \textbf{profundidade}
-dentro do poço~861; \textbf{não} constitui validação totalmente
-independente nem prova de extrapolação interpoços.
+
+\textbf{Alcance.} A validação OOF mede se o corretor generaliza em
+\textbf{profundidade} dentro do poço~861: ``fora da amostra'' aqui significa
+outro trecho do mesmo poço, não outro poço.
+
+\textbf{Limite.} Não constitui validação totalmente independente nem prova de
+extrapolação interpoços; transferência para poço vizinho (p.ex.\ \#1045)
+exige testes A/B explícitos (Seção~\ref{sec:proximos_passos}).
 A afirmação defensável é:
 \emph{o híbrido reduz o erro OOF no poço~861 e mostra que parte do desvio
 remanescente entre DEM/Gassmann e DSI pode ser modelada por variáveis de perfil
@@ -421,11 +492,26 @@ O RMSE cai de 0,48 para 0,18~km/s---queda de 63\%, maior em proporção que a
 do MAPE, porque o corretor ataca justamente as excursões grandes.
 A média de \Vp{} predita passa de 5,17~km/s (Gassmann) para 4,91~km/s
 (híbrido), praticamente coincidente com a média sônica 4,90~km/s.
-Vale notar a decomposição do erro físico: dos 0,48~km/s de RMSE do baseline,
-0,27~km/s são viés puro, de modo que o corretor precisa explicar tanto o
-deslocamento sistemático quanto a dispersão remanescente---e faz as duas
-coisas, já que o RMSE final (0,18~km/s) fica abaixo até do desvio-padrão do
-erro Gassmann ($\approx 0{,}39$~km/s).
+Vale notar a decomposição do erro físico. Se
+$e_i=V_{\mathrm{p,Gassmann},i}-V_{\mathrm{p,sonic},i}$ e
+$\bar{e}$ é o viés médio ($+0{,}27$~km/s),
+\begin{equation}
+  \mathrm{RMSE}^{2}
+  =
+  \bar{e}^{2}
+  +
+  \frac{1}{n}\sum_i(e_i-\bar{e})^{2},
+\end{equation}
+logo a dispersão residual após o viés é
+$\sqrt{0{,}48^{2}-0{,}27^{2}}\approx 0{,}40$~km/s
+(coerente com $\mathrm{std}(e)\approx 0{,}39$~km/s).
+Dos 0,48~km/s de RMSE do baseline, 0,27~km/s são viés puro:
+\textbf{subtrair apenas a constante} não fecha o gap---restam
+$\approx 0{,}40$~km/s de estrutura, o que motiva $h(X)$ na
+Eq.~\eqref{eq:dvp_decomp}.
+O corretor precisa explicar tanto o deslocamento sistemático quanto a
+dispersão remanescente---e faz as duas coisas, já que o RMSE final
+(0,18~km/s) fica abaixo até dessa dispersão pós-viés.
 O patamar de 2,8\% MAPE no OOF supera o critério de aceite definido
 no planejamento (MAPE $< 12\%$ ou $|\text{viés}| < 0{,}35$~km/s), mas deve
 ser lido como validação \emph{no mesmo poço}, não como garantia de
@@ -589,9 +675,11 @@ Figura~\ref{fig:gassmann_depth_ref}) e \Vp{} híbrida OOF (produto desta etapa).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.78\linewidth]{figures/fig3_vp_hybrid_depth}
+  \includegraphics[width=0.78\linewidth]{figures/fig3_vp_hybrid_depth_hfu}
   \caption{Trilha de profundidade pós-Etapa~3: \Vp{} sônico (DSI), Gassmann
-           (Etapa~2b) e híbrido OOF (Etapa~3). Comparar com a
+           (Etapa~2b) e híbrido OOF (Etapa~3), com faixa lateral colorida pela
+           HFU de laboratório em cada amostra. As HFUs são intercaladas ao
+           longo da coluna (não formam blocos contínuos). Comparar com a
            Figura~\ref{fig:gassmann_depth_ref}: o corretor ML aproxima a trilha
            física do sônico sem substituir a baseline Gassmann.}
   \label{fig:hybrid_depth}
@@ -637,9 +725,24 @@ de fluxo, comparando Gassmann e híbrido OOF.
 A HFU vem de laboratório (mesma segmentação da calibração DEM/SC);
 a análise é \emph{pós-hoc}, não influencia o treino.
 
+\textbf{Leitura correta da estratificação.}
+As HFUs \textbf{não} formam intervalos contíguos de profundidade: ao longo
+da coluna elas são \textbf{intercaladas} (faixa lateral da
+Figura~\ref{fig:hybrid_depth}).
+Os números da Tabela~\ref{tab:hfu_compare} agrupam as 87 amostras pelo
+\emph{rótulo} de HFU de cada linha---não são MAPE de ``zonas''
+$z\in[z_a,z_b]$ associadas a uma única HFU.
+Por isso a tabela e o gráfico de profundidade respondem a perguntas
+diferentes: a tabela resume erro por classe petrofísica; o gráfico mostra
+\emph{onde} essas classes aparecem (misturadas) e como as trilhas se
+comportam linha a linha.
+Não se deve confundir essa estratificação com os blocos de profundidade
+do OOF ($B_0,B_1,B_2$), que são contíguos por construção.
+
 \begin{table}[H]
   \centering
-  \caption{MAPE e viés de \Vp{} versus DSI por HFU: Gassmann versus híbrido OOF.}
+  \caption{MAPE e viés de \Vp{} versus DSI por HFU: Gassmann versus híbrido OOF
+           (agregação por rótulo de amostra; HFUs intercaladas em profundidade).}
   \label{tab:hfu_compare}
   \begin{tabular}{ccccc}
     \toprule
@@ -659,9 +762,9 @@ $+1{,}31 \rightarrow +0{,}17$~km/s) e na HFU~3
 (11,5\% $\rightarrow$ 5,4\%; viés $+0{,}51 \rightarrow +0{,}15$~km/s).
 A HFU~4, calibrada por \emph{fallback} na Etapa~2 (sem plugs), superestimava
 \Vp{} em mais de 1,3~km/s em média (predição $\approx 6{,}08$ versus
-sônica $\approx 4{,}77$~km/s); o híbrido recalibra essa faixa para perto do
-DSI, mas o suporte de apenas seis pontos e a validação OOF no mesmo
-intervalo impõem cautela---o resultado é \emph{promissor}, não definitivo.
+sônica $\approx 4{,}77$~km/s); o híbrido recalibra essas \emph{amostras}
+para perto do DSI, mas o suporte de apenas seis pontos e a validação OOF
+no mesmo poço impõem cautela---o resultado é \emph{promissor}, não definitivo.
 A HFU~1 concentra 42 das 87 amostras e, com MAPE físico já moderado (6,8\%),
 cai para 2,2\% com viés praticamente nulo; por ser a classe majoritária, é ela
 que puxa o MAPE global para 2,8\%.
@@ -672,6 +775,11 @@ Ou seja, o ML não degrada onde a física já fecha, mas também não tem o que
 extrair ali; o ganho vem inteiramente das unidades mal calibradas.
 Essa leitura reforça que o corretor está compensando deficiência de
 calibração DEM/SC por HFU, não descobrindo física nova.
+Em outras palavras: a falta de plugs na HFU~4 explica o gap grande do
+\textbf{Gassmann} frente ao sônico; \textbf{não} explica os
+$\approx 5\%$ de MAPE que restam no híbrido após a correção---esses
+remanescentes são erro residual do corretor, não o mesmo mecanismo do
+viés físico original.
 
 \subsection{CLP-CSGM sobre resíduo \Vp{} (Etapa~3b)}
 \label{sec:clp_vp_residual}
@@ -886,12 +994,20 @@ profundidade específica entra no subconjunto de calibração.
   \label{fig:rho_sweep}
 \end{figure}
 
-\textbf{Leitura operacional:} sem sônico denso no treino, o CLP só compensa a
-partir de calibração esparsa em $\gtrsim 70\%$ das profundidades---exigência
-alta o bastante para tornar o cenário pouco realista em poço novo; com apenas
+\textbf{Leitura operacional:}
+\begin{itemize}
+  \item Há sônico denso no treino do residual?
+        $\rightarrow$ mantenha o RF pontual (oracle).
+  \item Caso contrário, a decisão depende de $\rho$:
+        para $\rho\lesssim 0{,}5$, CLP e RF esparso empatam perto do
+        Gassmann (pouca correção útil);
+        para $\rho\gtrsim 0{,}7$, o CLP cruza o oracle---exigência alta
+        e pouco realista em poço novo.
+\end{itemize}
+Sem sônico denso no treino, o CLP só compensa a
+partir de calibração esparsa em $\gtrsim 70\%$ das profundidades; com apenas
 dez plugs, RF sparse e CLP são ambos próximos do Gassmann e muito
-inferiores ao RF oracle;
-com sônico em todo o intervalo de treino, mantenha o RF pontual da Etapa~3.
+inferiores ao RF oracle.
 A mensagem prática é que a densidade de calibração, não o algoritmo, é o
 fator limitante nesse regime.
 
@@ -980,6 +1096,112 @@ haveria baseline interpretável para inversão.
 A Etapa~3 fecha um \emph{gap operacional} identificado na própria discussão
 da Etapa~2, não propõe substituir a física por caixa-preta.
 
+\subsection{Hipótese de porosidade (\phiND{}) e composição do residual}
+\label{sec:phi_nd_hypothesis}
+
+A escolha de \phiND{} como porosidade de entrada na Etapa~2---e, portanto,
+na tendência física fixa da Etapa~3---não é metodologicamente errada; é
+defensável, desde que a hipótese seja explícita.
+A mesma \phiND{} desempenha dois papéis físicos distintos.
+
+No DEM, a porosidade controla quanto o espaço poroso reduz a rigidez da
+matriz mineral:
+\begin{equation}
+  (K_m,G_m)
+  \xrightarrow[\alpha]{\phiND{}}
+  (K_{\mathrm{dry}},G_{\mathrm{dry}}).
+\end{equation}
+Mesmo poros que pouco contribuem para o escoamento podem deformar e
+amolecer o arcabouço; para o meio seco, uma estimativa de porosidade
+\emph{total} de perfil é, portanto, razoável.
+
+Em Gassmann, a hipótese é mais restritiva: o formalismo pressupõe
+comunicação hidráulica e equilíbrio de pressão do fluido no espaço poroso.
+A porosidade teoricamente relevante é a parcela conectada que participa da
+pressurização.
+Ao reutilizar \phiND{} na saturação, o modelo de \textbf{porosidade única}
+adota aproximadamente
+\begin{equation}
+  \phi_{\mathrm{mecanica}}
+  \approx
+  \phi_{\mathrm{hidraulicamente\ ativa}}
+  \approx
+  \phiND{}.
+\end{equation}
+Essa aproximação é comum e mais defensável em carbonato relativamente
+limpo, com baixa fração de argila; pode degradar-se na presença de vugs
+isolados ou poros que não entram no equilíbrio de pressão.
+Não afirmamos que \phiND{} seja porosidade efetiva (PHIE) medida: ela é a
+estimativa contínua disponível de porosidade total, usada de forma
+\textbf{consistente} no DEM e em Gassmann.
+
+A formulação da Etapa~3 permanece
+\begin{equation}
+  V_{\mathrm{p,sonic}}
+  =
+  V_{\mathrm{p,Gassmann}}(\phiND{},\mathrm{HFU},\theta)
+  + g(X) + \varepsilon,
+\end{equation}
+com tendência física previamente fixada e
+$g(X)\approx\mathbb{E}[\Delta V_{\mathrm{p}}\mid X]$
+(Seção~\ref{sec:form_estat}).
+Se \phiND{} não coincidir com a porosidade fisicamente mais apropriada,
+parte do erro entra no residual
+$\Delta V_{\mathrm{p}} = V_{\mathrm{p,sonic}} - V_{\mathrm{p,Gassmann}}$.
+Em primeira ordem (Apêndice~\ref{app:phi_taylor}), isolando apenas $\phi$
+com HFU e $\theta$ fixos ($F_\phi=\partial F/\partial\phi$),
+\begin{equation}
+  \label{eq:dvp_phi_taylor}
+  \Delta V_{\mathrm{p}}
+  \approx
+  -F_\phi(\phiND{},\theta,h)\,\delta\phi
+  + r_{\mathrm{outros}} + \varepsilon,
+\end{equation}
+onde $\delta\phi=\phiND{}-\phi^{*}$ e $r_{\mathrm{outros}}$ agrupa
+diferenças físicas além de $\phi$: $S_w$, $K_f$, frequência
+(Gassmann vs.\ sônico), pressão efetiva, anisotropia, mineralogia,
+geometria porosa ($\alpha$), HFU mal atribuída, heterogeneidade abaixo
+da resolução do perfil e interações entre esses mecanismos.
+Com $\mathbb{E}[\varepsilon\mid X]=0$,
+\begin{equation}
+  g(X)
+  \approx
+  \mathbb{E}\bigl[-F_\phi\,\delta\phi + r_{\mathrm{outros}}\bigm| X\bigr]:
+\end{equation}
+o corretor \textbf{não} aprende $F_\phi$; aprende a contribuição
+previsível dessa soma a partir de $X$.
+
+\textbf{Conclusão cuidadosa sobre o sinal.}
+Na faixa usada, $F_\phi<0$. Se $\delta\phi\ge 0$
+($\phi^{*}$ efetiva menor que \phiND{}), o termo isolado
+$-F_\phi\delta\phi\ge 0$ empurra $\Delta V_{\mathrm{p}}$ para cima.
+Observamos o contrário:
+$V_{\mathrm{p,Gassmann}}>V_{\mathrm{p,sonic}}$
+$\Rightarrow$ $\Delta V_{\mathrm{p}}<0$
+($\mu_\Delta\approx -0{,}27$~km/s).
+Portanto uma porosidade efetiva menor \textbf{não pode ser a causa isolada}
+do residual negativo---não implica $\delta\phi=0$ nem que \phiND{} esteja
+``correta''; $\phi$ ainda pode participar do erro, mas com sinal
+contrário ao viés total.
+Em média,
+$\mu_\Delta
+\approx\mathbb{E}[-F_\phi\delta\phi]+\mathbb{E}[r_{\mathrm{outros}}]$;
+como $\mu_\Delta<0$ e $\mathbb{E}[-F_\phi\delta\phi]\ge 0$ sob a hipótese
+$\delta\phi\ge 0$, necessariamente $\mathbb{E}[r_{\mathrm{outros}}]<0$
+(os demais mecanismos devem dominar o sinal).
+Exemplo numérico: $-F_\phi\delta\phi=+0{,}10$ e
+$r_{\mathrm{outros}}=-0{,}40$ já produzem
+$\Delta V_{\mathrm{p}}\approx -0{,}30$~km/s.
+
+Seria problemático: (i)~chamar \phiND{} de PHIE medida; (ii)~trocar a
+porosidade na Etapa~3 sem recalcular DEM, Gassmann e o residual;
+(iii)~afirmar que o corretor isolou o mecanismo do desvio;
+(iv)~declarar transferência automática para outro poço;
+(v)~afirmar simplesmente que ``a escolha de \phiND{} não explica o viés''
+sem a ressalva de causa \emph{isolada}.
+A coerência Etapa~2~$\rightarrow$~Etapa~3 exige manter a mesma \phiND{} na
+baseline física.
+
 \subsection{CLP-CSGM versus regressão pontual}
 
 A Etapa~3b (Seção~\ref{sec:clp_vp_residual}) testou reconstrução CLP-CSGM
@@ -994,9 +1216,122 @@ O CLP permanece relevante para cenários com \textbf{medidas esparsas} em $b$
 (análogo à Etapa~1f); para correção residual em perfil completo, o RF
 pontual é superior neste poço.
 
+\subsection{Sensibilidade ao fluido ($K_f$, $S_w$)}
+\label{sec:kf_sensitivity}
+
+O produto oficial mantém fluido \textbf{constante} no Gassmann:
+$S_w=1$, $K_f=2{,}2$~GPa e $\rho_f=1{,}03$~g/cc (água de formação, PVT
+default da Etapa~2b).
+No intervalo modelado (5205,9--5233,7~m), a curva LAS confirma
+$S_w=1$ ponto a ponto, e a curva \texttt{KFluid} do processamento
+petrofísico/PVT tem mediana $\approx 2{,}83$~GPa com variação pequena em
+profundidade (Figura~\ref{fig:kf_sw_las}).
+Isso motiva um teste A/B controlado: mesmo DEM seco, mesma \phiND{},
+mesma HFU e mesmos blocos OOF; só o fluido ($K_f$, $\rho_f$) muda no
+Gassmann, e o híbrido é re-treinado em OOF.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/fig3_kf_sw_study_interval}
+  \caption{Intervalo do modelo: $S_w$ (LAS), $K_f$ (\texttt{KFluid}) e
+  $C_f=1/K_f$. Verde: $K_f=2{,}2$~GPa adotado; laranja: mediana do perfil.}
+  \label{fig:kf_sw_las}
+\end{figure}
+
+A Tabela~\ref{tab:kf_sensitivity} resume o default, a mediana de poço
+e o cenário NMR VHR (perfil $K_f(z)$).
+Atualizar o default para a mediana de poço ($\approx 2{,}83$~GPa) quase não
+altera o MAPE Gassmann (7,28\% em ambos) e deixa o híbrido RF praticamente
+igual (2,78\% $\rightarrow$ 2,81\%, $+0{,}03$~p.p.); a linear permanece em 2,10\%.
+O viés Gassmann sobe ligeiramente ($+0{,}271 \rightarrow +0{,}295$~km/s):
+$K_f$ menor (2,2~GPa) deixa o fluido um pouco mais compressível e o
+$V_{\mathrm{p}}$ um pouco mais baixo, o que \emph{compensa} parcialmente o
+viés positivo---efeito de nível, não de fluido ``mais certo''.
+
+Como cenário NMR, misturamos água e óleo via \texttt{SWIRR} com a média
+de Voigt--Reuss--Hill (VHR). Não é correção física da mistura iso-tensão
+nem modelo de saturação heterogênea/patchy:
+\begin{equation}
+  \label{eq:kf_vrh}
+  K_V = S_w K_{\mathrm{brine}} + S_o K_{\mathrm{oil}},
+  \qquad
+  \frac{1}{K_R}
+  =
+  \frac{S_w}{K_{\mathrm{brine}}}
+  +
+  \frac{S_o}{K_{\mathrm{oil}}},
+  \qquad
+  K_{\mathrm{VHR}} = \frac{K_V + K_R}{2}.
+\end{equation}
+A densidade é volumétrica,
+$\rho_f = S_w\rho_{\mathrm{brine}}+S_o\rho_{\mathrm{oil}}$.
+Após a mistura, o Gassmann é chamado com $S_w=1$: $K_f$ e $\rho_f$ já
+representam o fluido que ocupa o poro; passar \texttt{SWIRR} de novo
+multiplicaria indevidamente a densidade.
+No intervalo, a mediana de $S_w^{\mathrm{NMR}}$ (após recorte) é
+$\approx 0{,}31$ ($S_o\approx 0{,}69$), $K_f$ VHR $\approx 1{,}40$~GPa
+e $\rho_f\approx 0{,}80$~g/cc (Figura~\ref{fig:kf_sw_nmr}).
+Três amostras LAS/rock no intervalo têm \texttt{SWIRR}$<0$
+(5205,984; 5206,136; 5206,289~m) e foram recortadas para $0$;
+duas entram nas 87 linhas do modelo.
+Esse recorte é bound numérico, não evidência de óleo puro.
+\texttt{SWIRR} permanece proxy de saturação irredutível, não $S_w$ in situ.
+A porosidade de entrada permanece \phiND{}: papéis distintos
+($\phi$ = volume de poro; $S_w$ = preenchimento).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig3_kf_sw_nmr_study_interval}
+  \caption{Alternativa NMR com mistura VHR: $S_w$/\texttt{SWIRR}
+  (recortes em vermelho), $K_f$ VHR e $C_f=1/K_f$.
+  Verde: $K_f=2{,}2$~GPa adotado; laranja: mediana VHR
+  ($\approx 1{,}40$~GPa).}
+  \label{fig:kf_sw_nmr}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{MAPE (\%) e viés (km/s) no intervalo modelado
+  (87 linhas, OOF em 3~blocos).
+  As três colunas compartilham o DEM seco e a \phiND{};
+  só o fluido no Gassmann muda. NMR = mistura VHR no perfil $K_f(z)$.}
+  \label{tab:kf_sensitivity}
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lcccccc}
+    \toprule
+    & \multicolumn{2}{c}{$K_f=2{,}2$} &
+      \multicolumn{2}{c}{$K_f\approx 2{,}83$} &
+      \multicolumn{2}{c}{VHR NMR} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+    Etapa & MAPE & Viés & MAPE & Viés & MAPE & Viés \\
+    \midrule
+    Gassmann & 7,28 & $+0{,}271$ & 7,28 & $+0{,}295$ &
+      7,63 & $+0{,}266$ \\
+    Híbr.\ RF & 2,78 & $+0{,}014$ & 2,81 & $+0{,}017$ &
+      2,91 & $+0{,}016$ \\
+    Híbr.\ lin. & 2,10 & $+0{,}002$ & 2,10 & $+0{,}002$ &
+      2,10 & $+0{,}002$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+VHR piora um pouco o MAPE frente ao adotado (Gassmann
+$\approx +0{,}35$~p.p.; RF $\approx +0{,}14$~p.p.); a linear fica igual.
+Perfil $K_f(z)$ e mediana VHR produzem métricas \emph{próximas, não iguais}
+(7,63\% vs 7,62\%).
+Isso não demonstra que $K_f$ varie pouco
+(VHR $\approx 1{,}0$--$2{,}1$~GPa neste intervalo):
+o produto (MAPE/viés) é pouco sensível a usar o perfil ou a mediana.
+\textbf{Decisão:} mantemos $K_f=2{,}2$~GPa no fluxo oficial; mediana de
+poço e VHR+\texttt{SWIRR} ficam como testes de sensibilidade.
+O script \texttt{run\_861\_kf\_fluid\_sensitivity.py} regenera figuras e
+tabelas sob
+\texttt{methods\_comparison/results/kf\_fluid\_sensitivity\_861/}.
+
 \subsection{Limitações metodológicas}
 
-Quatro limitações devem acompanhar qualquer uso dos números desta etapa.
+Cinco limitações devem acompanhar qualquer uso dos números desta etapa.
 \textbf{(i)} Amostra pequena (87 linhas, oito \emph{features}): complexidade do
 modelo foi mantida modesta (RF com 200 árvores) para reduzir risco de
 sobreajuste; mesmo assim, HFU~4 com $n=6$ permanece estatisticamente frágil,
@@ -1005,15 +1340,23 @@ e é justamente ela que concentra o maior ganho reportado.
 evitam vazamento espacial trivial, mas o sônico entra no alvo residual---a
 OOF não equivale a poço ou intervalo independente; extrapolação fora
 de campo Lapa não está demonstrada.
-\textbf{(iii)} PVT fixo: sensibilidade a $K_f$, saturação parcial e pressão
-não foi explorada; parte do resíduo ``aprendido'' pelo ML pode correlacionar-se
-com proxy litológicos de condições de fluido não modeladas explicitamente.
+\textbf{(iii)} Fluido no Gassmann: o produto usa PVT fixo
+($K_f=2{,}2$~GPa, $S_w=1$, $\rho_f=1{,}03$~g/cc).
+A Seção~\ref{sec:kf_sensitivity} explorou a mediana de poço
+($\approx 2{,}83$~GPa) e VHR+\texttt{SWIRR} (figura NMR).
+Nenhuma melhorou o produto frente ao sônico neste intervalo, mas pressão efetiva e
+outras condições in situ continuam fora do escopo.
 \textbf{(iv)} O MAPE de 2,8\% é baixo em termos absolutos, mas mede
 interpolação em profundidade dentro de um intervalo de 28~m com amostragem
 densa; blocos vizinhos compartilham facies, de modo que o teste é menos severo
 do que a rotulação ``fora-da-amostra'' pode sugerir.
+\textbf{(v)} Hipótese de porosidade única (\phiND{} no DEM e em Gassmann):
+diferenças entre porosidade total e hidraulicamente ativa fazem parte da
+incerteza da tendência física e podem contribuir para $\Delta V_{\mathrm{p}}$
+(Seção~\ref{sec:phi_nd_hypothesis}); a física não foi reajustada com o sônico.
 
 \subsection{Random Forest versus alternativas e próximos passos}
+\label{sec:proximos_passos}
 
 A Tabela~\ref{tab:regressor_sensitivity} mostra que a regressão linear
 entregaria MAPE ainda menor que o RF (2,1\% versus 2,8\%), com viés
@@ -1024,14 +1367,35 @@ auditar, exportar e transferir para outro poço do que um ensemble.
 Mantemos o RF no produto documentado por alinhamento à Etapa~1; testes futuros
 podem exportar ambas as trilhas e comparar estabilidade interpoços, onde a
 vantagem do modelo mais simples tende a crescer.
-Para produção de perfil, o próximo passo natural é exportar a coluna
-$V_{\mathrm{p,hybrid}}$ (RF ou regressão linear) ao produto integrado e repetir
-a validação
-tripla da Etapa~2 (laboratório onde houver plugs, \phiND{} versus \phiS{}, DSI)
-com a nova trilha.
-Antes de inversão sísmica, recomenda-se validação em poço vizinho ou
-intervalo não usado no treino, e refinamento de PVT onde houver amostras de
-fluido.
+
+\textbf{Decisão operacional no poço~861.}
+Só física (Gassmann) basta onde a HFU~2 já fecha ($\mathrm{MAPE}\approx 2\%$),
+quando não há sônico denso para treinar o residual, ou quando a
+interpretabilidade da cadeia DEM--Gassmann é prioritária.
+O híbrido RF é preferível no mesmo poço com sônico no alvo---em especial
+HFU~3/4---e convém reportar também a trilha linear (sensibilidade).
+
+\textbf{Testes A/B no poço \#1045 (próximo passo de generalização).}
+\begin{itemize}
+  \item \textbf{Teste~A (transferir o corretor):}
+        treina Gassmann $+$ residual no 861; aplica em \#1045 com
+        perfis e Gassmann \emph{local}; o sônico do 1045 entra
+        \textbf{só} na avaliação---o modelo \textbf{não} é retreinado
+        no sônico do poço novo.
+  \item \textbf{Teste~B (reproduzir o método):}
+        Gassmann local no poço novo + aprendizado residual em blocos
+        de profundidade do próprio \#1045 (sônico no alvo, como aqui).
+\end{itemize}
+Nos dois testes: Gassmann local; \phiS{} e $\Delta t$ fora de $X$.
+Só após A/B faz sentido exportar o híbrido a perfil de produção /
+inversão sísmica.
+Para produção de perfil no 861, o próximo passo natural permanece exportar
+a coluna $V_{\mathrm{p,hybrid}}$ (RF ou regressão linear) ao produto
+integrado e repetir a validação tripla da Etapa~2 (laboratório onde houver
+plugs, \phiND{} versus \phiS{}, DSI) com a nova trilha.
+Recomenda-se também refinamento de PVT onde houver amostras de fluido
+(a Seção~\ref{sec:kf_sensitivity} já quantifica que mediana de poço e
+VHR+\texttt{SWIRR} não melhoram o produto neste intervalo).
 
 \section{Conclusões}
 \label{sec:conclusoes}
@@ -1064,9 +1428,22 @@ fluido.
   \item \textbf{CLP-CSGM:} as variantes por janelas (6,3--6,7\% MAPE) ficam
         atrás do RF pontual e só superam o oracle com calibração esparsa em
         $\gtrsim 70\%$ das profundidades.
+  \item \textbf{Porosidade:} \phiND{} é entrada total de perfil (modelo de
+        porosidade única), não PHIE medida; eventuais discrepâncias com a
+        porosidade hidraulicamente ativa entram na incerteza da tendência e
+        no residual (Seção~\ref{sec:phi_nd_hypothesis}).
+        Isoladamente, $\phi^{*}$ menor que \phiND{} produz contribuição
+        \textbf{positiva} a $\Delta V_{\mathrm{p}}$, oposta ao viés
+        observado ($\Delta V_{\mathrm{p}}<0$); outros mecanismos
+        ($r_{\mathrm{outros}}$) precisam dominar o sinal em média.
+  \item \textbf{Fluido:} $K_f=2{,}2$~GPa ($S_w=1$) permanece no produto;
+        mediana de poço ($\approx 2{,}83$~GPa) e VHR+\texttt{SWIRR}
+        ($\approx 1{,}40$~GPa) não melhoram Gassmann nem o híbrido
+        OOF frente ao sônico neste intervalo
+        (Seção~\ref{sec:kf_sensitivity}).
   \item \textbf{Próximo passo:} exportar $V_{\mathrm{p,hybrid}}$ (RF ou
-        regressão linear)
-        ao perfil de produção e validar em poço ou intervalo independente
+        regressão linear) ao perfil de produção; testes A/B no poço \#1045
+        (transferir o corretor do 861 vs.\ reproduzir o método localmente)
         antes de inversão sísmica.
 \end{enumerate}
 
@@ -1082,7 +1459,101 @@ física versus híbrido, sensibilidade aos seis regressores
 \texttt{regressor\_oof\_vp\_depth.csv}), figuras de profundidade (RF e comparativa
 por regressor) e \emph{scatter} do resíduo, modelo Random Forest serializado e manifesto com métricas da
 rodada de junho de 2026.
+A sensibilidade a fluido ($K_f$, $S_w$, VHR+\texttt{SWIRR}) é regenerada por
+\texttt{scripts/run\_861\_kf\_fluid\_sensitivity.py}, com métricas, recortes de
+\texttt{SWIRR} e manifesto em
+\texttt{results/kf\_fluid\_sensitivity\_861/} e figuras
+\texttt{latex/figures/fig3\_kf\_sw\_*.png}
+(flag \texttt{--write-latex-figures}; conferência \texttt{--check-slides}
+usa os mesmos arredondamentos da Tabela~\ref{tab:kf_sensitivity}).
 O relatório da Etapa~2 documenta a origem de \Vp{} Gassmann e do casamento DSI;
 a Etapa~1 documenta o protocolo depth-block herdado nesta fase.
+
+\appendix
+
+\section{Erro de porosidade e residual: aproximação de primeira ordem}
+\label{app:phi_taylor}
+
+Esta derivação não introduz uma lei física nova: apenas isola quanto um
+erro na porosidade de entrada altera a velocidade prevista pela cadeia
+DEM--Gassmann, e como isso entra em $\Delta V_{\mathrm{p}}$.
+
+O modelo completo é $V_p=F(\phi,\theta,h)$, onde $\phi$ é porosidade,
+$\theta$ reúne mineralogia, razão de aspecto $\alpha$, $S_w$, $K_f$,
+pressão etc., e $h$ é a HFU.
+Fixamos HFU e $\theta$ para calcular a parcial
+$F_\phi=\partial F/\partial\phi$: a pergunta respondida é o que ocorre,
+na mesma HFU e nos mesmos parâmetros, se trocarmos apenas \phiND{} por
+uma porosidade efetiva $\phi^{*}$ menor.
+Define-se
+\begin{equation}
+  F(\phi,\theta,h) = V_{\mathrm{p,Gassmann}}(\phi,\theta,h),
+\end{equation}
+que resume $\phi \rightarrow (K_{\mathrm{dry}},G_{\mathrm{dry}})
+\rightarrow K_{\mathrm{sat}} \rightarrow \rho_{\mathrm{sat}}
+\rightarrow V_{\mathrm{p}}$.
+No modelo atual calcula-se $F(\phiND{},\theta,h)$.
+Seja
+\begin{equation}
+  \delta\phi = \phiND{} - \phi^{*},
+\end{equation}
+de modo que $\phi^{*} = \phiND{} - \delta\phi$
+($\delta\phi>0$ significa \phiND{} maior que $\phi^{*}$).
+
+Escreve-se o sônico como
+$V_{\mathrm{p,sonic}} = F(\phi^{*},\theta,h) + r_{\mathrm{outros}} + \varepsilon$,
+onde $r_{\mathrm{outros}}$ agrupa mecanismos distintos do erro de porosidade
+(lista operacional na Seção~\ref{sec:phi_nd_hypothesis}).
+O residual da Etapa~3 é
+\begin{equation}
+  \Delta V_{\mathrm{p}}
+  = V_{\mathrm{p,sonic}} - F(\phiND{},\theta,h)
+  = F(\phi^{*},\theta,h) - F(\phiND{},\theta,h)
+  + r_{\mathrm{outros}} + \varepsilon.
+\end{equation}
+Com a expansão de Taylor de primeira ordem em torno de \phiND{}
+(incremento $-\delta\phi$),
+\begin{equation}
+  F(\phiND{} - \delta\phi,\theta,h)
+  \approx
+  F(\phiND{},\theta,h) - F_\phi(\phiND{},\theta,h)\,\delta\phi,
+\end{equation}
+obtém-se
+\begin{equation}
+  \Delta V_{\mathrm{p}}
+  \approx
+  -F_\phi(\phiND{},\theta,h)\,\delta\phi
+  + r_{\mathrm{outros}} + \varepsilon,
+\end{equation}
+como na Eq.~\eqref{eq:dvp_phi_taylor}.
+
+Em geral espera-se $F_\phi<0$
+(aumento de porosidade reduz módulos do arcabouço; esse efeito costuma
+dominar a redução de densidade).
+Então, sob $\delta\phi\ge 0$, o efeito isolado de $\phi$ é
+$-F_\phi\delta\phi\ge 0$: $\phi^{*}$ menor \textbf{aumenta} $F$ e
+empurra $\Delta V_{\mathrm{p}}$ para cima---sinal \textbf{contrário}
+ao residual observado ($\Delta V_{\mathrm{p}}<0$).
+A Taylor é local; se $F(\cdot,\theta,h)$ for monótona decrescente em
+$\phi$ no intervalo entre $\phi^{*}$ e \phiND{}, a mesma desigualdade
+$F(\phi^{*})\ge F(\phiND{})$ vale por diferença finita, sem depender da
+aproximação de primeira ordem.
+Validação forte: curvas $V_p(\phi)$ por HFU no intervalo relevante.
+A sensibilidade também pode ser estimada numericamente, por exemplo
+\begin{equation}
+  F_\phi
+  \approx
+  \frac{F(\phi+\eta,\theta,h)-F(\phi-\eta,\theta,h)}{2\eta},
+\end{equation}
+sem derivar analiticamente todo o DEM e Gassmann
+($\eta$ é o passo de diferença finita).
+
+A aproximação despreza termos $O((\delta\phi)^{2})$ e é razoável quando
+$\delta\phi$ é pequeno, $F$ varia suavemente e a HFU (e $\theta$) permanece
+fixa.
+Ela \textbf{não} afirma que todo o residual da Etapa~3 seja causado por
+porosidade: apenas isola uma contribuição possível entre várias, e mostra
+que a hipótese $\phi^{*}<\phiND{}$ sozinha não explica o sinal do viés
+negativo (Seção~\ref{sec:phi_nd_hypothesis}).
 
 \end{document}

@@ -6,12 +6,29 @@ Well 861: fluid Kf sensitivity for Gassmann + hybrid residual (Entrega 2).
 Scenarios (same DEM dry frame and Phi_ND; only fluid in Gassmann changes):
   1) kf_adopted_2p2     -- PVT default Kf=2.2 GPa, rho=1.03, Sw=1
   2) kf_well_median     -- median KFluid/RhoFluid from rock861 in study interval
-  3) nmr_vrh_z          -- VRH fluid mix with SWIRR(z), KBrine, KOil (depth-varying)
-  4) nmr_vrh_median     -- constant median of VRH Kf/rho from scenario 3
+  3) nmr_wood_z         -- Wood/Reuss mix with SWIRR(z) (iso-stress reference)
+  4) nmr_wood_median    -- constant median of Wood Kf/rho from scenario 3
+  5) nmr_vrh_z          -- VRH mix with SWIRR(z) (alternative mixing scenario)
+  6) nmr_vrh_median     -- constant median of VRH Kf/rho from scenario 5
+
+Mixing laws (fluids):
+  Wood/Reuss is the iso-stress mix (pressure equilibration during the wave).
+  VRH = (Voigt + Reuss)/2 is an alternative mixing scenario, not a physical
+  correction of Wood. Patchy/heterogeneous saturation is a different hypothesis.
+
+Gassmann Sw after a mix:
+  Kf and rho already represent the pore-filling mixture, so Gassmann is called
+  with sw_gassmann=1. That is not a second saturation factor. sw_mix (from
+  clipped SWIRR) is stored separately.
+
+SWIRR clip:
+  Values outside [0, 1] are clipped. Negative SWIRR mapped to 0 is a numerical
+  bound, not evidence of pure oil. SWIRR is an irreducible-water proxy, not
+  necessarily in-situ Sw.
 
 Also regenerates depth-track figures used in Entrega 2 slides:
   fig3_kf_sw_study_interval.png
-  fig3_kf_sw_nmr_study_interval.png
+  fig3_kf_sw_nmr_study_interval.png  (VHR mix only; Wood is table-only)
 
 Outputs:
   methods_comparison/data/processed/kf_fluid_sensitivity_861/
@@ -27,6 +44,7 @@ import argparse
 import json
 import shutil
 import sys
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
@@ -96,6 +114,7 @@ N_ESTIMATORS = 200
 RANDOM_STATE = 42
 
 # Rounded values published in poco861_etapa3_entrega2.tex (slides 14/16).
+# Tolerances must be tighter than slide rounding so a stale table fails.
 REFERENCE_SLIDE: Dict[str, Dict[str, Dict[str, float]]] = {
     "kf_adopted_2p2": {
         "gassmann": {"mape_pct": 7.28, "bias_km_s": 0.271},
@@ -103,8 +122,18 @@ REFERENCE_SLIDE: Dict[str, Dict[str, Dict[str, float]]] = {
         "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
     },
     "kf_well_median": {
-        "gassmann": {"mape_pct": 7.26, "bias_km_s": 0.293},
-        "hybrid_rf": {"mape_pct": 2.82, "bias_km_s": 0.018},
+        "gassmann": {"mape_pct": 7.28, "bias_km_s": 0.295},
+        "hybrid_rf": {"mape_pct": 2.81, "bias_km_s": 0.017},
+        "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
+    },
+    "nmr_wood_z": {
+        "gassmann": {"mape_pct": 7.66, "bias_km_s": 0.261},
+        "hybrid_rf": {"mape_pct": 2.97, "bias_km_s": 0.026},
+        "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
+    },
+    "nmr_wood_median": {
+        "gassmann": {"mape_pct": 7.65, "bias_km_s": 0.261},
+        "hybrid_rf": {"mape_pct": 2.95, "bias_km_s": 0.026},
         "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
     },
     "nmr_vrh_z": {
@@ -118,6 +147,22 @@ REFERENCE_SLIDE: Dict[str, Dict[str, Dict[str, float]]] = {
         "hybrid_lr": {"mape_pct": 2.10, "bias_km_s": 0.002},
     },
 }
+
+MAPE_TOL_PP = 0.015
+BIAS_TOL_KM_S = 0.002
+
+
+@dataclass(frozen=True)
+class FluidScenario:
+    """One Gassmann fluid case. Mix Sw and Gassmann Sw are distinct fields."""
+
+    scenario_id: str
+    kf: np.ndarray
+    rho_f: np.ndarray
+    sw_gassmann: np.ndarray
+    fluid_name: str
+    mix_law: str
+    sw_mix: Optional[np.ndarray] = None
 
 
 def utc_now_iso() -> str:
@@ -160,8 +205,8 @@ def vrh_kf(
 ) -> np.ndarray:
     """Voigt-Reuss-Hill fluid bulk modulus (GPa).
 
-    K_VRH = (K_V + K_R) / 2, with K_R = Wood (harmonic) and
-    K_V = arithmetic saturation-weighted mix.
+    Alternative mixing scenario: K_VRH = (K_V + K_R) / 2.
+    K_R is Wood (harmonic). This average is not a patchy-saturation model.
     """
     return 0.5 * (
         voigt_kf(sw, k_brine, k_oil) + reuss_kf(sw, k_brine, k_oil)
@@ -182,6 +227,36 @@ def mix_rho(
 # Backward-compatible aliases used by older call sites / notebooks.
 wood_kf = reuss_kf
 wood_rho = mix_rho
+
+
+def self_check_mix_laws() -> List[str]:
+    """Algebra checks for Wood/VRH mix identities."""
+    fails: List[str] = []
+    sw = np.array([0.0, 0.31, 1.0], dtype=np.float64)
+    kb = np.array([2.8, 2.8, 2.8], dtype=np.float64)
+    ko = np.array([0.8, 0.8, 0.8], dtype=np.float64)
+    kv = voigt_kf(sw, kb, ko)
+    kr = reuss_kf(sw, kb, ko)
+    kh = vrh_kf(sw, kb, ko)
+    if abs(float(kr[0]) - 0.8) > 1e-12:
+        fails.append("Wood Sw=0 must equal K_oil")
+    if abs(float(kr[2]) - 2.8) > 1e-12:
+        fails.append("Wood Sw=1 must equal K_brine")
+    if abs(float(kv[0]) - 0.8) > 1e-12 or abs(float(kv[2]) - 2.8) > 1e-12:
+        fails.append("Voigt extremes must match end-members")
+    if np.any(kr - 1e-12 > kv):
+        fails.append("Reuss must be <= Voigt")
+    if np.any(np.abs(kh - 0.5 * (kv + kr)) > 1e-12):
+        fails.append("VRH must be the arithmetic mean of Voigt and Reuss")
+    if np.any((kh + 1e-12 < kr) | (kh - 1e-12 > kv)):
+        fails.append("K_R <= K_VRH <= K_V must hold")
+    rho_b = np.array([1.03, 1.03, 1.03], dtype=np.float64)
+    rho_o = np.array([0.70, 0.70, 0.70], dtype=np.float64)
+    rho = mix_rho(sw, rho_b, rho_o)
+    expect = sw * rho_b + (1.0 - sw) * rho_o
+    if np.any(np.abs(rho - expect) > 1e-12):
+        fails.append("Density mix must be volume-weighted")
+    return fails
 
 
 def study_interval_from_logs(logs: pd.DataFrame) -> Tuple[float, float]:
@@ -207,6 +282,20 @@ def load_fluid_tables() -> Tuple[pd.DataFrame, pd.DataFrame]:
             raise ValueError("log861 missing column: {}".format(col))
         log[col] = pd.to_numeric(log[col], errors="coerce")
     return rock, log
+
+
+def swirr_clip_table(md: np.ndarray, sw_raw: np.ndarray) -> pd.DataFrame:
+    """Rows where SWIRR was outside [0, 1] before clipping."""
+    raw = sw_raw.astype(np.float64)
+    outside = (raw < 0.0) | (raw > 1.0)
+    return pd.DataFrame(
+        {
+            "MD": md[outside],
+            "SWIRR_raw": raw[outside],
+            "SWIRR_clipped": _clip01(raw[outside]),
+            "clip_reason": np.where(raw[outside] < 0.0, "lt_0", "gt_1"),
+        }
+    )
 
 
 def attach_fluid_to_profile(
@@ -240,15 +329,18 @@ def attach_fluid_to_profile(
         direction="nearest",
     )
     merged = merged.rename(columns={"depth_m": DEPTH_COL})
-    merged["sw_nmr"] = _clip01(merged["SWIRR"].to_numpy(dtype=np.float64))
+    sw_raw = merged["SWIRR"].to_numpy(dtype=np.float64)
+    merged["swirr_raw"] = sw_raw
+    merged["swirr_clipped_flag"] = (sw_raw < 0.0) | (sw_raw > 1.0)
+    merged["sw_nmr"] = _clip01(sw_raw)
     merged["so_nmr"] = 1.0 - merged["sw_nmr"]
-    merged["kf_vrh_gpa"] = vrh_kf(
-        merged["sw_nmr"].to_numpy(dtype=np.float64),
-        merged["KBrine"].to_numpy(dtype=np.float64),
-        merged["KOil"].to_numpy(dtype=np.float64),
-    )
+    kb = merged["KBrine"].to_numpy(dtype=np.float64)
+    ko = merged["KOil"].to_numpy(dtype=np.float64)
+    sw = merged["sw_nmr"].to_numpy(dtype=np.float64)
+    merged["kf_wood_gpa"] = reuss_kf(sw, kb, ko)
+    merged["kf_vrh_gpa"] = vrh_kf(sw, kb, ko)
     merged["rho_mix_gcc"] = mix_rho(
-        merged["sw_nmr"].to_numpy(dtype=np.float64),
+        sw,
         merged["RhoBrine"].to_numpy(dtype=np.float64),
         merged["RhoOil"].to_numpy(dtype=np.float64),
     )
@@ -260,8 +352,10 @@ def process_profile_with_fluid(
     hfu_params: Dict[int, Any],
     kf: np.ndarray,
     rho_f: np.ndarray,
-    sw: np.ndarray,
+    sw_gassmann: np.ndarray,
     fluid_name: str,
+    mix_law: str,
+    sw_mix: Optional[np.ndarray],
 ) -> pd.DataFrame:
     """DEM dry + Gassmann with per-row fluid properties."""
     rows: List[dict] = []
@@ -295,8 +389,9 @@ def process_profile_with_fluid(
                 rho_matrix_gcc=hp.matrix_rho_gcc,
                 kf_gpa=float(kf[i]),
                 rho_fluid_gcc=float(rho_f[i]),
-                sw=float(sw[i]),
+                sw=float(sw_gassmann[i]),
             )
+            mix_val = float("nan") if sw_mix is None else float(sw_mix[i])
             rows.append(
                 {
                     DEPTH_COL: depth,
@@ -305,9 +400,11 @@ def process_profile_with_fluid(
                     "Phi_Sonic (pu)": phi_sonic,
                     PHI_LAB_COL: phi_lab,
                     "fluid_name": fluid_name,
+                    "mix_law": mix_law,
                     "kf_used_gpa": float(kf[i]),
                     "rho_fluid_used_gcc": float(rho_f[i]),
-                    "sw_used": float(sw[i]),
+                    "sw_gassmann": float(sw_gassmann[i]),
+                    "sw_mix": mix_val,
                     **out,
                     "status": "ok",
                     "error": "",
@@ -421,37 +518,66 @@ def metrics_dict_from_validation(validation: pd.DataFrame) -> Dict[str, float]:
 
 
 def run_scenario(
-    scenario_id: str,
+    scenario: FluidScenario,
     profile: pd.DataFrame,
     hfu_params: Dict[int, Any],
     logs: pd.DataFrame,
     sonic: pd.DataFrame,
-    kf: np.ndarray,
-    rho_f: np.ndarray,
-    sw: np.ndarray,
-    fluid_name: str,
     merge_tol_m: float,
 ) -> Dict[str, Any]:
     """One fluid scenario: Gassmann + hybrid RF/LR."""
     sat = process_profile_with_fluid(
-        profile, hfu_params, kf=kf, rho_f=rho_f, sw=sw, fluid_name=fluid_name
+        profile,
+        hfu_params,
+        kf=scenario.kf,
+        rho_f=scenario.rho_f,
+        sw_gassmann=scenario.sw_gassmann,
+        fluid_name=scenario.fluid_name,
+        mix_law=scenario.mix_law,
+        sw_mix=scenario.sw_mix,
     )
     validation = validate_vs_sonic(sat, sonic, merge_tol_m)
     gass = metrics_dict_from_validation(validation)
     residual_df = build_residual_from_validation(validation, logs)
     hybrid = oof_hybrid_metrics(residual_df)
+    sw_mix_median = (
+        float("nan")
+        if scenario.sw_mix is None
+        else float(np.nanmedian(scenario.sw_mix))
+    )
     return {
-        "scenario_id": scenario_id,
-        "fluid_name": fluid_name,
-        "kf_median_gpa": float(np.nanmedian(kf)),
-        "rho_median_gcc": float(np.nanmedian(rho_f)),
-        "sw_median": float(np.nanmedian(sw)),
+        "scenario_id": scenario.scenario_id,
+        "fluid_name": scenario.fluid_name,
+        "mix_law": scenario.mix_law,
+        "kf_median_gpa": float(np.nanmedian(scenario.kf)),
+        "rho_median_gcc": float(np.nanmedian(scenario.rho_f)),
+        "sw_gassmann_median": float(np.nanmedian(scenario.sw_gassmann)),
+        "sw_mix_median": sw_mix_median,
         "gassmann": gass,
         "hybrid_rf": hybrid["hybrid_rf"],
         "hybrid_lr": hybrid["hybrid_lr"],
         "sat_profile": sat,
         "validation": validation,
     }
+
+
+def _style_depth_track(
+    ax: Any,
+    xlabel: str,
+    title: str,
+    z0: float,
+    z1: float,
+    *,
+    legend_fs: float = 10.5,
+) -> None:
+    """Shared typography for portrait depth tracks on Beamer slides."""
+    ax.set_xlabel(xlabel, fontsize=14)
+    ax.set_title(title, fontsize=15, pad=8)
+    ax.tick_params(axis="both", labelsize=12, width=1.1, length=5)
+    ax.axhline(z0, color="0.45", linestyle="--", linewidth=1.0)
+    ax.axhline(z1, color="0.45", linestyle="--", linewidth=1.0)
+    ax.grid(True, alpha=0.28)
+    ax.legend(fontsize=legend_fs, loc="best", framealpha=0.92, borderpad=0.3)
 
 
 def plot_las_interval(
@@ -469,7 +595,7 @@ def plot_las_interval(
     ml = (log["MD"] >= z0) & (log["MD"] <= z1)
     lsub = log.loc[ml].copy()
 
-    fig, axes = plt.subplots(1, 3, figsize=(9.2, 8.0), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(12.0, 7.6), sharey=True)
     ax0, ax1, ax2 = axes
 
     ax0.fill_betweenx(
@@ -480,43 +606,46 @@ def plot_las_interval(
         alpha=0.85,
         label="Sw LAS",
     )
-    ax0.set_xlabel("Saturation")
     ax0.set_xlim(0.0, 1.05)
-    ax0.set_title("Sw (LAS)")
     ax0.invert_yaxis()
-    ax0.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
-    ax0.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
-    ax0.grid(True, alpha=0.25)
-    ax0.legend(fontsize=7, loc="best")
+    _style_depth_track(ax0, "Sw", "Sw (LAS)", z0, z1)
 
-    ax1.plot(r["KFluid"], r["MD"], color="#d62728", linewidth=1.2, label="Kf well")
-    ax1.axvline(kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="Kf=2.2 adopted")
-    ax1.axvline(kf_well_med, color="#ff7f0e", linestyle=":", linewidth=1.4, label="Kf median")
-    ax1.set_xlabel("Kf (GPa)")
-    ax1.set_title("Fluid bulk modulus")
-    ax1.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
-    ax1.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
-    ax1.grid(True, alpha=0.25)
-    ax1.legend(fontsize=7, loc="best")
+    ax1.plot(r["KFluid"], r["MD"], color="#d62728", linewidth=1.8, label="KFluid")
+    ax1.axvline(
+        kf_adopted,
+        color="#2ca02c",
+        linestyle="--",
+        linewidth=1.8,
+        label="Kf=2.2 adopted",
+    )
+    ax1.axvline(
+        kf_well_med,
+        color="#ff7f0e",
+        linestyle=":",
+        linewidth=2.0,
+        label="Kf median 2.83",
+    )
+    _style_depth_track(ax1, "Kf (GPa)", "Fluid bulk modulus", z0, z1)
 
     cf = 1.0 / r["KFluid"].to_numpy(dtype=np.float64)
-    ax2.plot(cf, r["MD"], color="#9467bd", linewidth=1.2, label="Cf")
-    ax2.axvline(1.0 / kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="1/2.2")
-    ax2.set_xlabel("Cf = 1/Kf (1/GPa)")
-    ax2.set_title("Compressibility")
-    ax2.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
-    ax2.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
-    ax2.grid(True, alpha=0.25)
-    ax2.legend(fontsize=7, loc="best")
+    ax2.plot(cf, r["MD"], color="#9467bd", linewidth=1.8, label="Cf")
+    ax2.axvline(
+        1.0 / kf_adopted,
+        color="#2ca02c",
+        linestyle="--",
+        linewidth=1.8,
+        label="1/2.2",
+    )
+    _style_depth_track(ax2, "Cf (1/GPa)", "Compressibility", z0, z1)
 
-    ax0.set_ylabel("Depth (m)")
+    ax0.set_ylabel("Depth (m)", fontsize=14)
     fig.suptitle(
         "Well 861: LAS Sw and Kf in [{:.1f}, {:.1f}] m".format(z0, z1),
-        fontsize=11,
+        fontsize=15,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=180, bbox_inches="tight")
+    fig.savefig(out_path, dpi=220, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -525,72 +654,83 @@ def plot_nmr_interval(
     z0: float,
     z1: float,
     kf_adopted: float,
-    kf_nmr_med: float,
+    kf_vrh_med: float,
     out_path: Path,
 ) -> None:
-    """Depth tracks: SWIRR/So, VRH Kf, Cf in study interval."""
+    """Depth tracks: SWIRR/So and VHR Kf/Cf in study interval."""
     m = (rock["MD"] >= z0) & (rock["MD"] <= z1)
     r = rock.loc[m].copy()
-    sw = _clip01(r["SWIRR"].to_numpy(dtype=np.float64))
+    sw_raw = r["SWIRR"].to_numpy(dtype=np.float64)
+    sw = _clip01(sw_raw)
     so = 1.0 - sw
-    kf = vrh_kf(
-        sw,
-        r["KBrine"].to_numpy(dtype=np.float64),
-        r["KOil"].to_numpy(dtype=np.float64),
-    )
-    cf = 1.0 / kf
+    kb = r["KBrine"].to_numpy(dtype=np.float64)
+    ko = r["KOil"].to_numpy(dtype=np.float64)
+    kf_v = vrh_kf(sw, kb, ko)
     md = r["MD"].to_numpy(dtype=np.float64)
+    clipped = (sw_raw < 0.0) | (sw_raw > 1.0)
 
-    fig, axes = plt.subplots(1, 3, figsize=(9.2, 8.0), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(12.0, 7.6), sharey=True)
     ax0, ax1, ax2 = axes
 
     ax0.fill_betweenx(md, 0.0, sw, color="#1f77b4", alpha=0.85, label="Sw NMR")
-    ax0.fill_betweenx(md, sw, 1.0, color="#2ca02c", alpha=0.75, label="So = 1 - Sw")
+    ax0.fill_betweenx(md, sw, 1.0, color="#2ca02c", alpha=0.75, label="So = 1-Sw")
+    if np.any(clipped):
+        ax0.scatter(
+            sw[clipped],
+            md[clipped],
+            s=36,
+            c="red",
+            zorder=3,
+            label="SWIRR clip to 0",
+        )
     ax0.set_xlim(0.0, 1.0)
-    ax0.set_xlabel("Saturation")
-    ax0.set_title("NMR (SWIRR)")
     ax0.invert_yaxis()
-    ax0.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
-    ax0.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
-    ax0.grid(True, alpha=0.25)
-    ax0.legend(fontsize=7, loc="best")
+    _style_depth_track(ax0, "Saturation", "NMR (SWIRR)", z0, z1)
 
-    ax1.plot(kf, md, color="#d62728", linewidth=1.2, label="Kf VRH+NMR")
-    ax1.axvline(kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="Kf=2.2 adopted")
-    ax1.axvline(kf_nmr_med, color="#ff7f0e", linestyle=":", linewidth=1.4, label="Kf NMR median")
-    ax1.set_xlabel("Kf (GPa)")
-    ax1.set_title("Fluid bulk modulus")
-    ax1.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
-    ax1.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
-    ax1.grid(True, alpha=0.25)
-    ax1.legend(fontsize=7, loc="best")
+    ax1.plot(kf_v, md, color="#d62728", linewidth=1.8, label="VHR")
+    ax1.axvline(
+        kf_adopted,
+        color="#2ca02c",
+        linestyle="--",
+        linewidth=1.8,
+        label="Kf=2.2 adopted",
+    )
+    ax1.axvline(
+        kf_vrh_med,
+        color="#ff7f0e",
+        linestyle=":",
+        linewidth=2.0,
+        label="VHR med. 1.40",
+    )
+    _style_depth_track(ax1, "Kf (GPa)", "Fluid bulk modulus", z0, z1, legend_fs=10.0)
 
-    ax2.plot(cf, md, color="#9467bd", linewidth=1.2, label="Cf")
-    ax2.axvline(1.0 / kf_adopted, color="#2ca02c", linestyle="--", linewidth=1.2, label="1/2.2")
-    ax2.set_xlabel("Cf = 1/Kf (1/GPa)")
-    ax2.set_title("Compressibility")
-    ax2.axhline(z0, color="0.5", linestyle="--", linewidth=0.8)
-    ax2.axhline(z1, color="0.5", linestyle="--", linewidth=0.8)
-    ax2.grid(True, alpha=0.25)
-    ax2.legend(fontsize=7, loc="best")
+    ax2.plot(1.0 / kf_v, md, color="#9467bd", linewidth=1.8, label="Cf VHR")
+    ax2.axvline(
+        1.0 / kf_adopted,
+        color="#2ca02c",
+        linestyle="--",
+        linewidth=1.8,
+        label="1/2.2",
+    )
+    _style_depth_track(ax2, "Cf (1/GPa)", "Compressibility", z0, z1)
 
-    ax0.set_ylabel("Depth (m)")
+    ax0.set_ylabel("Depth (m)", fontsize=14)
     fig.suptitle(
-        "Well 861: VRH+NMR (SWIRR) in [{:.1f}, {:.1f}] m".format(z0, z1),
-        fontsize=11,
+        "Well 861: NMR VHR mix in [{:.1f}, {:.1f}] m".format(z0, z1),
+        fontsize=15,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=180, bbox_inches="tight")
+    fig.savefig(out_path, dpi=220, bbox_inches="tight")
     plt.close(fig)
 
 
 def compare_to_reference(
     results: Dict[str, Dict[str, Any]],
-    mape_tol: float = 0.05,
-    bias_tol: float = 0.02,
+    mape_tol: float = MAPE_TOL_PP,
+    bias_tol: float = BIAS_TOL_KM_S,
 ) -> Tuple[bool, List[str]]:
-    """Check computed metrics against slide reference values."""
+    """Check computed metrics against published slide rounding."""
     lines: List[str] = []
     ok_all = True
     for sid, ref_stages in REFERENCE_SLIDE.items():
@@ -645,6 +785,10 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """Entry point."""
     args = parse_args(argv)
+    mix_fails = self_check_mix_laws()
+    if mix_fails:
+        raise RuntimeError("mix-law self-check failed: {}".format("; ".join(mix_fails)))
+
     out_root = args.out_root.resolve()
     tables = out_root / "tables"
     figures = out_root / "figures"
@@ -661,89 +805,126 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     hfu_table = load_hfu_lab_calibrated(HFU_LAB_CALIB_CSV)
     hfu_params = build_hfu_params_from_lab_calib(hfu_table)
 
-    # Interval medians from rock (same window as slides).
     rock_iv = rock[(rock["MD"] >= z0) & (rock["MD"] <= z1)]
     kf_well = float(rock_iv["KFluid"].median())
     rho_well = float(rock_iv["RhoFluid"].median())
 
+    clip_rock = swirr_clip_table(
+        rock_iv["MD"].to_numpy(dtype=np.float64),
+        rock_iv["SWIRR"].to_numpy(dtype=np.float64),
+    )
+    clip_profile = swirr_clip_table(
+        profile[DEPTH_COL].to_numpy(dtype=np.float64),
+        profile["swirr_raw"].to_numpy(dtype=np.float64),
+    )
+    clip_rock.to_csv(tables / "swirr_clip_rock_interval.csv", index=False, float_format="%.6f")
+    clip_profile.to_csv(
+        tables / "swirr_clip_profile87.csv", index=False, float_format="%.6f"
+    )
+
     n = len(profile)
     ones = np.ones(n, dtype=np.float64)
+    sw_mix = profile["sw_nmr"].to_numpy(dtype=np.float64)
+    rho_mix = profile["rho_mix_gcc"].to_numpy(dtype=np.float64)
+    kf_wood = profile["kf_wood_gpa"].to_numpy(dtype=np.float64)
+    kf_vrh = profile["kf_vrh_gpa"].to_numpy(dtype=np.float64)
+    kf_wood_med = float(np.nanmedian(kf_wood))
+    kf_vrh_med = float(np.nanmedian(kf_vrh))
+    rho_nmr_med = float(np.nanmedian(rho_mix))
 
-    scenarios: List[Tuple[str, np.ndarray, np.ndarray, np.ndarray, str]] = [
-        (
-            "kf_adopted_2p2",
-            ones * float(pvt["kf_gpa"]),
-            ones * float(pvt["rho_fluid_gcc"]),
-            ones * float(pvt["sw"]),
-            "pvt_default_2p2",
+    scenarios: List[FluidScenario] = [
+        FluidScenario(
+            scenario_id="kf_adopted_2p2",
+            kf=ones * float(pvt["kf_gpa"]),
+            rho_f=ones * float(pvt["rho_fluid_gcc"]),
+            sw_gassmann=ones * float(pvt["sw"]),
+            fluid_name="pvt_default_2p2",
+            mix_law="none",
         ),
-        (
-            "kf_well_median",
-            ones * kf_well,
-            ones * rho_well,
-            ones * 1.0,
-            "rock_KFluid_median",
+        FluidScenario(
+            scenario_id="kf_well_median",
+            kf=ones * kf_well,
+            rho_f=ones * rho_well,
+            sw_gassmann=ones * 1.0,
+            fluid_name="rock_KFluid_median",
+            mix_law="none",
         ),
-        (
-            "nmr_vrh_z",
-            profile["kf_vrh_gpa"].to_numpy(dtype=np.float64),
-            profile["rho_mix_gcc"].to_numpy(dtype=np.float64),
-            ones * 1.0,
-            "vrh_SWIRR_depth",
+        FluidScenario(
+            scenario_id="nmr_wood_z",
+            kf=kf_wood,
+            rho_f=rho_mix,
+            sw_gassmann=ones * 1.0,
+            fluid_name="wood_SWIRR_depth",
+            mix_law="wood",
+            sw_mix=sw_mix,
+        ),
+        FluidScenario(
+            scenario_id="nmr_wood_median",
+            kf=ones * kf_wood_med,
+            rho_f=ones * rho_nmr_med,
+            sw_gassmann=ones * 1.0,
+            fluid_name="wood_SWIRR_median",
+            mix_law="wood",
+            sw_mix=sw_mix,
+        ),
+        FluidScenario(
+            scenario_id="nmr_vrh_z",
+            kf=kf_vrh,
+            rho_f=rho_mix,
+            sw_gassmann=ones * 1.0,
+            fluid_name="vrh_SWIRR_depth",
+            mix_law="vrh",
+            sw_mix=sw_mix,
+        ),
+        FluidScenario(
+            scenario_id="nmr_vrh_median",
+            kf=ones * kf_vrh_med,
+            rho_f=ones * rho_nmr_med,
+            sw_gassmann=ones * 1.0,
+            fluid_name="vrh_SWIRR_median",
+            mix_law="vrh",
+            sw_mix=sw_mix,
         ),
     ]
-    kf_nmr_med = float(np.nanmedian(profile["kf_vrh_gpa"].to_numpy(dtype=np.float64)))
-    rho_nmr_med = float(np.nanmedian(profile["rho_mix_gcc"].to_numpy(dtype=np.float64)))
-    scenarios.append(
-        (
-            "nmr_vrh_median",
-            ones * kf_nmr_med,
-            ones * rho_nmr_med,
-            ones * 1.0,
-            "vrh_SWIRR_median",
-        )
-    )
 
     results: Dict[str, Dict[str, Any]] = {}
     summary_rows: List[dict] = []
 
-    for sid, kf, rho_f, sw, fname in scenarios:
-        print("Running scenario {} ...".format(sid))
+    for scn in scenarios:
+        print("Running scenario {} ...".format(scn.scenario_id))
         res = run_scenario(
-            scenario_id=sid,
+            scenario=scn,
             profile=profile,
             hfu_params=hfu_params,
             logs=logs,
             sonic=sonic,
-            kf=kf,
-            rho_f=rho_f,
-            sw=sw,
-            fluid_name=fname,
             merge_tol_m=float(args.merge_tol_m),
         )
-        results[sid] = res
+        results[scn.scenario_id] = res
         res["validation"].to_csv(
-            tables / "{}_validation.csv".format(sid),
+            tables / "{}_validation.csv".format(scn.scenario_id),
             index=False,
             float_format="%.6f",
         )
         res["sat_profile"].to_csv(
-            tables / "{}_sat_profile.csv".format(sid),
+            tables / "{}_sat_profile.csv".format(scn.scenario_id),
             index=False,
             float_format="%.6f",
         )
         for stage in ("gassmann", "hybrid_rf", "hybrid_lr"):
             summary_rows.append(
                 {
-                    "scenario_id": sid,
+                    "scenario_id": scn.scenario_id,
                     "stage": stage,
                     "mape_pct": res[stage]["mape_pct"],
                     "bias_km_s": res[stage]["bias_km_s"],
                     "rmse_km_s": res[stage]["rmse_km_s"],
                     "kf_median_gpa": res["kf_median_gpa"],
                     "rho_median_gcc": res["rho_median_gcc"],
-                    "sw_median": res["sw_median"],
-                    "fluid_name": fname,
+                    "sw_gassmann_median": res["sw_gassmann_median"],
+                    "sw_mix_median": res["sw_mix_median"],
+                    "mix_law": res["mix_law"],
+                    "fluid_name": scn.fluid_name,
                 }
             )
         print(
@@ -776,7 +957,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         z0=z0,
         z1=z1,
         kf_adopted=float(pvt["kf_gpa"]),
-        kf_nmr_med=kf_nmr_med,
+        kf_vrh_med=kf_vrh_med,
         out_path=fig_nmr,
     )
 
@@ -787,6 +968,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             shutil.copy2(src, dst)
             print("Wrote latex figure {}".format(dst))
 
+    clip_qc = {
+        "n_rock_interval": int(len(rock_iv)),
+        "n_swirr_clipped_rock": int(len(clip_rock)),
+        "n_profile87": int(len(profile)),
+        "n_swirr_clipped_profile87": int(int(profile["swirr_clipped_flag"].sum())),
+        "note": (
+            "Clipping SWIRR to [0, 1] is a numerical bound. "
+            "Negative values mapped to 0 are not evidence of pure oil. "
+            "SWIRR is an irreducible-water proxy, not necessarily in-situ Sw."
+        ),
+    }
+
     manifest = {
         "generated_utc": utc_now_iso(),
         "well_id": "861",
@@ -794,16 +987,31 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "pvt_default": pvt,
         "kf_well_median_gpa": kf_well,
         "rho_well_median_gcc": rho_well,
-        "kf_nmr_vrh_median_gpa": kf_nmr_med,
+        "kf_nmr_wood_median_gpa": kf_wood_med,
+        "kf_nmr_vrh_median_gpa": kf_vrh_med,
         "rho_nmr_mix_median_gcc": rho_nmr_med,
+        "sw_mix_median": float(np.nanmedian(sw_mix)),
+        "sw_gassmann_after_mix": 1.0,
+        "mix_note": (
+            "Wood/Reuss is the iso-stress fluid mix. VRH is an alternative "
+            "mixing scenario, not a physical correction of Wood. After mixing, "
+            "Gassmann uses sw_gassmann=1 because Kf and rho already represent "
+            "the pore-filling fluid."
+        ),
+        "swirr_clip": clip_qc,
         "n_blocks_oof": N_BLOCKS,
         "n_estimators_rf": N_ESTIMATORS,
         "random_state": int(args.random_state),
+        "mape_tol_pp": MAPE_TOL_PP,
+        "bias_tol_km_s": BIAS_TOL_KM_S,
         "scenarios": {
             sid: {
                 "fluid_name": results[sid]["fluid_name"],
+                "mix_law": results[sid]["mix_law"],
                 "kf_median_gpa": results[sid]["kf_median_gpa"],
                 "rho_median_gcc": results[sid]["rho_median_gcc"],
+                "sw_gassmann_median": results[sid]["sw_gassmann_median"],
+                "sw_mix_median": results[sid]["sw_mix_median"],
                 "gassmann": results[sid]["gassmann"],
                 "hybrid_rf": results[sid]["hybrid_rf"],
                 "hybrid_lr": results[sid]["hybrid_lr"],
@@ -821,10 +1029,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     check_path = tables / "slide_check.txt"
     check_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    # Versionable summary copies (processed/ is gitignored).
     RESULTS_ROOT.mkdir(parents=True, exist_ok=True)
     shutil.copy2(tables / "summary_metrics.csv", RESULTS_ROOT / "summary_metrics.csv")
     shutil.copy2(check_path, RESULTS_ROOT / "slide_check.txt")
+    shutil.copy2(
+        tables / "swirr_clip_rock_interval.csv",
+        RESULTS_ROOT / "swirr_clip_rock_interval.csv",
+    )
     (RESULTS_ROOT / "MANIFEST.json").write_text(
         json.dumps(manifest, indent=2) + "\n",
         encoding="utf-8",
@@ -835,6 +1046,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(line)
     print("OUT {}".format(out_root))
     print("RESULTS {}".format(RESULTS_ROOT))
+    print(
+        "SWIRR clip rock interval: {} / {} rows".format(
+            clip_qc["n_swirr_clipped_rock"], clip_qc["n_rock_interval"]
+        )
+    )
     if args.check_slides and not ok:
         print("FAIL: metrics disagree with Entrega 2 slide table")
         return 1

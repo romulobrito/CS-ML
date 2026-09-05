@@ -488,12 +488,11 @@
   \begin{columns}[T,onlytextwidth]
     \column{0.50\textwidth}
     \footnotesize
-    87/87 profundidades casadas; híbrido usa predições OOF do RF.
-    \par
-    \vspace{0.06cm}
+    87/87 profundidades; híbrido = OOF do RF.
+    \vspace{0.04cm}
     {\centering
     \scriptsize
-    \setlength{\tabcolsep}{3.5pt}
+    \setlength{\tabcolsep}{3.2pt}
     \begin{tabular}{lcccc}
       \toprule
       Modelo & MAPE & RMSE & Viés & $\bar{V}_{\mathrm{p}}$ \\
@@ -503,15 +502,30 @@
       DSI (ref.) & --- & --- & --- & 4,90 \\
       \bottomrule
     \end{tabular}
-    \par}
-    \vspace{0.10cm}
-    {\scriptsize O RMSE cai 63\%, mais que o MAPE em proporção: o corretor
-    ataca justamente as excursões grandes. O resultado final (0,18~km/s) fica
-    abaixo até do desvio-padrão do erro Gassmann ($\approx 0{,}39$~km/s), ou
-    seja, o ML explica viés \emph{e} dispersão.}
-    \column{0.46\textwidth}
-    \slidefigure[0.84]{fig3_vp_hybrid_depth}{Trilha pós-Etapa~3: sónico,
-    Gassmann e híbrido OOF (RF).}
+    \par
+    \vspace{0.08cm}
+    \setlength{\tabcolsep}{2.8pt}
+    \begin{tabular}{ccccc}
+      \toprule
+      HFU & $n$ & Plugs & MAPE gas. & MAPE híb. \\
+      \midrule
+      1 & 42 & 4 & 6,8 & 2,2 \\
+      2 & 29 & 4 & 2,2 & 2,3 \\
+      3 & 10 & 2 & 11,5 & 5,4 \\
+      4 & 6 & \textbf{0} & 28,1 & 4,8 \\
+      \bottomrule
+    \end{tabular}
+    \par
+    \vspace{0.04cm}
+    }
+    {\scriptsize
+    Plugs explicam o gap da \textbf{física} (HFU~4), não o descolamento
+    residual do híbrido: onde faltam plugs o corretor \emph{fecha} o sónico;
+    o que sobra (HFU~3/4 $\approx 5\%$) é erro OOF local, não falta de
+    calibração CT.}
+    \column{0.48\textwidth}
+    \slidefigure[0.78]{fig3_vp_hybrid_depth_hfu}{Trilha: sónico, Gassmann,
+    híbrido OOF; faixa = HFU lab (intercalada).}
   \end{columns}
 \end{frame}
 
@@ -874,8 +888,12 @@
     \begin{exampleblock}{Física não identificada}
       \scriptsize
       \begin{itemize}
-        \item PVT fixo ($K_f$, $S_w=1$, pressão): sensibilidade não explorada.
-        \item O resíduo aprendido pode combinar pressão efetiva, limites de
+        \item Fluido: produto com $K_f=2{,}2$~GPa e $S_w=1$; mediana de
+              poço ($\approx 2{,}83$~GPa) e VHR+\texttt{SWIRR} foram
+              testadas e \textbf{não} melhoram vs.\ sónico
+              (relatório residual, Seção de sensibilidade a $K_f$).
+        \item Pressão efetiva e demais condições in situ continuam fora
+              do escopo; o resíduo aprendido pode ainda combinar limites de
               Gassmann, erro de segmentação HFU, anisotropia e condição de
               medida do DSI.
         \item \textbf{Não} é novo modelo físico nem explicação mecanística
@@ -911,6 +929,8 @@
     \item \textbf{CLP-CSGM (3b/3c):} variantes por janelas ficam em 6,3--6,7\%
           e só superam o oracle com calibração esparsa em
           $\gtrsim 70\%$ das profundidades.
+    \item \textbf{Fluido:} $K_f=2{,}2$~GPa mantido; mediana de poço e
+          VHR+\texttt{SWIRR} não melhoram vs.\ sónico neste intervalo.
   \end{enumerate}
 \end{frame}
 
