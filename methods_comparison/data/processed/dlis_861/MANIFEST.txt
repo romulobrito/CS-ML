@@ -1,0 +1,52 @@
+Well 861 -- DLIS sonic extraction
+generated_utc: 2026-07-26T16:41:30Z
+
+Source: 3-brsa-861-sps_ait_pex_dsi.dlis
+Frame: 60B (logical_file=0)
+
+Depth calibration:
+  method: tdep_divide_scale
+  formula: depth_m = TDEP / tdep_scale
+  tdep_scale: 393.7008 (source: declared_units)
+  declared TDEP units: '0.1 in' -> 393.7008
+  fitted scale (cross-check): 408.1000
+  scale disagreement: 3.66%
+  warning: TDEP scale fitted to Auddys depths (408.1000) disagrees with the unit declared in the DLIS ('0.1 in' -> 393.7008) by 3.66%. Using the declared unit; the fitted value would shift depths by about 183.7 m at 5206 m.
+  Auddys depth range: 5205.91 - 5233.72 m
+  merge matches (tol): 87
+
+Cropped sonic log:
+  rows: 182
+  DTCO valid: 182
+  DTSM valid: 182
+  Vp valid: 182
+
+Outputs:
+  tables/sonic_log.csv
+  tables/sonic_log_full.csv
+  depth_calibration.json
+  metrics.json
+
+Next step:
+  python methods_comparison/scripts/run_861_dlis_dem_validation.py
+
+--- Sonic vs DEM validation ---
+generated_utc: 2026-07-26T16:42:59Z
+n_matched_vp: 87
+mape_vp_pct: 8.48
+rmse_vp_km_s: 0.533
+pearson_r_vp: 0.3408
+
+--- Sonic vs DEM validation ---
+generated_utc: 2026-07-26T16:48:12Z
+n_matched_vp: 87
+mape_vp_pct: 8.65
+rmse_vp_km_s: 0.540
+pearson_r_vp: 0.3404
+
+--- Sonic vs DEM validation ---
+generated_utc: 2026-07-26T16:57:08Z
+n_matched_vp: 87
+mape_vp_pct: 8.65
+rmse_vp_km_s: 0.540
+pearson_r_vp: 0.3404

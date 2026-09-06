@@ -1,0 +1,30 @@
+{
+  "n_plugs_calibrated": 9,
+  "n_hfu_calibrated": 3,
+  "robust_exclude_f2911v": true,
+  "excluded_samples": [
+    "F2911V"
+  ],
+  "before": {
+    "mae_vp_km_s": 1.1315900803565613,
+    "rmse_vp_km_s": 1.2574575917895117,
+    "mape_vp_pct": 22.8966671433677,
+    "bias_vp_km_s": 1.1117173535621927,
+    "pearson_r_vp": -0.07591615470999871,
+    "mean_vp_lab_km_s": 5.19,
+    "mean_vp_pred_km_s": 6.301717353562193
+  },
+  "after": {
+    "mae_vp_km_s": 0.39494183889171974,
+    "rmse_vp_km_s": 0.5018745296916359,
+    "mape_vp_pct": 7.481468359243709,
+    "bias_vp_km_s": -0.00989849860303169,
+    "pearson_r_vp": 0.3243683828409656,
+    "mean_vp_lab_km_s": 5.19,
+    "mean_vp_pred_km_s": 5.180101501396968
+  },
+  "mape_improvement_pct_points": 15.41519878412399,
+  "rmse_improvement_km_s": 0.7555830620978757,
+  "generated_utc": "2026-07-26T16:56:04Z",
+  "smoke": false
+}

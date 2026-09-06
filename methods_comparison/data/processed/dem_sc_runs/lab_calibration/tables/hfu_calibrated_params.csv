@@ -1,0 +1,4 @@
+HFU,n_plugs_calib,plug_ids,scenario_chosen,alpha_ct_median,alpha_calibrated,matrix_k_scale,matrix_g_scale,rmse_vp_before_km_s,rmse_vp_after_km_s,mape_vp_before_pct,mape_vp_after_pct,alpha_only_rmse_after,joint_rmse_after
+1,4,"F2852H,F2859H,F2870H,F2935H",alpha_matrix_scale,0.554259,0.950000,0.697175,0.697175,1.186990,0.644729,20.413386,10.973166,0.790461,0.644729
+2,4,"F2854H,F2880H,F2910H,F2911V",alpha_matrix_scale,0.553722,0.182054,0.709257,0.709257,1.654759,0.339679,36.398096,6.770773,0.724084,0.339679
+3,2,"F2829V,F2830H",alpha_matrix_scale,0.614844,0.950000,0.721186,0.721186,1.062516,0.545952,17.636822,10.203984,0.558700,0.545952

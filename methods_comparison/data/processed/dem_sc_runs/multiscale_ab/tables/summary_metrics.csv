@@ -1,0 +1,7 @@
+model,scope,mae_vp_km_s,rmse_vp_km_s,mape_vp_pct,bias_vp_km_s,pearson_r_vp,mean_vp_lab_km_s,mean_vp_pred_km_s
+M1_monoscale_calibrated,in_sample,0.455638,0.521570,9.138372,-0.005892,0.572055,5.052800,5.046908
+M2a_oracle_per_plug,in_sample,0.173591,0.367580,2.972454,-0.160740,0.856641,5.052800,4.892060
+M2b_oracle_hfu_median,in_sample,0.173685,0.358332,2.990471,-0.161989,0.873662,5.052800,4.890811
+M2b_forward_hfu_median,in_sample,0.433574,0.536792,8.711518,0.036206,0.527550,5.052800,5.089006
+M1_monoscale_calibrated,loo,0.749503,0.853819,14.846040,-0.069446,0.070502,5.052800,4.983353
+M2b_forward_hfu_median,loo,0.618032,0.775828,11.975738,-0.107556,-0.042659,5.052800,4.945244

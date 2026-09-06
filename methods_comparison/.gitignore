@@ -11,6 +11,30 @@ data/Sismica*/
 data/ROCKPHYS*
 data/processed/*
 !data/processed/861_integrated_logs_enriched.xlsx
+# Etapa 2 audit allowlist (tables/metrics only; no figures, no DLIS)
+!data/ROCKPHYS_Database_04_12_2024 (7).xlsx
+!data/General_Output_Results_PoreInfo_samples_w861_MOGNOTomo.xlsx
+!data/processed/861_integrated_ct_samples.xlsx
+!data/processed/861_ct_samples.csv
+!data/processed/README_ETAPA2_AUDIT.md
+!data/processed/rockphys_861/
+!data/processed/rockphys_861/**
+!data/processed/dem_sc_runs/
+!data/processed/dem_sc_runs/hfu_calibration/
+!data/processed/dem_sc_runs/hfu_calibration/*.csv
+!data/processed/dem_sc_runs/lab_validation/
+!data/processed/dem_sc_runs/lab_validation/**
+!data/processed/dem_sc_runs/lab_calibration/
+!data/processed/dem_sc_runs/lab_calibration/**
+!data/processed/dem_sc_runs/multiscale_ab/
+!data/processed/dem_sc_runs/multiscale_ab/**
+!data/processed/dem_sc_runs/multiscale_nmr/
+!data/processed/dem_sc_runs/multiscale_nmr/**
+!data/processed/dlis_861/
+!data/processed/dlis_861/**
+!data/processed/dlis_861_gassmann/
+!data/processed/dlis_861_gassmann/**
+data/processed/**/figures/
 
 # LaTeX build junk
 latex/**/*.aux

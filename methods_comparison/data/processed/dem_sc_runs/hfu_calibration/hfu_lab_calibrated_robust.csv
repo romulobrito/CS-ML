@@ -1,0 +1,5 @@
+HFU,alpha,alpha_ct_median,matrix_k_gpa,matrix_g_gpa,matrix_k_gpa_ct,matrix_g_gpa_ct,matrix_k_scale,matrix_g_scale,matrix_rho_gcc,param_source,n_ct_plugs,n_plugs_calib,rmse_vp_after_km_s
+1,0.950000,0.554259,58.551992,25.741037,83.984587,36.921892,0.697175,0.697175,2.773829,lab_calibrated_alpha_matrix_scale,4,4,0.644729
+2,0.215776,0.560294,59.876185,26.157235,83.151246,36.325071,0.720088,0.720088,2.766349,lab_calibrated_alpha_matrix_scale,4,3,0.051880
+3,0.950000,0.614844,58.976621,25.477993,81.777313,35.327928,0.721186,0.721186,2.754277,lab_calibrated_alpha_matrix_scale,2,2,0.545952
+4,0.582888,,82.464280,35.826499,82.464280,35.826499,1.000000,1.000000,2.760313,fallback_hfu4_avg_hfu2_hfu3_lab,0,0,

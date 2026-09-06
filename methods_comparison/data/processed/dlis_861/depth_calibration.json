@@ -1,0 +1,18 @@
+{
+  "method": "tdep_divide_scale",
+  "tdep_scale": 393.7007874015748,
+  "depth_formula": "depth_m = TDEP / tdep_scale",
+  "n_samples_in_window": 182,
+  "depth_min_m": 5205.9839999999995,
+  "depth_max_m": 5233.5684,
+  "auddys_depth_min_m": 5205.91,
+  "auddys_depth_max_m": 5233.72,
+  "merge_matches": 87,
+  "declared_units": "0.1 in",
+  "declared_scale": 393.7007874015748,
+  "fitted_scale": 408.10000000000866,
+  "fitted_merge_matches": 87,
+  "scale_source": "declared_units",
+  "scale_rel_diff": 0.03657400000002198,
+  "scale_warning": "TDEP scale fitted to Auddys depths (408.1000) disagrees with the unit declared in the DLIS ('0.1 in' -> 393.7008) by 3.66%. Using the declared unit; the fitted value would shift depths by about 183.7 m at 5206 m."
+}

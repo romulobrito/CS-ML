@@ -1,0 +1,19 @@
+Well 861 -- Etapa 2f multiscale A/B experiment
+Generated: 2026-07-26T16:50:38Z
+Planning: methods_comparison/planning/etapa2f_dem_multiscale_ab_poco861.md
+Plugs: 10
+Primary metric: M2b forward LOO vs M1 LOO
+Recommendation: keep_monoscale (LOO gain 2.87 p.p. without in-sample gain; not enough for profile.)
+MAPE M1 in-sample: 9.14%
+MAPE M2b forward in-sample: 8.71%
+MAPE M1 LOO: 14.85%
+MAPE M2b forward LOO: 11.98%
+MAPE M2a oracle in-sample (diagnostic): 2.97%
+
+Tables:
+  tables/plug_comparison.csv
+  tables/summary_metrics.csv
+  tables/loo_m2b_forward_comparison.csv
+Figures:
+  figures/vp_crossplot_m1_vs_m2b_forward.png
+  figures/abs_error_m1_m2a_oracle_m2b_forward.png

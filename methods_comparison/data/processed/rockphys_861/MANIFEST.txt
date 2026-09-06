@@ -1,0 +1,19 @@
+Well 861 -- ROCKPHYS lab ingest (Etapa 2)
+Generated: 2026-06-15T19:58:14Z
+
+Source workbook: ROCKPHYS_Database_04_12_2024 (7).xlsx
+Velocity rows (861): 196
+Unique samples: 28
+Depth range (m): 5206.00 -- 5232.55
+Confining pressures (MPa): 5.5, 8.3, 11.0, 13.8, 16.5, 19.3, 22.1
+
+tables/
+  861_rockphys_velocity.csv         -- all pressure steps
+  861_rockphys_velocity_ct_plugs.csv -- CT plugs at 22.1 MPa
+  861_rockphys_porosity.csv
+  861_rockphys_mineralogy.csv
+  861_rockphys_rock_info.csv
+
+Note: CT sample F2911V maps to lab id F2911H (orientation label).
+
+Planning: methods_comparison/planning/etapa2_dem_sc_vpvs_poco861.md
