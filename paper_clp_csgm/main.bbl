@@ -1,15 +1,70 @@
-\begin{thebibliography}{17}
+\begin{thebibliography}{46}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
+\bibitem[Abdel~Azim and Aljehani(2022)]{abdelazim2022permlogs}
+Reda Abdel~Azim and Abdulrahman Aljehani.
+\newblock Neural network model for permeability prediction from reservoir well
+  logs.
+\newblock \emph{Processes}, 10\penalty0 (12):\penalty0 2587, 2022.
+\newblock \doi{10.3390/pr10122587}.
+
+\bibitem[Adler and Öktem(2018)]{adler2018deepbayes}
+Jonas Adler and Ozan Öktem.
+\newblock Deep bayesian inversion, 2018.
+\newblock URL \url{https://arxiv.org/abs/1811.05910}.
+
 \bibitem[Ahmadi and Chen(2019)]{ahmadi2019comparison}
 Mohammad~Ali Ahmadi and Zhangxin Chen.
 \newblock Comparison of machine learning methods for estimating permeability
   and porosity of oil reservoirs via petro-physical logs.
 \newblock \emph{Petroleum}, 5\penalty0 (3):\penalty0 271--284, 2019.
+
+\bibitem[Al-Fakih et~al.(2023)Al-Fakih, Kaka, and
+  Koeshidayatullah]{alfakih2023northsea}
+Abdulrahman Al-Fakih, SanLinn~I. Kaka, and Ardiansyah~I. Koeshidayatullah.
+\newblock Reservoir property prediction in the north sea using machine
+  learning.
+\newblock \emph{IEEE Access}, 11:\penalty0 140148--140160, 2023.
+\newblock \doi{10.1109/ACCESS.2023.3336623}.
+
+\bibitem[Al-Fakih et~al.(2025)Al-Fakih, Koeshidayatullah, Mukerji, Al-Azani,
+  and Kaka]{alfakih2025wellloggan}
+Abdulrahman Al-Fakih, A.~Koeshidayatullah, Tapan Mukerji, Sadam Al-Azani, and
+  SanLinn~I. Kaka.
+\newblock Well log data generation and imputation using sequence based
+  generative adversarial networks.
+\newblock \emph{Scientific Reports}, 15:\penalty0 11000, 2025.
+\newblock \doi{10.1038/s41598-025-95709-0}.
+
+\bibitem[Al-Fakih et~al.(2026)Al-Fakih, Koeshidayatullah, Saraih, Mukerji,
+  Kanfar, Alali, and Kaka]{alfakih2026pix2geomodel}
+Abdulrahman Al-Fakih, Ardiansyah Koeshidayatullah, Nabil~A. Saraih, Tapan
+  Mukerji, Rayan Kanfar, Abdulmohsen Alali, and SanLinn~I. Kaka.
+\newblock Pix2geomodel: A next-generation reservoir geomodeling with
+  property-to-property translation.
+\newblock \emph{Geoenergy Science and Engineering}, 258:\penalty0 214342, 2026.
+\newblock \doi{10.1016/j.geoen.2025.214342}.
+
+\bibitem[Altekrüger et~al.(2024)Altekrüger, Hagemann, and
+  Steidl]{altekruger2024robustcgm}
+Fabian Altekrüger, Paul Hagemann, and Gabriele Steidl.
+\newblock Conditional generative models are provably robust: Pointwise
+  guarantees for bayesian inverse problems.
+\newblock \emph{Transactions on Machine Learning Research}, 2024.
+\newblock ISSN 2835-8856.
+
+\bibitem[Alvarez et~al.(2025)Alvarez, Missagia, da~Silva, and
+  Carrasquilla]{alvarez2025nonlinear}
+Auddys Alvarez, Roseane Missagia, Romulo~Brito da~Silva, and Abel Carrasquilla.
+\newblock Non-linear regression for permeability prediction and hydraulic flow
+  units' characterization from core and well logs of a pre-salt carbonate
+  reservoir in the santos basin, brazil.
+\newblock \emph{Journal of Applied Geophysics}, 241:\penalty0 105865, 2025.
+\newblock \doi{10.1016/j.jappgeo.2025.105865}.
 
 \bibitem[Asim et~al.(2020)Asim, Daniels, Leong, Ahmed, and
   Hand]{asim2020invertible}
@@ -25,6 +80,13 @@ George Asquith and Daniel Krygowski.
 \newblock \emph{Basic Well Log Analysis}.
 \newblock American Association of Petroleum Geologists, 2 edition, 2004.
 
+\bibitem[Bendel et~al.(2024)Bendel, Ahmad, and Schniter]{bendel2024rcgan}
+Matthew~C. Bendel, Rizwan Ahmad, and Philip Schniter.
+\newblock A regularized conditional gan for posterior sampling in image
+  recovery problems.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~36, 2024.
+
 \bibitem[Bishop(2006)]{bishop2006pattern}
 Christopher~M. Bishop.
 \newblock \emph{Pattern Recognition and Machine Learning}.
@@ -36,6 +98,13 @@ Ashish Bora, Ajil Jalal, Eric Price, and Alexandros~G. Dimakis.
 \newblock In \emph{Proceedings of the 34th International Conference on Machine
   Learning}, volume~70 of \emph{Proceedings of Machine Learning Research},
   pages 537--546. PMLR, 2017.
+
+\bibitem[Burger and Lucka(2014)]{burger2014map}
+Martin Burger and Felix Lucka.
+\newblock Maximum a posteriori estimates in linear inverse problems with
+  log-concave priors are proper {Bayes} estimators.
+\newblock \emph{Inverse Problems}, 30\penalty0 (11):\penalty0 114004, 2014.
+\newblock \doi{10.1088/0266-5611/30/11/114004}.
 
 \bibitem[Candes et~al.(2006{\natexlab{a}})Candes, Romberg, and
   Tao]{candes2006robust}
@@ -52,6 +121,35 @@ Emmanuel~J. Candes, Justin~K. Romberg, and Terence Tao.
 \newblock \emph{Communications on Pure and Applied Mathematics}, 59\penalty0
   (8):\penalty0 1207--1223, 2006{\natexlab{b}}.
 
+\bibitem[da~Silva et~al.(2025)da~Silva, Passos, Oishi, and
+  Kutz]{dasilva2025csshredenhancingshredrobust}
+Romulo~B. da~Silva, Diego Passos, C{\'a}ssio~M. Oishi, and J.~Nathan Kutz.
+\newblock {CS-SHRED}: Enhancing {SHRED} for robust recovery of spatiotemporal
+  dynamics, 2025.
+\newblock URL \url{https://arxiv.org/abs/2507.22303}.
+
+\bibitem[Dasgupta et~al.(2024)Dasgupta, Ramaswamy, Murgoitio~Esandi, Foo,
+  Chakraborty, Koutsourelakis, Kochmann, and
+  Yang]{dasgupta2024mechanicsdiffusion}
+Agnimitra Dasgupta, Harisankar Ramaswamy, Javier Murgoitio~Esandi, Ken Foo,
+  Arka Chakraborty, Phaedon-Stelios Koutsourelakis, Dennis~M. Kochmann, and
+  Yunzhu Yang.
+\newblock Conditional score-based diffusion models for solving inverse problems
+  in mechanics, 2024.
+\newblock URL \url{https://arxiv.org/abs/2406.13154}.
+
+\bibitem[de~Assis et~al.(2022)de~Assis, da~Silva, Lima~Neto, Galante, Campi,
+  de~Oliveira, Missagia, and Ceia]{deAssis2022CompressiveSF}
+Pedro~Carlos de~Assis, Romulo~B. da~Silva, Irineu Lima~Neto, Alan~C. Galante,
+  Alexandre~L. Campi, Alessandro~R. de~Oliveira, Roseane~Marchezi Missagia, and
+  Marco A.~R. Ceia.
+\newblock Compressive sensing framework using the linear {Radon} transform for
+  {3D} ultrasonic data reconstruction in a pinch-out reservoir model.
+\newblock In \emph{Second International Meeting for Applied Geoscience \&
+  Energy}, pages 2621--2625. Society of Exploration Geophysicists and American
+  Association of Petroleum Geologists, 2022.
+\newblock \doi{10.1190/image2022-3749310.1}.
+
 \bibitem[Donoho(2006)]{donoho2006compressed}
 David~L. Donoho.
 \newblock Compressed sensing.
@@ -63,10 +161,41 @@ Darwin~V. Ellis and Julian~M. Singer.
 \newblock \emph{Well Logging for Earth Scientists}.
 \newblock Springer, 2 edition, 2007.
 
+\bibitem[He et~al.(2025)He, Zhang, Wu, Zhang, Zhang, Zhuo, Song, Dai, and
+  Dang]{he2025porosity}
+Yawen He, Hongjun Zhang, Zhiyu Wu, Hongbo Zhang, Xin Zhang, Xiaojing Zhuo,
+  Xiaoli Song, Sha Dai, and Wei Dang.
+\newblock Porosity prediction of tight reservoir rock using well logging data
+  and machine learning.
+\newblock \emph{Scientific Reports}, 15:\penalty0 13124, 2025.
+\newblock \doi{10.1038/s41598-025-95578-7}.
+
+\bibitem[Hennenfent and Herrmann(2008)]{hennenfent2008simplydenoise}
+Gilles Hennenfent and Felix~J. Herrmann.
+\newblock Simply denoise: Wavefield reconstruction via jittered undersampling.
+\newblock \emph{Geophysics}, 73\penalty0 (3):\penalty0 V19--V28, 2008.
+\newblock \doi{10.1190/1.2841038}.
+
+\bibitem[Herrmann and Hennenfent(2008)]{herrmann2008nonparametric}
+Felix~J. Herrmann and Gilles Hennenfent.
+\newblock Non-parametric seismic data recovery with curvelet frames.
+\newblock \emph{Geophysical Journal International}, 173\penalty0 (1):\penalty0
+  233--248, 2008.
+\newblock \doi{10.1111/j.1365-246X.2007.03698.x}.
+
 \bibitem[Hoerl and Kennard(1970)]{hoerl1970ridge}
 Arthur~E. Hoerl and Robert~W. Kennard.
 \newblock Ridge regression: Biased estimation for nonorthogonal problems.
 \newblock \emph{Technometrics}, 12\penalty0 (1):\penalty0 55--67, 1970.
+
+\bibitem[Jacobsen et~al.(2025)Jacobsen, Zhuang, and
+  Duraisamy]{jacobsen2025cocogen}
+Christian Jacobsen, Yilin Zhuang, and Karthik Duraisamy.
+\newblock Cocogen: Physically consistent and conditioned score-based generative
+  models for forward and inverse problems.
+\newblock \emph{SIAM Journal on Scientific Computing}, 47\penalty0
+  (2):\penalty0 C399--C425, 2025.
+\newblock \doi{10.1137/24M1636071}.
 
 \bibitem[Kamath et~al.(2020)Kamath, Price, and Scarlett]{kamath2020power}
 Akshay Kamath, Eric Price, and Jonathan Scarlett.
@@ -74,6 +203,33 @@ Akshay Kamath, Eric Price, and Jonathan Scarlett.
 \newblock In \emph{Proceedings of the 37th International Conference on Machine
   Learning}, volume 119 of \emph{Proceedings of Machine Learning Research},
   pages 5101--5109. PMLR, 2020.
+
+\bibitem[Kim et~al.(2021)Kim, Lee, and Yang]{kim2021measurementconditional}
+Kyung-Su Kim, Jung~Hyun Lee, and Eunho Yang.
+\newblock Compressed sensing via measurement-conditional generative models.
+\newblock \emph{IEEE Access}, 9:\penalty0 155335--155352, 2021.
+\newblock \doi{10.1109/ACCESS.2021.3128721}.
+
+\bibitem[Kingma and Ba(2015)]{kingma2015adam}
+Diederik~P. Kingma and Jimmy Ba.
+\newblock Adam: A method for stochastic optimization, 2015.
+\newblock URL \url{https://arxiv.org/abs/1412.6980}.
+
+\bibitem[Koeshidayatullah et~al.(2026)Koeshidayatullah, Al-Fakih, and
+  Kaka]{koeshidayatullah2026timegpt}
+Ardiansyah Koeshidayatullah, Abdulrahman Al-Fakih, and SanLinn~Ismael Kaka.
+\newblock Toward basin-agnostic well log imputation and anomaly detection via a
+  pre-trained time-series foundation model.
+\newblock \emph{Energy Geoscience}, 7\penalty0 (2):\penalty0 100536, 2026.
+\newblock \doi{10.1016/j.engeos.2026.100536}.
+
+\bibitem[Koray et~al.(2024)Koray, Bui, Kubi, Ampomah,
+  et~al.]{koray2024integrated}
+Abdul-Muaizz Koray, Dung Bui, Emmanuel~Appiah Kubi, William Ampomah, et~al.
+\newblock Machine learning based reservoir characterization and numerical
+  modeling from integrated well log and core data.
+\newblock \emph{Geoenergy Science and Engineering}, 243:\penalty0 213296, 2024.
+\newblock \doi{10.1016/j.geoen.2024.213296}.
 
 \bibitem[Lucas et~al.(2018)Lucas, Iliadis, Molina, and
   Katsaggelos]{lucas2018using}
@@ -83,9 +239,42 @@ Alice Lucas, Michael Iliadis, Rafael Molina, and Aggelos~K. Katsaggelos.
 \newblock \emph{IEEE Signal Processing Magazine}, 35\penalty0 (1):\penalty0
   20--36, 2018.
 
+\bibitem[Markus et~al.(2026)Markus, Ba, Abid, Richard, and
+  Obadiah]{markus2026hybrid}
+Uti~Ikitsombika Markus, Jing Ba, Muhammad Abid, Faruwa~Ajibola Richard, and Emo
+  Obadiah.
+\newblock Hybrid optimization of interpretable ensemble machine learning for
+  petrophysical property prediction from well logs.
+\newblock \emph{Frontiers in Earth Science}, 13:\penalty0 1721227, 2026.
+\newblock \doi{10.3389/feart.2025.1721227}.
+
+\bibitem[Matinkia et~al.(2023)Matinkia, Hashami, Mehrad, Hajsaeedi, and
+  Velayati]{matinkia2023permpred}
+Morteza Matinkia, Romina Hashami, Mohammad Mehrad, Mohammad~Reza Hajsaeedi, and
+  Arian Velayati.
+\newblock Prediction of permeability from well logs using a new hybrid machine
+  learning algorithm.
+\newblock \emph{Petroleum}, 9\penalty0 (1):\penalty0 108--123, 2023.
+\newblock \doi{10.1016/j.petlm.2022.03.003}.
+
 \bibitem[Mirza and Osindero(2014)]{mirza2014conditional}
 Mehdi Mirza and Simon Osindero.
 \newblock Conditional generative adversarial nets, 2014.
+
+\bibitem[Mondal and Singh(2022)]{mondal2022corelog}
+Ilius Mondal and Kumar~Hemant Singh.
+\newblock Core-log integration and application of machine learning technique
+  for better reservoir characterisation of eocene carbonates, indian offshore.
+\newblock \emph{Energy Geoscience}, 3\penalty0 (1):\penalty0 49--62, 2022.
+\newblock \doi{10.1016/j.engeos.2021.10.006}.
+
+\bibitem[Muir and Zhan(2021)]{muir2021seismicwavefield}
+Jack~B. Muir and Zhongwen Zhan.
+\newblock Seismic wavefield reconstruction using a pre-conditioned
+  wavelet--curvelet compressive sensing approach.
+\newblock \emph{Geophysical Journal International}, 227\penalty0 (1):\penalty0
+  303--315, 2021.
+\newblock \doi{10.1093/gji/ggab222}.
 
 \bibitem[Ongie et~al.(2020)Ongie, Jalal, Metzler, Baraniuk, Dimakis, and
   Willett]{ongie2020deep}
@@ -95,6 +284,22 @@ Greg Ongie, Ajil Jalal, Christopher~A. Metzler, Richard~G. Baraniuk,
 \newblock \emph{IEEE Journal on Selected Areas in Information Theory},
   1\penalty0 (1):\penalty0 39--56, 2020.
 
+\bibitem[Pan et~al.(2023)Pan, Torres-Verd{\'\i}n, Duncan, and
+  Pyrcz]{pan2023multiwell}
+Wen Pan, Carlos Torres-Verd{\'\i}n, Ian~J. Duncan, and Michael~J. Pyrcz.
+\newblock Improving multiwell petrophysical interpretation from well logs via
+  machine learning and statistical models.
+\newblock \emph{Geophysics}, 88\penalty0 (2), 2023.
+\newblock \doi{10.1190/GEO2022-0151.1}.
+
+\bibitem[Shi et~al.(2024)Shi, Shi, Bie, Han, Ni, Mao, and Zhao]{shi2024gnsperm}
+Pengyu Shi, Pengda Shi, Kang Bie, Chuang Han, Xiaowei Ni, Zhiqiang Mao, and
+  Peiqiang Zhao.
+\newblock Prediction of permeability in a tight sandstone reservoir using a
+  gated network stacking model driven by data and physical models.
+\newblock \emph{Frontiers in Earth Science}, 12:\penalty0 1364515, 2024.
+\newblock \doi{10.3389/feart.2024.1364515}.
+
 \bibitem[Sohn et~al.(2015)Sohn, Lee, and Yan]{sohn2015learning}
 Kihyuk Sohn, Honglak Lee, and Xinchen Yan.
 \newblock Learning structured output representation using deep conditional
@@ -102,11 +307,27 @@ Kihyuk Sohn, Honglak Lee, and Xinchen Yan.
 \newblock In \emph{Advances in Neural Information Processing Systems},
   volume~28, 2015.
 
-\bibitem[Ulyanov et~al.(2018)Ulyanov, Vedaldi, and Lempitsky]{ulyanov2018deep}
-Dmitry Ulyanov, Andrea Vedaldi, and Victor Lempitsky.
-\newblock Deep image prior.
-\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and
-  Pattern Recognition}, pages 9446--9454, 2018.
+\bibitem[Sun et~al.(2026)Sun, Zhao, Peng, Huang, and Li]{sun2026corecalibrated}
+Weizhi Sun, Junxing Zhao, Shuaijie Peng, Wenlu Huang, and Hongyi Li.
+\newblock Physically consistent joint prediction of porosity and shale volume
+  via core-calibrated deep learning in well-consolidated sandstones.
+\newblock \emph{Scientific Reports}, 16:\penalty0 1737, 2026.
+\newblock \doi{10.1038/s41598-025-31326-1}.
+
+\bibitem[Tikhonov(1963)]{tikhonov1963solution}
+Andrey~N. Tikhonov.
+\newblock Solution of incorrectly formulated problems and the regularization
+  method.
+\newblock \emph{Soviet Mathematics Doklady}, 4:\penalty0 1035--1038, 1963.
+
+\bibitem[Wang et~al.(2024)Wang, Cai, Liu, Lu, Qiu, Hu, Li, and
+  Gamage]{wang2024loggingreview}
+Zihao Wang, Yidong Cai, Dameng Liu, Jun Lu, Feng Qiu, Jinghong Hu, Zhentao Li,
+  and Ranjith~Pathegama Gamage.
+\newblock A review of machine learning applications to geophysical logging
+  inversion of unconventional gas reservoir parameters.
+\newblock \emph{Earth-Science Reviews}, 258:\penalty0 104969, 2024.
+\newblock \doi{10.1016/j.earscirev.2024.104969}.
 
 \bibitem[Wood(2020)]{wood2020predicting}
 David~A. Wood.
@@ -115,5 +336,13 @@ David~A. Wood.
   well-log data.
 \newblock \emph{Journal of Petroleum Science and Engineering}, 184:\penalty0
   106587, 2020.
+
+\bibitem[Zhang et~al.(2025)Zhang, Liu, Wei, Li, Zayier, and
+  Cheng]{zhang2025rockphysicslogs}
+Ji~Zhang, Guiping Liu, Zhen Wei, Shengge Li, Yeheya Zayier, and Yuanfeng Cheng.
+\newblock Machine learning-based prediction of well logs guided by rock physics
+  and its interpretation.
+\newblock \emph{Sensors}, 25\penalty0 (3):\penalty0 836, 2025.
+\newblock \doi{10.3390/s25030836}.
 
 \end{thebibliography}

@@ -34,8 +34,20 @@ def plot_crosswell() -> str:
         axes = np.array([axes])
     for ax, step in zip(axes, steps):
         sub = df[df["step"] == step].sort_values("rho")
-        ax.plot(sub["rho"], sub["clp_csgm_rmse"], marker="o", label="CLP-CSGM Ridge", color="#d62728")
-        ax.plot(sub["rho"], sub["ae_ub_rmse"], marker="o", label="AE [u,b]", color="#17becf")
+        ax.plot(
+            sub["rho"],
+            sub["clp_csgm_rmse_mean"],
+            marker="o",
+            label="CLP-CSGM Ridge",
+            color="#d62728",
+        )
+        ax.plot(
+            sub["rho"],
+            sub["ae_ub_rmse_mean"],
+            marker="o",
+            label="AE [u,b]",
+            color="#17becf",
+        )
         ax.set_title("step = {}".format(step))
         ax.set_xlabel("rho")
         ax.grid(True, alpha=0.3)

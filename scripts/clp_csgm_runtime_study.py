@@ -157,12 +157,44 @@ def build_f03_case() -> RuntimeCase:
     if not F03_DATA.is_file():
         raise FileNotFoundError(str(F03_DATA))
     tab = rwf.load_f03_table(str(F03_DATA))
-    x_all, y_all, _centers, _ranges = rwf.build_sliding_windows(
-        tab, 64, 1, channels=("gr",)
+    n_rows = int(tab.n_rows)
+    n_tr_rows = int(np.floor(0.6 * n_rows))
+    n_va_rows = int(np.floor(0.2 * n_rows))
+    n_te_rows = int(n_rows - n_tr_rows - n_va_rows)
+    if min(n_tr_rows, n_va_rows, n_te_rows) < 64:
+        raise ValueError(
+            "Row split too small for F03 depth-first runtime case: "
+            "train={} val={} test={}".format(n_tr_rows, n_va_rows, n_te_rows)
+        )
+    tr = rwf.F03Table(
+        depth=tab.depth[:n_tr_rows].copy(),
+        ac=tab.ac[:n_tr_rows].copy(),
+        gr=tab.gr[:n_tr_rows].copy(),
+        porosity=tab.porosity[:n_tr_rows].copy(),
     )
-    sl_tr, sl_va, sl_te, n_tr, n_va, n_te = rwf.contiguous_split(
-        int(x_all.shape[0]), 0.6, 0.2
+    va = rwf.F03Table(
+        depth=tab.depth[n_tr_rows : n_tr_rows + n_va_rows].copy(),
+        ac=tab.ac[n_tr_rows : n_tr_rows + n_va_rows].copy(),
+        gr=tab.gr[n_tr_rows : n_tr_rows + n_va_rows].copy(),
+        porosity=tab.porosity[n_tr_rows : n_tr_rows + n_va_rows].copy(),
     )
+    te = rwf.F03Table(
+        depth=tab.depth[n_tr_rows + n_va_rows :].copy(),
+        ac=tab.ac[n_tr_rows + n_va_rows :].copy(),
+        gr=tab.gr[n_tr_rows + n_va_rows :].copy(),
+        porosity=tab.porosity[n_tr_rows + n_va_rows :].copy(),
+    )
+    x_tr, y_tr, _c1, _r1 = rwf.build_sliding_windows(tr, 64, 1, channels=("gr",))
+    x_va, y_va, _c2, _r2 = rwf.build_sliding_windows(va, 64, 1, channels=("gr",))
+    x_te, y_te, _c3, _r3 = rwf.build_sliding_windows(te, 64, 1, channels=("gr",))
+    n_tr = int(x_tr.shape[0])
+    n_va = int(x_va.shape[0])
+    n_te = int(x_te.shape[0])
+    x_all = np.concatenate([x_tr, x_va, x_te], axis=0)
+    y_all = np.concatenate([y_tr, y_va, y_te], axis=0)
+    sl_tr = slice(0, n_tr)
+    sl_va = slice(n_tr, n_tr + n_va)
+    sl_te = slice(n_tr + n_va, n_tr + n_va + n_te)
     data = rwf.build_direct_ub_data_dict(x_all, y_all, sl_tr, sl_va, sl_te, "dct")
     cfg = _base_cfg(
         profile="real_well_f03_direct_ub",

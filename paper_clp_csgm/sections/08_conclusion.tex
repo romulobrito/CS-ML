@@ -1,29 +1,94 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We introduced CLP-CSGM Ridge, a conditional generative compressed sensing method
-for petrophysical property estimation from dense logs and sparse core
-measurements. The method learns a target-property decoder, predicts a
-log-conditioned latent prior with ridge regression, and refines the latent code
-at test time by enforcing sparse measurement consistency.
+We introduced CLP-CSGM. A decoder trained on windows of the target curve
+supplies the windows the reconstruction may use. The dense logs set the
+starting point of the search. At inference the decoded window must match the
+sparse measurements. The MAP/Tikhonov reading and the local error bound
+separate measurement noise, decoder error, a poor starting point, and whether
+nearby windows can be told apart from the measurements.
 
-In cross-well low-data Vc prediction, CLP-CSGM Ridge outperformed the strongest
-direct \([u,b]\) autoencoder baseline in all tested training-size and
-measurement-ratio cells. In the real-well F03 GR-only porosity case, it
-achieved the best average RMSE, with its clearest advantage in the sparsest
-measurement regimes. These results indicate that conditional latent generative
-priors are a promising alternative to fixed-basis sparse residual recovery for
-petrophysical sparse-measurement assimilation.
+Under the paired F3 protocols, CLP-CSGM Ridge has lower mean RMSE than AE
+$[\boldsymbol{u},\boldsymbol{b}]$, the most competitive direct baseline in this
+cross-well benchmark, in seven of nine cross-well cells. This is a conditional
+advantage where training support is smallest (steps $16$ and $32$), not overall
+superiority: AE
+$[\boldsymbol{u},\boldsymbol{b}]$ has lower mean RMSE at step $8$ for
+$\rho=0.05$ and $\rho=0.10$. The unweighted mean of the nine cell-level mean
+RMSE values decreases from $0.03496$ to $0.02862$, a reduction of approximately
+$18.1\%$. In the F03-4 GR-only benchmark, CLP-CSGM Ridge has the lowest mean
+RMSE at $\rho\in\{0.20,0.30\}$, while AE $[\boldsymbol{u},\boldsymbol{b}]$ has
+lower mean RMSE at $\rho\in\{0.40,0.60\}$. That benchmark assimilates the
+processed porosity curve with gamma ray as the only dense input; the depth
+profile at $\rho=0.20$ follows the broad trend of this curve. It is a
+controlled stress test under intentionally incomplete context and is not
+evidence of general porosity reconstruction performance. The full Ridge model
+has lower mean RMSE than
+prior-only in every cross-well cell and than measurement-only CSGM in seven of
+nine cells. It also has lower mean RMSE than both ablations throughout the
+F03-4 grid. The opposite Ridge--MLP rankings show that the better map from
+dense logs to the starting point depends on the test.
 
-The ablation results clarify why the method works in the studied regimes. The
-prior-only decoder \(G(h(u))\) is weaker than the full method, showing that
-sparse target-well measurements add information beyond log-conditioned latent
-regression. Measurement-only CSGM is also weaker, showing that sparse
-observations alone do not provide a stable latent estimate in these low-data
-settings. Finally, the Ridge prior is consistently stronger than the MLP prior,
-supporting the use of a low-capacity conditional latent prior when training
-windows are scarce.
+On the tests reported here, CLP-CSGM complements direct regression because
+the sparse values stay measurements that the reconstructed window must match.
+The F3 evidence
+is reconstruction of processed target logs: cross-well $V_c$ is
+Larionov-derived from gamma ray, F03-4 porosity is density-derived, and
+sparse observations are coordinate subsamples of these same curves rather than
+independently acquired core or laboratory measurements. A separate
+single-well supplement on laboratory porosity scores held-out laboratory
+coordinates. CLP-CSGM is not superior on the mean RMSE: the direct AE is lower
+because the deepest block shifts the logs away from the logs used to fit the
+starting-point map. Laboratory measurements correct that starting point in
+every split, and the correction is enough on the two shallower blocks, where
+the test logs remain close to those training logs and CLP-CSGM Ridge keeps
+the lower block-mean RMSE. That supplement is one cored interval. The cross-well
+comparison is a controlled single-holdout benchmark on F03-4 and is not
+evidence of operational cross-well or multi-field transferability. Broader
+assessment will require larger multi-well datasets, independently calibrated
+targets, and geological labels. It will also require uncertainty estimates and
+faster latent-refinement strategies.
 
-Future work should evaluate the method on additional fields, compare richer
-conditional priors, investigate uncertainty quantification in latent space, and
-study measurement designs beyond coordinate subsampling.
+
+\paragraph*{Author Contributions}\mbox{}\\[0.25em]
+\noindent
+\textbf{Romulo Brito da Silva:} Conceptualization, Methodology, Software, Formal Analysis, Data Curation, Validation, Visualization, Writing---Original Draft, Writing---Review \& Editing.
+
+\noindent
+\textbf{Diego Passos:} Visualization, including figure organization and standardization, Writing---Review \& Editing.
+
+\noindent
+\textbf{Irineu de Azevedo Lima Neto:} Visualization, including figure organization and standardization, Writing---Review \& Editing.
+
+\noindent
+\textbf{Herson Oliveira da Rocha:} Visualization, including figure organization and standardization, Writing---Review \& Editing.
+
+\noindent
+\textbf{Roseane Marchezi Missagia:} Senior Review, Advisory Support, Writing---Review \& Editing.
+
+\noindent
+\textbf{Marco Antonio Rodrigues de Ceia:} Senior Review, Advisory Support, Writing---Review \& Editing.
+
+
+
+
+\section*{Declaration of competing interest}
+
+The authors declare that they have no known competing financial interests
+or personal relationships that could have appeared to influence the work
+reported in this paper.
+
+
+\section*{Declaration of generative AI and AI-assisted technologies
+in the manuscript preparation process}
+
+During the preparation of this work, the authors used OpenAI's ChatGPT
+to assist with language refinement, improve the clarity and organization
+of the manuscript, reduce its length to meet the journal's word-count
+requirements, and assist in the creation of explanatory schematic figures
+illustrating concepts, processes, and experimental workflows. The tool was
+not used to generate research data, perform the reported numerical experiments,
+fabricate or alter quantitative results, or determine the scientific
+conclusions. After using this tool, the authors reviewed, edited, and validated
+the text and figures as needed and take full responsibility for the content of
+the published article.

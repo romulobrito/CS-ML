@@ -34,7 +34,7 @@ F03_RUN = (
     / "real_well_f03"
     / "direct_ub"
     / "runs"
-    / "f03_gr_only_clp_csgm_ablation_ridge"
+    / "f03_full_gr_only_clp_csgm_ridge"
 )
 F03_MLP_RUN = (
     ROOT

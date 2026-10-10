@@ -6,11 +6,29 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage{adjustbox}
 \usepackage{natbib}
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,calc}
+
+\usepackage{setspace}
+\usepackage{lineno}
+
+% Float tuning for a manuscript with many figures and compact result tables.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.82}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.74}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{10pt plus 2pt minus 2pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
 
 \graphicspath{{figures/}}
 
@@ -20,34 +38,124 @@
 \theoremstyle{remark}
 \newtheorem{remark}{Remark}
 
-\title{Conditional Latent-Prior Generative Compressed Sensing for Petrophysical Property Estimation from Sparse Core Measurements}
-\author{Author names omitted for review}
+\newcommand{\keywords}[1]{%
+  \vspace{0.5em}
+  \noindent\textbf{Keywords:} #1\par
+}
+
+
+\title{Conditional Latent-Prior Generative Compressed Sensing for Petrophysical Target-Log Reconstruction}
+
+\author{%
+Romulo Brito da Silva\textsuperscript{1,3,*},
+Irineu de Azevedo Lima Neto\textsuperscript{3}\\
+Diego Passos\textsuperscript{4},
+Herson Oliveira da Rocha\textsuperscript{1,2,3}\\
+Roseane Marchezi Missagia\textsuperscript{1},\\
+Marco Antonio Rodrigues de Ceia\textsuperscript{1}\\[0.5em]
+\parbox{0.95\textwidth}{\centering\small
+\textsuperscript{1}LENEP, North Fluminense State University (UENF),
+Rodovia Amaral Peixoto, km 163, Imboassica,
+Macaé, RJ 27925-310, Brazil\\
+\textsuperscript{2}Polytechnic Institute (IPLOI), Campus Macaé,
+Federal University of Rio de Janeiro (UFRJ), Macaé, Brazil\\
+\textsuperscript{3}Scientific Computing Supporting Foundation (FACC),
+Petrópolis, Brazil\\
+\textsuperscript{4}Instituto Superior de Engenharia de Lisboa,
+Instituto Politécnico de Lisboa, Lisbon, Portugal\\[0.35em]
+\textsuperscript{*}Corresponding author at:
+LENEP/UENF, Rodovia Amaral Peixoto, km 163, Imboassica,
+Macaé, RJ 27925-310, Brazil.
+E-mail: \texttt{romulobrito@lenep.uenf.br}}
+}
 \date{}
 
 \begin{document}
-
+\doublespacing
+\linenumbers
 \maketitle
 
 \begin{abstract}
 Dense well logs provide continuous indirect observations of subsurface
-properties, whereas core measurements are sparse, expensive, and usually
-available only at selected depths. Direct supervised models can exploit log
-features, but they often use sparse target-well measurements only as additional
-inputs. Classical compressed sensing provides measurement consistency, but its
-fixed-basis sparsity assumption can be too rigid for cross-well petrophysical
-prediction. We propose Conditional Latent-Prior Compressed Sensing with
-Generative Models (CLP-CSGM), which learns a generative range of
-target-property windows and uses well logs to predict a latent prior. Sparse
-core measurements then refine the reconstruction through a test-time latent
-inverse problem. In low-data cross-well clay-volume prediction, CLP-CSGM Ridge
-improves over a direct autoencoder baseline in all tested training-size and
-measurement-ratio cells, reducing mean RMSE from 0.01905 to 0.01397. In a
-real-well F03-4 GR-only porosity stress test, CLP-CSGM Ridge attains the best
-average RMSE, with strongest gains in the sparsest measurement regimes.
-Ablations confirm that both the conditional prior and the sparse-measurement
-term are necessary, and that Ridge is more stable than an MLP latent prior in
-the tested low-data grids.
+properties, whereas target-property curves may be available only at selected
+depths. Direct supervised models can combine dense logs with sparse target
+observations, but they typically use the sparse entries as input features and do
+not require the reconstruction to honor them as measurements. We introduce Conditional Latent-Prior Compressed Sensing with Generative
+Models (CLP-CSGM). A decoder trained on windows of the target curve supplies
+the windows the reconstruction may use. The dense logs set the starting point
+of the search for that window. At inference, the decoded window is adjusted
+so that it matches the sparse measurements. A conditional local-recovery bound separates decoder error,
+prior mismatch, measurement noise, and local separability. It does not prove
+that the measurement operator satisfies S-REC on the trained decoder.
+We evaluate CLP-CSGM on public Dutch North Sea well-log data reorganized into a
+held-out-well clay-volume benchmark and a single-well porosity stress test with
+weak dense context. The F3 evaluation uses four wells, with F02-1, F03-2, and
+F06-1 for model development and F03-4 held out; the results are not presented
+as operational multi-well transfer. The clay-volume target is obtained from
+gamma ray by the Larionov relation, the single-well porosity target is
+processed and density-derived, and the sparse observations are coordinate
+subsamples of these same processed curves. The benchmarks therefore test
+reconstruction of processed target logs rather than recovery against
+independently acquired core or laboratory measurements. A limited-sample
+permeability case provides supplementary evidence. With a linear ridge map as
+the reference for that starting point, the comparison is a conditional advantage,
+not overall superiority. CLP-CSGM has lower mean RMSE than the direct
+autoencoder baseline in seven of nine cross-well cells, with the gains
+concentrated where training support is smallest (steps $16$ and $32$). The
+direct autoencoder has lower mean RMSE in the two remaining cells, both at
+step $8$ (the largest training pool) for $\rho=0.05$ and $\rho=0.10$. The
+unweighted mean of the nine cell-level RMSE values decreases from 0.0350 to
+0.0286, an overall reduction of about 18\%. In the GR-only porosity benchmark,
+CLP-CSGM has the lowest mean RMSE at the two sparsest ratios, including
+0.016 versus 0.018 at $\rho=0.20$, whereas the direct autoencoder has lower
+mean RMSE at $\rho=0.40$ and $\rho=0.60$. That GR-only comparison is a
+controlled sparse-assimilation test under intentionally incomplete context:
+gamma ray is the only dense input, and the depth profile follows the broad
+trend of the processed porosity curve. It is not evidence of general porosity
+reconstruction performance.
+Dropping either the dense-log starting point or the match to the sparse
+measurements raises the error in most cells. Which of the two matters more
+changes with the number of training windows and with how many depths are
+measured. The map from dense logs to the starting point is also
+dataset-dependent: a multilayer perceptron gives lower mean RMSE on the
+cross-well grid, whereas ridge gives lower mean RMSE when gamma ray is the
+only dense log. On these processed-log tests, CLP-CSGM complements direct
+regression when training windows are few, the test well differs from the
+training wells, or the dense logs are incomplete.
 \end{abstract}
+
+\keywords{compressed sensing; generative model; inverse problem;
+well-log reconstruction; petrophysics; sparse assimilation}
+
+\vspace{0.5em}
+\section*{Computer Code Availability}
+
+CLP-CSGM (Conditional Latent-Prior Compressed Sensing with Generative Models)
+was developed by Romulo Brito da Silva, LENEP, North Fluminense State
+University, Rodovia Amaral Peixoto, km 163, Imboassica, Macae,
+RJ 27925-310, Brazil (contact: \texttt{romulobrito@lenep.uenf.br} ;
+telephone: +55 21 99101-3308).
+First publicly released in 2026, it is implemented in Python 3.10 using
+NumPy 1.26, pandas 2.3, Matplotlib 3.7, scikit-learn 1.6, PyTorch 2.6,
+and PyWavelets 1.4. The source repository occupies approximately 10~MB,
+excluding datasets and experiment outputs, and runs on a multi-core CPU
+with at least 8~GB of RAM; CUDA is optional.
+
+Source code, installation instructions, dependencies, benchmark scripts,
+and documentation are available at
+\url{https://github.com/romulobrito/CLP--CSGM} under the MIT License.
+The repository covers the cross-well clay-volume and F03-4 porosity
+benchmarks, structural ablations, latent-prior sensitivity, and
+supplementary diagnostics. Processed well-log tables are not redistributed;
+the README specifies the required inputs and reproduction steps.
+
+\vspace{0.35em}
+\noindent\textbf{Data availability.}
+The F3-derived benchmarks follow \citet{zhang2025rockphysicslogs}; users
+must obtain the tabulated inputs from the cited releases or portals under
+the applicable licenses. The Lapa dataset follows
+\citet{alvarez2025nonlinear}, whose underlying field data cannot be shared
+publicly. Supplementary analyses therefore require locally authorized inputs.
 
 \input{sections/01_introduction}
 \input{sections/02_related_work}
@@ -58,7 +166,12 @@ the tested low-data grids.
 \input{sections/07_discussion}
 \input{sections/08_conclusion}
 
+\clearpage
 \bibliographystyle{plainnat}
 \bibliography{references}
+
+\clearpage
+\appendix
+\input{sections/09_appendix}
 
 \end{document}

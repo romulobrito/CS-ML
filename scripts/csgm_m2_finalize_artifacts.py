@@ -207,7 +207,24 @@ def summarize(per_seed: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
-    g["rmse_ci95_half"] = 1.96 * g["rmse_sem"]
+    def _t95_half(row):
+        n = int(row["n_seeds"])
+        if n <= 1:
+            return 0.0
+        tcrit = {
+            1: 12.706204736432095,
+            2: 4.302652729911275,
+            3: 3.182446305284263,
+            4: 2.7764451051977987,
+            5: 2.57058183563631,
+            6: 2.4469118511449682,
+            7: 2.3646242515927846,
+            8: 2.306004135204166,
+            9: 2.2621571627982046,
+        }.get(n - 1, 1.96)
+        return float(tcrit) * float(row["rmse_sem"])
+
+    g["rmse_ci95_half"] = g.apply(_t95_half, axis=1)
     g["method"] = pd.Categorical(g["method"], categories=list(METHOD_ORDER), ordered=True)
     return g.sort_values(["step", "measurement_ratio", "method"]).reset_index(drop=True)
 

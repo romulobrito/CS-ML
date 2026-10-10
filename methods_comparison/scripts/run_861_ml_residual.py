@@ -421,6 +421,28 @@ def run_regressor_sensitivity(
     return pd.DataFrame(rows), details, depth_df
 
 
+HFU_STRIP_COLORS: Dict[int, str] = {
+    1: "#4C78A8",
+    2: "#54A24B",
+    3: "#F58518",
+    4: "#E45756",
+}
+
+
+def _depth_bin_edges(depths: np.ndarray) -> np.ndarray:
+    """Half-way edges between sorted sample depths for a side strip."""
+    depths = np.asarray(depths, dtype=np.float64)
+    if depths.size == 0:
+        return np.asarray([], dtype=np.float64)
+    if depths.size == 1:
+        pad = 0.2
+        return np.asarray([depths[0] - pad, depths[0] + pad], dtype=np.float64)
+    mid = 0.5 * (depths[:-1] + depths[1:])
+    first = depths[0] - (depths[1] - depths[0]) * 0.5
+    last = depths[-1] + (depths[-1] - depths[-2]) * 0.5
+    return np.concatenate([[first], mid, [last]])
+
+
 def plot_vp_depth_tracks(
     df: pd.DataFrame,
     out_path: Path,
@@ -469,6 +491,105 @@ def plot_vp_depth_tracks(
     ax.legend(loc="best", fontsize=8)
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
+    fig.savefig(out_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_vp_depth_tracks_with_hfu(
+    df: pd.DataFrame,
+    out_path: Path,
+    hybrid_col: str = "vp_hybrid_oof_km_s",
+    hybrid_label: str = "Vp hybrid OOF (RF)",
+    hybrid_color: str = "#d62728",
+    hybrid_marker: str = "d",
+    title: str = "Well 861: RF hybrid vs Gassmann vs sonic (OOF)",
+) -> None:
+    """
+    Depth track with a side strip colored by lab HFU at each sample.
+
+    HFUs are interleaved along depth, so the strip is sample-wise rather than
+    continuous stratigraphic bands.
+    """
+    required = [DEPTH_COL, HFU_COL, "vp_sonic_km_s", "vp_gassmann_km_s", hybrid_col]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise KeyError("Missing columns: {}".format(", ".join(missing)))
+
+    work = df.sort_values(DEPTH_COL).reset_index(drop=True)
+    depths = work[DEPTH_COL].to_numpy(dtype=np.float64)
+    hfus = work[HFU_COL].to_numpy(dtype=np.int64)
+    edges = _depth_bin_edges(depths)
+
+    fig = plt.figure(figsize=(6.8, 8.0))
+    grid = fig.add_gridspec(1, 2, width_ratios=[1.0, 16.0], wspace=0.06)
+    ax_hfu = fig.add_subplot(grid[0, 0])
+    ax = fig.add_subplot(grid[0, 1], sharey=ax_hfu)
+
+    for i, hfu in enumerate(hfus):
+        color = HFU_STRIP_COLORS.get(int(hfu), "#9E9E9E")
+        ax_hfu.axhspan(edges[i], edges[i + 1], facecolor=color, edgecolor="none")
+    ax_hfu.set_xlim(0.0, 1.0)
+    ax_hfu.set_xticks([])
+    ax_hfu.set_ylabel("Depth (m)")
+    ax_hfu.set_xlabel("HFU", fontsize=8)
+    ax_hfu.tick_params(axis="y", labelsize=8)
+
+    ax.plot(
+        work["vp_sonic_km_s"],
+        depths,
+        "o-",
+        color="#2ca02c",
+        label="Vp sonic",
+        markersize=3,
+        linewidth=1.0,
+    )
+    ax.plot(
+        work["vp_gassmann_km_s"],
+        depths,
+        "s--",
+        color="#1f77b4",
+        label="Vp Gassmann",
+        markersize=3,
+        linewidth=1.0,
+    )
+    ax.plot(
+        work[hybrid_col],
+        depths,
+        hybrid_marker + "-",
+        color=hybrid_color,
+        label=hybrid_label,
+        markersize=3,
+        linewidth=1.2,
+    )
+    ax.set_xlabel("Vp (km/s)")
+    ax.set_title(title, fontsize=11)
+    ax.grid(True, alpha=0.3)
+    ax.tick_params(axis="y", labelleft=False)
+
+    handles = [
+        plt.Line2D(
+            [0],
+            [0],
+            marker="s",
+            color="none",
+            markerfacecolor=HFU_STRIP_COLORS[h],
+            markersize=8,
+            label="HFU {}".format(h),
+        )
+        for h in sorted(HFU_STRIP_COLORS)
+    ]
+    curve_handles, curve_labels = ax.get_legend_handles_labels()
+    ax.legend(
+        curve_handles + handles,
+        curve_labels + ["HFU {}".format(h) for h in sorted(HFU_STRIP_COLORS)],
+        loc="best",
+        fontsize=7,
+        framealpha=0.9,
+    )
+
+    ax_hfu.invert_yaxis()
+    fig.subplots_adjust(left=0.10, right=0.98, top=0.94, bottom=0.08, wspace=0.08)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
 
@@ -597,6 +718,14 @@ def run_residual_pipeline(
         hybrid_label="Vp hybrid OOF (RF)",
         hybrid_color="#d62728",
         title="Well 861: RF hybrid vs Gassmann vs sonic (OOF)",
+    )
+    plot_vp_depth_tracks_with_hfu(
+        work,
+        figures_dir / "vp_physics_vs_hybrid_vs_sonic_depth_hfu.png",
+        hybrid_col="vp_hybrid_oof_km_s",
+        hybrid_label="Vp hybrid OOF (RF)",
+        hybrid_color="#d62728",
+        title="Well 861: RF hybrid vs Gassmann vs sonic (OOF, HFU strip)",
     )
     ridge_col = "vp_hybrid_ridge_oof_km_s"
     if ridge_col in reg_depth_df.columns:

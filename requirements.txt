@@ -8,8 +8,13 @@ scikit-learn>=1.0
 pylops>=2.0
 spgl1>=2.0
 
-# Etapa 2 LFISTA: sir_cs_lfista.py and pipeline profiles lfista_integrated* (skip if you only run classic profiles)
-torch>=2.0
+# Etapa 2 rock physics (DEM/SC) -- optional cross-check vs rockphypy
+# rockphypy>=0.0.3
+# POC uses dem_sc_861_core.py (scipy); run crosscheck_dem_rockphypy.py to compare
+
+# DLIS well logs (Well 861 sonic extraction)
+dlisio>=1.0
+
 
 # Extra orthonormal bases for residual sparsification (haar, db4, sym4) in real-well benchmark
 PyWavelets>=1.4

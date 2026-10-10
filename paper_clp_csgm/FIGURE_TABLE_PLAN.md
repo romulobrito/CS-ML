@@ -40,7 +40,8 @@ to appendix, and what argument each artifact supports.
 
 ### Table: F03 GR-only summary
 
-- File: `tables/results_f03_gr_only.tex`
+- File: `tables/results_f03_gr_only_compact.tex` (main paper; RMSE pivot)
+- File: `tables/results_f03_gr_only.tex` (appendix; full multi-metric breakdown)
 - Section: Results.
 - Argument: CLP-CSGM Ridge is best on average, strongest at low measurement
   ratios, and slightly loses to AE at higher measurement ratios.

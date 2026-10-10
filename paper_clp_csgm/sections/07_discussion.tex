@@ -1,54 +1,139 @@
-\section{Discussion}
+\section{Interpretation, scope, and limitations}
 \label{sec:discussion}
 
-The results support the central hypothesis: sparse target-well measurements are
-more useful when they are enforced through a measurement-consistency term over a
-learned latent manifold than when they are used only as additional supervised
-features. In the cross-well Vc benchmark, the training set is small and the
-held-out well has a shifted target distribution. Direct baselines must learn a
-complete \([u,b]\to y\) map from few windows. CLP-CSGM Ridge decomposes the task
-into two simpler components: learn a plausible target manifold from training
-windows, then select a nearby latent code that is consistent with sparse
-measurements in the target well.
+CLP-CSGM uses three pieces that act together. The decoder range
+$\operatorname{Im}(G)$ is the set of target windows the decoder can produce.
+The starting code $\boldsymbol{z}_0=h(\boldsymbol{u})$ is the point the dense
+logs propose before any measurement is enforced. The measurement term
+$\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$ pulls the decoded window
+onto the sparse observations. The decoder range limits which windows can
+appear. The starting code carries the dense logs into that search, and the
+measurement term uses the sparse target values. Unlike direct
+$[\boldsymbol{u},\boldsymbol{b}]$ predictors,
+CLP-CSGM retains $\boldsymbol{b}$ as an explicit measurement during inference.
+It is therefore most relevant when dense logs are informative but incomplete
+and sparse target entries should be honored directly. Log-completion models
+fill a missing interval of a wireline curve, geomodel translation fills a
+property image from another image, and direct regression maps logs to porosity
+or shale volume
+\citep{koeshidayatullah2026timegpt,alfakih2026pix2geomodel,alfakih2025wellloggan,alfakih2023northsea}.
+CLP-CSGM is the relevant formulation when those dense logs are already
+available and a few observations of the target property must be honored by the
+reconstructed window.
 
-The ridge prior is important in this decomposition. It provides a stable
-log-conditioned center \(z_0(u)\) in regimes where a more flexible predictor
-could overfit. The sparse measurements then act as a local correction rather
-than as the only source of information. This explains why the method performs
-especially well in low-data and low-\(\rho\) settings.
+The depth profiles in
+Figs.~\ref{fig:crosswell_depth_profile} and~\ref{fig:f03_depth} illustrate how
+the balance of these information sources affects reconstruction detail. The
+multi-channel cross-well context supports closer tracking of the held-out
+$V_c$ profile, whereas the deliberately weak GR-only context produces a
+smoother F03-4 porosity reconstruction. The attainable detail is governed
+jointly by the information in $\boldsymbol{u}$, the adequacy of
+$\operatorname{Im}(G)$, and the number and placement of observations in
+$\boldsymbol{b}$.
 
-The ablation results strengthen this interpretation. The prior-only decoder is
-weaker than the full method, which shows that sparse measurements add useful
-target-well information beyond the log-conditioned latent estimate. The
-measurement-only CSGM variant is also weaker, especially at low \(\rho\), which
-shows that the sparse observations alone do not sufficiently identify a stable
-latent code. The method works best when both sources are used together: logs
-anchor the latent search, and sparse measurements correct it.
+The ablations in Section~\ref{subsec:ablation_analysis} drop one piece at a
+time. Using only the starting point, or only the measurements, raises the
+error in most cells, and which piece matters more changes with the number of
+training windows. The full Ridge model has lower mean RMSE than
+prior-only throughout the cross-well grid and lower mean RMSE than
+measurement-only CSGM in seven of nine cells. In the two step-$8$ exceptions,
+measurement-only inversion has lower mean RMSE, so the ridge starting point
+is not helpful in those cells. On the F03-4 grid, where gamma ray is the only
+dense log, the full model has lower mean RMSE than both ablations at every
+tested ratio. The starting point keeps the search from drifting, and the
+measurement term is still free to correct it.
 
-The Ridge-versus-MLP sensitivity study further supports the low-data design
-choice. A more flexible MLP prior does not improve the conditional latent prior
-in the tested grids; it is consistently worse than Ridge. This suggests that,
-with few training windows, regularized linear latent prediction is preferable to
-a higher-capacity prior that can overfit or become unstable.
+The sensitivity results in
+Section~\ref{subsec:latent_prior_sensitivity} show that no single architecture
+for $h$ is uniformly preferable. MLP has lower mean RMSE in all nine
+multi-channel cross-well cells, whereas Ridge has lower mean RMSE at every
+tested ratio under the single-channel F03-4 setting. In both cases, the
+difference decreases as $\rho$ increases, which is consistent with less
+dependence on the dense-log starting point as more target observations
+become available. These comparisons distinguish the CLP-CSGM framework from its reference
+implementation. Ridge remains the primary reported configuration because it is
+a fixed linear map: the main tables then use one $h$ in every cell, and $h$
+is not chosen after seeing the test ranking. The
+MLP results have the same experimental status. They show that a more flexible
+map improves the cross-well grid and that the preferred class changes with
+the test. The class of $h$, the latent dimension, and the regularization
+should be selected on validation data for the intended measurements, not by
+adopting whichever variant wins on the held-out test set. The
+experiments establish this sensitivity but do not identify which architectural
+property causes the opposite rankings.
 
-The real-well F03 experiment gives a more nuanced result. CLP-CSGM Ridge is the
-best method on average and is strongest when \(\rho\) is small. However, AE
-\([u,b]\) slightly outperforms it at larger \(\rho\). This loss is not
-inconsistent with the method objective. CLP-CSGM is designed for sparse
-assimilation under a generative prior; when many target samples are available,
-a direct model can exploit them without paying the cost or bias of staying near
-the learned latent manifold.
+The empirical scope is limited by the construction of the benchmark targets.
+In the cross-well experiment, $V_c$ is a processed Larionov-derived curve.
+The gamma-ray index between the clean and shale endpoints is linear in gamma
+ray. The Larionov map from that index to clay volume is not a straight line.
+If gamma ray has been logged, clay volume is obtained from that relation, and
+CLP-CSGM is not a substitute for it. Gamma ray is left out of the main input
+because the clay-volume curve was computed from it. Without that log the
+Larionov relation cannot be evaluated. The task is then to reconstruct the
+processed curve from the other dense logs while matching a few known values
+of the curve. Recovery of independently acquired clay-volume measurements is
+outside this scope. Putting gamma ray back, in
+Appendix~\ref{app:crosswell_gr_embargo}, lowers the absolute error and does
+not change the ordering of CLP-CSGM Ridge, the direct AE, and
+measurement-only CSGM at step $16$. That run checks the channel. It is not
+the log suite used for the main comparison.
 
-Several limitations remain. First, the autoencoder is intentionally small, so
-representation error may limit reconstruction of unusual geological patterns.
-Second, the theoretical guarantees of CSGM rely on assumptions such as suitable
-measurement operators and generator ranges; our coordinate subsampling and
-field data do not directly satisfy a proven guarantee. Third, latent
-optimization is nonconvex and more expensive than direct regression. Finally,
-the experiments use a limited number of wells, so broader geological validation
-is needed before claiming field-wide generality.
+The F03-4 porosity curve is density-derived, and its sparse values are taken
+from that same curve, not from core or laboratory plugs. Density porosity is
+linear in bulk density, and a standard sonic porosity is linear in slowness.
+If those logs have been recorded, the processed porosity is already
+determined. Sonic travel time is left out because it follows this curve
+almost one to one, and the density curve behind the porosity was itself
+predicted from sonic and gamma ray. The test uses gamma ray as the only dense
+log. Its errors do not transfer to a porosity interpretation that also uses
+density, neutron, and sonic. The two F3 benchmarks therefore remove the log
+the conventional formula needs and compare methods that must reconstruct the
+processed curve from the remaining logs while matching a few known values.
+They are not a contest against Larionov, density porosity, or sonic porosity
+on a fully logged well, and they are not a test against independent core or
+laboratory measurements.
 
-These limitations also clarify the contribution. CLP-CSGM Ridge is not a
-replacement for all direct petrophysical regressors. It is a targeted method
-for regimes where dense logs provide a useful but incomplete prior and sparse
-core measurements should be treated as measurement evidence in the target well.
+The Lapa permeability case
+\citep{alvarez2025nonlinear} extends the evaluation to another lithology and
+target property, but its small sample size limits generalization. The
+laboratory-porosity supplement in Appendix~\ref{app:phi_lab_861} uses
+$\mathrm{Phi_{lab}}$ rather than a curve computed from the wireline suite, and
+it scores only coordinates that were not supplied as measurements. The direct
+AE has the lower pooled mean RMSE. Laboratory coordinates still correct the
+log-only anchor in every split, and that correction is enough where the test
+logs remain close to the blocks that fit $h(\boldsymbol{u})$. On the deepest
+block the logs move outside that support, the ridge anchor starts far from the
+target windows, and a few measurements improve on the anchor without reaching
+the direct AE. The measurement term still lowers the error relative to the
+log-only anchor in that block. The supplement therefore does not extend the F3
+low-support advantage to a mean win on this laboratory target. Each test fold
+still has many overlapping training windows, so the direct map is in the
+regime where it was expected to be competitive. Block RMSE and the log
+summaries are reported in the appendix. Broader validation requires larger
+multi-well datasets, additional log suites, and facies-conditioned settings.
+
+
+The reported metrics are not stratified by lithofacies, lithological texture,
+or formal stratigraphic interval because the available benchmark tables do not
+provide independent geological labels at each depth sample. Consequently,
+RMSE, MAE, and relative $\ell_2$ error aggregate heterogeneous windows. The
+depth profiles provide qualitative audits but no geological performance
+breakdowns. Facies-resolved reliability would require independently interpreted
+or core-calibrated interval labels, particularly because the adequacy of the
+decoder range and the accuracy of the latent prior may vary across geological
+regimes.
+
+The recovery interpretation is also conditional.
+Proposition~\ref{prop:conditional_local_recovery} relates reconstruction error
+to decoder mismatch, latent-prior mismatch, measurement noise, optimization
+quality, and local separability, but does not prove that $M_{\Omega}$ satisfies
+S-REC for the trained decoder. The diagnostics in
+Appendix~\ref{app:separability} evaluate sampled decoder outputs and should not
+be interpreted as an operator-level guarantee.
+
+CLP-CSGM incurs iterative inference cost, whereas direct baselines produce
+predictions through a forward pass. The runtime results in
+Appendix~\ref{app:runtime} show that this additional cost is most justified
+when explicit measurement-consistent refinement produces a meaningful accuracy
+gain. Faster latent solvers, warm starts, adaptive stopping, or amortized
+refinement are natural directions for larger-scale deployment.

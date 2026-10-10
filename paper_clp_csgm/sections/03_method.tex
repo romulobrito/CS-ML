@@ -1,286 +1,599 @@
 \section{Method}
 \label{sec:method}
 
+CLP-CSGM uses three pieces. A decoder, trained on windows of the target
+curve, supplies the windows the reconstruction may use. A map from the dense
+logs returns the starting code of the search. At inference the search stays
+near that code, and the decoded window must match the sparse measurements.
+This section defines the measurement model, the objective, the comparisons
+that drop one piece, and the error bound.
+
 \subsection{Problem setup}
 \label{subsec:problem_setup}
 
-Let \(y\in\mathbb{R}^{N}\) denote a target-property window, such as clay volume
-or porosity, and let \(u\in\mathbb{R}^{p}\) denote the corresponding dense log
-window. Sparse core measurements are modeled as
+Let $\boldsymbol{y}\in\mathbb{R}^{N}$ denote a target-property window of $N$
+depth samples and let $\boldsymbol{u}\in\mathbb{R}^{p}$ denote the vectorized
+dense-log channels over the same interval. Target values are observed at the
+ordered coordinate set
+$\Omega=\{\omega_1,\ldots,\omega_m\}\subset\{1,\ldots,N\}$, where
+$1\leq m<N$ and the measurement ratio is $\rho=m/N$.
+
+The coordinate-restriction operator
+$M_{\Omega}:\mathbb{R}^{N}\rightarrow\mathbb{R}^{m}$ is represented by
+
 \begin{equation}
-  b = M y + \eta,
-  \label{eq:measurement_model}
+M_{\Omega}
+=
+\begin{bmatrix}
+\boldsymbol{e}_{\omega_1}^{\top}\\
+\vdots\\
+\boldsymbol{e}_{\omega_m}^{\top}
+\end{bmatrix}
+\in\mathbb{R}^{m\times N},
+\qquad
+M_{\Omega}\boldsymbol{y}
+=
+\begin{bmatrix}
+y_{\omega_1}\\
+\vdots\\
+y_{\omega_m}
+\end{bmatrix},
+\label{eq:measurement_operator}
 \end{equation}
-where \(M\in\mathbb{R}^{m\times N}\) is a known subsampling matrix, \(m<N\), and
-\(\eta\) is measurement noise. The objective is to estimate \(y\) in a target
-well using both \(u\) and \(b\).
 
-\begin{assumption}[Windowed generative structure]
-\label{ass:generator}
-Target-property windows are well approximated by the range of a decoder
-\(G:\mathbb{R}^{k}\to\mathbb{R}^{N}\), trained on target windows from training
-wells, with \(k<N\).
-\end{assumption}
+where $\boldsymbol{e}_i$ is the $i$-th canonical basis vector of
+$\mathbb{R}^{N}$. Coordinate restriction is widely used to represent incomplete
+seismic, ultrasonic, and sparse-sensor observations
+\citep{herrmann2008nonparametric,deAssis2022CompressiveSF,
+dasilva2025csshredenhancingshredrobust}.
 
-\begin{assumption}[Log-conditioned latent predictability]
-\label{ass:latent_prior}
-The dense log window \(u\) contains enough information to predict a useful
-latent prior \(z_0=h(u)\), where \(h\) is fitted on encoded training windows.
-\end{assumption}
+The sparse target measurements satisfy
 
-\subsection{Generative prior}
-\label{subsec:generative_prior}
-
-We train an autoencoder on standardized target windows. Its encoder maps
-\(y\) to a latent code \(E(y)\), and its decoder maps a code back to a target
-window, \(G(z)\). After training, only \(G\) is used in the inverse problem.
-This separates the signal prior from the sparse measurement operator: the
-decoder defines the admissible set of plausible property windows, whereas
-\(M\) specifies which depths are observed in the target well.
-
-\subsection{Conditional latent prior}
-\label{subsec:conditional_prior}
-
-The conditional prior is a ridge regression model
 \begin{equation}
-  z_0 = h(u),
-  \label{eq:latent_prior}
+\boldsymbol{b}
+=
+M_{\Omega}\boldsymbol{y}
++
+\boldsymbol{\eta},
+\qquad
+\boldsymbol{b},\boldsymbol{\eta}\in\mathbb{R}^{m},
+\label{eq:measurement_model}
 \end{equation}
-trained to map log windows to encoded target latents. Ridge regression was
-chosen because it is stable in low-data regimes and regularizes correlated log
-features \citep{hoerl1970ridge}. The method is not tied to ridge regression:
-other predictors can be substituted for \(h\), but the reported paper-facing
-variant is CLP-CSGM Ridge.
 
-\subsection{Test-time latent refinement}
-\label{subsec:latent_refinement}
+where $\boldsymbol{\eta}$ is additive noise. Under the Gaussian model,
+$\boldsymbol{\eta}\sim
+\mathcal{N}(\boldsymbol{0},\sigma_{\eta}^{2}I_m)$; the noiseless case has
+$\boldsymbol{\eta}=\boldsymbol{0}$.
 
-At validation and test time, the latent code is refined by
+The dense logs and the sparse measurements do different jobs. The dense-log
+vector $\boldsymbol{u}$ sets the starting code
+$\boldsymbol{z}_0=h(\boldsymbol{u})$. The measurements $\boldsymbol{b}$ enter
+only as the mismatch $\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$.
+The reconstruction therefore starts from the dense logs and is then required
+to agree with the sparse target values.
+
+
+
+\paragraph{Standardization and modeling assumptions.}
+All preprocessing statistics are computed from training windows only. Let
+$\boldsymbol{\mu}_y,\boldsymbol{s}_y$ and
+$\boldsymbol{\mu}_u,\boldsymbol{s}_u$ be the componentwise training means and
+standard deviations, with $D_y=\operatorname{diag}(\boldsymbol{s}_y)$ and
+$D_u=\operatorname{diag}(\boldsymbol{s}_u)$. We use
+$\widetilde{\boldsymbol{y}}=D_y^{-1}(\boldsymbol{y}-\boldsymbol{\mu}_y)$ and
+$\widetilde{\boldsymbol{u}}=D_u^{-1}(\boldsymbol{u}-\boldsymbol{\mu}_u)$.
+Sparse measurements are standardized with
+$D_{\Omega}=M_{\Omega}D_yM_{\Omega}^{\top}$ and
+$\widetilde{\boldsymbol{b}}=D_{\Omega}^{-1}
+(\boldsymbol{b}-M_{\Omega}\boldsymbol{\mu}_y)$; near-zero standard deviations
+use the implementation safeguard. Predictions return to the original scale via
+
 \begin{equation}
-  \hat z =
-  \arg\min_z
-  \underbrace{\|M G(z)-b\|_2^2}_{\text{sparse measurement consistency}}
-  +
-  \lambda
-  \underbrace{\|z-z_0(u)\|_2^2}_{\text{conditional latent prior}},
-  \qquad
-  \hat y = G(\hat z).
-  \label{eq:clp_csgm_objective}
+\widehat{\boldsymbol{y}}
+=
+\boldsymbol{\mu}_y
++
+D_y\widehat{\widetilde{\boldsymbol{y}}}.
+\label{eq:inverse_target_standardization}
 \end{equation}
-The regularization parameter \(\lambda\) is selected on validation windows for
-each measurement ratio and random seed.
+
+Subsequent equations omit tildes. We assume that target windows are adequately
+approximated by $\mathcal{M}=\operatorname{Im}(G)\subset\mathbb{R}^{N}$,
+with $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$ and $k<N$, and that
+$h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ provides a useful anchor
+$\boldsymbol{z}_0=h(\boldsymbol{u})$. These assumptions are assessed empirically
+through reconstruction, ablations, and prior sensitivity.
+
+
+
+\subsection{Learned model components}
+\label{subsec:learned_priors}
+
+Offline training fits an autoencoder on standardized target windows and a
+latent-prior predictor on paired dense-log windows and encoded targets. All
+learned components remain frozen during target-well reconstruction.
+
+\paragraph{Generative decoder.}
+Let
+$E_{\theta_E}:\mathbb{R}^{N}\rightarrow\mathbb{R}^{k}$ and
+$G_{\theta_G}:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$, with $k<N$, denote
+the encoder and decoder. Given standardized training targets
+$\{\widetilde{\boldsymbol{y}}_i\}_{i=1}^{n_{\mathrm{tr}}}$, their parameters
+are obtained from
+
+\begin{equation}
+\begin{aligned}
+(\widehat{\theta}_E,\widehat{\theta}_G)
+\in
+\operatorname*{arg\,min}_{\theta_E,\theta_G}
+\;&
+\frac{1}{n_{\mathrm{tr}}}
+\sum_{i=1}^{n_{\mathrm{tr}}}
+\left\|
+\widetilde{\boldsymbol{y}}_i
+-
+G_{\theta_G}
+\left(
+E_{\theta_E}
+\left(
+\widetilde{\boldsymbol{y}}_i
+\right)
+\right)
+\right\|_2^2
+\\
+&+
+\gamma_{\mathrm{AE}}
+\left(
+\|\theta_E\|_2^2+\|\theta_G\|_2^2
+\right),
+\end{aligned}
+\label{eq:autoencoder_training_objective}
+\end{equation}
+
+where $\gamma_{\mathrm{AE}}\geq 0$ is the regularization weight. After
+training, we write $E=E_{\widehat{\theta}_E}$ and
+$G=G_{\widehat{\theta}_G}$. The frozen decoder defines the learned
+target-window class
+
+\begin{equation}
+\mathcal{M}
+=
+\operatorname{Im}(G)
+=
+\left\{
+G(\boldsymbol{z}):
+\boldsymbol{z}\in\mathbb{R}^{k}
+\right\}
+\subseteq
+\mathbb{R}^{N}.
+\label{eq:decoder_range}
+\end{equation}
+
+Target-well reconstruction therefore optimizes only
+$\boldsymbol{z}\in\mathbb{R}^{k}$ and produces
+$\widehat{\boldsymbol{y}}
+=G(\widehat{\boldsymbol{z}})\in\mathcal{M}$; it does not update the network
+parameters or search over arbitrary vectors in $\mathbb{R}^{N}$.
+The encoder is used to train the decoder and to build the codes on which
+the dense-log map is fit. Inference does not encode the unknown window.
+In the reported model, $k=16$ is the dimension of that code.
+A reconstruction $G(E(\boldsymbol{y}))$ that is given the full target window
+checks whether the decoder can represent that window. It uses target values
+that inference does not have, so it is not one of the compared predictors.
+Appendix~\ref{app:crosswell_simple_baselines} reports that check.
+
+\paragraph{Log-conditioned latent prior.}
+Each training target is encoded as
+$\boldsymbol{z}_i=E(\widetilde{\boldsymbol{y}}_i)$, and
+$h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ is fitted from
+$\{(\widetilde{\boldsymbol{u}}_i,\boldsymbol{z}_i)\}_{i=1}^{n_{\mathrm{tr}}}$.
+For the Ridge variant,
+$h(\widetilde{\boldsymbol{u}})
+=W\widetilde{\boldsymbol{u}}+\boldsymbol{c}$, with parameters
+
+\begin{equation}
+(\widehat{W},\widehat{\boldsymbol{c}})
+\in
+\operatorname*{arg\,min}_{W,\boldsymbol{c}}
+\left\{
+\frac{1}{n_{\mathrm{tr}}}
+\sum_{i=1}^{n_{\mathrm{tr}}}
+\left\|
+\boldsymbol{z}_i
+-
+W\widetilde{\boldsymbol{u}}_i
+-
+\boldsymbol{c}
+\right\|_2^2
++
+\alpha\|W\|_F^2
+\right\},
+\label{eq:ridge_latent_training_objective}
+\end{equation}
+
+where $\alpha\geq 0$ controls the Ridge penalty
+\citep{hoerl1970ridge}. After fitting,
+$h(\widetilde{\boldsymbol{u}})
+=\widehat{W}\widetilde{\boldsymbol{u}}
++\widehat{\boldsymbol{c}}$, and, suppressing tildes, the contextual anchor is
+$\boldsymbol{z}_0=h(\boldsymbol{u})\in\mathbb{R}^{k}$. The decoder $G$
+determines which target windows can be represented, and $h$ uses dense-log
+context to center the latent search. CLP-CSGM is this scheme; the class of
+$h$ is a configuration choice. Ridge is the primary reference because it is a
+linear map from the dense logs to the starting code, not because it is the
+best map in every test. An MLP variant of $h$ is reported with the
+same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
 
 \begin{figure}[t]
-  \centering
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-    node distance=7mm and 8mm,
-    >=Latex,
-    every node/.style={font=\small},
-    block/.style={
-      draw,
-      rounded corners=2pt,
-      align=center,
-      minimum width=2.45cm,
-      minimum height=0.95cm,
-      inner sep=5pt
-    },
-    io/.style={block, fill=blue!8},
-    model/.style={block, fill=green!10},
-    latent/.style={block, fill=orange!12},
-    solve/.style={block, fill=red!10},
-    artifact/.style={block, fill=green!6},
-    stage/.style={
-      draw,
-      rounded corners=4pt,
-      dashed,
-      inner sep=8pt
-    },
-    arrow/.style={->, thick},
-    guide/.style={->, thick, dashed}
-  ]
-    % Offline stage
-    \node[io] (y) {Training target\\windows \(y\)};
-    \node[model, right=of y] (ae) {Train autoencoder\\\(E, G\)};
-    \node[latent, right=of ae] (ey) {Encode targets\\\(E(y)\)};
-    \node[artifact, right=of ey] (g) {Frozen decoder\\\(G\)};
-
-    \node[io, below=of y] (u) {Training dense\\logs \(u\)};
-    \node[model, right=of u] (hfit) {Fit latent prior\\from \((u, E(y))\)};
-    \node[artifact, right=of hfit] (h) {Trained prior\\\(h:u\mapsto z_0\)};
-
-    \draw[arrow] (y) -- (ae);
-    \draw[arrow] (ae) -- (ey);
-    \draw[arrow] (ey) -- (g);
-    \draw[arrow] (u) -- (hfit);
-    \draw[arrow] (ey) -- (hfit);
-    \draw[arrow] (hfit) -- (h);
-
-    \node[stage, fit=(y)(ae)(ey)(g)(u)(hfit)(h),
-      label={[font=\bfseries\small]above:Offline training}] (offline) {};
-
-    % Target-well stage
-    \node[io, below=20mm of u] (uast) {Target-well dense\\logs \(u_\ast\)};
-    \node[latent, right=of uast] (z0) {Latent anchor\\\(z_0=h(u_\ast)\)};
-    \node[solve, right=of z0, minimum width=4.4cm] (opt) {Latent refinement\\$\min_z\, \|MG(z)-b_\ast\|_2^2 + \lambda\|z-z_0\|_2^2$};
-    \node[model, right=of opt] (yhat) {Reconstruction\\\(\hat y = G(\hat z)\)};
-    \node[io, below=of opt] (bast) {Sparse target\\measurements \(b_\ast\)};
-
-    \draw[arrow] (uast) -- (z0);
-    \draw[arrow] (z0) -- (opt);
-    \draw[arrow] (opt) -- (yhat);
-    \draw[arrow] (bast) -- (opt);
-    \draw[guide] (h.south) -- node[right] {apply \(h\)} (z0.north);
-    \draw[guide] (g.south) -- node[right] {use \(G\)} (opt.north);
-
-    \node[stage, fit=(uast)(z0)(opt)(yhat)(bast),
-      label={[font=\bfseries\small]above:Target-well inference}] (online) {};
-  \end{tikzpicture}
-  }
-  \caption{CLP-CSGM workflow. Offline, target windows train an autoencoder and
-  dense logs are paired with encoded latents to fit the conditional prior
-  \(h\). For a target well, dense logs produce the latent anchor \(z_0\), sparse
-  measurements enforce data consistency, and latent optimization is decoded by
-  \(G\) to obtain the final estimate.}
-  \label{fig:clp_csgm_workflow}
+    \centering
+    \includegraphics[width=0.66\linewidth]
+    {figures/view_conditional_latent_prior.png}
+    \caption{Geometry of the log-conditioned starting point. Dense logs determine
+    $\boldsymbol{z}_0=h(\boldsymbol{u})$, and test-time refinement moves the code
+    to $\widehat{\boldsymbol{z}}$ so that
+    $G(\widehat{\boldsymbol{z}})\in\mathcal{M}$ better matches the sparse
+    observations $\boldsymbol{b}$ through $M_{\Omega}$.}
+    \label{fig:conditional_prior_geometry}
 \end{figure}
 
-Figure~\ref{fig:clp_csgm_workflow} summarizes the complete CLP-CSGM workflow and
-separates the operations that are learned offline from the operations performed
-for a target well. In the offline stage, target windows \(y\) train an
-autoencoder, whose decoder \(G\) is retained as the generative range used by the
-inverse problem. The same trained encoder maps target windows to latent codes
-\(E(y)\); these latents, paired with dense log windows \(u\), define the
-supervised training set for the latent prior \(h:u\mapsto z_0\). In the
-target-well stage, the dense logs \(u_\ast\) are used only to compute the latent
-anchor \(z_0=h(u_\ast)\), while sparse observations \(b_\ast\) enter only
-through the data-fidelity term. The final estimate is therefore not a direct
-regression from \([u_\ast,b_\ast]\) to \(y_\ast\); it is the decoded output of a
-latent code selected to remain close to the log-conditioned prior and consistent
-with the measured target entries.
+\subsection{Test-time reconstruction}
+\label{subsec:test_time_reconstruction}
 
+At inference time, $G$ and $h$ remain fixed, and only the latent code of the
+current target window is optimized. Given standardized dense logs
+$\widetilde{\boldsymbol{u}}\in\mathbb{R}^{p}$ and sparse target observations
+$\widetilde{\boldsymbol{b}}\in\mathbb{R}^{m}$, define
+$\boldsymbol{z}_0=h(\widetilde{\boldsymbol{u}})$. CLP-CSGM computes
+
+\begin{equation}
+\begin{aligned}
+\widehat{\boldsymbol{z}}_{\mathrm{num}}
+&\in
+\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\left\{
+\left\|
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right\|_2^2
++
+\lambda
+\left\|
+\boldsymbol{z}
+-
+\boldsymbol{z}_0
+\right\|_2^2
+\right\},
+\\
+\widehat{\boldsymbol{y}}
+&=
+\boldsymbol{\mu}_y
++
+D_yG\left(\widehat{\boldsymbol{z}}_{\mathrm{num}}\right).
+\end{aligned}
+\label{eq:clp_csgm_objective}
+\end{equation}
+
+The first term enforces measurement consistency and the second regularizes
+latent search toward the anchor; $\lambda\geq0$ is selected on validation
+windows for each measurement ratio and seed. Because $G$ is nonlinear, the
+objective is generally nonconvex and is solved with Adam
+\citep{kingma2015adam}. The first run starts from $\boldsymbol{z}_0$; additional
+restarts use small Gaussian perturbations, and the lowest-objective candidate is
+retained. Thus $\widehat{\boldsymbol{z}}_{\mathrm{num}}$ is a numerical
+solution, not a certified global minimizer.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.86\linewidth]
+    {figures/pipeline_CLP-CSGM_v3.pdf}
+    \caption{CLP-CSGM workflow. Offline, standardized target windows train the
+    autoencoder $(E,G)$, and paired dense-log windows fit the latent-prior
+    predictor $h$. At inference, $\boldsymbol{u}_{\ast}$ determines
+    $\boldsymbol{z}_0=h(\boldsymbol{u}_{\ast})$, sparse observations
+    $\boldsymbol{b}_{\ast}$ constrain latent refinement through $M_{\Omega}$,
+    and the decoded result is returned to the original target scale.
+    OpenAI's ChatGPT, using the GPT-5.5 model, was used to assist in generating
+    the initial explanatory schematic and visual layout. The final figure was
+    reviewed, edited, and validated by the authors.}
+    \label{fig:clp_csgm_workflow}
+\end{figure}
+
+\paragraph{Ablation variants.}
+The \emph{latent-prior-only} variant suppresses refinement and uses
+$\widehat{\boldsymbol{z}}_{\mathrm{prior}}=\boldsymbol{z}_0$, followed by
+$\widehat{\boldsymbol{y}}_{\mathrm{prior}}
+=\boldsymbol{\mu}_y+
+D_yG(\widehat{\boldsymbol{z}}_{\mathrm{prior}})$.
+The \emph{measurement-only CSGM} variant sets $\lambda=0$ and computes
+
+\begin{equation}
+\widehat{\boldsymbol{z}}_{\mathrm{meas}}
+\in
+\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\left\|
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right\|_2^2.
+\label{eq:measurement_only_ablation}
+\end{equation}
+
+The latent-prior-only variant uses only the dense-log starting point. The
+measurement-only variant uses only the sparse measurements and recovers
+measurement-only generative compressed sensing \citep{bora2017compressed}.
+Comparison with the full objective in
+Eq.~\eqref{eq:clp_csgm_objective} shows what each piece contributes. Results
+are reported in Section~\ref{subsec:ablation_analysis}.
+
+\subsection{Interpretation and theoretical context}
+\label{subsec:interpretation_scope}
+
+The theoretical results required to interpret CLP-CSGM are stated below.
+Complete proofs appear in Appendix~\ref{app:theory}.
 
 \begin{proposition}[MAP and Tikhonov interpretation]
 \label{prop:map}
-Assume \(b\mid z\sim\mathcal{N}(M G(z),\sigma_b^2 I)\) and
-\(z\mid u\sim\mathcal{N}(z_0(u),\sigma_z^2 I)\). Then the maximum a posteriori
-estimate of \(z\) minimizes Eq.~\eqref{eq:clp_csgm_objective} with
-\(\lambda=\sigma_b^2/\sigma_z^2\), up to a positive multiplicative constant.
+Suppressing tildes, assume
+$p(\boldsymbol{b}\mid\boldsymbol{z},\boldsymbol{u})
+=p(\boldsymbol{b}\mid\boldsymbol{z})$ and
+
+$\boldsymbol{b}\mid\boldsymbol{z}
+\sim
+\mathcal{N}
+\left(
+M_{\Omega}G(\boldsymbol{z}),
+\sigma_{\eta}^{2}I_m
+\right)$,
+while
+$\boldsymbol{z}\mid\boldsymbol{u}
+\sim
+\mathcal{N}
+\left(
+\boldsymbol{z}_0,
+\sigma_z^{2}I_k
+\right)$,
+where
+$\boldsymbol{z}_0=h(\boldsymbol{u})$,
+$\sigma_{\eta}>0$, and $\sigma_z>0$.
+Then every MAP estimator satisfies
+
+\begin{equation}
+\widehat{\boldsymbol{z}}_{\mathrm{MAP}}
+\in
+\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\left\{
+\left\|
+M_{\Omega}G(\boldsymbol{z})
+-
+\boldsymbol{b}
+\right\|_2^2
++
+\lambda
+\left\|
+\boldsymbol{z}
+-
+\boldsymbol{z}_0
+\right\|_2^2
+\right\},
+\qquad
+\lambda
+=
+\frac{\sigma_{\eta}^{2}}{\sigma_z^{2}}.
+\label{eq:map_tikhonov_objective}
+\end{equation}
+
+Thus, CLP-CSGM is a Tikhonov-regularized latent inverse problem. Its center is
+the log-conditioned anchor, not the origin
+\citep{tikhonov1963solution,burger2014map}. The likelihood induces the
+data-fidelity term, while the conditional prior induces the latent penalty.
 \end{proposition}
 
-\begin{proof}
-The negative log posterior is, up to constants independent of \(z\),
-\[
-  \frac{1}{2\sigma_b^2}\|M G(z)-b\|_2^2
-  +
-  \frac{1}{2\sigma_z^2}\|z-z_0(u)\|_2^2.
-\]
-Multiplying by \(2\sigma_b^2\) gives Eq.~\eqref{eq:clp_csgm_objective}.
-\end{proof}
+\begin{remark}[Relation to classical CSGM]
+\label{rem:csgm_relation}
+Setting $\lambda=0$ recovers the measurement-only CSGM problem in
+Eq.~\eqref{eq:measurement_only_ablation}
+\citep{bora2017compressed}. Increasing $\lambda$ shifts the reconstruction
+toward the latent-prior estimate $G(\boldsymbol{z}_0)$ by penalizing departures
+from $\boldsymbol{z}_0=h(\boldsymbol{u})$ more strongly.
+\end{remark}
 
-\begin{proposition}[Relation to classical CSGM]
-\label{prop:csgm_relation}
-If \(\lambda=0\), CLP-CSGM reduces to the standard CSGM measurement-consistency
-problem \(\min_z \|M G(z)-b\|_2^2\). If \(\lambda\to\infty\), the solution is
-forced toward the direct latent prediction \(z_0(u)\), and the method approaches
-the decoder-only estimate \(G(z_0(u))\).
-\end{proposition}
 
 \begin{proposition}[Existence of a minimizer]
 \label{prop:existence}
-Assume that the decoder \(G:\mathbb{R}^k \to \mathbb{R}^n\) is continuous and
-that \(\lambda>0\). For fixed \(M\), \(b\), and \(z_0\), the objective
-\[
-  \mathcal{J}(z)
-  =
-  \|M G(z)-b\|_2^2
-  +
-  \lambda\|z-z_0\|_2^2
-\]
-admits at least one global minimizer in \(\mathbb{R}^k\).
+Assume that $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$ is continuous and
+$\lambda>0$. For fixed $M_{\Omega}$,
+$\widetilde{\boldsymbol{b}}\in\mathbb{R}^{m}$, and
+$\boldsymbol{z}_0\in\mathbb{R}^{k}$, the objective
+$\mathcal{J}(\boldsymbol{z})
+=
+\|M_{\Omega}G(\boldsymbol{z})
+-\widetilde{\boldsymbol{b}}\|_2^2
++
+\lambda\|\boldsymbol{z}-\boldsymbol{z}_0\|_2^2$
+is continuous and coercive. Consequently,
+
+\begin{equation}
+\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\mathcal{J}(\boldsymbol{z})
+\neq
+\varnothing.
+\label{eq:existence_argmin}
+\end{equation}
 \end{proposition}
 
-\begin{proof}
-Since \(G\) is continuous and \(M\) is linear, the map
-\[
-  z \mapsto \|M G(z)-b\|_2^2
-\]
-is continuous. The quadratic regularization term
-\[
-  z \mapsto \lambda\|z-z_0\|_2^2
-\]
-is also continuous and, because \(\lambda>0\), coercive in \(z\). Therefore,
-\[
-  \mathcal{J}(z)\to+\infty
-  \qquad \text{as} \qquad
-  \|z\|_2\to\infty .
-\]
-Hence \(\mathcal{J}\) is continuous and coercive on \(\mathbb{R}^k\), so it
-attains its global minimum at some \(\hat z\in\mathbb{R}^k\).
-\end{proof}
+For any global minimizer $\widehat{\boldsymbol{z}}$,
+$\mathcal{J}(\widehat{\boldsymbol{z}})
+\leq
+\mathcal{J}(\boldsymbol{z}_0)
+=
+\|M_{\Omega}G(\boldsymbol{z}_0)
+-\widetilde{\boldsymbol{b}}\|_2^2$.
+Exact minimization therefore cannot worsen the optimized objective relative to
+the latent-prior-only candidate, although it does not guarantee lower error with
+respect to the unknown target. For
+$\widehat{\boldsymbol{z}}_{\mathrm{num}}$, this comparison holds only when
+$\mathcal{J}(\widehat{\boldsymbol{z}}_{\mathrm{num}})
+\leq
+\mathcal{J}(\boldsymbol{z}_0)$.
 
-\begin{remark}[Role of the regularization parameter]
-\label{rem:lambda_role}
-The parameter \(\lambda\) balances adherence to the log-conditioned latent
-anchor against sparse-measurement consistency. Small values of \(\lambda\)
-recover behavior closer to measurement-driven generative inversion, while large
-values increasingly restrict the solution toward the decoder-only conditional
-estimate \(G(h(u))\). Thus, \(\lambda\) does not merely scale a penalty term; it
-determines how strongly dense contextual information is allowed to shape the
-final reconstruction relative to sparse direct observations. The validation grid
-implements this trade-off empirically.
-\end{remark}
 
 \begin{remark}[Representation error and decoder mismatch]
 \label{rem:representation_error}
-The proposed reconstruction is restricted to the image of the decoder \(G\).
-Therefore, even when the sparse measurements are noiseless and the optimization
-is solved exactly, the reconstruction error cannot in general be smaller than
-the mismatch between the true signal and the decoder range. More precisely, if
-\(y^\star\) denotes the unknown target signal and
-\[
-  \mathcal{M}=\operatorname{Im}(G)
-\]
-denotes the learned manifold, then the method operates under an implicit
-approximation error of the form
-\[
-  \inf_{\tilde y\in\mathcal{M}}\|y^\star-\tilde y\| .
-\]
-This term is not specific to the conditional latent prior; it is inherited from
-the use of a learned generative range itself. Consequently, CLP-CSGM should be
-interpreted as combining two sources of inductive bias: a manifold constraint
-induced by the decoder and a conditional latent regularization induced by the
-logs.
+Suppressing tildes when standardized coordinates are understood, every
+CLP-CSGM reconstruction satisfies
+$\widehat{\boldsymbol{y}}
+=G(\widehat{\boldsymbol{z}})\in\mathcal{M}$, where
+$\mathcal{M}=\operatorname{Im}(G)\subseteq\mathbb{R}^{N}$. Consequently, for
+an unknown target window $\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$, the error
+of any decoder-based reconstruction is bounded below by the oracle
+representation error
+
+\begin{equation}
+\operatorname{dist}
+\left(
+\boldsymbol{y}^{\star},
+\mathcal{M}
+\right)
+:=
+\inf_{\boldsymbol{y}'\in\mathcal{M}}
+\left\|
+\boldsymbol{y}^{\star}
+-
+\boldsymbol{y}'
+\right\|_2
+=
+\inf_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\left\|
+\boldsymbol{y}^{\star}
+-
+G(\boldsymbol{z})
+\right\|_2.
+\label{eq:oracle_decoder_error}
+\end{equation}
+
+Thus, even with noiseless observations and exact global optimization, latent
+refinement cannot remove mismatch between
+$\boldsymbol{y}^{\star}$ and the decoder range. This structural error is
+represented by $\boldsymbol{r}^{\dagger}$ in
+Proposition~\ref{prop:conditional_local_recovery} and is distinct from the
+latent-prior mismatch
+$\|\boldsymbol{z}^{\dagger}-\boldsymbol{z}_0\|_2$.
+
+An inaccurate anchor
+$\boldsymbol{z}_0=h(\boldsymbol{u})$ may bias the search toward a suboptimal
+latent region. The data-fidelity term can partially correct this bias when the
+sparse observations are informative and $\lambda$ does not dominate the
+objective. The decoder range determines what can be represented; the
+log-conditioned anchor determines where the latent search is centered.
 \end{remark}
 
-\begin{remark}[Interpretation of the ablation study]
-\label{rem:ablation_interpretation}
-The ablation study separates the contributions of three structural components:
-the learned manifold \(G\), the conditional latent anchor \(z_0=h(u)\), and the
-sparse-measurement consistency term. The prior-only variant isolates the
-conditional latent prior without test-time assimilation, whereas the
-measurement-only variant isolates the generative inverse problem without dense
-contextual anchoring. The complete CLP-CSGM objective combines both mechanisms.
-Thus, improvements of the full method over both ablated variants empirically
-support the claim that its gains arise from the interaction between contextual
-latent regularization and sparse-measurement refinement, rather than from either
-component alone.
-\end{remark}
 
-\begin{remark}[Theoretical scope]
-CSGM theory provides recovery results when the measurement operator satisfies
-conditions such as S-REC over the generator range \citep{bora2017compressed}.
-Our subsampling operators and learned autoencoder are practical choices for
-well-log windows, not a setting in which those guarantees are proven directly.
-The theory is used here to motivate the generative-prior formulation; empirical
-validation establishes performance for the studied petrophysical tasks.
-\end{remark}
+\begin{proposition}[Conditional local recovery interpretation]
+\label{prop:conditional_local_recovery}
+Suppressing tildes, let
+$\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$ satisfy
+$\boldsymbol{b}
+=M_{\Omega}\boldsymbol{y}^{\star}+\boldsymbol{\eta}$, let
+$\boldsymbol{z}_0=h(\boldsymbol{u})$, $\lambda>0$, and let
+$\widehat{\boldsymbol{z}}$ be any global minimizer of
+Eq.~\eqref{eq:clp_csgm_objective}. For any reference code
+$\boldsymbol{z}^{\dagger}\in\mathbb{R}^{k}$, define
 
-\subsection{Limitations}
-\label{subsec:method_limitations}
+\begin{equation}
+\begin{aligned}
+\boldsymbol{r}^{\dagger}
+&=
+\boldsymbol{y}^{\star}
+-
+G(\boldsymbol{z}^{\dagger}),
+&
+\boldsymbol{e}^{\dagger}
+&=
+M_{\Omega}\boldsymbol{r}^{\dagger}
++
+\boldsymbol{\eta},
+\\
+\Delta^{\dagger}
+&=
+\left(
+\|\boldsymbol{e}^{\dagger}\|_2^2
++
+\lambda
+\|\boldsymbol{z}^{\dagger}-\boldsymbol{z}_0\|_2^2
+\right)^{1/2},
+&
+R^{\dagger}
+&=
+\frac{\Delta^{\dagger}}{\sqrt{\lambda}}.
+\end{aligned}
+\label{eq:local_recovery_quantities}
+\end{equation}
 
-The method inherits representation error from the decoder: if a target profile
-is outside the learned range, no latent optimization can recover it exactly.
-The optimization problem is nonconvex, so restarts and validation are important.
-Finally, the method is computationally heavier than direct regression because it
-solves a latent inverse problem for each validation and test window.
+Let
+$\mathcal{M}_{R^{\dagger}}
+=
+G(B(\boldsymbol{z}_0,R^{\dagger}))$, where
+$B(\boldsymbol{z}_0,R^{\dagger})
+=
+\left\{
+\boldsymbol{z}\in\mathbb{R}^{k}:
+\|\boldsymbol{z}-\boldsymbol{z}_0\|_2
+\leq R^{\dagger}
+\right\}$.
+If, for some $\gamma_R>0$ and $\delta_R\geq0$,
+
+\begin{equation}
+\left\|
+M_{\Omega}
+(\boldsymbol{y}_1-\boldsymbol{y}_2)
+\right\|_2
+\geq
+\gamma_R
+\left\|
+\boldsymbol{y}_1-\boldsymbol{y}_2
+\right\|_2
+-
+\delta_R,
+\qquad
+\forall\,
+\boldsymbol{y}_1,\boldsymbol{y}_2
+\in
+\mathcal{M}_{R^{\dagger}},
+\label{eq:local_srec_condition}
+\end{equation}
+
+then
+
+\begin{equation}
+\left\|
+G(\widehat{\boldsymbol{z}})
+-
+\boldsymbol{y}^{\star}
+\right\|_2
+\leq
+\|\boldsymbol{r}^{\dagger}\|_2
++
+\frac{
+\Delta^{\dagger}
++
+\|\boldsymbol{e}^{\dagger}\|_2
++
+\delta_R
+}{
+\gamma_R
+}.
+\label{eq:local_recovery_bound}
+\end{equation}
+\end{proposition}
+
+Proposition~\ref{prop:conditional_local_recovery} is a sufficient conditional
+interpretation, not a verified guarantee for the trained decoder. The latent
+penalty localizes the S-REC condition around $\boldsymbol{z}_0$, while the bound
+separates representation error, measurement residual/noise, prior mismatch, and
+local separability, following the decoder-range view of generative compressed
+sensing \citep{candes2006stable,bora2017compressed}. Coordinate restriction is
+not proved to satisfy S-REC on the trained range; this depends on local decoder
+secants. The proof, inexact-optimizer extension, and empirical separability
+diagnostics appear in Appendix~\ref{app:conditional_local_recovery} and
+Appendix~\ref{app:separability}.

@@ -7,6 +7,11 @@ measurements.
 This repository contains the code needed to reproduce CLP-CSGM experiments.
 It intentionally excludes private raw data and heavy experiment outputs.
 
+## License
+
+Source code in this repository is distributed under the MIT License.
+See the `LICENSE` file for the full text.
+
 ## 1) What this repository contains
 
 - Core CLP-CSGM implementation:
@@ -54,15 +59,17 @@ where:
 
 ### 3.1 Repository policy
 
-This repository ships **code only**. It does **not** commit processed well-log
-tables or field datasets. Reasons:
+This repository ships **code plus a small synthetic smoke dataset**. It does
+**not** redistribute the processed F3 paper tables or private field datasets.
 
+- **Synthetic smoke (included):** `data/synthetic/` provides dummy well-log
+  tables so reviewers can install dependencies and execute CLP-CSGM smoke tests
+  with no external download. See Section 6.1 and `data/README.md`.
 - **F3 / Zhang et al. (Sensors):** the study publishes scripts and data via an
   external archive and cites industry/academic data access (see their Data
-  Availability Statement). Redistribution here would require checking **their**
-  archive license and any **third-party** data terms (e.g., F3 demo projects).
-  Users should obtain files from the sources linked in that paper and place them
-  locally under `data/`.
+  Availability Statement). Users should obtain the tabulated inputs from the
+  sources linked in that paper and place them locally under `data/` for full
+  paper reproduction (Section 5).
 - **Lapa / Alvarez et al. (Journal of Applied Geophysics):** the article states
   that the authors **do not have permission to share the data**. Do **not**
   expect a public drop-in dataset for those supplementary scripts; keep any local
@@ -80,10 +87,13 @@ current terms:
 
 ### 3.3 Local layout expected by the benchmarks
 
-Create `data/` at the repository root and place required files there after you
-obtain them under the applicable licenses.
+Synthetic tables already present for offline tests:
 
-Required files for the **main paper** benchmark commands:
+- `data/synthetic/SYN-A,SYN-B,SYN-C_6logs.txt`
+- `data/synthetic/SYN-D_6logs.txt`
+- `data/synthetic/SYN-D_AC+GR+Porosity.txt`
+
+For the **main paper** benchmark commands (Section 5), also place:
 
 - `data/F02-1,F03-2,F06-1_6logs_30dB.txt`
 - `data/F03-4_6logs_30dB.txt`
@@ -101,17 +111,24 @@ pip install -r requirements.txt
 ```
 
 Main dependencies are listed in `requirements.txt`:
-`numpy`, `pandas`, `matplotlib`, `scikit-learn`, `torch`, `PyWavelets`.
+`numpy`, `pandas`, `matplotlib`, `scikit-learn`, `torch`, `PyWavelets`, `scipy`.
 
 ## 5) Main reproducibility runs
 
-### 5.1 Cross-well Vc (Ridge prior + CLP-CSGM ablations)
+The main cross-well Vc benchmark excludes gamma ray from the dense input
+`u`. Use `--channels sonic,rhob,ai,vp` (sonic, bulk density, acoustic
+impedance, and Vp). This matches the manuscript protocol and the default of
+`sir_cs_benchmark_multi_well_vc.py`. GR is omitted to avoid the trivial
+GR -> Vc shortcut (Larionov-derived target). The GR-inclusive setting is
+only a sensitivity check (Appendix B.7); see Section 8 below.
+
+### 5.1 Cross-well Vc, main no-GR protocol (Ridge prior + CLP-CSGM ablations)
 
 ```bash
 python sir_cs_benchmark_multi_well_vc.py \
   --train-path data/F02-1,F03-2,F06-1_6logs_30dB.txt \
   --test-path data/F03-4_6logs_30dB.txt \
-  --channels sonic,rhob,gr,ai,vp \
+  --channels sonic,rhob,ai,vp \
   --target vc \
   --step 8 \
   --rhos 0.05,0.10,0.20 \
@@ -124,13 +141,13 @@ python sir_cs_benchmark_multi_well_vc.py \
 
 Repeat with `--step 16` and `--step 32`.
 
-### 5.2 Cross-well Vc (MLP prior sensitivity)
+### 5.2 Cross-well Vc, main no-GR protocol (MLP prior sensitivity)
 
 ```bash
 python sir_cs_benchmark_multi_well_vc.py \
   --train-path data/F02-1,F03-2,F06-1_6logs_30dB.txt \
   --test-path data/F03-4_6logs_30dB.txt \
-  --channels sonic,rhob,gr,ai,vp \
+  --channels sonic,rhob,ai,vp \
   --target vc \
   --step 8 \
   --rhos 0.05,0.10,0.20 \
@@ -169,13 +186,73 @@ python sir_cs_benchmark_real_well_direct_ub.py \
   --no-lfista
 ```
 
-## 6) Fast smoke tests
+## 6) Smoke tests
+
+### 6.1 Offline synthetic smoke (no external data; recommended first check)
+
+Uses only the committed tables under `data/synthetic/`. This path is intended
+for CAGEO/code evaluation when the paper F3 files are not yet available locally.
+It exercises CLP-CSGM Ridge, structural ablations, and both benchmark launchers
+with reduced epochs/iterations.
+
+```bash
+bash scripts/run_synthetic_smoke.sh
+```
+
+Equivalent explicit commands:
+
+```bash
+python scripts/make_synthetic_smoke_data.py   # optional regenerate
+
+python sir_cs_benchmark_multi_well_vc.py \
+  --train-path data/synthetic/SYN-A,SYN-B,SYN-C_6logs.txt \
+  --test-path data/synthetic/SYN-D_6logs.txt \
+  --channels sonic,rhob,ai,vp \
+  --target vc \
+  --window-len 64 \
+  --step 16 \
+  --fast \
+  --run-csgm-m2 \
+  --run-csgm-ablations \
+  --csgm-prior-type ridge \
+  --csgm-ae-epochs 8 \
+  --csgm-iters 20 \
+  --csgm-restarts 1 \
+  --csgm-lambda-grid 0.01 \
+  --no-lfista \
+  --base-dir outputs/synthetic_smoke/cross_well_vc \
+  --run-id synthetic_crosswell_smoke
+
+python sir_cs_benchmark_real_well_direct_ub.py \
+  --data-path data/synthetic/SYN-D_AC+GR+Porosity.txt \
+  --u-channels gr \
+  --window-len 64 \
+  --step 8 \
+  --fast \
+  --run-csgm-m2 \
+  --run-csgm-ablations \
+  --csgm-prior-type ridge \
+  --csgm-ae-epochs 8 \
+  --csgm-iters 20 \
+  --csgm-restarts 1 \
+  --csgm-lambda-grid 0.01 \
+  --no-lfista \
+  --base-dir outputs/synthetic_smoke/real_well \
+  --run-id synthetic_porosity_smoke
+```
+
+Synthetic RMSE values are **not** comparable to the manuscript tables.
+
+### 6.2 Fast smoke on paper F3 files (requires local data)
+
+Same main no-GR channels as Section 5.1, but needs the F3 tables listed in
+Section 3.3.
 
 ```bash
 python sir_cs_benchmark_multi_well_vc.py \
   --train-path data/F02-1,F03-2,F06-1_6logs_30dB.txt \
   --test-path data/F03-4_6logs_30dB.txt \
-  --channels sonic,rhob,gr,ai,vp \
+  --channels sonic,rhob,ai,vp \
   --target vc \
   --step 32 \
   --run-csgm-m2 \
@@ -198,6 +275,8 @@ python sir_cs_benchmark_real_well_direct_ub.py \
 
 Scripts commonly used for paper supplementary analyses:
 
+- `scripts/make_synthetic_smoke_data.py`
+- `scripts/run_synthetic_smoke.sh`
 - `scripts/auddys_smoke_direct_ub.py`
 - `scripts/auddys_clp_csgm_eda.py`
 - `scripts/clp_csgm_diagnostic_assets.py`
@@ -206,14 +285,55 @@ Scripts commonly used for paper supplementary analyses:
 - `scripts/clp_csgm_ablation_assets.py`
 - `scripts/clp_csgm_paper_assets.py`
 - `scripts/clp_csgm_quick_figures.py`
+- `scripts/clp_csgm_uncertainty_assets.py`
 
-## 8) Embargo boundary check (anti-leakage)
+Student-t seed-level intervals and paired Delta-RMSE tables/figures for the manuscript are regenerated with `scripts/clp_csgm_uncertainty_assets.py` (requires local `outputs/` summaries from the main benchmarks).
 
-For cross-well train/validation overlap diagnostics, use:
+## 8) Appendix B.7: GR-inclusive sensitivity and embargo boundary check
 
-- `--val-embargo-windows <k>` in `sir_cs_benchmark_multi_well_vc.py`
+These commands are **not** the main cross-well benchmark. They reproduce the
+Appendix B.7 channel-ablation / embargo-style checks: reintroducing GR into
+`u` (stronger dense context) and optionally dropping overlap-prone
+train/validation boundary windows.
 
-This drops overlap-prone boundary windows between train and validation tails.
+GR-inclusive sensitivity (step 16 example; do not treat as the main result):
+
+```bash
+python sir_cs_benchmark_multi_well_vc.py \
+  --train-path data/F02-1,F03-2,F06-1_6logs_30dB.txt \
+  --test-path data/F03-4_6logs_30dB.txt \
+  --channels sonic,rhob,gr,ai,vp \
+  --target vc \
+  --step 16 \
+  --rhos 0.05,0.10,0.20 \
+  --seeds 7,23,41 \
+  --run-csgm-m2 \
+  --run-csgm-ablations \
+  --csgm-prior-type ridge \
+  --no-lfista
+```
+
+Embargo-style boundary check (main no-GR channels + boundary-window removal):
+
+```bash
+python sir_cs_benchmark_multi_well_vc.py \
+  --train-path data/F02-1,F03-2,F06-1_6logs_30dB.txt \
+  --test-path data/F03-4_6logs_30dB.txt \
+  --channels sonic,rhob,ai,vp \
+  --target vc \
+  --step 16 \
+  --rhos 0.05,0.10,0.20 \
+  --seeds 7,23,41 \
+  --val-embargo-windows 4 \
+  --run-csgm-m2 \
+  --run-csgm-ablations \
+  --csgm-prior-type ridge \
+  --no-lfista
+```
+
+`--val-embargo-windows <k>` drops overlap-prone boundary windows between the
+training and validation tails. Combine with `--channels sonic,rhob,gr,ai,vp`
+only when reproducing the GR-inclusive embargo row of Appendix B.7.
 
 ## 9) Outputs and repository policy
 
@@ -228,6 +348,8 @@ This repository should remain lightweight:
 - Main seeds: `7,23,41`
 - Cross-well low-data steps: `8,16,32`
 - Cross-well rhos: `0.05,0.10,0.20`
+- Cross-well dense channels (main): `sonic,rhob,ai,vp` (GR excluded)
+- Cross-well GR-inclusive channels (Appendix B.7 only): `sonic,rhob,gr,ai,vp`
 - F03-4 rhos: `0.20,0.30,0.40,0.50,0.60`
 - Main method: CLP-CSGM Ridge
 - Sensitivity method: CLP-CSGM MLP prior
