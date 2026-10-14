@@ -314,15 +314,18 @@ or returns a property from the logs.
 
 CLP-CSGM recovers a window of a target property when dense logs are available
 along the window and only sparse observations of that property are in hand.
-The dense logs set the latent anchor, and the sparse values remain
-measurements. After training, the latent code is adjusted so that the decoded
-window matches those measurements on the observed coordinates. The difference
-is which quantity is unknown. In log completion, geomodel translation, and
-direct regression, the missing property values are what the trained model must
-produce. In CLP-CSGM those sparse values are already known measurements, and
-the unknown is the remainder of the target window, which the inference step is
-required to keep consistent with them. We do not compare numerical errors
-with the four studies, because the unknowns are not the same.
+The conditional map predicts z_0 = h(u) from the dense logs. This code
+initializes the first latent trajectory and remains the center of the
+quadratic penalty. The sparse values remain measurements. After training,
+latent refinement balances agreement with those measurements against
+deviation from z_0. A residual at the observed depths can remain. The
+difference is which quantity is unknown. In log completion, geomodel
+translation, and direct regression, the missing property values are what the
+trained model must produce. In CLP-CSGM those sparse values are already known
+measurements, and the unknown is the remainder of the target window. The
+inference step penalizes disagreement with those measurements. We do not
+compare numerical errors with the four studies, because the unknowns are not
+the same.
 
 Where the text was changed: the Introduction (end of the first paragraph);
 Related work, subsection Petrophysical log prediction (the comparison of the

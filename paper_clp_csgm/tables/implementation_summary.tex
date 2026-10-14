@@ -14,7 +14,7 @@ Ridge regressor with \(\alpha=1.0\) on standardized \((u,z)\) pairs (main experi
 \midrule
 Target-well inference &
 Latent refinement &
-Adam \citep{kingma2015adam} for 400 iterations, learning rate \(0.05\), three restarts (anchor \(z_0=h(u)\) plus perturbed starts); \(\lambda\) selected on validation from \(\{10^{-4},3{\cdot}10^{-4},10^{-3},3{\cdot}10^{-3},10^{-2},3{\cdot}10^{-2},10^{-1}\}\). \\
+Adam \citep{kingma2015adam} for 400 iterations, learning rate \(0.05\), three restarts (first start at \(z_0=h(u)\); two further starts at \(z_0\) plus \(\mathcal{N}(0,0.05^{2}I)\); penalty center remains \(z_0\)); \(\lambda\) selected on validation from \(\{10^{-4},3{\cdot}10^{-4},10^{-3},3{\cdot}10^{-3},10^{-2},3{\cdot}10^{-2},10^{-1}\}\). \\
 &
 Reconstruction &
 \(\hat{y}=G(\hat{z})\) after inverse standardization to the original target scale. \\

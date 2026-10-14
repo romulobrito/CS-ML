@@ -361,12 +361,17 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Reviewer request: the writing stacks terminology. The abstract examples
   are admissible reconstruction range, low-capacity latent-prior reference,
   contextual latent anchoring, and sparse-measurement consistency.
-- Change made: those labels are replaced by the operations. The decoder
-  supplies the windows the reconstruction may use. Dense logs set the
-  starting point. At inference the decoded window must match the sparse
-  measurements. Ridge is the linear reference for that starting point.
-  The same wording is carried through the narrative sections. Numbers and
-  closed claim limits are unchanged.
+- Change made: those labels are replaced by the operations, and a later
+  wording pass states both roles of z_0. The decoder supplies the windows
+  the reconstruction may use. The conditional map predicts z_0 from the
+  dense logs. The first trajectory starts at z_0; the other two start at
+  z_0 plus N(0, 0.05^2 I). The penalty center remains z_0 on every restart
+  and every iteration. The measurement term is a penalty, so a residual can
+  remain. The decoder range and that penalty are separate. Prior-only is
+  the decoded prediction G(z_0), with no latent search. Ridge is the linear
+  reference for z_0. This pass clarifies the existing formulation. The
+  equations, the algorithm, and the reported numbers are unchanged.
+  R3-P01, R3-P03, and R3-P06 stay pending.
 - Files: `main.tex`; `sections/01_introduction.tex`;
   `sections/02_related_work.tex`; `sections/03_method.tex`;
   `sections/04_data_and_eda.tex`; `sections/05_experiments.tex`;

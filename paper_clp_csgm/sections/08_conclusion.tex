@@ -2,10 +2,15 @@
 \label{sec:conclusion}
 
 We introduced CLP-CSGM. A decoder trained on windows of the target curve
-supplies the windows the reconstruction may use. The dense logs set the
-starting point of the search. At inference the decoded window must match the
-sparse measurements. The MAP/Tikhonov reading and the local error bound
-separate measurement noise, decoder error, a poor starting point, and whether
+supplies the windows the reconstruction may use. The conditional map predicts
+a latent code $\boldsymbol{z}_0$ from the dense auxiliary logs. This code
+provides an informed initialization and serves as the reference for the
+quadratic penalty during latent refinement. Latent refinement balances
+agreement with the sparse observations against deviation from
+$\boldsymbol{z}_0$. A residual at the observed depths can remain. The
+MAP/Tikhonov reading and the local error bound
+separate measurement noise, decoder error, a code $\boldsymbol{z}_0$ far from
+a good code, and whether
 nearby windows can be told apart from the measurements.
 
 Under the paired F3 protocols, CLP-CSGM Ridge has lower mean RMSE than AE
@@ -27,10 +32,11 @@ has lower mean RMSE than
 prior-only in every cross-well cell and than measurement-only CSGM in seven of
 nine cells. It also has lower mean RMSE than both ablations throughout the
 F03-4 grid. The opposite Ridge--MLP rankings show that the better map from
-dense logs to the starting point depends on the test.
+dense logs to $\boldsymbol{z}_0$ depends on the test.
 
 On the tests reported here, CLP-CSGM complements direct regression because
-the sparse values stay measurements that the reconstructed window must match.
+the sparse values stay measurements, and the reconstructed window is
+penalized for disagreeing with them.
 The F3 evidence
 is reconstruction of processed target logs: cross-well $V_c$ is
 Larionov-derived from gamma ray, F03-4 porosity is density-derived, and
@@ -39,7 +45,8 @@ independently acquired core or laboratory measurements. A separate
 single-well supplement on laboratory porosity scores held-out laboratory
 coordinates. CLP-CSGM is not superior on the mean RMSE: the direct AE is lower
 because the deepest block shifts the logs away from the logs used to fit the
-starting-point map. Laboratory measurements correct that starting point in
+map to $\boldsymbol{z}_0$. Laboratory measurements correct that decoded
+prediction in
 every split, and the correction is enough on the two shallower blocks, where
 the test logs remain close to those training logs and CLP-CSGM Ridge keeps
 the lower block-mean RMSE. That supplement is one cored interval. The cross-well

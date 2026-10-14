@@ -20,13 +20,19 @@ Source comments: `docs/revision/CLP_CSGM_Pareceres_Consolidados.md`.
 We thank the reviewer for this comment. The stacked labels in the abstract
 have been replaced by a description of the operations. The decoder, trained
 on windows of the target curve, supplies the windows the reconstruction may
-use. The dense logs set the starting point of the search. At inference the
-decoded window is adjusted so that it matches the sparse measurements. Ridge
-is described as the linear map used as the reference for that starting point.
-The ablation sentence now says that dropping either the dense-log starting
-point or the match to the sparse measurements raises the error in most cells,
-and that which term matters more changes with the number of training windows
-and with how many depths are measured.
+use. The conditional map predicts a latent code z_0 from the dense auxiliary
+logs. This code provides an informed initialization and serves as the
+reference for the quadratic penalty during latent refinement. The first
+trajectory starts at z_0. Each additional restart starts at z_0 plus an
+independent draw from N(0, 0.05^2 I). The penalty center remains z_0 on every
+restart and every iteration. Latent refinement balances agreement with the
+sparse observations against deviation from z_0. A residual at the observed
+depths can remain. The decoder range and that penalty are separate. Ridge is
+the linear map used as the reference for z_0. Using only the decoded
+prediction of the conditional prior, or only the measurement penalty, raises
+the error in most cells. This wording clarifies the formulation already
+implemented. It does not change the algorithm, the equations, or the reported
+results.
 
 The same plain description is used in the Introduction, Related work, Method,
 Data and exploratory analysis, Experimental setup, Results, Interpretation,
@@ -35,10 +41,14 @@ limits already stated in the abstract are unchanged: the advantage is
 conditional on small training support, the local bound is not an S-REC proof,
 and the gamma-ray-only porosity test is not general porosity performance.
 
-Where the text was changed: Abstract; Introduction; Related work; Method;
-Data and exploratory analysis; Experimental setup; Results; Interpretation,
-scope, and limitations; Conclusion; Appendix Supplementary Theoretical
-Details (the opening paragraph).
+Where the text was changed: Abstract; Introduction; Related work; Method
+(the opening, the paragraph after the measurement model, the conditional-code
+figure caption, Test-time reconstruction, and the ablation paragraph);
+Experimental setup (the protocol caption, the restart paragraph, and the
+implementation table); Results (Ablation analysis); Interpretation, scope,
+and limitations; Conclusion; Appendix Supplementary Theoretical Details
+(the opening paragraph); Appendix Laboratory porosity on a cored interval
+(the definition of the decoded prediction).
 
 ## R3-02 -- Practical advantage versus conventional relations
 

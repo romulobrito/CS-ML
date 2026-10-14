@@ -4,7 +4,7 @@
 This section collects the proofs omitted from the main text, including the
 detailed conditional local-recovery argument. That argument separates four
 contributions to the error: how far the true window is from anything the
-decoder can produce, how far the dense-log starting code is from a good code,
+decoder can produce, how far $\boldsymbol{z}_0$ is from a good code,
 measurement noise, and whether the measurements can tell nearby windows apart.
 
 \subsection{MAP and Tikhonov interpretation}
@@ -863,7 +863,8 @@ observes $13$ coordinates, and CLP-CSGM Ridge has mean RMSE $0.0372$
 against an interpolation RMSE of $0.0423$. At steps $16$ and $32$ the
 dense-log window itself has mean RMSE $0.0426$ and $0.0432$, already near
 the interpolation error at this noise. The pattern agrees with the ablation
-in Section~\ref{subsec:ablation_analysis}, where that starting point is not
+in Section~\ref{subsec:ablation_analysis}, where the conditional code
+$\boldsymbol{z}_0$ is not
 helpful at step $8$.
 
 \subsection{Computational Trade-Offs}
@@ -1035,7 +1036,9 @@ every window. The laboratory value on those coordinates is the measurement,
 with no added noise. RMSE is computed only on the remaining coordinates.
 $\rho=0.25$ uses $m=2$ measurements and $\rho=0.50$ uses $m=4$. The direct AE
 receives $[\boldsymbol{u},\boldsymbol{b}]$ with the same coordinates. The
-log-only anchor is $G(h(\boldsymbol{u}))$ without the measurement term. Neither
+The decoded prediction of the conditional prior is
+$G(h(\boldsymbol{u}))$, with no latent search. It is reported below as the
+log-only anchor. Neither
 method is added to the main F3 tables.
 
 \begin{table}[htbp]
@@ -1080,7 +1083,7 @@ The gain where CLP-CSGM Ridge is ahead has two parts. First, the measurement
 term is doing the work the method is built for: in every block and at both
 ratios, CLP-CSGM Ridge has lower RMSE than the log-only anchor. The laboratory
 coordinates pull the latent code off $h(\boldsymbol{u})$. Second, that pull is
-most useful when the anchor is already a usable start. In the shallowest
+most useful when $\boldsymbol{z}_0$ is already near a useful code. In the shallowest
 block, mean $\mathrm{Phi_{lab}}$ is $0.092$ with standard deviation $0.019$,
 mean gamma ray is about $15~\mathrm{API}$, and the median deep resistivity is
 about $1900$. Adding two further laboratory coordinates ($\rho=0.50$ rather
@@ -1098,7 +1101,7 @@ $30~\mathrm{API}$, and the median deep resistivity falls to about $600$. The
 lithotype mix also changes: codes $2$ and $4$ account for $25$ of the $29$
 rows, whereas the middle block is mostly code $1$. The ridge anchor is a
 linear map from $\boldsymbol{u}$ fitted on the other blocks, so
-$\boldsymbol{z}_0=h(\boldsymbol{u})$ starts far from the laboratory windows.
+$\boldsymbol{z}_0=h(\boldsymbol{u})$ lies far from the laboratory windows.
 With only $m=2$ or $m=4$ measurements in a length-$8$ window, the residual
 still improves on that anchor ($0.0931$ versus $0.1142$, and $0.1016$ versus
 $0.1234$) but does not catch the direct AE. The AE never has to pass through

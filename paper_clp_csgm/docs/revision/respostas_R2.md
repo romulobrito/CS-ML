@@ -20,22 +20,23 @@ We thank the reviewer for this structural comment. The Introduction now
 states the practical problem before any formulation. Dense wireline logs run
 along the target well but measure the target property only indirectly. A few
 depths already carry a value of that property, and the task is to reconstruct
-the remaining depths while keeping those known values.
+the remaining depths while penalizing disagreement with those known values.
 
 A direct map that joins those sparse values to the dense logs is not required
 to reproduce them after training. This paper keeps them as measurements, so
-the reconstructed window has to match them. Log completion, geomodel
+the reconstructed window is penalized for disagreeing with them. That penalty
+does not force every observation to be met exactly. Log completion, geomodel
 translation, and direct regression are named as trained maps that return the
 missing property. The comparison of those tasks with this measurement role is
 in Related work.
 
 The objective has been removed from the Introduction. It is stated in Method,
 subsection Test-time reconstruction. The Introduction describes that step in
-words and points to the subsection: a decoder supplies the admissible
-windows, the dense logs set the starting point of the latent search, and the
-decoded window must agree with the sparse measurements. Ridge remains the
-linear low-capacity reference for the map from dense logs to that starting
-point. It is not presented as best in every regime.
+words and points to the subsection: a decoder supplies the windows the
+reconstruction may use, the conditional map predicts z_0 from the dense logs,
+and latent refinement balances agreement with the sparse observations against
+deviation from z_0. A residual at the observed depths can remain. Ridge remains the
+linear low-capacity reference for the map from dense logs to z_0. It is not presented as best in every regime.
 
 Where the text was changed: the Introduction (from the opening through the
 paragraph that points to Test-time reconstruction). The objective itself is

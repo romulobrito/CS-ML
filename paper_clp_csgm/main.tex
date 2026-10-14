@@ -82,9 +82,12 @@ depths. Direct supervised models can combine dense logs with sparse target
 observations, but they typically use the sparse entries as input features and do
 not require the reconstruction to honor them as measurements. We introduce Conditional Latent-Prior Compressed Sensing with Generative
 Models (CLP-CSGM). A decoder trained on windows of the target curve supplies
-the windows the reconstruction may use. The dense logs set the starting point
-of the search for that window. At inference, the decoded window is adjusted
-so that it matches the sparse measurements. A conditional local-recovery bound separates decoder error,
+the windows the reconstruction may use. The conditional map predicts a latent
+code $z_0$ from the dense auxiliary logs. This code provides an informed
+initialization and serves as the reference for the quadratic penalty during
+latent refinement. That refinement balances agreement with the sparse
+observations against deviation from $z_0$, and a residual at the observed
+depths can remain. A conditional local-recovery bound separates decoder error,
 prior mismatch, measurement noise, and local separability. It does not prove
 that the measurement operator satisfies S-REC on the trained decoder.
 We evaluate CLP-CSGM on public Dutch North Sea well-log data reorganized into a
@@ -98,7 +101,7 @@ subsamples of these same processed curves. The benchmarks therefore test
 reconstruction of processed target logs rather than recovery against
 independently acquired core or laboratory measurements. A limited-sample
 permeability case provides supplementary evidence. With a linear ridge map as
-the reference for that starting point, the comparison is a conditional advantage,
+the reference for $z_0$, the comparison is a conditional advantage,
 not overall superiority. CLP-CSGM has lower mean RMSE than the direct
 autoencoder baseline in seven of nine cross-well cells, with the gains
 concentrated where training support is smallest (steps $16$ and $32$). The
@@ -113,10 +116,10 @@ controlled sparse-assimilation test under intentionally incomplete context:
 gamma ray is the only dense input, and the depth profile follows the broad
 trend of the processed porosity curve. It is not evidence of general porosity
 reconstruction performance.
-Dropping either the dense-log starting point or the match to the sparse
-measurements raises the error in most cells. Which of the two matters more
-changes with the number of training windows and with how many depths are
-measured. The map from dense logs to the starting point is also
+Using only the decoded prediction of the conditional prior, or only the
+measurement penalty, raises the error in most cells. Which of the two matters
+more changes with the number of training windows and with how many depths are
+measured. The map from dense logs to $z_0$ is also
 dataset-dependent: a multilayer perceptron gives lower mean RMSE on the
 cross-well grid, whereas ridge gives lower mean RMSE when gamma ray is the
 only dense log. On these processed-log tests, CLP-CSGM complements direct

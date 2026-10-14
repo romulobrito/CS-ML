@@ -32,22 +32,24 @@ the property from the logs, and target values act as training labels.
 
 CLP-CSGM recovers a window of a target property when dense logs are available
 along the window and only sparse observations of that property are in hand.
-The dense logs set the starting point $\boldsymbol{z}_0=h(\boldsymbol{u})$ of
-the search. The sparse values are measurements $\boldsymbol{b}$. After
-training, the code is adjusted so that the decoded window matches
-$\boldsymbol{b}$ at the observed depths. Log completion and geomodel
+The conditional map predicts $\boldsymbol{z}_0=h(\boldsymbol{u})$ from the
+dense logs. This code initializes the first latent trajectory and remains the
+center of the quadratic penalty. The sparse values are measurements
+$\boldsymbol{b}$. After training, latent refinement balances agreement with
+$\boldsymbol{b}$ against deviation from $\boldsymbol{z}_0$. A residual at the
+observed depths can remain. Log completion and geomodel
 translation fill a curve or a map from context. Direct regression predicts the
-property from the logs. CLP-CSGM keeps an explicit match to those measurements
+property from the logs. CLP-CSGM keeps an explicit measurement penalty
 at inference. The difference is which quantity is unknown. In log completion,
 geomodel translation, and direct regression, the missing property values are
 what the trained model must produce. In CLP-CSGM those sparse values are
 already known measurements, and the unknown is the remainder of the target
-window, which the inference step is required to keep consistent with them.
+window. The inference step penalizes disagreement with those measurements.
 
 The experiments use the processed F3 block data of
 \citet{zhang2025rockphysicslogs}, who combine supervised prediction with
 Gardner and Larionov relations and SHAP-based interpretation. We use these logs
-to study reconstruction from dense context while enforcing explicit consistency
+to study reconstruction from dense context while penalizing disagreement
 with sparse target-well observations.
 
 
@@ -65,7 +67,8 @@ muir2021seismicwavefield,dasilva2025csshredenhancingshredrobust}.
 
 CSGM replaces fixed-basis sparsity with the range $\operatorname{Im}(G)$ of a
 learned generator or decoder \citep{bora2017compressed}. Reconstruction searches
-for a latent code $\boldsymbol{z}$ whose decoded signal matches the measurements.
+for a latent code $\boldsymbol{z}$ whose decoded signal reduces the
+measurement residual.
 Recovery properties and limitations of this learned-range prior have been studied
 under set-restricted conditions and related generative formulations
 \citep{bora2017compressed,kamath2020power,asim2020invertible}. CLP-CSGM retains
@@ -88,12 +91,13 @@ score/diffusion models for inverse reconstruction
 \citep{dasgupta2024mechanicsdiffusion,jacobsen2025cocogen}.
 
 CLP-CSGM belongs to this explicit conditional inverse-reconstruction setting.
-Dense logs set the starting point $\boldsymbol{z}_0=h(\boldsymbol{u})$ before
-the search, and the sparse target values enter only through the difference
-between the decoded window and those measurements. That starting point stays
-a penalty during the search. The experiments therefore compare a direct map
-from $[\boldsymbol{u},\boldsymbol{b}]$ to the window, a reconstruction that
-uses only the starting point, and a reconstruction that uses only the
-measurements.
+Dense logs predict $\boldsymbol{z}_0=h(\boldsymbol{u})$ before the search.
+This code initializes the first trajectory and remains the center of the
+quadratic penalty. The other restarts begin at small perturbations of
+$\boldsymbol{z}_0$. The sparse target values enter only through the
+measurement residual. The experiments therefore compare a direct map
+from $[\boldsymbol{u},\boldsymbol{b}]$ to the window, the decoded prediction
+of the conditional prior $G(\boldsymbol{z}_0)$, and a reconstruction that uses
+only the measurements.
 Measurement-conditional generators and posterior-sampling architectures remain
 outside the empirical scope.

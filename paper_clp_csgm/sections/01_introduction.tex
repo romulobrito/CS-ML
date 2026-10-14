@@ -6,7 +6,8 @@ in a target well. Dense wireline logs run along the well, but they measure
 the target property only indirectly
 \citep{ellis2007well,asquith2004basic,wang2024loggingreview,mondal2022corelog,sun2026corecalibrated}.
 A few depths already carry a value of that property. The task is to
-reconstruct the remaining depths while keeping those known values.
+reconstruct the remaining depths while penalizing disagreement with those
+known values.
 
 Supervised regressors learn a nonlinear map from logs to the target property.
 When the sparse observations are available, they are commonly joined to the
@@ -14,35 +15,45 @@ dense logs and used as extra inputs
 \citep{bishop2006pattern,ahmadi2019comparison,wood2020predicting,pan2023multiwell,mondal2022corelog,koray2024integrated,matinkia2023permpred,abdelazim2022permlogs,shi2024gnsperm,he2025porosity,markus2026hybrid}.
 After training, that map is not required to reproduce the observations it was
 given. In this work those observations stay measurements: the reconstructed
-window has to match them.
+window is penalized for disagreeing with them, and that penalty does not
+force every observation to be met exactly.
 
 Recent studies complete a missing log interval, translate a geomodel property
 map, or regress porosity and shale volume from the log suite
 \citep{koeshidayatullah2026timegpt,alfakih2026pix2geomodel,alfakih2025wellloggan,alfakih2023northsea}.
 Each of those predictors returns the missing property from a trained map.
 Section~\ref{sec:related_work} compares those trained maps with the
-measurement constraint used here.
+measurement penalty used here.
 
-Enforcing that match still requires a representation of the target window.
+Using that penalty still requires a representation of the target window.
 A fixed sparsity basis is a weak description of this window when the logs
 change from one well to another
 \citep{donoho2006compressed,candes2006robust,candes2006stable,bora2017compressed}.
 Conditional Latent-Prior CSGM (CLP-CSGM) learns which target windows the
-decoder can produce and lets the dense logs set the starting point of the
-search. At inference the search stays near that point, and the decoded window
-must agree with the sparse measurements.
-Section~\ref{subsec:test_time_reconstruction} states this step. Ridge is the
-primary reference for the map from dense logs to that starting point, because
+decoder can produce. The conditional map predicts a latent code
+$\boldsymbol{z}_0$ from the dense auxiliary logs. This code provides an
+informed initialization and serves as the reference for the quadratic penalty
+during latent refinement. Latent refinement balances agreement with the sparse
+observations against deviation from $\boldsymbol{z}_0$. A residual at the
+observed depths can remain. The decoder range and that penalty are separate:
+the range limits which windows can appear, and the penalty keeps the latent
+code near $\boldsymbol{z}_0$.
+Section~\ref{subsec:test_time_reconstruction} states this step, including the
+first trajectory and the perturbed restarts. Ridge is the
+primary reference for the map from dense logs to $\boldsymbol{z}_0$, because
 it is a linear low-capacity map, not because it is best in every regime. An
 MLP is tested with the same pipeline.
 
-The contributions are threefold. First, the dense logs set the starting point
-and the sparse values stay measurements that the reconstructed window must
-match. Second, the objective has a MAP/Tikhonov reading and a local error
-bound that separates decoder error, a poor starting point, noise, and whether
+The contributions are threefold. First, the dense logs predict
+$\boldsymbol{z}_0$, which initializes the first latent trajectory and remains
+the center of the quadratic penalty, while the sparse values enter as a
+penalized measurement residual. Second, the objective has a MAP/Tikhonov
+reading and a local error bound that separates decoder error, a code
+$\boldsymbol{z}_0$ far from a good code, noise, and whether
 nearby windows can be told apart from the measurements. Third, the tests use
 three development wells and hold out F03-4. They compare direct baselines,
-versions that drop the starting point or the measurement match, and a ridge
-map against a multilayer perceptron for the starting point. That local bound
+the decoded prediction of the conditional prior, a measurement-penalty-only
+search, and a ridge map against a multilayer perceptron for
+$\boldsymbol{z}_0$. That local bound
 separates those error sources under stated assumptions. It is not a verified
 S-REC guarantee for the trained decoder.

@@ -3,23 +3,26 @@
 
 CLP-CSGM uses three pieces that act together. The decoder range
 $\operatorname{Im}(G)$ is the set of target windows the decoder can produce.
-The starting code $\boldsymbol{z}_0=h(\boldsymbol{u})$ is the point the dense
-logs propose before any measurement is enforced. The measurement term
-$\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$ pulls the decoded window
-onto the sparse observations. The decoder range limits which windows can
-appear. The starting code carries the dense logs into that search, and the
-measurement term uses the sparse target values. Unlike direct
+The conditional map predicts $\boldsymbol{z}_0=h(\boldsymbol{u})$ from the
+dense logs. This code initializes the first latent trajectory and remains the
+center of the quadratic penalty. The measurement term
+$\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$ penalizes disagreement
+with the sparse observations and does not force those observations to be met
+exactly. The decoder range limits which windows can
+appear. The code $\boldsymbol{z}_0$ carries the dense logs into that search,
+and the measurement term uses the sparse target values. Unlike direct
 $[\boldsymbol{u},\boldsymbol{b}]$ predictors,
-CLP-CSGM retains $\boldsymbol{b}$ as an explicit measurement during inference.
+CLP-CSGM retains $\boldsymbol{b}$ as an explicit measurement penalty during
+inference.
 It is therefore most relevant when dense logs are informative but incomplete
-and sparse target entries should be honored directly. Log-completion models
+and sparse target entries should enter that penalty. Log-completion models
 fill a missing interval of a wireline curve, geomodel translation fills a
 property image from another image, and direct regression maps logs to porosity
 or shale volume
 \citep{koeshidayatullah2026timegpt,alfakih2026pix2geomodel,alfakih2025wellloggan,alfakih2023northsea}.
 CLP-CSGM is the relevant formulation when those dense logs are already
-available and a few observations of the target property must be honored by the
-reconstructed window.
+available and a few observations of the target property enter the
+reconstructed window through that penalty.
 
 The depth profiles in
 Figs.~\ref{fig:crosswell_depth_profile} and~\ref{fig:f03_depth} illustrate how
@@ -32,16 +35,17 @@ $\operatorname{Im}(G)$, and the number and placement of observations in
 $\boldsymbol{b}$.
 
 The ablations in Section~\ref{subsec:ablation_analysis} drop one piece at a
-time. Using only the starting point, or only the measurements, raises the
+time. Using only the decoded prediction of the conditional prior, or only the
+measurements, raises the
 error in most cells, and which piece matters more changes with the number of
 training windows. The full Ridge model has lower mean RMSE than
 prior-only throughout the cross-well grid and lower mean RMSE than
 measurement-only CSGM in seven of nine cells. In the two step-$8$ exceptions,
-measurement-only inversion has lower mean RMSE, so the ridge starting point
-is not helpful in those cells. On the F03-4 grid, where gamma ray is the only
+measurement-only inversion has lower mean RMSE, so the conditional code
+$\boldsymbol{z}_0$ is not helpful in those cells. On the F03-4 grid, where gamma ray is the only
 dense log, the full model has lower mean RMSE than both ablations at every
-tested ratio. The starting point keeps the search from drifting, and the
-measurement term is still free to correct it.
+tested ratio. The penalty around $\boldsymbol{z}_0$ keeps the search from
+drifting, and the measurement term can still correct it.
 
 The sensitivity results in
 Section~\ref{subsec:latent_prior_sensitivity} show that no single architecture
@@ -49,7 +53,7 @@ for $h$ is uniformly preferable. MLP has lower mean RMSE in all nine
 multi-channel cross-well cells, whereas Ridge has lower mean RMSE at every
 tested ratio under the single-channel F03-4 setting. In both cases, the
 difference decreases as $\rho$ increases, which is consistent with less
-dependence on the dense-log starting point as more target observations
+dependence on $\boldsymbol{z}_0$ as more target observations
 become available. These comparisons distinguish the CLP-CSGM framework from its reference
 implementation. Ridge remains the primary reported configuration because it is
 a fixed linear map: the main tables then use one $h$ in every cell, and $h$
@@ -100,12 +104,12 @@ laboratory-porosity supplement in Appendix~\ref{app:phi_lab_861} uses
 $\mathrm{Phi_{lab}}$ rather than a curve computed from the wireline suite, and
 it scores only coordinates that were not supplied as measurements. The direct
 AE has the lower pooled mean RMSE. Laboratory coordinates still correct the
-log-only anchor in every split, and that correction is enough where the test
+decoded prediction of the conditional prior in every split, and that correction is enough where the test
 logs remain close to the blocks that fit $h(\boldsymbol{u})$. On the deepest
-block the logs move outside that support, the ridge anchor starts far from the
-target windows, and a few measurements improve on the anchor without reaching
+block the logs move outside that support, the conditional code lies far from the
+target windows, and a few measurements improve on the decoded prediction without reaching
 the direct AE. The measurement term still lowers the error relative to the
-log-only anchor in that block. The supplement therefore does not extend the F3
+decoded prediction of the conditional prior in that block. The supplement therefore does not extend the F3
 low-support advantage to a mean win on this laboratory target. Each test fold
 still has many overlapping training windows, so the direct map is in the
 regime where it was expected to be competitive. Block RMSE and the log

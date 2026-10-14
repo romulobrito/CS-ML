@@ -11,8 +11,9 @@ sampled coordinates, and noise realizations.
     \includegraphics[width=0.90\linewidth]
     {figures/experimental_setup_v2.pdf}
     \caption{Experimental protocol. Offline training fits the decoder and the
-    map from dense logs to the starting code. At test time that code is
-    adjusted on the target well. Partitions, measurement ratios, seeds, and
+    map from dense logs to $\boldsymbol{z}_0$. At test time the first
+    trajectory starts at that code and the penalty remains centered there.
+    Partitions, measurement ratios, seeds, and
     sparse-observation draws are shared across methods, which are evaluated
     using RMSE, MAE, and relative $\ell_2$ error. OpenAI's ChatGPT, using the GPT-5.5 model, was used to
     assist in generating the initial explanatory schematic and visual layout.
@@ -69,9 +70,10 @@ The smaller Lapa pre-salt permeability case
 \citep{alvarez2025nonlinear} is retained as supplementary evidence in
 Appendix~\ref{app:lapa_case}. Appendix~\ref{app:phi_lab_861} reports a
 separate single-well check on laboratory porosity. The direct AE has the
-lower mean held-out RMSE. Laboratory measurements correct the log-only anchor
+lower mean held-out RMSE. Laboratory measurements correct the decoded
+prediction of the conditional prior
 in every split, and that correction is enough where the test logs remain close
-to the anchor's training support. The check is not part of the main grid.
+to the support used to fit $h(\boldsymbol{u})$. The check is not part of the main grid.
 
 \subsection{Training, validation, and test protocol}
 \label{subsec:train_val_test_protocol}
@@ -183,11 +185,14 @@ $k=16$ and a decoder that remains frozen during target-well reconstruction.
 \end{table}
 
 For CLP-CSGM, the first latent-refinement run starts from
-$\boldsymbol{z}_0=h(\boldsymbol{u})$, additional runs use small Gaussian
-perturbations around this anchor, and the candidate with the lowest objective
-is retained. The measurement-only ablation sets $\lambda=0$ and starts from
-zero, whereas the prior-only variant returns $G(h(\boldsymbol{u}))$ without
-refinement. Predictions are returned to the original scale using
+$\boldsymbol{z}_0=h(\boldsymbol{u})$. Each additional run starts at
+$\boldsymbol{z}_0$ plus an independent draw from
+$\mathcal{N}(\boldsymbol{0},0.05^{2}I)$. The penalty center remains
+$\boldsymbol{z}_0$ on every run and every iteration, and the candidate with
+the lowest objective is retained. The measurement-only ablation sets
+$\lambda=0$ and starts from zero, whereas the prior-only variant returns the
+decoded prediction of the conditional prior, $G(h(\boldsymbol{u}))$, with no
+latent search. Predictions are returned to the original scale using
 Eq.~\eqref{eq:inverse_target_standardization}.
 
 \subsection{Baselines and evaluation metrics}

@@ -303,7 +303,7 @@ measurements still correct the log-only anchor, which CLP-CSGM Ridge beats in
 every split. That correction is enough on the two shallower blocks, where the
 test logs remain close to the support that fits the anchor and CLP-CSGM Ridge
 has the lower block-mean RMSE. It does not close the gap on the deepest block,
-where the logs shift and the anchor starts far from the target windows. The
+where the logs shift and the conditional code lies far from the target windows. The
 block RMSE, the log summaries, and the split counts are in
 Appendix~\ref{app:phi_lab_861}.
 
@@ -311,8 +311,8 @@ Appendix~\ref{app:phi_lab_861}.
 \label{subsec:ablation_analysis}
 
 The structural ablations drop one term at a time.
-Prior-only returns $G(h(\boldsymbol{u}))$, the window decoded from the
-dense-log starting point, with no further adjustment. Measurement-only
+Prior-only returns the decoded prediction of the conditional prior,
+$G(h(\boldsymbol{u}))$, with no latent search. Measurement-only
 sets $\lambda=0$ and searches the decoder range using only the sparse
 measurements \citep{bora2017compressed}. The comparison shows what each
 term contributes
@@ -323,7 +323,7 @@ in all nine cells, with reductions from $20.5\%$ to $60.6\%$
 (Table~\ref{tab:ablation_crosswell}). It also has lower mean RMSE than
 measurement-only CSGM in seven cells. The exceptions are step $8$ with
 $\rho\in\{0.05,0.10\}$, where measurement-only CSGM has lower mean RMSE and the
-Ridge anchor is not beneficial. At steps $16$ and $32$, the full model has
+Ridge code $\boldsymbol{z}_0$ is not beneficial. At steps $16$ and $32$, the full model has
 lower mean RMSE than both ablations at every tested ratio.
 
 \begin{table}[t]
@@ -345,7 +345,7 @@ relative to prior-only
 increases from approximately $18.5\%$ at $\rho=0.20$ to $37.7\%$ at
 $\rho=0.60$, while its largest gains over measurement-only occur at the
 sparsest ratios. Both terms contribute. The cross-well exceptions show that
-the ridge starting point is not helpful in every cell.
+the conditional code $\boldsymbol{z}_0$ is not helpful in every cell.
 
 \begin{table}[t]
     \centering

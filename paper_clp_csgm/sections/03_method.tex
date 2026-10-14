@@ -2,9 +2,13 @@
 \label{sec:method}
 
 CLP-CSGM uses three pieces. A decoder, trained on windows of the target
-curve, supplies the windows the reconstruction may use. A map from the dense
-logs returns the starting code of the search. At inference the search stays
-near that code, and the decoded window must match the sparse measurements.
+curve, supplies the windows the reconstruction may use. The conditional map
+predicts a latent code $\boldsymbol{z}_0$ from the dense auxiliary logs. This
+code provides an informed initialization and serves as the reference for the
+quadratic penalty during latent refinement. Latent refinement balances
+agreement with the sparse observations against deviation from
+$\boldsymbol{z}_0$. A residual at the observed depths can remain. The decoder
+range and the quadratic penalty are different components.
 This section defines the measurement model, the objective, the comparisons
 that drop one piece, and the error bound.
 
@@ -66,11 +70,11 @@ $\boldsymbol{\eta}\sim
 $\boldsymbol{\eta}=\boldsymbol{0}$.
 
 The dense logs and the sparse measurements do different jobs. The dense-log
-vector $\boldsymbol{u}$ sets the starting code
+vector $\boldsymbol{u}$ predicts the code
 $\boldsymbol{z}_0=h(\boldsymbol{u})$. The measurements $\boldsymbol{b}$ enter
-only as the mismatch $\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$.
-The reconstruction therefore starts from the dense logs and is then required
-to agree with the sparse target values.
+only as the penalized mismatch $\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$.
+The first latent trajectory starts at $\boldsymbol{z}_0$, and the penalty
+center remains $\boldsymbol{z}_0$.
 
 
 
@@ -220,7 +224,7 @@ $\boldsymbol{z}_0=h(\boldsymbol{u})\in\mathbb{R}^{k}$. The decoder $G$
 determines which target windows can be represented, and $h$ uses dense-log
 context to center the latent search. CLP-CSGM is this scheme; the class of
 $h$ is a configuration choice. Ridge is the primary reference because it is a
-linear map from the dense logs to the starting code, not because it is the
+linear map from the dense logs to $\boldsymbol{z}_0$, not because it is the
 best map in every test. An MLP variant of $h$ is reported with the
 same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
 
@@ -228,11 +232,12 @@ same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
     \centering
     \includegraphics[width=0.66\linewidth]
     {figures/view_conditional_latent_prior.png}
-    \caption{Geometry of the log-conditioned starting point. Dense logs determine
-    $\boldsymbol{z}_0=h(\boldsymbol{u})$, and test-time refinement moves the code
-    to $\widehat{\boldsymbol{z}}$ so that
-    $G(\widehat{\boldsymbol{z}})\in\mathcal{M}$ better matches the sparse
-    observations $\boldsymbol{b}$ through $M_{\Omega}$.}
+    \caption{Geometry of the conditional latent code. Dense logs determine
+    $\boldsymbol{z}_0=h(\boldsymbol{u})$. That code initializes the first
+    trajectory and remains the center of the quadratic penalty. Test-time
+    refinement moves the code to $\widehat{\boldsymbol{z}}$ inside the decoder
+    range $\mathcal{M}$, balancing the measurement residual against deviation
+    from $\boldsymbol{z}_0$.}
     \label{fig:conditional_prior_geometry}
 \end{figure}
 
@@ -274,12 +279,17 @@ D_yG\left(\widehat{\boldsymbol{z}}_{\mathrm{num}}\right).
 \label{eq:clp_csgm_objective}
 \end{equation}
 
-The first term enforces measurement consistency and the second regularizes
-latent search toward the anchor; $\lambda\geq0$ is selected on validation
+The first term penalizes disagreement with the sparse observations and the
+second penalizes deviation from $\boldsymbol{z}_0$. Their sum does not force
+the observations to be met exactly, so a residual at the observed depths can
+remain. $\lambda\geq0$ is selected on validation
 windows for each measurement ratio and seed. Because $G$ is nonlinear, the
 objective is generally nonconvex and is solved with Adam
-\citep{kingma2015adam}. The first run starts from $\boldsymbol{z}_0$; additional
-restarts use small Gaussian perturbations, and the lowest-objective candidate is
+\citep{kingma2015adam}. The first run starts from $\boldsymbol{z}_0$. Each
+additional restart starts at $\boldsymbol{z}_0$ plus an independent draw from
+$\mathcal{N}(\boldsymbol{0},0.05^{2}I)$, with the same shape as
+$\boldsymbol{z}_0$. The penalty center remains $\boldsymbol{z}_0$ on every
+restart and every iteration, and the lowest-objective candidate is
 retained. Thus $\widehat{\boldsymbol{z}}_{\mathrm{num}}$ is a numerical
 solution, not a certified global minimizer.
 
@@ -291,7 +301,8 @@ solution, not a certified global minimizer.
     autoencoder $(E,G)$, and paired dense-log windows fit the latent-prior
     predictor $h$. At inference, $\boldsymbol{u}_{\ast}$ determines
     $\boldsymbol{z}_0=h(\boldsymbol{u}_{\ast})$, sparse observations
-    $\boldsymbol{b}_{\ast}$ constrain latent refinement through $M_{\Omega}$,
+    $\boldsymbol{b}_{\ast}$ enter latent refinement as a measurement penalty
+    through $M_{\Omega}$,
     and the decoded result is returned to the original target scale.
     OpenAI's ChatGPT, using the GPT-5.5 model, was used to assist in generating
     the initial explanatory schematic and visual layout. The final figure was
@@ -319,7 +330,10 @@ M_{\Omega}G(\boldsymbol{z})
 \label{eq:measurement_only_ablation}
 \end{equation}
 
-The latent-prior-only variant uses only the dense-log starting point. The
+The latent-prior-only variant returns the decoded prediction of the
+conditional prior, $G(\boldsymbol{z}_0)$, with no latent search. In that
+variant $\boldsymbol{z}_0$ is not an initialization, because no trajectory is
+optimized. The
 measurement-only variant uses only the sparse measurements and recovers
 measurement-only generative compressed sensing \citep{bora2017compressed}.
 Comparison with the full objective in
@@ -394,7 +408,8 @@ data-fidelity term, while the conditional prior induces the latent penalty.
 Setting $\lambda=0$ recovers the measurement-only CSGM problem in
 Eq.~\eqref{eq:measurement_only_ablation}
 \citep{bora2017compressed}. Increasing $\lambda$ shifts the reconstruction
-toward the latent-prior estimate $G(\boldsymbol{z}_0)$ by penalizing departures
+toward the decoded prediction of the conditional prior,
+$G(\boldsymbol{z}_0)$, by penalizing departures
 from $\boldsymbol{z}_0=h(\boldsymbol{u})$ more strongly.
 \end{remark}
 
@@ -480,12 +495,14 @@ Proposition~\ref{prop:conditional_local_recovery} and is distinct from the
 latent-prior mismatch
 $\|\boldsymbol{z}^{\dagger}-\boldsymbol{z}_0\|_2$.
 
-An inaccurate anchor
+An inaccurate code
 $\boldsymbol{z}_0=h(\boldsymbol{u})$ may bias the search toward a suboptimal
-latent region. The data-fidelity term can partially correct this bias when the
+latent region, because it initializes the first trajectory and remains the
+center of the penalty. The data-fidelity term can partially correct this bias when the
 sparse observations are informative and $\lambda$ does not dominate the
 objective. The decoder range determines what can be represented; the
-log-conditioned anchor determines where the latent search is centered.
+conditional code $\boldsymbol{z}_0$ determines where the latent penalty is
+centered.
 \end{remark}
 
 
