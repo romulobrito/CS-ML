@@ -96,9 +96,11 @@ At step 8, with the two smaller measurement fractions, interpolation still has t
 
 At the two larger noise levels, CLP-CSGM has the lower error in every cell. Those levels are a sensitivity check. At the largest of them, the noise is several times the variation of the curve.
 
-The detail is in the appendix Direct linear maps, depth interpolation, and measurement noise, with the two tables and one depth example. The Results paragraph states the conclusion, the Experimental setup announces the experiment, and the Method explains the encoder. These runs are not merged into the submitted tables.
+Results also shows this ordering in one figure, with one panel per step and one curve per measurement fraction, so the step-8 cells are not averaged away. Relative to the curve standard deviation 0.035, on the same scale as the noise, 0.05 is about 1.43 times larger, and 0.10 and 0.20 are about 2.86 and 5.71 times larger.
 
-Where the text was changed: Method (the generative-decoder paragraph); Experimental setup (the paragraph after the sparse-coordinate placement check); Results (the paragraph after the sparse-coordinate placement conclusion); Appendix Direct linear maps, depth interpolation, and measurement noise.
+The detail is in the appendix Direct linear maps, depth interpolation, and measurement noise, with the two tables and one depth example. The Results paragraph states the conclusion next to that figure. The Experimental setup announces the experiment, and the Method explains the encoder. These runs are not merged into the submitted tables.
+
+Where the text was changed: Method (the generative-decoder paragraph); Experimental setup (the paragraph after the sparse-coordinate placement check); Results (the paragraph after the sparse-coordinate placement conclusion, and the RMSE-versus-noise figure); Appendix Direct linear maps, depth interpolation, and measurement noise.
 
 **Shared reply:** none. `R3-04` asks how the published noise level was chosen and stays in the queue.
 

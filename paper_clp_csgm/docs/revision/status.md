@@ -412,9 +412,12 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   step 8 for rho 0.20, with the selected penalty inside the published grid.
   At 0.10 and 0.20 it is lower in all nine cells; those levels are a
   sensitivity check, and at 0.20 some selected weights lie above the
-  published grid. The depth figure uses noise 0.01 and 0.05 for one
-  interval (seed 7, step 32, rho 0.20). The main nine-cell grid is
-  unchanged. The step-8 exception at noise 0.05, rho 0.05 and 0.10, is
+  published grid. Results includes an RMSE-versus-noise figure with one
+  panel per step and one curve per measurement fraction. Relative to the
+  held-out standard deviation 0.035, noise 0.05, 0.10, and 0.20 are about
+  1.43, 2.86, and 5.71 times larger; 0.10 and 0.20 stay a sensitivity
+  check. The depth figure uses noise 0.01 and 0.05 for one interval
+  (seed 7, step 32, rho 0.20). The main nine-cell grid is unchanged. The step-8 exception at noise 0.05, rho 0.05 and 0.10, is
   tied to the dense-log map: its window has RMSE 0.0564, above
   interpolation at 0.0456 and 0.0442, while G(E(y)) at that step is
   0.0073. Four and six measurements do not close the gap; thirteen do.
@@ -422,7 +425,8 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `sections/06_results.tex`; `sections/09_appendix.tex`;
   `tables/robustness_crosswell_simple_baselines.tex`;
   `tables/robustness_crosswell_noise_sweep.tex`;
-  `figures/crosswell_vc_noise_panels_step32_rho020_seed7.png`.
+  `figures/crosswell_vc_noise_panels_step32_rho020_seed7.png`;
+  `figures/crosswell_vc_rmse_vs_noise.png`.
 - Shared reply: none. `R3-04` asks how the published noise was chosen and
   stays in the queue.
 

@@ -70,28 +70,51 @@ remains the less stable regime.
 Appendix~\ref{app:crosswell_simple_baselines} compares those same nine cells
 with ordinary least squares and ridge regression from
 $[\boldsymbol{u},\boldsymbol{b}]$, and with linear interpolation of the
-sparse measurements along depth. At the published noise standard deviation
-$0.01$, interpolation has the lowest full-window RMSE in all nine cells and
-in all $27$ seed comparisons. CLP-CSGM Ridge is lower than both direct linear
-maps at step $16$, $\rho=0.20$, and at step $32$ for every $\rho$.
-The held-out $V_c$ curve has standard deviation $0.035$. Raising only the
-noise standard deviation to $0.05$, the same order as that variation, makes
-CLP-CSGM Ridge lower in every seed at steps $16$ and $32$ and at step $8$
-for $\rho=0.20$. The penalty weight selected on validation in those cells
-stays inside the published grid. At $0.10$ and $0.20$ the CLP-CSGM error
-remains lower in all nine cells. Those two levels are a sensitivity check:
-at $0.20$ the noise is several times the variation of the curve.
-The interpolation advantage is tied to the noise level. It holds at the
-published standard deviation $0.01$, where the measurements are a slightly
-perturbed copy of the curve. Raising that standard deviation to $0.05$
-removes the advantage in the few-window cells. The interpolation error grows
-with the noise because the interpolated curve follows the measurements.
-The CLP-CSGM error moves less and stays near the window predicted from the
-dense logs alone. At step $8$ for $\rho=0.05$ and $\rho=0.10$, interpolation
-still has the lower mean at noise $0.05$. The dense-log starting window at
-that step already has higher error than the interpolation, and four or six
-measured depths do not close the gap. The decoder can still represent the
-curve. These runs are not merged into the submitted tables.
+sparse measurements along depth. The linear maps are scored at the published
+noise standard deviation $0.01$. At that reference level, interpolation has
+the lowest full-window RMSE in all nine cells and in all $27$ seed
+comparisons. CLP-CSGM Ridge is lower than both direct linear maps at step
+$16$, $\rho=0.20$, and at step $32$ for every $\rho$.
+
+Figure~\ref{fig:crosswell_rmse_vs_noise} uses the same windows and changes
+only the noise. Each panel is one step and each curve is one measurement
+fraction, so the nine cells are not averaged together. At noise $0.01$,
+interpolation has the lower error in all nine configurations. At noise
+$0.05$, CLP-CSGM Ridge has the lower mean RMSE at steps $16$ and $32$ and
+at step $8$ for $\rho=0.20$. At step $8$ for $\rho=0.05$ and $\rho=0.10$,
+interpolation keeps the lower mean. At $0.10$ and $0.20$, CLP-CSGM Ridge
+has the lower error in all nine configurations. The held-out $V_c$ curve
+has standard deviation $0.035$, on the same scale as this noise. Relative
+to that deviation, $0.05$ is about $1.43$ times larger, and $0.10$ and
+$0.20$ are about $2.86$ and $5.71$ times larger. Those last two levels are
+strong perturbations and are a sensitivity check. The penalty weight
+selected at $0.01$ and at $0.05$ stays inside the published grid.
+The interpolation error grows with the noise because the interpolated curve
+follows the measurements. The CLP-CSGM error moves less and stays near the
+window predicted from the dense logs alone. At step $8$ for $\rho=0.05$ and
+$\rho=0.10$, that starting window already has higher error than the
+interpolation at noise $0.05$, and four or six measured depths do not close
+the gap. The decoder can still represent the curve. These runs are not
+merged into the submitted tables.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\linewidth]{crosswell_vc_rmse_vs_noise.png}
+    \caption{Mean full-window RMSE of depth interpolation and CLP-CSGM Ridge
+    when only the measurement-noise standard deviation changes. Each panel is
+    one step and each measurement fraction is drawn separately, so the nine
+    cells are not averaged. Values are means over seeds $\{7,23,41\}$.
+    The dotted line is the held-out $V_c$ standard deviation $0.035$, on the
+    same scale as the noise. Noise $0.05$ is about $1.43$ times that
+    deviation. The shaded region marks $0.10$ and $0.20$, about $2.86$ and
+    $5.71$ times that deviation, which are a sensitivity check.
+    At $0.01$, interpolation is lower in every cell. At $0.05$, CLP-CSGM
+    Ridge is lower at steps $16$ and $32$ and at step $8$ for $\rho=0.20$;
+    at step $8$ for $\rho=0.05$ and $\rho=0.10$, interpolation remains lower.
+    At $0.10$ and $0.20$, CLP-CSGM Ridge is lower in all nine cells.
+    Per-seed values are in Table~\ref{tab:crosswell_noise_sweep}.}
+    \label{fig:crosswell_rmse_vs_noise}
+\end{figure}
 
 Taken with the ten-seed panel, the two checks separate the randomness behind
 the three-seed intervals: more seeds, each with its own coordinate draw, and

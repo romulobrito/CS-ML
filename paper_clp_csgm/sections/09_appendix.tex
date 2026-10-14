@@ -799,10 +799,11 @@ $8$, $0.0426$ at step $16$, and $0.0432$ at step $32$.
   \caption{Interpolation versus CLP-CSGM Ridge when only the measurement-noise
   standard deviation changes. RMSE values are means over the three paper
   seeds. Wins count seeds in which CLP-CSGM Ridge has strictly lower RMSE.
-  The held-out $V_c$ standard deviation is $0.035$.
-  Noise levels $0.10$ and $0.20$ are a sensitivity check. At $0.20$ the noise
-  is several times that variation, and some selected penalty weights lie
-  above the published grid.}
+  The held-out $V_c$ standard deviation is $0.035$, on the same scale as the
+  noise. Noise $0.05$ is about $1.43$ times that deviation. Noise levels
+  $0.10$ and $0.20$ are about $2.86$ and $5.71$ times that deviation and are
+  a sensitivity check. At $0.20$ some selected penalty weights lie above the
+  published grid.}
   \label{tab:crosswell_noise_sweep}
   \small
   \adjustbox{max width=\linewidth}{\input{tables/robustness_crosswell_noise_sweep.tex}}
@@ -810,17 +811,15 @@ $8$, $0.0426$ at step $16$, and $0.0432$ at step $32$.
 
 At noise standard deviation $0.05$, CLP-CSGM Ridge is lower in every seed at
 steps $16$ and $32$ and at step $8$ for $\rho=0.20$. At step $8$ for
-$\rho=0.05$ and $\rho=0.10$ the two means remain close, and interpolation
-still has the lower mean. At $0.10$ and $0.20$, CLP-CSGM Ridge is lower in
-all nine cells and in all three seeds. The interpolation advantage is
-tied to the noise level: it holds at $0.01$ and, once the noise reaches the
-variation of the curve, it no longer holds in the few-window cells. The
-interpolation error grows because the interpolated curve follows the
-measurements. The CLP-CSGM error moves less and stays near the dense-log
-window.
-Fig.~\ref{fig:crosswell_noise_panels} shows one such interval. The two panels
-use separate horizontal scales. Panel (a) is the published noise. Panel (b)
-is noise standard deviation $0.05$, not the larger sensitivity levels.
+$\rho=0.05$ and $\rho=0.10$, interpolation still has the lower mean.
+At $0.10$ and $0.20$, CLP-CSGM Ridge is lower in all nine cells and in all
+three seeds. Figure~\ref{fig:crosswell_rmse_vs_noise} shows this ordering
+with one panel per step. The interpolation error grows because the
+interpolated curve follows the measurements. The CLP-CSGM error moves less
+and stays near the dense-log window.
+Fig.~\ref{fig:crosswell_noise_panels} shows one held-out interval at the
+published noise and at noise $0.05$. The two panels use separate horizontal
+scales. Panel (b) is not one of the larger sensitivity levels.
 
 \begin{figure}[htbp]
   \centering
