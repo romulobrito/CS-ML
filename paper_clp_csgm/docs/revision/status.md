@@ -416,11 +416,19 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   panel per step and one curve per measurement fraction. Relative to the
   held-out standard deviation 0.035, noise 0.05, 0.10, and 0.20 are about
   1.43, 2.86, and 5.71 times larger; 0.10 and 0.20 stay a sensitivity
-  check. The depth figure uses noise 0.01 and 0.05 for one interval
-  (seed 7, step 32, rho 0.20). The main nine-cell grid is unchanged. The step-8 exception at noise 0.05, rho 0.05 and 0.10, is
-  tied to the dense-log map: its window has RMSE 0.0564, above
-  interpolation at 0.0456 and 0.0442, while G(E(y)) at that step is
-  0.0073. Four and six measurements do not close the gap; thirteen do.
+  check. The figure axis is logarithmic. The decoder and the dense-log map
+  are fit once per step and seed; the penalty is selected again for each
+  measurement fraction and noise level. Noise 0.01 in the figure is that
+  refit: at step 16, rho 0.20, the published CLP mean is 0.01771 and the
+  refit mean is 0.0159, with selected weight 0.0001. The ordering at 0.01
+  is unchanged. The step-8 pattern is compatible with a weak dense-log
+  window and does not isolate that window as the only cause. The depth
+  figure uses noise 0.01 and 0.05 for one interval (seed 7, step 32, rho
+  0.20). The main nine-cell grid is unchanged. At step 8, noise 0.05, rho
+  0.05 and 0.10, the dense-log window has RMSE 0.0564, above interpolation
+  at 0.0456 and 0.0442, while G(E(y)) is 0.0073. CLP stays between those
+  values at 0.0508 and 0.0456. At rho 0.20, with thirteen measurements, the
+  CLP mean is 0.0372 and interpolation is 0.0423.
 - Files: `sections/03_method.tex`; `sections/05_experiments.tex`;
   `sections/06_results.tex`; `sections/09_appendix.tex`;
   `tables/robustness_crosswell_simple_baselines.tex`;

@@ -783,16 +783,25 @@ step $16$ for $\rho=0.05$ and $\rho=0.10$, one or both linear maps are lower
 than CLP-CSGM Ridge. The measurements at this noise level are a slightly
 perturbed copy of the same smooth curve, so connecting them is enough.
 
-The same windows and the same standard-normal draws are then rescaled to
-noise standard deviations $0.05$, $0.10$, and $0.20$.
-Table~\ref{tab:crosswell_noise_sweep} refits CLP-CSGM at each level so that
-every noise shares one decoder per seed. The penalty grid used for that
-refit keeps the published values and adds larger weights, up to $100$, so
-validation can reduce the pull of a noisy measurement. At $0.01$ and at
-$0.05$ every selected weight still lies inside the published grid. The
-held-out curve has standard deviation $0.035$. The window predicted from the
-dense logs alone, with no measurement term, has mean RMSE $0.0564$ at step
-$8$, $0.0426$ at step $16$, and $0.0432$ at step $32$.
+The same windows and the same standard-normal draws are scaled to noise
+standard deviations $0.01$, $0.05$, $0.10$, and $0.20$.
+Table~\ref{tab:crosswell_noise_sweep} and
+Fig.~\ref{fig:crosswell_rmse_vs_noise} use one refit of that series.
+The decoder and the dense-log map are fit once per step and seed, without
+the sparse measurements. For each measurement fraction and each noise
+level, the penalty weight is selected again on validation full-window RMSE.
+The reported CLP-CSGM values are that selected-penalty result, not a
+reconstruction with one fixed weight. The penalty grid keeps the published
+values and adds larger weights, up to $100$, so validation can reduce the
+pull of a noisy measurement. At $0.01$ and at $0.05$ every selected weight
+still lies inside the published grid. At noise $0.01$ the ordering matches
+Table~\ref{tab:crosswell_simple_baselines}, but the cell means are those of
+this refit. At step $16$ and $\rho=0.20$, the published CLP-CSGM mean is
+$0.01771$ and the refit mean is $0.0159$. In that cell the selected weight
+is $0.0001$, inside the published grid. The held-out curve has standard
+deviation $0.035$. The window predicted from the dense logs alone, with no
+measurement term, has mean RMSE $0.0564$ at step $8$, $0.0426$ at step
+$16$, and $0.0432$ at step $32$.
 
 \begin{table}[htbp]
   \centering
@@ -802,8 +811,10 @@ $8$, $0.0426$ at step $16$, and $0.0432$ at step $32$.
   The held-out $V_c$ standard deviation is $0.035$, on the same scale as the
   noise. Noise $0.05$ is about $1.43$ times that deviation. Noise levels
   $0.10$ and $0.20$ are about $2.86$ and $5.71$ times that deviation and are
-  a sensitivity check. At $0.20$ some selected penalty weights lie above the
-  published grid.}
+  a sensitivity check. The decoder and the dense-log map are fit once per
+  step and seed, and the penalty is selected on validation at each noise
+  level. Noise $0.01$ in this table is that refit. At $0.20$ some selected
+  penalty weights lie above the published grid.}
   \label{tab:crosswell_noise_sweep}
   \small
   \adjustbox{max width=\linewidth}{\input{tables/robustness_crosswell_noise_sweep.tex}}
@@ -839,22 +850,20 @@ step $16$, and $0.0110$ at step $32$. That reconstruction is given the full
 target window, so it is a check that the decoder can represent the curve. It
 is not a predictor and it is not ranked with the methods above.
 
-The step-$8$ exception at noise standard deviation $0.05$ comes from the
-dense-log map, not from that decoder check. At step $8$ the decoder
-represents the held-out curve with mean test RMSE $0.0073$. The window
-predicted from the dense logs alone has mean RMSE $0.0564$. Interpolation
-at the same step and noise has mean RMSE $0.0456$ for $\rho=0.05$ and
-$0.0442$ for $\rho=0.10$. Those ratios observe $4$ and $6$ coordinates in a
-window of length $64$. CLP-CSGM Ridge then stays between the two, at
-$0.0508$ and $0.0456$, so the search does not close the gap. At
-$\rho=0.20$ the same window observes $13$ coordinates, the search does
-close it, and CLP-CSGM Ridge has mean RMSE $0.0372$ against an
-interpolation RMSE of $0.0423$. At steps $16$ and $32$ the dense-log window
-itself has mean RMSE $0.0426$ and $0.0432$, already near the
-interpolation error at this noise, so the same sparse measurements are
-enough. The step-$8$ result is a limit of the dense-log map on this
-held-out well. It agrees with the ablation in
-Section~\ref{subsec:ablation_analysis}, where that starting point is not
+The step-$8$ pattern at noise standard deviation $0.05$ is compatible with
+a limit of the dense-log map. It is not explained by the decoder check
+alone, and these comparisons do not isolate that map as the only cause.
+At step $8$ the decoder represents the held-out curve with mean test RMSE
+$0.0073$. The window predicted from the dense logs alone has mean RMSE
+$0.0564$. Interpolation at the same step and noise has mean RMSE $0.0456$
+for $\rho=0.05$ and $0.0442$ for $\rho=0.10$. Those ratios observe $4$ and
+$6$ coordinates in a window of length $64$. CLP-CSGM Ridge then stays
+between the two, at $0.0508$ and $0.0456$. At $\rho=0.20$ the same window
+observes $13$ coordinates, and CLP-CSGM Ridge has mean RMSE $0.0372$
+against an interpolation RMSE of $0.0423$. At steps $16$ and $32$ the
+dense-log window itself has mean RMSE $0.0426$ and $0.0432$, already near
+the interpolation error at this noise. The pattern agrees with the ablation
+in Section~\ref{subsec:ablation_analysis}, where that starting point is not
 helpful at step $8$.
 
 \subsection{Computational Trade-Offs}

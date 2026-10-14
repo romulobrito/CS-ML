@@ -139,7 +139,7 @@ def main() -> None:
         axis.set_xticks([0.01, 0.05, 0.10, 0.20])
         axis.set_xticklabels(["0.01", "0.05", "0.10", "0.20"])
         axis.set_title("Step {0}".format(step), fontsize=9)
-        axis.set_xlabel("Noise standard deviation", fontsize=8)
+        axis.set_xlabel("Noise standard deviation (log scale)", fontsize=8)
         axis.tick_params(labelsize=7.5)
         axis.grid(True, which="major", axis="y", linewidth=0.4, color="#DDDDDD")
         axis.set_axisbelow(True)
