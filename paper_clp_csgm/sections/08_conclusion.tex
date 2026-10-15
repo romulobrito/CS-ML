@@ -14,8 +14,11 @@ a good code, and whether
 nearby windows can be told apart from the measurements.
 
 Under the paired F3 protocols, CLP-CSGM Ridge has lower mean RMSE than AE
-$[\boldsymbol{u},\boldsymbol{b}]$, the most competitive direct baseline in this
-cross-well benchmark, in seven of nine cross-well cells. This is a conditional
+$[\boldsymbol{u},\boldsymbol{b}]$ in seven of nine cross-well cells. On the
+published grid that autoencoder has the lowest unweighted mean RMSE among the
+direct baselines MLP, PCA, and AE $[\boldsymbol{u},\boldsymbol{b}]$. The
+seven-of-nine result is a comparison with this autoencoder, not a ranking
+against interpolation or the direct linear maps. This is a conditional
 advantage where training support is smallest (steps $16$ and $32$), not overall
 superiority: AE
 $[\boldsymbol{u},\boldsymbol{b}]$ has lower mean RMSE at step $8$ for
@@ -34,22 +37,39 @@ nine cells. It also has lower mean RMSE than both ablations throughout the
 F03-4 grid. The opposite Ridge--MLP rankings show that the better map from
 dense logs to $\boldsymbol{z}_0$ depends on the test.
 
-On the tests reported here, CLP-CSGM complements direct regression because
-the sparse values stay measurements, and the reconstructed window is
-penalized for disagreeing with them.
+At the reference noise standard deviation $0.01$, depth interpolation of the
+sparse measurements has lower full-window RMSE than CLP-CSGM Ridge in all
+nine configurations and in all $27$ seed comparisons. In that regime the
+sparse measurements already support a competitive simple solution, which
+limits the need for a learned reconstruction. The same windows were then
+rescored at noise standard deviations $0.05$, $0.10$, and $0.20$, with the
+decoder and the dense-log map held fixed and the penalty reselected at each
+level. At $0.05$, about $1.43$ times the held-out curve standard deviation
+$0.035$, CLP-CSGM Ridge has the lower mean RMSE at steps $16$ and $32$ and at
+step $8$ for $\rho=0.20$. At step $8$ for $\rho=0.05$ and $\rho=0.10$,
+interpolation keeps the lower mean. At $0.10$ and $0.20$, about $2.86$ and
+$5.71$ times that standard deviation, CLP-CSGM Ridge has the lower error in
+all nine configurations. Those two levels are strong perturbations and are a
+sensitivity check, not typical field conditions. AE
+$[\boldsymbol{u},\boldsymbol{b}]$, ordinary least squares, and direct ridge
+regression were not rerun across this sweep, and no smoothing comparator was
+added, so the change is not a general advantage under noise.
+
+The study presents a latent reconstruction that combines dense-log context
+with sparse target observations. The benefit depends on the regime.
 The F3 evidence
 is reconstruction of processed target logs: cross-well $V_c$ is
 Larionov-derived from gamma ray, F03-4 porosity is density-derived, and
 sparse observations are coordinate subsamples of these same curves rather than
 independently acquired core or laboratory measurements. A separate
 single-well supplement on laboratory porosity scores held-out laboratory
-coordinates. CLP-CSGM is not superior on the mean RMSE: the direct AE is lower
-because the deepest block shifts the logs away from the logs used to fit the
-map to $\boldsymbol{z}_0$. Laboratory measurements correct that decoded
-prediction in
-every split, and the correction is enough on the two shallower blocks, where
-the test logs remain close to those training logs and CLP-CSGM Ridge keeps
-the lower block-mean RMSE. That supplement is one cored interval. The cross-well
+coordinates and is not part of that processed-log grid. Relative to the
+decoded prediction $G(\boldsymbol{z}_0)$, CLP-CSGM Ridge has lower RMSE in
+every split. It also has the lower block-mean RMSE on the two shallower
+blocks. On the pooled mean, the direct AE is lower. The larger share of that
+error sits in the deepest block. The log differences observed there are
+compatible with a transfer difficulty. They do not establish that shift as
+the only cause. That supplement is one cored interval. The cross-well
 comparison is a controlled single-holdout benchmark on F03-4 and is not
 evidence of operational cross-well or multi-field transferability. Broader
 assessment will require larger multi-well datasets, independently calibrated

@@ -27,9 +27,13 @@ the single-well porosity target is processed and density-derived, and that
 sparse observations are coordinate subsamples of these same processed curves.
 It also states that the benchmarks test reconstruction of processed target
 logs rather than recovery against independently acquired core or laboratory
-measurements. The Conclusions now repeat this F3 evidence limit before the
-sentence on remaining validation needs. The closing Abstract sentence is
-restricted to the tested processed-log benchmarks.
+measurements. A supplementary single-well laboratory-porosity check is named
+as outside that grid and is not a mean win for CLP-CSGM. The Conclusions now
+repeat this F3 evidence limit before the sentence on remaining validation
+needs, and they separate that laboratory supplement from the processed-log
+benchmarks. The closing Abstract sentence is restricted to regime-dependent
+benefit on the tests reported here. This wording does not close the request
+for a broader independent-measurement validation.
 
 Where the text was changed: the Abstract, and the Conclusion (the F3
 evidence-limit paragraph, before the remaining-work sentence). The Data and
@@ -37,8 +41,8 @@ exploratory analysis section and the Interpretation, scope, and limitations
 section already stated this origin and were left in place.
 
 No new experiments or numerical results were added for this comment. A
-separate independent-measurement test remains outside the scope of this
-textual revision and is addressed under R1-M11.
+broader independent-measurement test remains open and is addressed under
+R1-M11.
 
 ---
 
@@ -146,18 +150,27 @@ We thank the reviewer for asking that the seven-of-nine cross-well result,
 and the GR-only reversal at higher measurement ratios, be framed as a
 conditional advantage rather than overall superiority.
 
-The Abstract now states that the comparison is a conditional advantage, not
-overall superiority. It places the seven-of-nine gains where training
-support is smallest (steps 16 and 32) and states that the direct autoencoder
-has lower mean RMSE in the two remaining cells, both at step 8 for rho=0.05
-and rho=0.10. For the GR-only benchmark, the Abstract states that CLP-CSGM
-has the lowest mean RMSE at the two sparsest ratios and that the direct
-autoencoder has lower mean RMSE at rho=0.40 and rho=0.60. The Conclusions
-repeat this framing and name the same exceptions.
+The Abstract now states that the comparison with the direct autoencoder
+[u,b] is a conditional advantage, not overall superiority. On the published
+cross-well grid that autoencoder has the lowest unweighted mean RMSE among
+the direct baselines MLP, PCA, and the autoencoder. The seven-of-nine gains
+are placed where training support is smallest (steps 16 and 32), and the
+direct autoencoder has lower mean RMSE in the two remaining cells, both at
+step 8 for rho=0.05 and rho=0.10. The Abstract also states that, at the
+reference noise 0.01, depth interpolation has lower error than CLP-CSGM in
+all nine configurations, and that raising only the noise is a sensitivity
+check rather than a general ranking. For the GR-only benchmark, the Abstract
+states that CLP-CSGM has the lowest mean RMSE at the two sparsest ratios and
+that the direct autoencoder has lower mean RMSE at rho=0.40 and rho=0.60.
+The Conclusions repeat this framing, name the same exceptions, and keep the
+noise-level exceptions in the conclusion rather than in the abstract. This
+wording does not close requests for further experiments or for broader
+generalization.
 
 Where the text was changed: the Abstract (conditional-advantage paragraph)
-and the Conclusion (the paired-protocol paragraph). The manuscript has no
-separate Highlights section. No new experiments were added for this comment.
+and the Conclusion (the paired-protocol paragraph and the noise paragraph).
+The manuscript has no separate Highlights section. No new experiments were
+added for this comment.
 
 ---
 
@@ -375,25 +388,25 @@ increase in rho changes it little. The middle block is close, with CLP-CSGM
 Ridge still slightly lower. This is not the scarce-window regime of F3 steps
 16 and 32: each test fold still has 28 to 35 overlapping training windows.
 
-The pooled mean goes the other way because of 5224.39--5233.72 m. Held out,
+The pooled mean is lower for the direct AE, and the larger share of that
+error sits in 5224.39--5233.72 m. Held out,
 that block has mean Phi_lab about 0.145, gamma ray about 30 API, and median
 deep resistivity about 600, against low gamma ray and resistivity near
 1600--1900 in the blocks that train the anchor. The lithotype mix changes as
-well. The ridge anchor is a linear map fitted on the other blocks, so z0
-starts far from the laboratory windows. With m=2 or m=4 in a length-8 window,
+well. The decoded prediction G(z0) differs substantially from the target
+windows in that block. With m=2 or m=4 in a length-8 window,
 the residual still beats the log-only anchor (0.0931 versus 0.1142 at
 rho=0.25, and 0.1016 versus 0.1234 at rho=0.50) but does not catch the direct
-AE (0.0691 and 0.0676). The AE uses the same b as features and does not have
-to pass through the shifted anchor.
+AE (0.0691 and 0.0676). These log differences are compatible with a transfer
+difficulty. They do not establish that shift as the only cause.
 
-CLP-CSGM Ridge therefore gains when the logs seen in training still describe
-the test interval and the laboratory coordinates can finish the correction. It
-loses the pooled mean when the test logs move outside that support and only a
-few measurements are available to repair z0. The measurement term does not
-fail. The F3 low-support advantage is not a mean win on this laboratory
-target. The supplement is one cored interval. The Lapa permeability case
-remains a limited-sample supplement whose sparse observations are subsamples
-of the same permeability series.
+CLP-CSGM Ridge has lower RMSE than G(z0) in every split, and it has the lower
+block-mean RMSE on the two shallower blocks. On the pooled mean the direct AE
+is lower. The measurement term does not fail. The F3 low-support advantage is
+not a mean win on this laboratory target. The supplement is one cored
+interval. The Lapa permeability case remains a limited-sample supplement whose
+sparse observations are subsamples of the same permeability series. This
+wording does not close a request for broader operational validation.
 
 Where the text was changed: Experimental setup (the sentence after the Lapa
 pointer); Results (the paragraph after the Lapa permeability summary, which
@@ -475,16 +488,19 @@ states them. Do not redraw the flow.
 
 **Proposed reply:**
 
-We thank the reviewer for this clarification. The statement that the direct AE
-is the most competitive direct baseline is now explicitly limited to this
-cross-well benchmark. In the Conclusion, the phrase is "the most competitive
-direct baseline in this cross-well benchmark". Results already restricts the
-same ranking to this grid: "the direct baseline with the lowest unweighted
-mean RMSE across the grid" and "the most competitive direct comparator in this
-grid". The Abstract names the direct autoencoder as a baseline and does not
-call it the strongest method in general.
+We thank the reviewer for this clarification. Among the direct baselines on
+the published cross-well grid, MLP, PCA, and AE [u,b], the autoencoder has
+the lowest unweighted mean RMSE. The seven-of-nine comparison is with that
+autoencoder. The Conclusion no longer calls it the most competitive baseline
+without naming that set, and it states that the result is not a ranking
+against interpolation or the direct linear maps. Results still says that AE
+has the lowest unweighted mean RMSE among the direct baselines and is the
+most competitive direct comparator in this grid, meaning that direct set.
+The Abstract names the same set and does not call the autoencoder the
+strongest method in general.
 
-Where the text was changed: the Conclusion (the sentence that reports the
+Where the text was changed: the Abstract (the sentence that names MLP, PCA,
+and the autoencoder) and the Conclusion (the sentence that reports the
 seven-of-nine cross-well comparison).
 
 ---

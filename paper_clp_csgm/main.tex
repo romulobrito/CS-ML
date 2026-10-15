@@ -99,16 +99,25 @@ gamma ray by the Larionov relation, the single-well porosity target is
 processed and density-derived, and the sparse observations are coordinate
 subsamples of these same processed curves. The benchmarks therefore test
 reconstruction of processed target logs rather than recovery against
-independently acquired core or laboratory measurements. A limited-sample
+independently acquired core or laboratory measurements. A supplementary
+single-well laboratory-porosity check, kept outside that grid, is not a mean
+win: the direct autoencoder has the lower pooled mean RMSE. A limited-sample
 permeability case provides supplementary evidence. With a linear ridge map as
-the reference for $z_0$, the comparison is a conditional advantage,
-not overall superiority. CLP-CSGM has lower mean RMSE than the direct
-autoencoder baseline in seven of nine cross-well cells, with the gains
-concentrated where training support is smallest (steps $16$ and $32$). The
-direct autoencoder has lower mean RMSE in the two remaining cells, both at
-step $8$ (the largest training pool) for $\rho=0.05$ and $\rho=0.10$. The
-unweighted mean of the nine cell-level RMSE values decreases from 0.0350 to
-0.0286, an overall reduction of about 18\%. In the GR-only porosity benchmark,
+the reference for $z_0$, the comparison with the direct autoencoder
+$[\boldsymbol{u},\boldsymbol{b}]$ is a conditional advantage,
+not overall superiority. On the published cross-well grid that autoencoder
+has the lowest unweighted mean RMSE among the direct baselines MLP, PCA, and
+the autoencoder. CLP-CSGM has lower mean RMSE than this autoencoder in seven
+of nine cross-well cells, with the gains concentrated where training support
+is smallest (steps $16$ and $32$). The direct autoencoder has lower mean RMSE
+in the two remaining cells, both at step $8$ (the largest training pool) for
+$\rho=0.05$ and $\rho=0.10$. The unweighted mean of the nine cell-level RMSE
+values decreases from 0.0350 to 0.0286, an overall reduction of about 18\%.
+At the reference noise standard deviation $0.01$, depth interpolation of the
+sparse measurements has lower error than CLP-CSGM in all nine configurations.
+Raising only that noise changes this interpolation--CLP ordering under larger
+perturbations. Those levels are a sensitivity check, not typical field
+conditions. In the GR-only porosity benchmark,
 CLP-CSGM has the lowest mean RMSE at the two sparsest ratios, including
 0.016 versus 0.018 at $\rho=0.20$, whereas the direct autoencoder has lower
 mean RMSE at $\rho=0.40$ and $\rho=0.60$. That GR-only comparison is a
@@ -122,9 +131,11 @@ more changes with the number of training windows and with how many depths are
 measured. The map from dense logs to $z_0$ is also
 dataset-dependent: a multilayer perceptron gives lower mean RMSE on the
 cross-well grid, whereas ridge gives lower mean RMSE when gamma ray is the
-only dense log. On these processed-log tests, CLP-CSGM complements direct
-regression when training windows are few, the test well differs from the
-training wells, or the dense logs are incomplete.
+only dense log. On these tests the benefit of the latent refinement depends
+on the regime. CLP-CSGM can complement the direct autoencoder when training
+windows are few, the test well differs from the training wells, or the dense
+logs are incomplete. At the reference noise, interpolation of the sparse
+measurements is already a competitive simple solution.
 \end{abstract}
 
 \keywords{compressed sensing; generative model; inverse problem;

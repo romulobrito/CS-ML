@@ -104,7 +104,10 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   advantage, not overall superiority; make Abstract/Highlights explicit.
 - Change made: Abstract and Conclusions name the two step-8 losses
   (rho=0.05 and 0.10) and the GR-only AE wins at rho=0.40 and 0.60.
-  Gains tied to the smallest training support (steps 16 and 32).
+  Gains tied to the smallest training support (steps 16 and 32). The
+  Abstract also states that interpolation is lower in all nine cells at
+  noise 0.01. That sentence does not turn the 7/9 result into a ranking
+  against every method. Requests for further experiments stay open.
 - Files: `main.tex`; `sections/08_conclusion.tex`.
 - Shared reply: none. Nearby IDs ask for different experiments or claim
   limits.
@@ -266,11 +269,13 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - State: `text_done`
 - Reviewer request: read "most competitive direct baseline" as specific to
   this benchmark, not as a general ranking.
-- Change made: Conclusion now says "the most competitive direct baseline in
-  this cross-well benchmark". Results already said "across the grid" and
-  "in this grid". Abstract does not call the AE the strongest method in
-  general.
-- Files: `sections/08_conclusion.tex`.
+- Change made: the seven-of-nine comparison is with AE [u,b]. On the
+  published grid that autoencoder has the lowest unweighted mean RMSE among
+  MLP, PCA, and AE. The Conclusion states that this is not a ranking against
+  interpolation or the direct linear maps. The Abstract names the same set.
+  The noise sweep and the laboratory supplement are not closed by this
+  wording.
+- Files: `main.tex`; `sections/08_conclusion.tex`.
 - Shared reply: none. Nearby IDs ask for other comparators or for limits on
   the F3 targets, not for this ranking phrase.
 

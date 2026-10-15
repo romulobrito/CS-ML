@@ -61,9 +61,13 @@ the single-well porosity target is processed and density-derived, and that
 sparse observations are coordinate subsamples of these same processed curves.
 It also states that the benchmarks test reconstruction of processed target
 logs rather than recovery against independently acquired core or laboratory
-measurements. The Conclusions now repeat this F3 evidence limit before the
-sentence on remaining validation needs. The closing Abstract sentence is
-restricted to the tested processed-log benchmarks.
+measurements. A supplementary single-well laboratory-porosity check is named
+as outside that grid and is not a mean win for CLP-CSGM. The Conclusions now
+repeat this F3 evidence limit before the sentence on remaining validation
+needs, and they separate that laboratory supplement from the processed-log
+benchmarks. The closing Abstract sentence is restricted to regime-dependent
+benefit on the tests reported here. This wording does not close the request
+for a broader independent-measurement validation.
 
 Where the text was changed: the Abstract, and the Conclusion (the F3
 evidence-limit paragraph, before the remaining-work sentence). The Data and
@@ -71,8 +75,8 @@ exploratory analysis section and the Interpretation, scope, and limitations
 section already stated this origin and were left in place.
 
 No new experiments or numerical results were added for this comment. A
-separate independent-measurement test remains outside the scope of this
-textual revision and is addressed under R1-M11.
+broader independent-measurement test remains open and is addressed under
+R1-M11.
 
 ## R2-03 -- Realism of excluding GR and sonic
 
