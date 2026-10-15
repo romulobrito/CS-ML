@@ -458,11 +458,71 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `tables/robustness_crosswell_noise_sweep.tex`;
   `figures/crosswell_vc_noise_panels_step32_rho020_seed7.png`;
   `figures/crosswell_vc_rmse_vs_noise.png`.
-- Shared reply: none. `R3-04` asks how the published noise was chosen and
-  stays in the queue.
+- Shared reply: none. `R3-04` is answered in its own entry. This item
+  does not close it.
+
+### R3-04
+
+- State: `text_done`
+- Reviewer request: how the noise level is chosen, and how that choice
+  balances the prior against the data fit.
+- Change made: text only. After coordinate subsampling, independent
+  Gaussian noise is added with standard deviation 0.01 on cross-well Vc
+  and 0.02 on F03-4 porosity, in the units of the target curve. Relative
+  to the held-out Vc standard deviation of about 0.035, 0.01 is about
+  0.29 times that deviation. These levels were adopted for controlled
+  benchmarks. No calibration to instrumental uncertainty is documented.
+  The 30dB filename label is not this added standard deviation, and the
+  procedure behind the label is not defined here. Every method in a run
+  uses the same noisy observations. Direct [u,b] models standardize after
+  the noise is added. The implemented data term is the squared residual in
+  the original target units. It equals the standardized residual weighted
+  by D_Omega, the diagonal of the training standard deviations at the
+  observed coordinates. On the cross-well Vc training windows those
+  standard deviations are not equal: the largest-to-smallest ratio is about
+  1.13 at step 8, 1.23 at step 16, and 1.40 at step 32. The displayed
+  objective, the measurement-only ablation, and the existence objective now
+  use that weighted residual. The MAP identity lambda = sigma_eta^2 /
+  sigma_z^2 applies to the isotropic likelihood in original units. It does
+  not apply to the unweighted standardized residual. The reported runs
+  select lambda by validation full-window RMSE on the published grid and
+  freeze it before the test score. Dividing both terms by the number of
+  windows multiplies the objective by one positive factor and leaves the
+  minimizers unchanged. The sensitivity sweep uses a different, wider grid:
+  1e-4, 1e-3, 1e-2, 1e-1, 1, 10, and 100. It omits the factor-of-three
+  values from the published grid. At 0.01 and 0.05 every selected weight
+  also belongs to the published grid. That membership does not mean the two
+  searches were the same. At noise 0.10, step 16 and rho 0.10, one seed
+  selects the weight 1. At noise 0.20 some cells select 100, the largest
+  candidate that was tried. That choice is not an optimum outside the
+  grid. The algorithm and the reported numbers are unchanged.
+- Files: `sections/03_method.tex`; `sections/05_experiments.tex`;
+  `sections/06_results.tex`; `sections/07_discussion.tex`;
+  `sections/09_appendix.tex`; `tables/implementation_summary.tex`.
+- Shared reply: the same evidence is restated under `R3-P09`. `R3-P10`
+  and `R3-P16` stay pending.
+- Not done: a field-calibrated noise model, a definition of the 30dB
+  label, and a covariance model for the measurement noise.
+
+### R3-P09
+
+- State: `text_done`
+- Reviewer request: how the measurement noise is set, and how lambda is
+  determined.
+- Change made: the same text as `R3-04`. The objective now states the
+  identity between the original-scale residual and the standardized residual
+  weighted by D_Omega. The MAP ratio is limited to the original-scale
+  likelihood. The sweep is described as a different, wider grid. A common
+  positive factor is said to leave the minimizers unchanged.
+- Files: `sections/03_method.tex`; `sections/05_experiments.tex`;
+  `sections/06_results.tex`; `sections/07_discussion.tex`;
+  `sections/09_appendix.tex`; `tables/implementation_summary.tex`.
+- Shared reply: same evidence as `R3-04`, written as its own entry.
+- Not done: `R3-P10` (covariance) and `R3-P16` (origin of 30dB).
 
 ## Queue (not yet processed)
 
-R3-04 .. R3-06,
-R3-A01 .. R3-A05, R3-P01 .. R3-P19, AE-01.
+R3-05 .. R3-06,
+R3-A01 .. R3-A05, R3-P01 .. R3-P08, R3-P10 .. R3-P19, AE-01.
 R1-m03 and R1-m05 remain deferred.
+`R3-P09` is text_done. `R3-P10` and `R3-P16` remain pending.

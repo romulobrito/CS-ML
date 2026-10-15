@@ -72,7 +72,7 @@ $\boldsymbol{\eta}=\boldsymbol{0}$.
 The dense logs and the sparse measurements do different jobs. The dense-log
 vector $\boldsymbol{u}$ predicts the code
 $\boldsymbol{z}_0=h(\boldsymbol{u})$. The measurements $\boldsymbol{b}$ enter
-only as the penalized mismatch $\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$.
+only as the penalized mismatch in Eq.~\eqref{eq:clp_csgm_objective}.
 The first latent trajectory starts at $\boldsymbol{z}_0$, and the penalty
 center remains $\boldsymbol{z}_0$.
 
@@ -101,7 +101,9 @@ D_y\widehat{\widetilde{\boldsymbol{y}}}.
 \label{eq:inverse_target_standardization}
 \end{equation}
 
-Subsequent equations omit tildes. We assume that target windows are adequately
+Where a later equation omits tildes, its coordinates are those written there.
+The refinement objective keeps the standardized residual and the diagonal
+weight $D_{\Omega}$. We assume that target windows are adequately
 approximated by $\mathcal{M}=\operatorname{Im}(G)\subset\mathbb{R}^{N}$,
 with $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$ and $k<N$, and that
 $h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ provides a useful anchor
@@ -258,9 +260,12 @@ $\boldsymbol{z}_0=h(\widetilde{\boldsymbol{u}})$. CLP-CSGM computes
 \operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
 \left\{
 \left\|
+D_{\Omega}
+\left(
 M_{\Omega}G(\boldsymbol{z})
 -
 \widetilde{\boldsymbol{b}}
+\right)
 \right\|_2^2
 +
 \lambda
@@ -283,8 +288,57 @@ D_yG\left(\widehat{\boldsymbol{z}}_{\mathrm{num}}\right).
 The first term penalizes disagreement with the sparse observations and the
 second penalizes deviation from $\boldsymbol{z}_0$. Their sum does not force
 the observations to be met exactly, so a residual at the observed depths can
-remain. $\lambda\geq0$ is selected on validation
-windows for each measurement ratio and seed. Because $G$ is nonlinear, the
+remain. Because each row of $M_{\Omega}$ selects one window coordinate,
+
+\begin{equation}
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2
+=
+\left\|
+M_{\Omega}
+\left(
+\boldsymbol{\mu}_y
++
+D_yG(\boldsymbol{z})
+\right)
+-
+\boldsymbol{b}
+\right\|_2^2.
+\label{eq:weighted_residual_identity}
+\end{equation}
+
+The left-hand side is the data term in
+Eq.~\eqref{eq:clp_csgm_objective}. The right-hand side is the squared
+residual in the original target units, which is the residual evaluated by
+the implementation. The diagonal entries of $D_y$ are the training standard
+deviations of the window coordinates. On the cross-well $V_c$ training
+windows those entries are not equal: the ratio of the largest to the
+smallest is about $1.13$ at step $8$, $1.23$ at step $16$, and $1.40$ at
+step $32$. A single factor therefore does not convert a penalty weight
+between the unweighted standardized residual and this objective. The
+implementation also divides both terms by the number of windows. Multiplying
+the entire objective by the same positive factor leaves its minimizers
+unchanged. $\lambda\geq0$ is selected on validation
+windows for each measurement ratio and seed.
+Proposition~\ref{prop:map} identifies $\lambda$ with
+$\sigma_{\eta}^{2}/\sigma_{z}^{2}$ when the likelihood is an isotropic
+Gaussian in those original target units. That is the scale of
+Eq.~\eqref{eq:weighted_residual_identity}. The same ratio does not apply to
+the unweighted standardized residual
+$\|M_{\Omega}G(\boldsymbol{z})-\widetilde{\boldsymbol{b}}\|_2^2$. The
+reported experiments do not compute $\lambda$ from those variances. For
+each seed and each measurement ratio, validation full-window RMSE selects
+one candidate from
+$\{10^{-4},3\cdot10^{-4},10^{-3},3\cdot10^{-3},10^{-2},3\cdot10^{-2},10^{-1}\}$,
+and that choice is fixed before the test score is computed. The selected
+$\lambda$ is the validation choice for the original-scale objective.
+Because $G$ is nonlinear, the
 objective is generally nonconvex and is solved with Adam
 \citep{kingma2015adam}. The first run starts from $\boldsymbol{z}_0$. Each
 additional restart starts at $\boldsymbol{z}_0$ plus an independent draw from
@@ -324,9 +378,12 @@ The \emph{measurement-only CSGM} variant sets $\lambda=0$ and computes
 \in
 \operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
 \left\|
+D_{\Omega}
+\left(
 M_{\Omega}G(\boldsymbol{z})
 -
 \widetilde{\boldsymbol{b}}
+\right)
 \right\|_2^2.
 \label{eq:measurement_only_ablation}
 \end{equation}
@@ -349,7 +406,7 @@ Complete proofs appear in Appendix~\ref{app:theory}.
 
 \begin{proposition}[MAP and Tikhonov interpretation]
 \label{prop:map}
-Suppressing tildes, assume
+Assume
 $p(\boldsymbol{b}\mid\boldsymbol{z},\boldsymbol{u})
 =p(\boldsymbol{b}\mid\boldsymbol{z})$ and
 
@@ -357,7 +414,10 @@ $\boldsymbol{b}\mid\boldsymbol{z}
 \sim
 \mathcal{N}
 \left(
-M_{\Omega}G(\boldsymbol{z}),
+M_{\Omega}
+\left(
+\boldsymbol{\mu}_y+D_yG(\boldsymbol{z})
+\right),
 \sigma_{\eta}^{2}I_m
 \right)$,
 while
@@ -379,9 +439,12 @@ Then every MAP estimator satisfies
 \operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
 \left\{
 \left\|
+D_{\Omega}
+\left(
 M_{\Omega}G(\boldsymbol{z})
 -
-\boldsymbol{b}
+\widetilde{\boldsymbol{b}}
+\right)
 \right\|_2^2
 +
 \lambda
@@ -398,7 +461,12 @@ M_{\Omega}G(\boldsymbol{z})
 \label{eq:map_tikhonov_objective}
 \end{equation}
 
-Thus, CLP-CSGM is a Tikhonov-regularized latent inverse problem. Its center is
+By Eq.~\eqref{eq:weighted_residual_identity}, this data term is the
+original-scale residual. The ratio
+$\sigma_{\eta}^{2}/\sigma_{z}^{2}$ is the MAP weight on that scale. It is
+not the weight of the unweighted standardized residual, because the diagonal
+entries of $D_y$ vary by coordinate. Thus, CLP-CSGM is a
+Tikhonov-regularized latent inverse problem. Its center is
 the log-conditioned anchor, not the origin
 \citep{tikhonov1963solution,burger2014map}. The likelihood induces the
 data-fidelity term, while the conditional prior induces the latent penalty.
@@ -418,13 +486,19 @@ from $\boldsymbol{z}_0=h(\boldsymbol{u})$ more strongly.
 \begin{proposition}[Existence of a minimizer]
 \label{prop:existence}
 Assume that $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$ is continuous and
-$\lambda>0$. For fixed $M_{\Omega}$,
+$\lambda>0$. For fixed $M_{\Omega}$, $D_{\Omega}$,
 $\widetilde{\boldsymbol{b}}\in\mathbb{R}^{m}$, and
 $\boldsymbol{z}_0\in\mathbb{R}^{k}$, the objective
 $\mathcal{J}(\boldsymbol{z})
 =
-\|M_{\Omega}G(\boldsymbol{z})
--\widetilde{\boldsymbol{b}}\|_2^2
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2
 +
 \lambda\|\boldsymbol{z}-\boldsymbol{z}_0\|_2^2$
 is continuous and coercive. Consequently,
@@ -443,8 +517,14 @@ $\mathcal{J}(\widehat{\boldsymbol{z}})
 \leq
 \mathcal{J}(\boldsymbol{z}_0)
 =
-\|M_{\Omega}G(\boldsymbol{z}_0)
--\widetilde{\boldsymbol{b}}\|_2^2$.
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z}_0)
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2$.
 Exact minimization therefore cannot worsen the optimized objective relative to
 the latent-prior-only candidate, although it does not guarantee lower error with
 respect to the unknown target. For
@@ -509,7 +589,10 @@ centered.
 
 \begin{proposition}[Conditional local recovery interpretation]
 \label{prop:conditional_local_recovery}
-Suppressing tildes, let
+In this proposition and its proof, $G(\boldsymbol{z})$ denotes the
+reconstruction in the original target units. The residual
+$\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$ is the right-hand side
+of Eq.~\eqref{eq:weighted_residual_identity}. Let
 $\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$ satisfy
 $\boldsymbol{b}
 =M_{\Omega}\boldsymbol{y}^{\star}+\boldsymbol{\eta}$, let

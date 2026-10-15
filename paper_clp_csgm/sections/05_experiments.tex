@@ -132,8 +132,8 @@ target values in the ordering of $M_{\Omega}$. Because $\Omega$ is fixed within
 the cell, the $j$-th entry of $\boldsymbol{b}$ consistently corresponds to
 coordinate $\omega_j$ across windows, making coordinate identity implicit in
 the stable input ordering. No zero-padded target, binary mask, or measurement
-matrix is added. CLP-CSGM uses $M_{\Omega}$ explicitly in
-$\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$. The protocol therefore
+matrix is added. CLP-CSGM uses $M_{\Omega}$ explicitly in the measurement
+term of Eq.~\eqref{eq:clp_csgm_objective}. The protocol therefore
 compares direct fusion with operator-based assimilation under a fixed sampling
 pattern, giving the direct models a stable coordinate-to-input mapping within
 each cell. Appendix~\ref{app:crosswell_explicit_mask} gives one direct AE the
@@ -160,10 +160,19 @@ value $0.01$. Section~\ref{sec:results} summarizes that noise dependence
 for interpolation and CLP-CSGM Ridge. The linear maps and the per-seed
 tables are not merged into the submitted nine-cell grid.
 
-Noise is applied after subsampling, with
-$\sigma_{\eta}=0.01$ for cross-well $V_c$ and
-$\sigma_{\eta}=0.02$ for F03-4 porosity, independently across coordinates and
-windows.
+Noise is applied after coordinate subsampling. Each observed coordinate
+receives an independent standard-normal draw, scaled to a fixed standard
+deviation and added to the subsampled target value. That standard deviation
+is $\sigma_{\eta}=0.01$ for cross-well $V_c$ and $\sigma_{\eta}=0.02$ for
+F03-4 porosity, in the units of the target curve. It is not a percentage of
+the curve. The held-out $V_c$ curve has standard deviation about $0.035$, so
+$0.01$ is about $0.29$ times that deviation. These two levels were adopted
+for the controlled benchmarks. No calibration to instrumental measurement
+uncertainty is documented. The input files are labeled 30dB. That label is
+not this added standard deviation, and this manuscript does not define the
+procedure behind the label. Within one run, every method uses the same noisy
+observations. Direct $[\boldsymbol{u},\boldsymbol{b}]$ models standardize the
+concatenated features after the noise has been added.
 
 
 \subsection{Implementation details}

@@ -91,8 +91,13 @@ used for sensitivity analysis and were not calibrated to field measurement
 uncertainties. The decoder and the
 dense-log map are fit once per step and seed. The penalty weight is then
 selected on validation for each measurement fraction and each noise level,
-so the curves are not a fixed-penalty reconstruction. The weight selected
-at $0.01$ and at $0.05$ stays inside the published grid. The points at
+so the curves are not a fixed-penalty reconstruction. The sensitivity sweep
+uses a different, wider grid. The weight selected
+at $0.01$ and at $0.05$ also belongs to the published grid. That membership
+does not mean the two searches were the same. At noise $0.20$,
+some cells select $100$, the largest candidate in the sweep grid. That
+choice is the best value among the candidates that were tried, not an
+optimum outside the grid. The points at
 noise $0.01$ belong to this same refit: their ordering matches the
 published grid, and the cell means can differ slightly from that grid.
 The interpolation error grows with the noise because the interpolated curve

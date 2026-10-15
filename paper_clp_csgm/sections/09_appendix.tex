@@ -38,14 +38,14 @@ Therefore,
 
 Since
 \[
-  b\mid z \sim \mathcal{N}(M_\Omega G(z),\sigma_\eta^2 I_m),
+  b\mid z \sim \mathcal{N}\!\left(M_\Omega(\mu_y+D_y G(z)),\sigma_\eta^2 I_m\right),
 \]
 we have, up to constants independent of \(z\),
 \[
   -\log p(b\mid z)
   =
   \frac{1}{2\sigma_\eta^2}
-  \|M_\Omega G(z)-b\|_2^2
+  \|M_\Omega(\mu_y+D_y G(z))-b\|_2^2
   +
   \mathrm{const}.
 \]
@@ -64,22 +64,25 @@ we have, up to constants independent of \(z\),
 \]
 Hence the MAP estimate minimizes
 \[
-  \frac{1}{2\sigma_\eta^2}\|M_\Omega G(z)-b\|_2^2
+  \frac{1}{2\sigma_\eta^2}\|M_\Omega(\mu_y+D_y G(z))-b\|_2^2
   +
   \frac{1}{2\sigma_z^2}\|z-z_0(u)\|_2^2.
 \]
-Multiplying this objective by the positive constant \(2\sigma_\eta^2\) does
-not change its minimizers. Thus,
+Multiplying this objective by the positive constant \(2\sigma_\eta^2\) leaves
+its minimizers unchanged. Thus,
 \[
   \hat z_{\mathrm{MAP}}
   \in
   \arg\min_z
-  \|M_\Omega G(z)-b\|_2^2
+  \|M_\Omega(\mu_y+D_y G(z))-b\|_2^2
   +
   \frac{\sigma_\eta^2}{\sigma_z^2}
   \|z-z_0(u)\|_2^2.
 \]
-Therefore the CLP-CSGM objective is recovered with
+By the identity in Eq.~\eqref{eq:weighted_residual_identity}, the data term
+is the weighted standardized residual minimized in
+Eq.~\eqref{eq:clp_csgm_objective}. Therefore the CLP-CSGM objective is
+recovered on the original measurement scale with
 \[
   \lambda=\frac{\sigma_\eta^2}{\sigma_z^2}.
 \]
@@ -91,9 +94,10 @@ log-conditioned latent anchor \(z_0(u)\), not at the origin.
 \label{app:existence_proof}
 
 \begin{proof}[Proof of Proposition~\ref{prop:existence}]
-Since \(G\) is continuous and \(M_\Omega\) is linear, the map
+Since \(G\) is continuous, \(M_\Omega\) is linear, and \(D_\Omega\) does not
+depend on \(z\), the map
 \[
-  z \mapsto \|M_\Omega G(z)-b\|_2^2
+  z \mapsto \|D_\Omega(M_\Omega G(z)-\tilde b)\|_2^2
 \]
 is continuous. The quadratic term
 \[
@@ -101,7 +105,7 @@ is continuous. The quadratic term
 \]
 is also continuous. Hence
 \[
-  J(z)=\|M_\Omega G(z)-b\|_2^2+\lambda\|z-z_0\|_2^2
+  J(z)=\|D_\Omega(M_\Omega G(z)-\tilde b)\|_2^2+\lambda\|z-z_0\|_2^2
 \]
 is continuous on \(\mathbb{R}^k\).
 
@@ -184,6 +188,9 @@ recovery interpretation summarized in the main text. The full proof is followed
 by the corresponding extension for a numerical optimizer.
 
 \begin{proof}[Proof of Proposition~\ref{prop:conditional_local_recovery}]
+As in the proposition, \(G(z)\) denotes the reconstruction in the original
+target units, and \(\|M_\Omega G(z)-b\|_2^2\) is the right-hand side of
+Eq.~\eqref{eq:weighted_residual_identity}.
 By global optimality of \(\hat z\),
 \[
   \mathcal{J}(\hat z)\le \mathcal{J}(z^\dagger).
@@ -804,10 +811,16 @@ The decoder and the dense-log map are fit once per step and seed, without
 the sparse measurements. For each measurement fraction and each noise
 level, the penalty weight is selected again on validation full-window RMSE.
 The reported CLP-CSGM values are that selected-penalty result, not a
-reconstruction with one fixed weight. The penalty grid keeps the published
-values and adds larger weights, up to $100$, so validation can reduce the
-pull of a noisy measurement. At $0.01$ and at $0.05$ every selected weight
-still lies inside the published grid. At noise $0.01$ the ordering matches
+reconstruction with one fixed weight. The sensitivity sweep uses a
+different, wider grid, with candidates $10^{-4}$, $10^{-3}$, $10^{-2}$,
+$10^{-1}$, $1$, $10$, and $100$. It omits the factor-of-three candidates
+from the published grid. At $0.01$ and at $0.05$ every selected weight also
+belongs to the published grid. That membership does not mean the two
+searches were the same. At noise $0.10$, step $16$ and
+$\rho=0.10$, one seed selects the weight $1$, above the published grid and still
+inside the sweep. At noise $0.20$, some cells select
+$100$, the largest candidate that was tried. That selection is not an
+optimum outside the searched grid. At noise $0.01$ the ordering matches
 Table~\ref{tab:crosswell_simple_baselines}, but the cell means are those of
 this refit. At step $16$ and $\rho=0.20$, the published CLP-CSGM mean is
 $0.01771$ and the refit mean is $0.0159$. In that cell the selected weight
@@ -829,7 +842,8 @@ $16$, and $0.0432$ at step $32$.
   dense-log map are fit once per
   step and seed, and the penalty is selected on validation at each noise
   level. Noise $0.01$ in this table is that refit. At $0.20$ some selected
-  penalty weights lie above the published grid.}
+  weights equal $100$, the largest candidate on this grid, which is not an
+  optimum outside the grid.}
   \label{tab:crosswell_noise_sweep}
   \small
   \adjustbox{max width=\linewidth}{\input{tables/robustness_crosswell_noise_sweep.tex}}

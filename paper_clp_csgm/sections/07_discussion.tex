@@ -5,10 +5,9 @@ CLP-CSGM uses three pieces that act together. The decoder range
 $\operatorname{Im}(G)$ is the set of target windows the decoder can produce.
 The conditional map predicts $\boldsymbol{z}_0=h(\boldsymbol{u})$ from the
 dense logs. This code initializes the first latent trajectory and remains the
-center of the quadratic penalty. The measurement term
-$\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$ penalizes disagreement
-with the sparse observations and does not force those observations to be met
-exactly. The decoder range limits which windows can
+center of the quadratic penalty. The measurement term in Eq.~\eqref{eq:clp_csgm_objective} penalizes
+disagreement with the sparse observations in the original target units and
+does not force those observations to be met exactly. The decoder range limits which windows can
 appear. The code $\boldsymbol{z}_0$ carries the dense logs into that search,
 and the measurement term uses the sparse target values. Unlike direct
 $[\boldsymbol{u},\boldsymbol{b}]$ predictors,
