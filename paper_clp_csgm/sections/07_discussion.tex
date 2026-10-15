@@ -26,13 +26,16 @@ reconstructed window through that penalty.
 
 The depth profiles in
 Figs.~\ref{fig:crosswell_depth_profile} and~\ref{fig:f03_depth} illustrate how
-the balance of these information sources affects reconstruction detail. The
-multi-channel cross-well context supports closer tracking of the held-out
-$V_c$ profile, whereas the deliberately weak GR-only context produces a
-smoother F03-4 porosity reconstruction. The attainable detail is governed
-jointly by the information in $\boldsymbol{u}$, the adequacy of
-$\operatorname{Im}(G)$, and the number and placement of observations in
-$\boldsymbol{b}$.
+the balance of these information sources affects reconstruction detail in the
+displayed examples. The multi-channel cross-well context supports closer
+tracking of the broad held-out $V_c$ variations, whereas the deliberately weak
+GR-only context produces a smoother F03-4 porosity reconstruction that omits
+some local variations. The displayed porosity window shows that both
+CLP-CSGM and the direct autoencoder can miss a local depression. These
+examples do not establish a uniform advantage across the benchmark. The
+attainable detail is governed jointly by the information in $\boldsymbol{u}$,
+the adequacy of $\operatorname{Im}(G)$, and the number and placement of
+observations in $\boldsymbol{b}$.
 
 The ablations in Section~\ref{subsec:ablation_analysis} drop one piece at a
 time. Using only the decoded prediction of the conditional prior, or only the

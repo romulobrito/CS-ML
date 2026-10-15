@@ -21,19 +21,18 @@ targets is central and must appear early. In the original submission this
 limitation was stated in the Data section and in the Discussion, but it was
 not explicit in the Abstract or the Conclusions.
 
-We have revised both. The Abstract now states that the held-out-well
-clay-volume target is obtained from gamma ray by the Larionov relation, that
-the single-well porosity target is processed and density-derived, and that
-sparse observations are coordinate subsamples of these same processed curves.
-It also states that the benchmarks test reconstruction of processed target
-logs rather than recovery against independently acquired core or laboratory
-measurements. A supplementary single-well laboratory-porosity check is named
-as outside that grid and is not a mean win for CLP-CSGM. The Conclusions now
+We have revised both. The Abstract now states that clay volume is obtained
+from gamma ray by the Larionov relation, that porosity is processed and
+density-derived, and that sparse observations are coordinate subsamples of
+these same curves rather than independently acquired core or laboratory
+measurements. It also states that, in a supplementary laboratory-porosity
+check, the direct autoencoder has the lower mean error. The Conclusions
 repeat this F3 evidence limit before the sentence on remaining validation
 needs, and they separate that laboratory supplement from the processed-log
-benchmarks. The closing Abstract sentence is restricted to regime-dependent
-benefit on the tests reported here. This wording does not close the request
-for a broader independent-measurement validation.
+benchmarks. The closing Abstract sentence states that the benefit depends
+on the regime and that broader validation is still required. This wording
+does not close the request for a broader independent-measurement
+validation.
 
 Where the text was changed: the Abstract, and the Conclusion (the F3
 evidence-limit paragraph, before the remaining-work sentence). The Data and
@@ -59,14 +58,15 @@ named F02-1, F03-2, and F06-1 as the development wells and F03-4 as the
 held-out well in the experimental protocol, but the Abstract, Introduction,
 and Conclusions did not restrict the language to that single-holdout design.
 
-We have revised the text accordingly. The Abstract now states that the F3
-evaluation uses four wells, with three wells for model development and F03-4
-held out, and that the results are not presented as operational multi-well
-transfer. The third contribution in the Introduction is described as
-benchmark-specific. The experimental protocol now states that reported
+We have revised the text accordingly. The Abstract now states that the
+cross-well evaluation uses three wells for model development and one well
+held out. It does not name the wells, and it does not repeat the
+operational-transfer sentence. That sentence remains in the Introduction
+and in the Conclusion. The experimental protocol states that reported
 cross-well performance refers to this single held-out well. The Conclusions
-state that the cross-well comparison is a controlled single-holdout benchmark
-and is not evidence of operational cross-well or multi-field transferability.
+state that the cross-well comparison is a controlled single-holdout
+benchmark and is not evidence of operational cross-well or multi-field
+transferability.
 
 Where the text was changed: the Abstract; the Introduction (third
 contribution); Experimental setup, subsection Cross-well clay-volume (the
@@ -150,22 +150,19 @@ We thank the reviewer for asking that the seven-of-nine cross-well result,
 and the GR-only reversal at higher measurement ratios, be framed as a
 conditional advantage rather than overall superiority.
 
-The Abstract now states that the comparison with the direct autoencoder
-[u,b] is a conditional advantage, not overall superiority. On the published
-cross-well grid that autoencoder has the lowest unweighted mean RMSE among
-the direct baselines MLP, PCA, and the autoencoder. The seven-of-nine gains
-are placed where training support is smallest (steps 16 and 32), and the
-direct autoencoder has lower mean RMSE in the two remaining cells, both at
-step 8 for rho=0.05 and rho=0.10. The Abstract also states that, at the
-reference noise 0.01, depth interpolation has lower error than CLP-CSGM in
-all nine configurations, and that raising only the noise is a sensitivity
-check rather than a general ranking. For the GR-only benchmark, the Abstract
-states that CLP-CSGM has the lowest mean RMSE at the two sparsest ratios and
-that the direct autoencoder has lower mean RMSE at rho=0.40 and rho=0.60.
-The Conclusions repeat this framing, name the same exceptions, and keep the
-noise-level exceptions in the conclusion rather than in the abstract. This
-wording does not close requests for further experiments or for broader
-generalization.
+The Abstract states that the seven-of-nine comparison is a conditional
+advantage over the direct autoencoder, not superiority over every
+comparator. The gains are placed in the smallest training set. The Abstract
+does not list steps, measurement fractions, or the GR-only ratios. Those
+exceptions remain in the Results and in the Conclusion. The Abstract also
+states that, at the reference noise standard deviation 0.01, depth
+interpolation has lower error than CLP-CSGM in all nine configurations, and
+that under larger perturbations that comparison changes. Those noise levels
+were used for sensitivity analysis and were not calibrated to field
+measurement uncertainties. The Conclusion names the step-8 losses at
+rho=0.05 and rho=0.10, the GR-only reversal at rho=0.40 and rho=0.60, and
+the noise-level exceptions. This wording does not close requests for
+further experiments or for broader generalization.
 
 Where the text was changed: the Abstract (conditional-advantage paragraph)
 and the Conclusion (the paired-protocol paragraph and the noise paragraph).
@@ -214,23 +211,23 @@ were added, and the main tables were not switched to MLP.
 We thank the reviewer for stressing that Proposition 3 is conditional and
 does not prove S-REC for the trained decoder. That distinction was already
 stated in the Method section and in Interpretation, scope, and limitations,
-and the appendix diagnostics already say that they do not prove S-REC. It
-was not stated in the Abstract or the Introduction.
+and the appendix diagnostics already say that they do not prove S-REC. The
+original submission did not state it in the Abstract or the Introduction.
 
-We have made it explicit in both places so the local-recovery statement is
-not read as a formal recovery guarantee for the trained model. The Abstract
-now states what the bound does and what it does not: under stated conditions
-it separates decoder error, prior mismatch, measurement noise, and local
-separability, and it does not prove that the measurement operator satisfies
-S-REC on the trained decoder. The Introduction states the same role and the
-same limit after the three contributions. No new experiments or proofs were
-added for this comment.
+The distinction now stands in the Introduction, the Method, and
+Interpretation, scope, and limitations, so the local-recovery statement is
+not read as a formal recovery guarantee for the trained model. The journal
+abstract limit is 300 words, so the Abstract no longer repeats the bound.
+The Introduction states what the bound does and what it does not: under
+stated conditions it separates decoder error, prior mismatch, measurement
+noise, and local separability, and it does not prove that the measurement
+operator satisfies S-REC on the trained decoder. No new experiments or
+proofs were added for this comment.
 
-Where the text was changed: the Abstract (sentence after the inference-time
-description) and the Introduction (sentence after the three contributions).
-Method, subsection Interpretation and theoretical context, and
-Interpretation, scope, and limitations already contained this limit and were
-left in place.
+Where the text was changed: the Introduction (sentence after the three
+contributions). The Abstract no longer contains that sentence. Method,
+subsection Interpretation and theoretical context, and Interpretation,
+scope, and limitations already contained this limit and were left in place.
 
 ---
 
@@ -280,21 +277,23 @@ is a controlled sparse-assimilation experiment under intentionally incomplete
 context. Acoustic travel time is excluded because it is nearly collinear
 with the processed porosity target and would provide a near-direct proxy.
 The reported errors, including 0.016 versus 0.018 at rho=0.20, describe that
-stress test. The depth profile at rho=0.20 shows that CLP-CSGM follows the
-broad trend of the processed porosity curve under this weak context. These
-figures are not evidence of general porosity reconstruction with a full
-operational log suite or against independent core measurements.
+stress test. The depth profile at rho=0.20 shows that CLP-CSGM follows parts
+of the broad trend of the processed porosity curve and smooths local
+variations. The displayed window at that ratio shows that both CLP-CSGM and
+the direct autoencoder miss the central depression. These figures are not
+evidence of general porosity reconstruction with a full operational log suite
+or against independent core measurements. The displayed parity correlations,
+0.4632 for CLP-CSGM and 0.3720 for the autoencoder, describe the pooled
+points on that plot. They are not a significance test. The Abstract does
+not report the GR-only RMSE. The Conclusion keeps the same controlled-test
+limit next to that RMSE.
 
-The Experimental setup and the Interpretation, scope, and limitations
-section already described this benchmark as a controlled weak-context test.
-The Abstract and the Conclusions now state the same limit next to the
-GR-only RMSE. The depth-profile figure in the Results was retained.
-
-Where the text was changed: the Abstract (sentences after the GR-only RMSE)
-and the Conclusion (sentences after the F03-4 GR-only RMSE). Experimental
-setup, subsection Single-well F03-4 GR-only porosity benchmark, and
-Interpretation, scope, and limitations already contained this limit and were
-left in place.
+Where the text was changed: Results (the F03-4 depth-profile paragraph);
+Appendix Illustrative sparse-measurement windows; Appendix F03-4 Qualitative
+Reconstruction Views; and the Conclusion (sentences after the F03-4 GR-only
+RMSE). Experimental setup, subsection Single-well F03-4 GR-only porosity
+benchmark, and Interpretation, scope, and limitations already contained the
+controlled-test limit and were left in place.
 
 No new experiments were added for this comment. A test against independent
 core measurements remains outside this textual revision and is addressed
@@ -496,12 +495,14 @@ without naming that set, and it states that the result is not a ranking
 against interpolation or the direct linear maps. Results still says that AE
 has the lowest unweighted mean RMSE among the direct baselines and is the
 most competitive direct comparator in this grid, meaning that direct set.
-The Abstract names the same set and does not call the autoencoder the
-strongest method in general.
+The Abstract states the seven-of-nine comparison as a conditional
+advantage over that autoencoder, not superiority over every comparator,
+and does not name the MLP, PCA, and autoencoder set. That named set
+remains in the Conclusion.
 
-Where the text was changed: the Abstract (the sentence that names MLP, PCA,
-and the autoencoder) and the Conclusion (the sentence that reports the
-seven-of-nine cross-well comparison).
+Where the text was changed: the Abstract (the conditional-advantage
+paragraph) and the Conclusion (the sentence that names MLP, PCA, and the
+autoencoder).
 
 ---
 

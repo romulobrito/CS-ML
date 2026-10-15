@@ -55,19 +55,18 @@ targets is central and must appear early. In the original submission this
 limitation was stated in the Data section and in the Discussion, but it was
 not explicit in the Abstract or the Conclusions.
 
-We have revised both. The Abstract now states that the held-out-well
-clay-volume target is obtained from gamma ray by the Larionov relation, that
-the single-well porosity target is processed and density-derived, and that
-sparse observations are coordinate subsamples of these same processed curves.
-It also states that the benchmarks test reconstruction of processed target
-logs rather than recovery against independently acquired core or laboratory
-measurements. A supplementary single-well laboratory-porosity check is named
-as outside that grid and is not a mean win for CLP-CSGM. The Conclusions now
+We have revised both. The Abstract now states that clay volume is obtained
+from gamma ray by the Larionov relation, that porosity is processed and
+density-derived, and that sparse observations are coordinate subsamples of
+these same curves rather than independently acquired core or laboratory
+measurements. It also states that, in a supplementary laboratory-porosity
+check, the direct autoencoder has the lower mean error. The Conclusions
 repeat this F3 evidence limit before the sentence on remaining validation
 needs, and they separate that laboratory supplement from the processed-log
-benchmarks. The closing Abstract sentence is restricted to regime-dependent
-benefit on the tests reported here. This wording does not close the request
-for a broader independent-measurement validation.
+benchmarks. The closing Abstract sentence states that the benefit depends
+on the regime and that broader validation is still required. This wording
+does not close the request for a broader independent-measurement
+validation.
 
 Where the text was changed: the Abstract, and the Conclusion (the F3
 evidence-limit paragraph, before the remaining-work sentence). The Data and

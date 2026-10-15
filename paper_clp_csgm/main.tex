@@ -76,66 +76,34 @@ E-mail: \texttt{romulobrito@lenep.uenf.br}}
 \maketitle
 
 \begin{abstract}
-Dense well logs provide continuous indirect observations of subsurface
-properties, whereas target-property curves may be available only at selected
-depths. Direct supervised models can combine dense logs with sparse target
-observations, but they typically use the sparse entries as input features and do
-not require the reconstruction to honor them as measurements. We introduce Conditional Latent-Prior Compressed Sensing with Generative
+Reconstructing a petrophysical target curve is difficult when dense auxiliary
+logs are available along the well but the target is observed only at selected
+depths. Direct models can use those sparse observations as input features,
+yet they do not require the reconstruction to honor them as measurements.
+We introduce Conditional Latent-Prior Compressed Sensing with Generative
 Models (CLP-CSGM). A decoder trained on windows of the target curve supplies
-the windows the reconstruction may use. The conditional map predicts a latent
-code $z_0$ from the dense auxiliary logs. This code provides an informed
-initialization and serves as the reference for the quadratic penalty during
-latent refinement. That refinement balances agreement with the sparse
-observations against deviation from $z_0$, and a residual at the observed
-depths can remain. A conditional local-recovery bound separates decoder error,
-prior mismatch, measurement noise, and local separability. It does not prove
-that the measurement operator satisfies S-REC on the trained decoder.
-We evaluate CLP-CSGM on public Dutch North Sea well-log data reorganized into a
-held-out-well clay-volume benchmark and a single-well porosity stress test with
-weak dense context. The F3 evaluation uses four wells, with F02-1, F03-2, and
-F06-1 for model development and F03-4 held out; the results are not presented
-as operational multi-well transfer. The clay-volume target is obtained from
-gamma ray by the Larionov relation, the single-well porosity target is
-processed and density-derived, and the sparse observations are coordinate
-subsamples of these same processed curves. The benchmarks therefore test
-reconstruction of processed target logs rather than recovery against
-independently acquired core or laboratory measurements. A supplementary
-single-well laboratory-porosity check, kept outside that grid, is not a mean
-win: the direct autoencoder has the lower pooled mean RMSE. A limited-sample
-permeability case provides supplementary evidence. With a linear ridge map as
-the reference for $z_0$, the comparison with the direct autoencoder
-$[\boldsymbol{u},\boldsymbol{b}]$ is a conditional advantage,
-not overall superiority. On the published cross-well grid that autoencoder
-has the lowest unweighted mean RMSE among the direct baselines MLP, PCA, and
-the autoencoder. CLP-CSGM has lower mean RMSE than this autoencoder in seven
-of nine cross-well cells, with the gains concentrated where training support
-is smallest (steps $16$ and $32$). The direct autoencoder has lower mean RMSE
-in the two remaining cells, both at step $8$ (the largest training pool) for
-$\rho=0.05$ and $\rho=0.10$. The unweighted mean of the nine cell-level RMSE
-values decreases from 0.0350 to 0.0286, an overall reduction of about 18\%.
-At the reference noise standard deviation $0.01$, depth interpolation of the
-sparse measurements has lower error than CLP-CSGM in all nine configurations.
-Raising only that noise changes this interpolation--CLP ordering under larger
-perturbations. Those levels are a sensitivity check, not typical field
-conditions. In the GR-only porosity benchmark,
-CLP-CSGM has the lowest mean RMSE at the two sparsest ratios, including
-0.016 versus 0.018 at $\rho=0.20$, whereas the direct autoencoder has lower
-mean RMSE at $\rho=0.40$ and $\rho=0.60$. That GR-only comparison is a
-controlled sparse-assimilation test under intentionally incomplete context:
-gamma ray is the only dense input, and the depth profile follows the broad
-trend of the processed porosity curve. It is not evidence of general porosity
-reconstruction performance.
-Using only the decoded prediction of the conditional prior, or only the
-measurement penalty, raises the error in most cells. Which of the two matters
-more changes with the number of training windows and with how many depths are
-measured. The map from dense logs to $z_0$ is also
-dataset-dependent: a multilayer perceptron gives lower mean RMSE on the
-cross-well grid, whereas ridge gives lower mean RMSE when gamma ray is the
-only dense log. On these tests the benefit of the latent refinement depends
-on the regime. CLP-CSGM can complement the direct autoencoder when training
-windows are few, the test well differs from the training wells, or the dense
-logs are incomplete. At the reference noise, interpolation of the sparse
-measurements is already a competitive simple solution.
+the windows the reconstruction may use. Dense auxiliary logs predict a
+conditional latent code, $z_0$. Latent refinement balances disagreement with
+the sparse measurements against proximity to $z_0$. That code is the
+reference for this balance, not only a starting value. A residual at the
+observed depths can remain.
+The cross-well evaluation uses public Dutch North Sea logs, with three wells
+for model development and one well held out. The main targets are derived:
+clay volume from gamma ray by the Larionov relation, and a processed,
+density-derived porosity. Sparse observations are coordinate subsamples of
+these same curves rather than independently acquired core or laboratory
+measurements.
+CLP-CSGM has lower mean root-mean-square error than the direct autoencoder
+in seven of nine cross-well configurations, with the gains concentrated in
+the smallest training set. This comparison is a conditional advantage over
+that autoencoder, not superiority over every comparator. At the reference
+noise standard deviation 0.01, depth interpolation of the sparse measurements
+has lower error than CLP-CSGM in all nine configurations. Under larger
+perturbations that interpolation comparison changes. These noise levels were
+used for sensitivity analysis and were not calibrated to field measurement
+uncertainties. In a supplementary laboratory-porosity check, the direct
+autoencoder has the lower mean error. The benefit depends on the regime, and
+broader validation is still required.
 \end{abstract}
 
 \keywords{compressed sensing; generative model; inverse problem;

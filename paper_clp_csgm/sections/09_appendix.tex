@@ -443,14 +443,21 @@ are the actual sparse inputs generated under the benchmark noise model.
 Each figure fixes one test-window index, one seed, and one \(\rho\). These audit
 examples show that the markers alone underdetermine the reconstruction and that
 the methods interpolate between sparse constraints using different inductive
-biases. Aggregate tables and the main-text diagnostics provide the overall
-performance comparisons.
+biases. In the displayed porosity window, both CLP-CSGM Ridge and AE \([u,b]\)
+miss the central depression of the reference. In the displayed clay-volume
+window, the corresponding configuration is step 16, seed 7, \(\rho=0.10\), and
+window index 0. CLP-CSGM Ridge is closer to the reference, the autoencoder
+prediction is positively offset, and local deviations remain. These windows do
+not establish a uniform advantage. Aggregate tables and the main-text
+diagnostics provide the overall performance comparisons.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/f03_gr_only_seed7_rho0p2_ex0.png}
   \caption{F03-4 GR-only porosity example (test window index 0, seed 7, \(\rho=0.20\)):
-  ground truth, sparse noisy measurements \(b\), CLP-CSGM Ridge, and AE \([u,b]\).}
+  ground truth, sparse noisy measurements \(b\), CLP-CSGM Ridge, and AE \([u,b]\).
+  In this displayed window, both reconstructions miss the central depression of
+  the reference.}
   \label{fig:sparse_recon_f03}
 \end{figure}
 
@@ -458,7 +465,9 @@ performance comparisons.
   \centering
   \includegraphics[width=\linewidth]{figures/crosswell_vc_step16_seed7_rho0p1_ex0.png}
   \caption{Cross-well \(V_c\) example (held-out F03-4 test window index 0, step 16, seed 7,
-  \(\rho=0.10\)): ground truth, sparse noisy measurements \(b\), CLP-CSGM Ridge, and AE \([u,b]\).}
+  \(\rho=0.10\)): ground truth, sparse noisy measurements \(b\), CLP-CSGM Ridge, and AE \([u,b]\).
+  In this displayed window, CLP-CSGM Ridge is closer to the reference. The
+  autoencoder prediction is positively offset, and local deviations remain.}
   \label{fig:sparse_recon_crosswell}
 \end{figure}
 
@@ -473,28 +482,32 @@ window-level and pointwise audits.
 Figure~\ref{fig:f03_examples} shows representative F03-4 test windows and reveals
 local shape behavior compressed by scalar metrics. Direct MLP \([u,b]\) can
 produce oscillatory predictions, whereas PCA, AE, and CLP-CSGM Ridge are
-smoother. Aggregate metrics determine the window-level rankings.
+smoother. In these displayed windows, CLP-CSGM Ridge and the autoencoder miss
+part of the central depression of the reference. Aggregate metrics determine
+the window-level rankings.
 Figure~\ref{fig:f03_parity} pools pointwise predictions against ground
-truth over the F03-4 test windows. CLP-CSGM Ridge has the highest displayed
-pointwise correlation among the compared methods, but the scatter remains broad.
-The plot therefore indicates improved relative agreement while retaining
-substantial pointwise variability.
+truth over the F03-4 test windows. The figure prints a correlation of
+$0.4632$ for CLP-CSGM Ridge and $0.3720$ for AE \([u,b]\). The scatter remains
+broad. This comparison describes the pooled points on the plot. It does not
+establish statistical significance, and overlapping-window predictions are not
+independent observations.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/08_example_ground_truth_vs_models.png}
-  \caption{Representative F03-4 test windows. CLP-CSGM Ridge produces smooth
-  reconstructions that follow the ground-truth trend, while direct MLP
-  \([u,b]\) is visibly more oscillatory.}
+  \caption{Representative F03-4 test windows. Direct MLP \([u,b]\) is visibly
+  more oscillatory. CLP-CSGM Ridge and AE \([u,b]\) are smoother and, in these
+  displayed windows, miss part of the central depression of the reference.}
   \label{fig:f03_examples}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.82\linewidth]{figures/09_parity_ground_truth_vs_prediction.png}
-  \caption{Pooled parity plots for F03-4 test windows. CLP-CSGM Ridge attains the
-  highest displayed correlation among compared methods, while broad scatter
-  remains.}
+  \caption{Pooled parity plots for F03-4 test windows. The displayed correlations
+  are $0.4632$ for CLP-CSGM Ridge and $0.3720$ for AE \([u,b]\). Broad scatter
+  remains. These values describe the pooled points on the figure and are not a
+  significance test.}
   \label{fig:f03_parity}
 \end{figure}
 
@@ -810,8 +823,10 @@ $16$, and $0.0432$ at step $32$.
   seeds. Wins count seeds in which CLP-CSGM Ridge has strictly lower RMSE.
   The held-out $V_c$ standard deviation is $0.035$, on the same scale as the
   noise. Noise $0.05$ is about $1.43$ times that deviation. Noise levels
-  $0.10$ and $0.20$ are about $2.86$ and $5.71$ times that deviation and are
-  a sensitivity check. The decoder and the dense-log map are fit once per
+  $0.10$ and $0.20$ are about $2.86$ and $5.71$ times that deviation.
+  These noise levels were used for sensitivity analysis and were not
+  calibrated to field measurement uncertainties. The decoder and the
+  dense-log map are fit once per
   step and seed, and the penalty is selected on validation at each noise
   level. Noise $0.01$ in this table is that refit. At $0.20$ some selected
   penalty weights lie above the published grid.}
@@ -830,7 +845,13 @@ interpolated curve follows the measurements. The CLP-CSGM error moves less
 and stays near the dense-log window.
 Fig.~\ref{fig:crosswell_noise_panels} shows one held-out interval at the
 published noise and at noise $0.05$. The two panels use separate horizontal
-scales. Panel (b) is not one of the larger sensitivity levels.
+scales. Panel (b) is not one of the larger sensitivity levels. In this
+displayed interval, interpolation closely follows the reference at noise
+standard deviation $0.01$. At $0.05$, it exhibits larger excursions, while
+CLP-CSGM Ridge retains more of the broad profile structure. The example is
+consistent with the cell-level result for the corresponding configuration,
+step $32$ and $\rho=0.20$, and it does not extend to every configuration at
+that noise level.
 
 \begin{figure}[htbp]
   \centering

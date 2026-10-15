@@ -86,8 +86,9 @@ interpolation keeps the lower mean. At $0.10$ and $0.20$, CLP-CSGM Ridge
 has the lower error in all nine configurations. The held-out $V_c$ curve
 has standard deviation $0.035$, on the same scale as this noise. Relative
 to that deviation, $0.05$ is about $1.43$ times larger, and $0.10$ and
-$0.20$ are about $2.86$ and $5.71$ times larger. Those last two levels are
-strong perturbations and are a sensitivity check. The decoder and the
+$0.20$ are about $2.86$ and $5.71$ times larger. These noise levels were
+used for sensitivity analysis and were not calibrated to field measurement
+uncertainties. The decoder and the
 dense-log map are fit once per step and seed. The penalty weight is then
 selected on validation for each measurement fraction and each noise level,
 so the curves are not a fixed-penalty reconstruction. The weight selected
@@ -113,7 +114,9 @@ submitted tables.
     The dotted line is the held-out $V_c$ standard deviation $0.035$, on the
     same scale as the noise. Noise $0.05$ is about $1.43$ times that
     deviation. The shaded region marks $0.10$ and $0.20$, about $2.86$ and
-    $5.71$ times that deviation, which are a sensitivity check.
+    $5.71$ times that deviation. These noise levels were used for
+    sensitivity analysis and were not calibrated to field measurement
+    uncertainties.
     The decoder and the dense-log map are fit once per step and seed. The
     penalty weight is selected on validation for each measurement fraction
     and each noise level. The points at noise $0.01$ belong to this refit.
@@ -159,13 +162,20 @@ most competitive direct comparator in this grid.
     \label{fig:crosswell_all_methods}
 \end{figure}
 
-Figure~\ref{fig:crosswell_depth_profile} shows a representative held-out F03-4
-profile for step $16$, seed $7$, and $\rho=0.20$. With sonic, bulk density,
-acoustic impedance, and $V_p$ as dense inputs, CLP-CSGM Ridge follows the broad
-target variations more closely than AE
-$[\boldsymbol{u},\boldsymbol{b}]$ in this example, while direct MLP and PCA are
-visibly more oscillatory. The profile is consistent with the aggregate RMSE
-results for this cell; uniform window-level comparisons remain based on the
+Figure~\ref{fig:crosswell_depth_profile} shows one held-out F03-4 profile
+for step $16$, seed $7$, and $\rho=0.20$. In this displayed example,
+CLP-CSGM Ridge follows the broad variations of the processed reference more
+closely than AE $[\boldsymbol{u},\boldsymbol{b}]$. Direct MLP and PCA
+predictions exhibit larger oscillations. Their panels use wider horizontal
+scales than the reference, so that comparison is qualitative. The individual
+window in Fig.~\ref{fig:sparse_recon_crosswell} is a different configuration:
+step $16$, seed $7$, $\rho=0.10$, and window index 0. There, CLP-CSGM Ridge
+is closer to the reference, the autoencoder prediction is positively offset,
+and local deviations remain. These examples illustrate differences in
+reconstruction behavior within the displayed configurations. They do not
+establish a uniform advantage across the benchmark, and they are not a
+statistical-significance claim. The profile is consistent with the aggregate
+RMSE for this cell. Uniform window-level comparisons remain based on the
 aggregate metrics.
 
 \begin{figure}[!htbp]
@@ -173,7 +183,8 @@ aggregate metrics.
     \includegraphics[width=\linewidth]{10_depth_profile_crosswell_vc.png}
     \caption{Held-out F03-4 $V_c$ reconstruction at step $16$, seed $7$, and
     $\rho=0.20$. The target is the processed Larionov-derived curve, and the
-    sparse observations are coordinate subsamples of that curve.}
+    sparse observations are coordinate subsamples of that curve. The MLP and
+    PCA panels use wider horizontal scales than the reference panel.}
     \label{fig:crosswell_depth_profile}
 \end{figure}
 
@@ -269,25 +280,30 @@ RMSE advantage over the direct AE baseline.
     {10_depth_profile_porosity.png}
     \caption{F03-4 depth-profile reconstruction at $\rho=0.20$. The target is
     the processed density-derived porosity curve, and the sparse observations
-    are coordinate subsamples of that curve. CLP-CSGM Ridge follows the broad
-    porosity trend while smoothing some local variations.}
+    are coordinate subsamples of that curve. In this displayed profile,
+    CLP-CSGM Ridge follows parts of the broad trend and smooths local
+    variations. The panels do not share one horizontal scale.}
     \label{fig:f03_depth}
 \end{figure}
 
-Because the profile combines predictions from overlapping windows, it provides
-a qualitative assessment of the overall trend. Pointwise recovery and
-validation against independent core-porosity measurements fall outside this
-visualization. At
-$\rho=0.20$, CLP-CSGM Ridge follows the broad porosity trend more closely than
-AE $[\boldsymbol{u},\boldsymbol{b}]$, although it smooths some local variations
-under the weak GR-only context. The method uses $m=13$ observations per
-length-$64$ window and achieves a mean RMSE of approximately $0.016$. This
-profile-level behavior is consistent with the lower mean RMSE reported in
-Table~\ref{tab:f03_results} at $\rho=0.20$. The individual profile is
-illustrative; the aggregate results support the conclusion that the benefit of
-explicit latent refinement is concentrated at the sparse end of the tested grid
-under weak GR-only context. Additional window-level and parity audits are
-provided in Appendix~\ref{app:f03_qualitative_views}.
+The porosity example is more mixed than the clay-volume profile. In this
+displayed profile, CLP-CSGM Ridge follows parts of the broad trend and smooths
+local variations. Because the profile combines predictions from overlapping
+windows, the view is qualitative. Pointwise recovery and validation against
+independent core-porosity measurements fall outside this visualization. The
+displayed window in Fig.~\ref{fig:sparse_recon_f03} uses the corresponding
+configuration seed $7$, $\rho=0.20$, and window index 0. There, both
+CLP-CSGM Ridge and AE $[\boldsymbol{u},\boldsymbol{b}]$ miss the central
+depression of the reference. The pooled parity plot in
+Fig.~\ref{fig:f03_parity} prints a correlation of $0.4632$ for CLP-CSGM Ridge
+and $0.3720$ for the autoencoder. Those values describe the points drawn on
+that figure. They do not establish statistical significance, and
+overlapping-window predictions are not independent observations. The method
+uses $m=13$ observations per length-$64$ window and achieves a mean RMSE of
+approximately $0.016$ at $\rho=0.20$. This profile is consistent with the
+lower mean RMSE in Table~\ref{tab:f03_results} at that ratio. The profile is
+illustrative. The aggregate results still place the benefit of explicit latent
+refinement at the sparse end of this weak-context grid.
 
 The limited-sample Lapa permeability case in
 Appendix~\ref{app:lapa_case} provides supplementary evidence. The prior-guided

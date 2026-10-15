@@ -24,11 +24,14 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `sections/05_experiments.tex` (processed-curve, not independent measurement);
   `main.tex` Abstract (was missing);
   `sections/08_conclusion.tex` (mentioned future independent targets only).
-- Change made: Abstract now names Larionov `Vc`, density-derived porosity,
-  coordinate-subsampled `b`, and processed-log reconstruction vs independent
-  core/lab validation. Conclusion now states the same F3 evidence limit before
-  the remaining-work sentence. Closing Abstract sentence restricted to "tested
-  processed-log benchmarks".
+- Change made: Abstract names Larionov clay volume, density-derived
+  porosity, coordinate-subsampled observations, and processed curves rather
+  than independent core or laboratory measurements. It also states that the
+  laboratory-porosity supplement has the lower mean error for the direct
+  autoencoder. Conclusion states the same F3 evidence limit and separates
+  that supplement from the processed-log benchmarks. Closing Abstract
+  sentence states that the benefit depends on the regime and that broader
+  validation is still required.
 - Files: `main.tex`; `sections/08_conclusion.tex`
 - Evidence: submitted Data/Discussion already documented origin; no new
   numbers. This ID does not require a new experiment.
@@ -50,12 +53,12 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `sections/07_discussion.tex` asked for larger multi-well data but did not
   forbid transfer language; Abstract/Introduction/Conclusion did not state
   the 3+1 design as a claim limit.
-- Change made: Abstract names four F3 wells (three development, F03-4 held
-  out) and states that results are not operational multi-well transfer.
-  Introduction contribution 3 is benchmark-specific with the 3+1 split.
-  Experiments state that reported cross-well performance refers to this
-  single held-out well. Conclusion states the single-holdout design is not
-  operational transfer evidence. No new well and no new experiment.
+- Change made: Abstract states three development wells and one held-out
+  well. It does not name the wells and does not repeat the
+  operational-transfer sentence. That limit remains in the Introduction
+  and in the Conclusion. Experiments state that reported cross-well
+  performance refers to this single held-out well. No new well and no new
+  experiment.
 - Files: `main.tex`; `sections/01_introduction.tex`;
   `sections/05_experiments.tex`; `sections/08_conclusion.tex`
 - Shared reply: none. Nearby IDs (`R2-03`, `R3-02`, `R1-M03`, `R1-M11`,
@@ -102,12 +105,15 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - State: `text_done`
 - Reviewer request: frame 7/9 and the GR-only reversal as a conditional
   advantage, not overall superiority; make Abstract/Highlights explicit.
-- Change made: Abstract and Conclusions name the two step-8 losses
-  (rho=0.05 and 0.10) and the GR-only AE wins at rho=0.40 and 0.60.
-  Gains tied to the smallest training support (steps 16 and 32). The
-  Abstract also states that interpolation is lower in all nine cells at
-  noise 0.01. That sentence does not turn the 7/9 result into a ranking
-  against every method. Requests for further experiments stay open.
+- Change made: the Abstract states the seven-of-nine result as a
+  conditional advantage over the direct autoencoder, not superiority over
+  every comparator, with gains in the smallest training set. It states
+  that interpolation is lower in all nine configurations at the reference
+  noise 0.01, and that under larger perturbations that comparison changes.
+  Those noise levels were used for sensitivity analysis and were not
+  calibrated to field measurement uncertainties. The Abstract does not
+  list steps, fractions, or the GR-only ratios. Those exceptions remain
+  in the Results and in the Conclusion.
 - Files: `main.tex`; `sections/08_conclusion.tex`.
 - Shared reply: none. Nearby IDs ask for different experiments or claim
   limits.
@@ -131,9 +137,12 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - State: `text_done`
 - Reviewer request: keep Proposition 3 clearly conditional in the Abstract
   and Introduction; it does not prove S-REC for the trained decoder.
-- Change made: one sentence in the Abstract and one in the Introduction.
+- Change made: the Abstract no longer repeats the bound, because the
+  journal limit is 300 words. The Introduction still states that the bound
+  separates decoder error, prior mismatch, measurement noise, and local
+  separability, and that it does not prove S-REC for the trained decoder.
   Method and Discussion already stated the limit and were left in place.
-- Files: `main.tex`; `sections/01_introduction.tex`.
+- Files: `sections/01_introduction.tex`.
 - Shared reply: none (R3-05, R3-P02, R3-P15 are not the same request).
 
 ### R1-M08
@@ -162,11 +171,14 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   Results (fig:f03_depth) already shows that CLP-CSGM follows the broad
   trend of the processed curve at rho=0.20. Abstract and Conclusion reported
   the GR-only RMSE without that claim limit.
-- Change made: one pair of sentences in the Abstract and one pair in the
-  Conclusion, placed after the GR-only RMSE. Each states that gamma ray is
-  the only dense input, that the depth profile follows the broad trend, and
-  that the result is not general porosity reconstruction performance.
-- Files: `main.tex`; `sections/08_conclusion.tex`.
+- Change made: the Abstract no longer reports the GR-only RMSE. The
+  Results depth profile now says that CLP-CSGM follows parts of the broad
+  trend and smooths local variations, and that the displayed window misses
+  the central depression for both CLP-CSGM and the direct autoencoder. The
+  displayed parity correlations 0.4632 and 0.3720 are descriptive. The
+  Conclusion keeps the limit next to the GR-only RMSE.
+- Files: `sections/06_results.tex`; `sections/07_discussion.tex`;
+  `sections/08_conclusion.tex`; `sections/09_appendix.tex`.
 - Evidence: no new numbers. The depth-profile figure was retained.
 - Pending for this ID: none.
 - Not closed by this change: independent core measurements (`R1-M11`);
@@ -272,7 +284,8 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Change made: the seven-of-nine comparison is with AE [u,b]. On the
   published grid that autoencoder has the lowest unweighted mean RMSE among
   MLP, PCA, and AE. The Conclusion states that this is not a ranking against
-  interpolation or the direct linear maps. The Abstract names the same set.
+  interpolation or the direct linear maps. The Abstract states the
+  comparison as a conditional advantage and does not name that set.
   The noise sweep and the laboratory supplement are not closed by this
   wording.
 - Files: `main.tex`; `sections/08_conclusion.tex`.
@@ -420,13 +433,13 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   32 for every rho. The held-out Vc standard deviation is 0.035. At noise
   0.05, CLP-CSGM Ridge is lower in every seed at steps 16 and 32 and at
   step 8 for rho 0.20, with the selected penalty inside the published grid.
-  At 0.10 and 0.20 it is lower in all nine cells; those levels are a
-  sensitivity check, and at 0.20 some selected weights lie above the
+  At 0.10 and 0.20 it is lower in all nine cells. These noise levels were
+  used for sensitivity analysis and were not calibrated to field
+  measurement uncertainties. At 0.20 some selected weights lie above the
   published grid. Results includes an RMSE-versus-noise figure with one
   panel per step and one curve per measurement fraction. Relative to the
   held-out standard deviation 0.035, noise 0.05, 0.10, and 0.20 are about
-  1.43, 2.86, and 5.71 times larger; 0.10 and 0.20 stay a sensitivity
-  check. The figure axis is logarithmic. The decoder and the dense-log map
+  1.43, 2.86, and 5.71 times larger. The figure axis is logarithmic. The decoder and the dense-log map
   are fit once per step and seed; the penalty is selected again for each
   measurement fraction and noise level. Noise 0.01 in the figure is that
   refit: at step 16, rho 0.20, the published CLP mean is 0.01771 and the
