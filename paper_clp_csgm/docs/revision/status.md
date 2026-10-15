@@ -500,9 +500,9 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `sections/06_results.tex`; `sections/07_discussion.tex`;
   `sections/09_appendix.tex`; `tables/implementation_summary.tex`.
 - Shared reply: the same evidence is restated under `R3-P09`. `R3-P10`
-  and `R3-P16` stay pending.
-- Not done: a field-calibrated noise model, a definition of the 30dB
-  label, and a covariance model for the measurement noise.
+  is answered in its own entry. `R3-P16` stays pending.
+- Not done: a field-calibrated noise model and a definition of the 30dB
+  label.
 
 ### R3-P09
 
@@ -518,11 +518,34 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `sections/06_results.tex`; `sections/07_discussion.tex`;
   `sections/09_appendix.tex`; `tables/implementation_summary.tex`.
 - Shared reply: same evidence as `R3-04`, written as its own entry.
-- Not done: `R3-P10` (covariance) and `R3-P16` (origin of 30dB).
+- Not done: `R3-P16` (origin of 30dB).
+
+### R3-P10
+
+- State: `text_done`
+- Reviewer request: the annotation "covariance?" on the standardization
+  paragraph, at the standard deviations and the sparse-measurement scaling.
+- Change made: text only. D_y and D_u are per-coordinate scales, not
+  estimated profile covariances. The added benchmark noise is isotropic in
+  the original target units. After the diagonal standardization its
+  covariance is sigma_eta^2 D_Omega^{-2}: still independent, with unequal
+  variances when the training standard deviations differ. The likelihood
+  quadratic form is the implemented data term divided by sigma_eta^2.
+  sigma_z^2 I remains the MAP hypothesis for the Euclidean penalty, not an
+  estimated Ridge-residual covariance. G_orig denotes the decoder output in
+  original units. The local-recovery constants stay on that image, and the
+  separability ratios, already computed there, are not those constants.
+  No new experiment.
+- Files: `sections/03_method.tex`; `sections/07_discussion.tex`;
+  `sections/09_appendix.tex`.
+- Shared reply: none. `R3-04` and `R3-P09` now point to this entry.
+  `R3-P16` stays pending.
+- Not done: a definition of the 30dB label, and an estimated latent
+  covariance.
 
 ## Queue (not yet processed)
 
 R3-05 .. R3-06,
-R3-A01 .. R3-A05, R3-P01 .. R3-P08, R3-P10 .. R3-P19, AE-01.
+R3-A01 .. R3-A05, R3-P01 .. R3-P08, R3-P11 .. R3-P19, AE-01.
 R1-m03 and R1-m05 remain deferred.
-`R3-P09` is text_done. `R3-P10` and `R3-P16` remain pending.
+`R3-P09` and `R3-P10` are text_done. `R3-P16` remains pending.

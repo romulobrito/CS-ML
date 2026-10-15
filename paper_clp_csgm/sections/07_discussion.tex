@@ -2,7 +2,8 @@
 \label{sec:discussion}
 
 CLP-CSGM uses three pieces that act together. The decoder range
-$\operatorname{Im}(G)$ is the set of target windows the decoder can produce.
+$\operatorname{Im}(G_{\mathrm{orig}})$ is the set of target windows, in the
+original units, that the decoder can produce.
 The conditional map predicts $\boldsymbol{z}_0=h(\boldsymbol{u})$ from the
 dense logs. This code initializes the first latent trajectory and remains the
 center of the quadratic penalty. The measurement term in Eq.~\eqref{eq:clp_csgm_objective} penalizes
@@ -33,7 +34,7 @@ some local variations. The displayed porosity window shows that both
 CLP-CSGM and the direct autoencoder can miss a local depression. These
 examples do not establish a uniform advantage across the benchmark. The
 attainable detail is governed jointly by the information in $\boldsymbol{u}$,
-the adequacy of $\operatorname{Im}(G)$, and the number and placement of
+the adequacy of $\operatorname{Im}(G_{\mathrm{orig}})$, and the number and placement of
 observations in $\boldsymbol{b}$.
 
 The ablations in Section~\ref{subsec:ablation_analysis} drop one piece at a

@@ -83,14 +83,29 @@ All preprocessing statistics are computed from training windows only. Let
 $\boldsymbol{\mu}_y,\boldsymbol{s}_y$ and
 $\boldsymbol{\mu}_u,\boldsymbol{s}_u$ be the componentwise training means and
 standard deviations, with $D_y=\operatorname{diag}(\boldsymbol{s}_y)$ and
-$D_u=\operatorname{diag}(\boldsymbol{s}_u)$. We use
+$D_u=\operatorname{diag}(\boldsymbol{s}_u)$. These two matrices rescale each
+coordinate by its training standard deviation. They are not estimated
+covariance matrices of the profiles, and this rescaling leaves any
+correlation already present between coordinates unchanged. We use
 $\widetilde{\boldsymbol{y}}=D_y^{-1}(\boldsymbol{y}-\boldsymbol{\mu}_y)$ and
 $\widetilde{\boldsymbol{u}}=D_u^{-1}(\boldsymbol{u}-\boldsymbol{\mu}_u)$.
 Sparse measurements are standardized with
 $D_{\Omega}=M_{\Omega}D_yM_{\Omega}^{\top}$ and
 $\widetilde{\boldsymbol{b}}=D_{\Omega}^{-1}
 (\boldsymbol{b}-M_{\Omega}\boldsymbol{\mu}_y)$; near-zero standard deviations
-use the implementation safeguard. Predictions return to the original scale via
+use the implementation safeguard. The decoder $G$ returns a standardized
+window. The same window in the original target units is
+
+\begin{equation}
+G_{\mathrm{orig}}(\boldsymbol{z})
+=
+\boldsymbol{\mu}_y
++
+D_yG(\boldsymbol{z}),
+\label{eq:g_orig}
+\end{equation}
+
+and a standardized prediction returns to that scale by
 
 \begin{equation}
 \widehat{\boldsymbol{y}}
@@ -99,13 +114,57 @@ use the implementation safeguard. Predictions return to the original scale via
 +
 D_y\widehat{\widetilde{\boldsymbol{y}}}.
 \label{eq:inverse_target_standardization}
+\end{equation} For a fixed set
+of observed coordinates, Eq.~\eqref{eq:measurement_model} adds noise with
+$\boldsymbol{\eta}\sim\mathcal{N}(\boldsymbol{0},\sigma_{\eta}^{2}I_m)$.
+Independence across coordinates and a common variance are assumptions of
+this synthetic benchmark noise. They are not a demonstrated description of
+instrumental noise, and this manuscript does not identify them with the
+30dB filename label. The standardized noise is
+$\widetilde{\boldsymbol{\eta}}=D_{\Omega}^{-1}\boldsymbol{\eta}$. Because
+$D_{\Omega}$ is diagonal,
+
+\begin{equation}
+\operatorname{Cov}(\widetilde{\boldsymbol{\eta}})
+=
+\sigma_{\eta}^{2}D_{\Omega}^{-1}D_{\Omega}^{-\top}
+=
+\sigma_{\eta}^{2}D_{\Omega}^{-2}.
+\label{eq:standardized_noise_covariance}
 \end{equation}
+
+This diagonal transformation preserves the independence of the added
+Gaussian noise. When the training standard deviations differ across
+coordinates, the standardized variances differ as well. For
+$\boldsymbol{r}=M_{\Omega}G(\boldsymbol{z})-\widetilde{\boldsymbol{b}}$,
+
+\begin{equation}
+\boldsymbol{r}^{\top}
+\operatorname{Cov}(\widetilde{\boldsymbol{\eta}})^{-1}
+\boldsymbol{r}
+=
+\frac{1}{\sigma_{\eta}^{2}}
+\|D_{\Omega}\boldsymbol{r}\|_2^2.
+\label{eq:standardized_noise_likelihood}
+\end{equation}
+
+The right-hand side is the data term of
+Eq.~\eqref{eq:clp_csgm_objective} divided by $\sigma_{\eta}^{2}$.
+Proposition~\ref{prop:map} places the MAP weight
+$\sigma_{\eta}^{2}/\sigma_{z}^{2}$ on that original-scale term. The factor
+$\sigma_z^{2}I_k$ in that proposition is the isotropic hypothesis behind
+the Euclidean latent penalty. It is not an estimated covariance of the
+residuals of $h$. Ridge standardizes the latent codes while fitting $h$
+and returns $\boldsymbol{z}_0$ to the encoder scale.
 
 Where a later equation omits tildes, its coordinates are those written there.
 The refinement objective keeps the standardized residual and the diagonal
-weight $D_{\Omega}$. We assume that target windows are adequately
-approximated by $\mathcal{M}=\operatorname{Im}(G)\subset\mathbb{R}^{N}$,
-with $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$ and $k<N$, and that
+weight $D_{\Omega}$. The decoder
+$G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$, with $k<N$, supplies
+standardized windows, and $G_{\mathrm{orig}}$ supplies the corresponding
+windows in the original target units. We assume that those original-scale
+windows are adequately approximated by
+$\operatorname{Im}(G_{\mathrm{orig}})$, and that
 $h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ provides a useful anchor
 $\boldsymbol{z}_0=h(\boldsymbol{u})$. These assumptions are assessed empirically
 through reconstruction, ablations, and prior sensitivity.
@@ -175,10 +234,12 @@ G(\boldsymbol{z}):
 \label{eq:decoder_range}
 \end{equation}
 
+This set is the range of the standardized decoder. The windows returned
+to the original target units form $\operatorname{Im}(G_{\mathrm{orig}})$.
 Target-well reconstruction therefore optimizes only
 $\boldsymbol{z}\in\mathbb{R}^{k}$ and produces
 $\widehat{\boldsymbol{y}}
-=G(\widehat{\boldsymbol{z}})\in\mathcal{M}$; it does not update the network
+=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$; it does not update the network
 parameters or search over arbitrary vectors in $\mathbb{R}^{N}$.
 The encoder is used to train the decoder and to build the codes on which
 the dense-log map is fit. Inference does not encode the unknown window.
@@ -238,7 +299,8 @@ same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
     $\boldsymbol{z}_0=h(\boldsymbol{u})$. That code initializes the first
     trajectory and remains the center of the quadratic penalty. Test-time
     refinement updates the latent code to $\widehat{\boldsymbol{z}}$, whose
-    decoded window $G(\widehat{\boldsymbol{z}})$ belongs to $\mathcal{M}$,
+    decoded window $G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$ belongs to
+    $\operatorname{Im}(G_{\mathrm{orig}})$,
     balancing the measurement residual against deviation from
     $\boldsymbol{z}_0$.}
     \label{fig:conditional_prior_geometry}
@@ -278,9 +340,7 @@ M_{\Omega}G(\boldsymbol{z})
 \\
 \widehat{\boldsymbol{y}}
 &=
-\boldsymbol{\mu}_y
-+
-D_yG\left(\widehat{\boldsymbol{z}}_{\mathrm{num}}\right).
+G_{\mathrm{orig}}\left(\widehat{\boldsymbol{z}}_{\mathrm{num}}\right).
 \end{aligned}
 \label{eq:clp_csgm_objective}
 \end{equation}
@@ -301,12 +361,7 @@ M_{\Omega}G(\boldsymbol{z})
 \right\|_2^2
 =
 \left\|
-M_{\Omega}
-\left(
-\boldsymbol{\mu}_y
-+
-D_yG(\boldsymbol{z})
-\right)
+M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z})
 -
 \boldsymbol{b}
 \right\|_2^2.
@@ -369,8 +424,7 @@ solution, not a certified global minimizer.
 The \emph{latent-prior-only} variant suppresses refinement and uses
 $\widehat{\boldsymbol{z}}_{\mathrm{prior}}=\boldsymbol{z}_0$, followed by
 $\widehat{\boldsymbol{y}}_{\mathrm{prior}}
-=\boldsymbol{\mu}_y+
-D_yG(\widehat{\boldsymbol{z}}_{\mathrm{prior}})$.
+=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}}_{\mathrm{prior}})$.
 The \emph{measurement-only CSGM} variant sets $\lambda=0$ and computes
 
 \begin{equation}
@@ -414,10 +468,7 @@ $\boldsymbol{b}\mid\boldsymbol{z}
 \sim
 \mathcal{N}
 \left(
-M_{\Omega}
-\left(
-\boldsymbol{\mu}_y+D_yG(\boldsymbol{z})
-\right),
+M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z}),
 \sigma_{\eta}^{2}I_m
 \right)$,
 while
@@ -536,23 +587,22 @@ $\mathcal{J}(\widehat{\boldsymbol{z}}_{\mathrm{num}})
 
 \begin{remark}[Representation error and decoder mismatch]
 \label{rem:representation_error}
-Suppressing tildes when standardized coordinates are understood, every
-CLP-CSGM reconstruction satisfies
+Every CLP-CSGM reconstruction in the original target units satisfies
 $\widehat{\boldsymbol{y}}
-=G(\widehat{\boldsymbol{z}})\in\mathcal{M}$, where
-$\mathcal{M}=\operatorname{Im}(G)\subseteq\mathbb{R}^{N}$. Consequently, for
-an unknown target window $\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$, the error
-of any decoder-based reconstruction is bounded below by the oracle
-representation error
+=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})
+\in\operatorname{Im}(G_{\mathrm{orig}})$.
+Consequently, for an unknown target window
+$\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$, the error of any such
+reconstruction is bounded below by the oracle representation error
 
 \begin{equation}
 \operatorname{dist}
 \left(
 \boldsymbol{y}^{\star},
-\mathcal{M}
+\operatorname{Im}(G_{\mathrm{orig}})
 \right)
 :=
-\inf_{\boldsymbol{y}'\in\mathcal{M}}
+\inf_{\boldsymbol{y}'\in\operatorname{Im}(G_{\mathrm{orig}})}
 \left\|
 \boldsymbol{y}^{\star}
 -
@@ -563,15 +613,15 @@ representation error
 \left\|
 \boldsymbol{y}^{\star}
 -
-G(\boldsymbol{z})
+G_{\mathrm{orig}}(\boldsymbol{z})
 \right\|_2.
 \label{eq:oracle_decoder_error}
 \end{equation}
 
 Thus, even with noiseless observations and exact global optimization, latent
 refinement cannot remove mismatch between
-$\boldsymbol{y}^{\star}$ and the decoder range. This structural error is
-represented by $\boldsymbol{r}^{\dagger}$ in
+$\boldsymbol{y}^{\star}$ and $\operatorname{Im}(G_{\mathrm{orig}})$. This
+structural error is represented by $\boldsymbol{r}^{\dagger}$ in
 Proposition~\ref{prop:conditional_local_recovery} and is distinct from the
 latent-prior mismatch
 $\|\boldsymbol{z}^{\dagger}-\boldsymbol{z}_0\|_2$.
@@ -589,16 +639,16 @@ centered.
 
 \begin{proposition}[Conditional local recovery interpretation]
 \label{prop:conditional_local_recovery}
-In this proposition and its proof, $G(\boldsymbol{z})$ denotes the
-reconstruction in the original target units. The residual
-$\|M_{\Omega}G(\boldsymbol{z})-\boldsymbol{b}\|_2^2$ is the right-hand side
-of Eq.~\eqref{eq:weighted_residual_identity}. Let
+Let
 $\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$ satisfy
 $\boldsymbol{b}
 =M_{\Omega}\boldsymbol{y}^{\star}+\boldsymbol{\eta}$, let
 $\boldsymbol{z}_0=h(\boldsymbol{u})$, $\lambda>0$, and let
 $\widehat{\boldsymbol{z}}$ be any global minimizer of
-Eq.~\eqref{eq:clp_csgm_objective}. For any reference code
+Eq.~\eqref{eq:clp_csgm_objective}. The residual
+$\|M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z})-\boldsymbol{b}\|_2^2$
+is the right-hand side of Eq.~\eqref{eq:weighted_residual_identity}.
+For any reference code
 $\boldsymbol{z}^{\dagger}\in\mathbb{R}^{k}$, define
 
 \begin{equation}
@@ -607,7 +657,7 @@ $\boldsymbol{z}^{\dagger}\in\mathbb{R}^{k}$, define
 &=
 \boldsymbol{y}^{\star}
 -
-G(\boldsymbol{z}^{\dagger}),
+G_{\mathrm{orig}}(\boldsymbol{z}^{\dagger}),
 &
 \boldsymbol{e}^{\dagger}
 &=
@@ -634,7 +684,7 @@ R^{\dagger}
 Let
 $\mathcal{M}_{R^{\dagger}}
 =
-G(B(\boldsymbol{z}_0,R^{\dagger}))$, where
+G_{\mathrm{orig}}(B(\boldsymbol{z}_0,R^{\dagger}))$, where
 $B(\boldsymbol{z}_0,R^{\dagger})
 =
 \left\{
@@ -642,7 +692,9 @@ $B(\boldsymbol{z}_0,R^{\dagger})
 \|\boldsymbol{z}-\boldsymbol{z}_0\|_2
 \leq R^{\dagger}
 \right\}$.
-If, for some $\gamma_R>0$ and $\delta_R\geq0$,
+The constants $\gamma_R>0$ and $\delta_R\geq0$ below refer to pairs of
+windows in this original-scale image. They are not constants of the
+standardized decoder $G$. If
 
 \begin{equation}
 \left\|
@@ -668,7 +720,7 @@ then
 
 \begin{equation}
 \left\|
-G(\widehat{\boldsymbol{z}})
+G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})
 -
 \boldsymbol{y}^{\star}
 \right\|_2

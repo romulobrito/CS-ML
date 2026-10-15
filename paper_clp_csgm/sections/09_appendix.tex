@@ -188,28 +188,28 @@ recovery interpretation summarized in the main text. The full proof is followed
 by the corresponding extension for a numerical optimizer.
 
 \begin{proof}[Proof of Proposition~\ref{prop:conditional_local_recovery}]
-As in the proposition, \(G(z)\) denotes the reconstruction in the original
-target units, and \(\|M_\Omega G(z)-b\|_2^2\) is the right-hand side of
-Eq.~\eqref{eq:weighted_residual_identity}.
+The residual \(\|M_\Omega G_{\mathrm{orig}}(z)-b\|_2^2\) is the right-hand
+side of Eq.~\eqref{eq:weighted_residual_identity}, so it is the data term
+of \(\mathcal{J}\).
 By global optimality of \(\hat z\),
 \[
   \mathcal{J}(\hat z)\le \mathcal{J}(z^\dagger).
 \]
-Since \(y^\star = G(z^\dagger)+r^\dagger\), we have
+Since \(y^\star = G_{\mathrm{orig}}(z^\dagger)+r^\dagger\), we have
 \[
   b
   =
   M_\Omega y^\star+\eta
   =
-  M_\Omega G(z^\dagger)+M_\Omega r^\dagger+\eta
+  M_\Omega G_{\mathrm{orig}}(z^\dagger)+M_\Omega r^\dagger+\eta
   =
-  M_\Omega G(z^\dagger)+e^\dagger.
+  M_\Omega G_{\mathrm{orig}}(z^\dagger)+e^\dagger.
 \]
 Therefore,
 \[
   \mathcal{J}(z^\dagger)
   =
-  \|M_\Omega G(z^\dagger)-b\|_2^2
+  \|M_\Omega G_{\mathrm{orig}}(z^\dagger)-b\|_2^2
   +
   \lambda\|z^\dagger-z_0\|_2^2
   =
@@ -243,46 +243,46 @@ so
 Thus both \(\hat z\) and \(z^\dagger\) belong to \(B(z_0,R^\dagger)\).
 
 The local S-REC on \(\mathcal{M}_{R^\dagger}\) therefore applies to
-\(G(\hat z)\) and \(G(z^\dagger)\), giving
+\(G_{\mathrm{orig}}(\hat z)\) and \(G_{\mathrm{orig}}(z^\dagger)\), giving
 \[
-  \gamma_R\|G(\hat z)-G(z^\dagger)\|_2-\delta_R
+  \gamma_R\|G_{\mathrm{orig}}(\hat z)-G_{\mathrm{orig}}(z^\dagger)\|_2-\delta_R
   \le
-  \|M_\Omega(G(\hat z)-G(z^\dagger))\|_2.
+  \|M_\Omega(G_{\mathrm{orig}}(\hat z)-G_{\mathrm{orig}}(z^\dagger))\|_2.
 \]
 By the triangle inequality,
 \[
-  \|M_\Omega(G(\hat z)-G(z^\dagger))\|_2
+  \|M_\Omega(G_{\mathrm{orig}}(\hat z)-G_{\mathrm{orig}}(z^\dagger))\|_2
   \le
-  \|M_\Omega G(\hat z)-b\|_2
+  \|M_\Omega G_{\mathrm{orig}}(\hat z)-b\|_2
   +
-  \|b-M_\Omega G(z^\dagger)\|_2.
+  \|b-M_\Omega G_{\mathrm{orig}}(z^\dagger)\|_2.
 \]
 The first term satisfies
 \[
-  \|M_\Omega G(\hat z)-b\|_2^2
+  \|M_\Omega G_{\mathrm{orig}}(\hat z)-b\|_2^2
   \le
   \mathcal{J}(\hat z)
   \le
   (\Delta^\dagger)^2,
 \]
-so \(\|M_\Omega G(\hat z)-b\|_2\le \Delta^\dagger\). The second term is
+so \(\|M_\Omega G_{\mathrm{orig}}(\hat z)-b\|_2\le \Delta^\dagger\). The second term is
 \(\|e^\dagger\|_2\). Hence
 \[
-  \|M_\Omega(G(\hat z)-G(z^\dagger))\|_2
+  \|M_\Omega(G_{\mathrm{orig}}(\hat z)-G_{\mathrm{orig}}(z^\dagger))\|_2
   \le
   \Delta^\dagger+\|e^\dagger\|_2.
 \]
 Combining the last two displays gives
 \[
-  \|G(\hat z)-G(z^\dagger)\|_2
+  \|G_{\mathrm{orig}}(\hat z)-G_{\mathrm{orig}}(z^\dagger)\|_2
   \le
   \frac{\Delta^\dagger+\|e^\dagger\|_2+\delta_R}{\gamma_R}.
 \]
-Finally, since \(y^\star=G(z^\dagger)+r^\dagger\), a triangle inequality yields
+Finally, since \(y^\star=G_{\mathrm{orig}}(z^\dagger)+r^\dagger\), a triangle inequality yields
 \[
-  \|G(\hat z)-y^\star\|_2
+  \|G_{\mathrm{orig}}(\hat z)-y^\star\|_2
   \le
-  \|G(\hat z)-G(z^\dagger)\|_2
+  \|G_{\mathrm{orig}}(\hat z)-G_{\mathrm{orig}}(z^\dagger)\|_2
   +
   \|r^\dagger\|_2
   \le
@@ -326,7 +326,7 @@ incoherence level and the logarithm of the number of pairs. For the continuous
 decoder range, the analogous requirement would need to hold uniformly over the
 normalized secants
 \[
-  \frac{G(z_1)-G(z_2)}{\|G(z_1)-G(z_2)\|_2},
+  \frac{G_{\mathrm{orig}}(z_1)-G_{\mathrm{orig}}(z_2)}{\|G_{\mathrm{orig}}(z_1)-G_{\mathrm{orig}}(z_2)\|_2},
   \qquad
   z_1,z_2\in B(z_0,R^\dagger).
 \]
@@ -344,7 +344,8 @@ of decoder-generated candidates under coordinate subsampling.
 
 Table~\ref{tab:srec_percentiles} and Fig.~\ref{fig:srec_percentiles} provide an
 empirical check of the separation property that is relevant for generative
-compressed sensing. For pairs of decoder-generated training windows, we compute
+compressed sensing. For pairs of decoder-generated training windows, each
+returned to the original target units, we compute
 \[
   r_{ij}
   =
@@ -355,7 +356,8 @@ Values close to one indicate that coordinate subsampling preserves pairwise
 distances after energy normalization. This diagnostic does not prove S-REC over
 the learned decoder range. It instead examines the corresponding practical
 question of whether sparse observations distinguish plausible generated
-windows. The median ratio
+windows. The ratios describe separation of \(G_{\mathrm{orig}}\) windows.
+They are not the constants \(\gamma_R\) and \(\delta_R\). The median ratio
 remains close to one in all tested cells. Lower percentiles are generally
 stronger in denser settings, despite some non-monotonic variation at intermediate
 \(\rho\) values. The weakest case is the sparsest cross-well setting, where only
@@ -369,7 +371,7 @@ expected at very low measurement ratios.
   \includegraphics[width=\linewidth]{srec_percentiles.png}
   \caption{Empirical S-REC-style separation diagnostics. The curves show lower
   percentiles and medians of the energy-normalized pairwise separation ratio on
-  decoder-generated windows. Higher lower-percentile values indicate stronger
+  decoder-generated windows returned to the original target units. Higher lower-percentile values indicate stronger
   separation of plausible generated candidates under coordinate subsampling.}
   \label{fig:srec_percentiles}
 \end{figure}
