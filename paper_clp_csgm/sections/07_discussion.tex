@@ -106,8 +106,7 @@ it scores only coordinates that were not supplied as measurements. The direct
 AE has the lower pooled mean RMSE. Laboratory coordinates still correct the
 decoded prediction of the conditional prior in every split, and that correction is enough where the test
 logs remain close to the blocks that fit $h(\boldsymbol{u})$. On the deepest
-block the logs move outside that support, the conditional code lies far from the
-target windows, and a few measurements improve on the decoded prediction without reaching
+block the logs move outside that support, the decoded prediction $G(\boldsymbol{z}_0)$ differs substantially from the target windows, and a few measurements improve on the decoded prediction without reaching
 the direct AE. The measurement term still lowers the error relative to the
 decoded prediction of the conditional prior in that block. The supplement therefore does not extend the F3
 low-support advantage to a mean win on this laboratory target. Each test fold

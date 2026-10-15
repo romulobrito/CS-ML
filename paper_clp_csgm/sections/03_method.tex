@@ -235,9 +235,10 @@ same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
     \caption{Geometry of the conditional latent code. Dense logs determine
     $\boldsymbol{z}_0=h(\boldsymbol{u})$. That code initializes the first
     trajectory and remains the center of the quadratic penalty. Test-time
-    refinement moves the code to $\widehat{\boldsymbol{z}}$ inside the decoder
-    range $\mathcal{M}$, balancing the measurement residual against deviation
-    from $\boldsymbol{z}_0$.}
+    refinement updates the latent code to $\widehat{\boldsymbol{z}}$, whose
+    decoded window $G(\widehat{\boldsymbol{z}})$ belongs to $\mathcal{M}$,
+    balancing the measurement residual against deviation from
+    $\boldsymbol{z}_0$.}
     \label{fig:conditional_prior_geometry}
 \end{figure}
 
