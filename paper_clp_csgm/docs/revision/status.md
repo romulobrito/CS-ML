@@ -266,15 +266,20 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 
 ### R1-m03
 
-- State: `pending` (deferred)
+- State: `text_done`
 - Reviewer request: Figure 2 is useful, but the text is dense; enlarge some
   labels for print.
-- Decision: leave the workflow figure unchanged for now. If revised later,
-  enlarge only the smaller labels (axis names, the note under the sparse
-  observations, and the \(M\) and \(\lambda\) lines), or move those notes
-  into the caption. Do not redraw the flow.
-- Files: none changed. Figure is `figures/pipeline_CLP-CSGM_v3.pdf`,
-  included from `sections/03_method.tex`.
+- Change made: the workflow drawing was replaced and included at full line
+  width. Compact notes are now larger panel and box labels. Offline training
+  and target-well inference are separate panels. The inference panel names
+  the latent anchor, \(M_{\Omega}\), and \(G_{\mathrm{orig}}\), and the
+  refinement box states the original-scale residual. The Figure 2 caption
+  wording is unchanged.
+- Checked: compiled page 12. Panel labels and the refinement equation are
+  readable. The boxes do not overlap.
+- Files: `sections/03_method.tex`; `figures/pipeline_CLP-CSGM_v4.png`.
+- Not done: `R3-06` (results organization and other figures). This entry
+  does not close `R3-P08`.
 
 ### R1-m04
 
@@ -543,9 +548,46 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Not done: a definition of the 30dB label, and an estimated latent
   covariance.
 
+### R3-A03
+
+- State: `text_done`
+- Reviewer request: redraw Figure 1 so the mappings from \(z_0\) to
+  \(G(z_0)\) and from the refined code to its reconstruction are
+  unambiguous, and explain the arrows and the decoder-range curve.
+- Change made: the figure shows two horizontal decoding arrows, from
+  \(z_0\) to \(G_{\mathrm{orig}}(z_0)\) and from \(\widehat{z}\) to
+  \(G_{\mathrm{orig}}(\widehat{z})\), both on the blue curve
+  \(\operatorname{Im}(G_{\mathrm{orig}})\). The vertical arrow is latent
+  refinement. The caption states that the drawing is schematic and is not
+  a measured numerical trajectory.
+- Checked: compiled page 10. Both codes meet the curve. Labels, including
+  \(M_{\Omega}\widehat{y}\) and the footer, are readable and do not overlap.
+- Files: `sections/03_method.tex`;
+  `figures/view_conditional_latent_prior_final.pdf`.
+- Shared reply: none. `R3-P14` uses the same figure and answers a different
+  question.
+- Not done: `R3-06`; `R3-P08`.
+
+### R3-P14
+
+- State: `text_done`
+- Reviewer request: the old Figure 1 was hard to read; a tilded code seemed
+  to decode to \(G(z_0)\); the lower blue line led nowhere; \(M=\operatorname{Im}(G)\)
+  confused the index operator with the decoder range.
+- Change made: the tilde is on the dense-log argument of \(h\). The lower
+  arrow ends at \(G_{\mathrm{orig}}(\widehat{z})\) on the blue curve.
+  \(M_{\Omega}\) selects coordinates. \(\operatorname{Im}(G_{\mathrm{orig}})\)
+  is that curve. The caption states that they are not the same object.
+- Checked: same page-10 inspection as `R3-A03`.
+- Files: `sections/03_method.tex`;
+  `figures/view_conditional_latent_prior_final.pdf`.
+- Shared reply: none. `R3-A03` explains the two mappings and the arrows.
+- Not done: `R3-06`; `R3-P08`.
+
 ## Queue (not yet processed)
 
 R3-05 .. R3-06,
 R3-A01 .. R3-A05, R3-P01 .. R3-P08, R3-P11 .. R3-P19, AE-01.
-R1-m03 and R1-m05 remain deferred.
+R1-m05 remains deferred. `R1-m03`, `R3-A03`, and `R3-P14` are text_done.
+`R3-06` and `R3-P08` remain pending.
 `R3-P09` and `R3-P10` are text_done. `R3-P16` remains pending.

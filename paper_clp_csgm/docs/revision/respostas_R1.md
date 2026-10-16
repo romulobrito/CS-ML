@@ -473,13 +473,23 @@ generative inverse problems and positioning (closing paragraph).
 
 ## R1-m03 -- Figure 2 readability
 
-**Status:** `pending`
+**Status:** `text_done`
 
-**Deferred.** No change to the figure in this pass. The workflow stays as drawn.
-If the figure is revised later, enlarge only the smaller labels: axis names,
-the note under the sparse observations, and the lines for \(M\) and
-\(\lambda\). Those notes can instead move into the caption, which already
-states them. Do not redraw the flow.
+**Proposed reply:**
+
+We thank the reviewer for noting that Figure 2 was useful but dense in print.
+The workflow figure has been redrawn and is included at the full line width.
+The compact notes of the previous schematic are now larger panel and box
+labels. Offline training and target-well inference are separate panels. The
+inference panel names the latent anchor, the coordinate selection
+\(M_{\Omega}\), and the original-scale decoder \(G_{\mathrm{orig}}\). The
+refinement box states the original-scale residual. The caption still
+summarizes the same workflow and was not rewritten. At page size the panel
+labels and the refinement equation remain readable, and the boxes do not
+overlap.
+
+Where the text was changed: Method, subsection Test-time reconstruction
+(Figure 2).
 
 ## R1-m04 -- AE as best comparator only in this benchmark
 

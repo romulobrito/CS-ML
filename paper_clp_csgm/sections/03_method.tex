@@ -294,18 +294,23 @@ same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]
-    {figures/view_conditional_latent_prior_corrected.pdf}
+    {figures/view_conditional_latent_prior_final.pdf}
     \caption{Geometry of the conditional latent code, in the original target
     units. Dense logs determine $\boldsymbol{z}_0=h(\boldsymbol{u})$. That
     code initializes the first trajectory and remains the center of the
-    quadratic penalty. Test-time refinement updates the latent code to
-    $\widehat{\boldsymbol{z}}$. The decoded window
-    $\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$
-    belongs to $\operatorname{Im}(G_{\mathrm{orig}})$. $M_{\Omega}$ selects
-    the observed coordinates. The measurement residual is the gap between
-    $M_{\Omega}\widehat{\boldsymbol{y}}$ and $\boldsymbol{b}$. Refinement
-    balances that residual against deviation from $\boldsymbol{z}_0$, and
-    the observations need not be met exactly.}
+    quadratic penalty. The vertical arrow is latent refinement from
+    $\boldsymbol{z}_0$ to $\widehat{\boldsymbol{z}}$. The drawing is
+    schematic and does not show a measured numerical trajectory. The two
+    horizontal arrows are decoding by $G_{\mathrm{orig}}$: one maps
+    $\boldsymbol{z}_0$ to $G_{\mathrm{orig}}(\boldsymbol{z}_0)$, and the
+    other maps $\widehat{\boldsymbol{z}}$ to
+    $\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$.
+    The blue curve illustrates $\operatorname{Im}(G_{\mathrm{orig}})$, the
+    set of decoder outputs in the original target units. $M_{\Omega}$
+    selects the observed coordinates and is not that set. The measurement
+    residual is the gap between $M_{\Omega}\widehat{\boldsymbol{y}}$ and
+    $\boldsymbol{b}$. Refinement balances that residual against deviation
+    from $\boldsymbol{z}_0$, and the observations need not be met exactly.}
     \label{fig:conditional_prior_geometry}
 \end{figure}
 

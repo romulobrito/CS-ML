@@ -146,7 +146,26 @@ Where the text was changed: Method, subsection Test-time reconstruction (the lat
 
 ## R3-A03 -- Redraw Figure 1
 
-**Status:** `pending`
+**Status:** `text_done`
+
+**Proposed reply:**
+
+We thank the reviewer for asking that the two decoder mappings and the range
+curve be unambiguous.
+
+Figure 1 draws both mappings. One horizontal arrow applies
+\(G_{\mathrm{orig}}\) to \(\boldsymbol{z}_0\) and ends at
+\(G_{\mathrm{orig}}(\boldsymbol{z}_0)\). The other applies
+\(G_{\mathrm{orig}}\) to the refined code and ends at
+\(\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})\).
+Both outputs lie on the blue curve. That curve is
+\(\operatorname{Im}(G_{\mathrm{orig}})\), the set of decoder outputs in the
+original target units. The vertical arrow is latent refinement from
+\(\boldsymbol{z}_0\) to \(\widehat{\boldsymbol{z}}\). The drawing is
+schematic and does not show a measured numerical trajectory.
+
+Where the text was changed: Method, subsection Learned model components
+(Figure 1).
 
 ## R3-A04 -- Probability density in Figure 3
 
@@ -233,7 +252,27 @@ Where the text was changed: Method, subsection Problem setup (the paragraph Stan
 
 ## R3-P14 -- Arrows and symbols in Figure 1
 
-**Status:** `pending`
+**Status:** `text_done`
+
+**Proposed reply:**
+
+We thank the reviewer for pointing out that the previous drawing was hard
+to follow.
+
+The tilde in the drawing belongs to the dense-log argument of \(h\). It is
+not a second latent code, and that argument is not what is decoded. The
+upper horizontal arrow decodes \(\boldsymbol{z}_0\) to
+\(G_{\mathrm{orig}}(\boldsymbol{z}_0)\). The lower horizontal arrow decodes
+\(\widehat{\boldsymbol{z}}\) and ends at
+\(\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})\) on
+the blue curve. \(M_{\Omega}\) and \(\operatorname{Im}(G_{\mathrm{orig}})\)
+are different objects. \(M_{\Omega}\) selects the observed coordinates.
+\(\operatorname{Im}(G_{\mathrm{orig}})\) is the blue curve, the set of
+decoder outputs in the original target units. The drawing no longer
+identifies them with one symbol.
+
+Where the text was changed: Method, subsection Learned model components
+(Figure 1).
 
 ## R3-P15 -- Confusing propositions
 
