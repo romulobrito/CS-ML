@@ -293,16 +293,19 @@ same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.66\linewidth]
-    {figures/view_conditional_latent_prior.png}
-    \caption{Geometry of the conditional latent code. Dense logs determine
-    $\boldsymbol{z}_0=h(\boldsymbol{u})$. That code initializes the first
-    trajectory and remains the center of the quadratic penalty. Test-time
-    refinement updates the latent code to $\widehat{\boldsymbol{z}}$, whose
-    decoded window $G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$ belongs to
-    $\operatorname{Im}(G_{\mathrm{orig}})$,
-    balancing the measurement residual against deviation from
-    $\boldsymbol{z}_0$.}
+    \includegraphics[width=\linewidth]
+    {figures/view_conditional_latent_prior_corrected.pdf}
+    \caption{Geometry of the conditional latent code, in the original target
+    units. Dense logs determine $\boldsymbol{z}_0=h(\boldsymbol{u})$. That
+    code initializes the first trajectory and remains the center of the
+    quadratic penalty. Test-time refinement updates the latent code to
+    $\widehat{\boldsymbol{z}}$. The decoded window
+    $\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$
+    belongs to $\operatorname{Im}(G_{\mathrm{orig}})$. $M_{\Omega}$ selects
+    the observed coordinates. The measurement residual is the gap between
+    $M_{\Omega}\widehat{\boldsymbol{y}}$ and $\boldsymbol{b}$. Refinement
+    balances that residual against deviation from $\boldsymbol{z}_0$, and
+    the observations need not be met exactly.}
     \label{fig:conditional_prior_geometry}
 \end{figure}
 
@@ -405,8 +408,8 @@ solution, not a certified global minimizer.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.86\linewidth]
-    {figures/pipeline_CLP-CSGM_v3.pdf}
+    \includegraphics[width=\linewidth]
+    {figures/pipeline_CLP-CSGM_v4.png}
     \caption{CLP-CSGM workflow. Offline, standardized target windows train the
     autoencoder $(E,G)$, and paired dense-log windows fit the latent-prior
     predictor $h$. At inference, $\boldsymbol{u}_{\ast}$ determines
