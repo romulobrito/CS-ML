@@ -78,36 +78,59 @@ $16$, $\rho=0.20$, and at step $32$ for every $\rho$.
 
 Figure~\ref{fig:crosswell_rmse_vs_noise} uses the same windows and changes
 only the noise. Each panel is one step and each curve is one measurement
-fraction, so the nine cells are not averaged together. At noise $0.01$,
-interpolation has the lower error in all nine configurations. At noise
-$0.05$, CLP-CSGM Ridge has the lower mean RMSE at steps $16$ and $32$ and
-at step $8$ for $\rho=0.20$. At step $8$ for $\rho=0.05$ and $\rho=0.10$,
-interpolation keeps the lower mean. At $0.10$ and $0.20$, CLP-CSGM Ridge
-has the lower error in all nine configurations. The held-out $V_c$ curve
-has standard deviation $0.035$, on the same scale as this noise. Relative
-to that deviation, $0.05$ is about $1.43$ times larger, and $0.10$ and
-$0.20$ are about $2.86$ and $5.71$ times larger. These noise levels were
-used for sensitivity analysis and were not calibrated to field measurement
-uncertainties. The decoder and the
-dense-log map are fit once per step and seed. The penalty weight is then
-selected on validation for each measurement fraction and each noise level,
-so the curves are not a fixed-penalty reconstruction. The sensitivity sweep
-uses a different, wider grid. The weight selected
-at $0.01$ and at $0.05$ also belongs to the published grid. That membership
-does not mean the two searches were the same. At noise $0.20$,
-some cells select $100$, the largest candidate in the sweep grid. That
-choice is the best value among the candidates that were tried, not an
-optimum outside the grid. The points at
-noise $0.01$ belong to this same refit: their ordering matches the
-published grid, and the cell means can differ slightly from that grid.
-The interpolation error grows with the noise because the interpolated curve
-follows the measurements. The CLP-CSGM error moves less and stays near the
-window predicted from the dense logs alone. At step $8$ for $\rho=0.05$ and
+fraction, so the nine cells are not averaged together. The comparison is
+depth interpolation against CLP-CSGM Ridge. The noise value is the standard
+deviation of the added Gaussian, in the units of the $V_c$ curve. The
+held-out curve has standard deviation $0.035$ on that same scale.
+
+At noise $0.01$, about $0.29$ times that deviation, interpolation has the
+lower error in all nine configurations. The margin is large at step $8$
+and $\rho=0.05$: the mean RMSE is $0.0178$ for interpolation and $0.0456$
+for CLP-CSGM Ridge. The closest cell is step $16$ and $\rho=0.20$, with
+means $0.0112$ and $0.0159$. At this level the measurements remain a
+slightly perturbed copy
+of the same smooth curve, so connecting them along depth is enough.
+
+At noise $0.05$, about $1.43$ times the held-out deviation, CLP-CSGM Ridge
+has the lower mean RMSE at steps $16$ and $32$ and at step $8$ for
+$\rho=0.20$. At step $8$ for $\rho=0.05$ and $\rho=0.10$, interpolation
+keeps the lower mean. At $0.10$ and $0.20$, about $2.86$ and $5.71$ times
+that deviation, CLP-CSGM Ridge has the lower error in all nine
+configurations and in all three seeds. Across those nine cells,
+interpolation means lie between $0.0820$ and $0.0864$ at noise $0.10$ and
+between $0.1625$ and $0.1706$ at noise $0.20$, while CLP-CSGM Ridge remains
+between $0.0381$ and $0.0557$. These noise levels were used for sensitivity
+analysis and were not calibrated to field measurement uncertainties.
+
+The interpolation error grows because the interpolated curve follows the
+measurements. Once the noise reaches the scale of the curve, that
+dependence raises the full-window error. CLP-CSGM Ridge moves less and
+stays near the window predicted from the dense logs alone, which is why it
+has the lower error at $0.10$ and $0.20$. At step $8$ for $\rho=0.05$ and
 $\rho=0.10$, that starting window already has higher error than the
 interpolation at noise $0.05$, and the CLP-CSGM mean stays between the two.
-The decoder can still represent the curve. That pattern does not isolate
-the dense-log window as the only cause. These runs are not merged into the
-submitted tables.
+The decoder can still represent the curve, so that pattern does not isolate
+the dense-log window as the only cause. The evidence for this ordering is
+the refit in Table~\ref{tab:crosswell_noise_sweep}. AE
+$[\boldsymbol{u},\boldsymbol{b}]$, ordinary least squares, and direct ridge
+were not rerun across the sweep, so the result is the comparison with
+depth interpolation.
+
+The decoder and the dense-log map are fit once per step and seed. The
+penalty weight is then selected on validation for each measurement fraction
+and each noise level, so the curves are not a fixed-penalty reconstruction.
+The sensitivity sweep uses a different, wider grid. It omits the
+factor-of-three candidates of the published grid and adds $1$, $10$, and
+$100$. The weight selected at $0.01$ and at $0.05$ also belongs to the
+published grid. That membership does not mean the two searches were the
+same. At noise $0.20$, some cells select $100$, the largest candidate in
+the sweep grid. That choice is the best value among the candidates that
+were tried, not an optimum outside the grid. The points at noise $0.01$
+belong to this same refit. The ordering between interpolation and CLP-CSGM
+Ridge matches the published comparison at that noise, while a cell mean can
+differ slightly from the published CLP-CSGM value. At step $16$ and
+$\rho=0.20$, the published mean is $0.01771$ and the refit mean is
+$0.0159$. These runs are not merged into the submitted tables.
 
 \begin{figure}[!htbp]
     \centering

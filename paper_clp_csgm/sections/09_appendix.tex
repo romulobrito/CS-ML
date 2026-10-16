@@ -166,8 +166,10 @@ Assume that $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$ is continuous and
 $\lambda>0$. For fixed $M_{\Omega}$, $D_{\Omega}$,
 $\widetilde{\boldsymbol{b}}\in\mathbb{R}^{m}$, and
 $\boldsymbol{z}_0\in\mathbb{R}^{k}$, the objective
-$\mathcal{J}(\boldsymbol{z})
-=
+\begin{equation*}
+\begin{aligned}
+\mathcal{J}(\boldsymbol{z})
+&=
 \left\|
 D_{\Omega}
 \left(
@@ -176,8 +178,12 @@ M_{\Omega}G(\boldsymbol{z})
 \widetilde{\boldsymbol{b}}
 \right)
 \right\|_2^2
+\\
+&\quad
 +
-\lambda\|\boldsymbol{z}-\boldsymbol{z}_0\|_2^2$
+\lambda\|\boldsymbol{z}-\boldsymbol{z}_0\|_2^2
+\end{aligned}
+\end{equation*}
 is continuous and coercive. Consequently,
 
 \begin{equation}

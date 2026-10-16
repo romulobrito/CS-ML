@@ -595,7 +595,10 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   conditional local-recovery proposition stays in the body. Its S-REC limit
   is unchanged. No new theorem and no new experiment.
 - Checked: compiled pages 12--15 and appendix pages 45 and 47. No undefined
-  or duplicate labels. Equations are displayed and are not cut. Proposition
+  or duplicate labels. The existence statement on page 47 first set
+  \(\mathcal{J}(z)\) in the text line, and that line crossed the right
+  margin. The definition is now displayed on two lines and stays inside
+  the margin. Proposition
   numbers follow source order: conditional local recovery is first, then
   MAP, then existence.
 - Files: `sections/03_method.tex`; `sections/09_appendix.tex`.
@@ -620,7 +623,8 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 ## Queue (not yet processed)
 
 R3-06,
-R3-A01 .. R3-A05, R3-P01 .. R3-P08, R3-P11 .. R3-P19, AE-01.
+R3-A01, R3-A02, R3-A04, R3-A05,
+R3-P01 .. R3-P08, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
 R1-m05 remains deferred. `R1-m03`, `R3-A03`, and `R3-P14` are text_done.
 `R3-05` and `R3-P15` are text_done. `R3-06` and `R3-P08` remain pending.
 `R3-P09` and `R3-P10` are text_done. `R3-P16` remains pending.
