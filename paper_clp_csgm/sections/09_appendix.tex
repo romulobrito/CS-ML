@@ -1,14 +1,81 @@
 \section{Supplementary Theoretical Details}
 \label{app:theory}
 
-This section collects the proofs omitted from the main text, including the
-detailed conditional local-recovery argument. That argument separates four
+This section states the MAP/Tikhonov and existence results together with
+their proofs, and it gives the conditional local-recovery argument omitted
+from the main text. That argument separates four
 contributions to the error: how far the true window is from anything the
 decoder can produce, how far $\boldsymbol{z}_0$ is from a good code,
 measurement noise, and whether the measurements can tell nearby windows apart.
 
 \subsection{MAP and Tikhonov interpretation}
 \label{app:map_proof}
+
+\begin{proposition}[MAP and Tikhonov interpretation]
+\label{prop:map}
+Assume
+$p(\boldsymbol{b}\mid\boldsymbol{z},\boldsymbol{u})
+=p(\boldsymbol{b}\mid\boldsymbol{z})$ and
+
+$\boldsymbol{b}\mid\boldsymbol{z}
+\sim
+\mathcal{N}
+\left(
+M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z}),
+\sigma_{\eta}^{2}I_m
+\right)$,
+while
+$\boldsymbol{z}\mid\boldsymbol{u}
+\sim
+\mathcal{N}
+\left(
+\boldsymbol{z}_0,
+\sigma_z^{2}I_k
+\right)$,
+where
+$\boldsymbol{z}_0=h(\boldsymbol{u})$,
+$\sigma_{\eta}>0$, and $\sigma_z>0$.
+Then every MAP estimator satisfies
+
+\begin{equation}
+\widehat{\boldsymbol{z}}_{\mathrm{MAP}}
+\in
+\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\left\{
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2
++
+\lambda
+\left\|
+\boldsymbol{z}
+-
+\boldsymbol{z}_0
+\right\|_2^2
+\right\},
+\qquad
+\lambda
+=
+\frac{\sigma_{\eta}^{2}}{\sigma_z^{2}}.
+\label{eq:map_tikhonov_objective}
+\end{equation}
+
+By Eq.~\eqref{eq:weighted_residual_identity}, this data term is the
+original-scale residual. The ratio
+$\sigma_{\eta}^{2}/\sigma_{z}^{2}$ is the MAP weight on the latent penalty
+in that objective. The data term keeps coefficient one. The ratio is not
+the weight of the unweighted standardized residual, because the diagonal
+entries of $D_y$ vary by coordinate. Thus, CLP-CSGM is a
+Tikhonov-regularized latent inverse problem. Its center is
+the log-conditioned anchor, not the origin
+\citep{tikhonov1963solution,burger2014map}. The likelihood induces the
+data-fidelity term, while the conditional prior induces the latent penalty.
+\end{proposition}
 
 \begin{proof}[Proof of Proposition~\ref{prop:map}]
 The MAP estimate is obtained by maximizing the posterior density
@@ -92,6 +159,35 @@ log-conditioned latent anchor \(z_0(u)\), not at the origin.
 
 \subsection{Existence of a minimizer}
 \label{app:existence_proof}
+
+\begin{proposition}[Existence of a minimizer]
+\label{prop:existence}
+Assume that $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$ is continuous and
+$\lambda>0$. For fixed $M_{\Omega}$, $D_{\Omega}$,
+$\widetilde{\boldsymbol{b}}\in\mathbb{R}^{m}$, and
+$\boldsymbol{z}_0\in\mathbb{R}^{k}$, the objective
+$\mathcal{J}(\boldsymbol{z})
+=
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2
++
+\lambda\|\boldsymbol{z}-\boldsymbol{z}_0\|_2^2$
+is continuous and coercive. Consequently,
+
+\begin{equation}
+\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\mathcal{J}(\boldsymbol{z})
+\neq
+\varnothing.
+\label{eq:existence_argmin}
+\end{equation}
+\end{proposition}
 
 \begin{proof}[Proof of Proposition~\ref{prop:existence}]
 Since \(G\) is continuous, \(M_\Omega\) is linear, and \(D_\Omega\) does not

@@ -130,7 +130,42 @@ Where the text was changed: Method, subsection Test-time reconstruction (the lat
 
 ## R3-05 -- Role of the theory section
 
-**Status:** `pending`
+**Status:** `text_done`
+
+**Proposed reply:**
+
+We thank the reviewer for noting that the MAP/Tikhonov reading and the
+existence of a minimizer are standard arguments, and for asking how they
+bear on the application.
+
+Both results are classical. They are not presented as new theoretical
+contributions. Under the stated Gaussian hypotheses, the MAP reading gives
+the data term coefficient one and sets
+\(\lambda=\sigma_{\eta}^{2}/\sigma_{z}^{2}\) as the multiplier of a
+quadratic penalty centered at \(\boldsymbol{z}_0\). The experiments still
+select \(\lambda\) by validation and do not estimate that ratio. The
+reading explains the form of the penalty. It does not demonstrate
+empirical superiority. The existence result says that a continuous decoder
+and \(\lambda>0\) make the objective continuous and coercive, so a
+minimizer exists. It does not give uniqueness, convexity, or convergence
+of Adam to a global minimizer, and it does not extend automatically to
+\(\lambda=0\). Lowering the objective does not by itself lower the error
+against the unknown target. The comparison between the numerical solution
+and \(\boldsymbol{z}_0\) uses the objective values that were obtained. The
+formal statements now stand with their proofs in the appendix. The body
+states what each result is for and what it does not guarantee. The
+conditional local-recovery proposition remains in the body. It organizes
+representation error, observed discrepancy, deviation from
+\(\boldsymbol{z}_0\), and local separability. It remains conditional: it
+does not prove that the coordinate mask satisfies S-REC on the trained
+decoder, and the empirical diagnostics do not certify that condition for
+every pair of windows. No new theoretical guarantee and no new experiment
+were added. This comment overlaps R3-P15, which concerns the order of the
+propositions. That request is answered in its own reply.
+
+Where the text was changed: Method, subsection Interpretation and
+theoretical context; Appendix MAP and Tikhonov interpretation; Appendix
+Existence of a minimizer.
 
 ## R3-06 -- Main result and figure readability
 
@@ -276,7 +311,36 @@ Where the text was changed: Method, subsection Learned model components
 
 ## R3-P15 -- Confusing propositions
 
-**Status:** `pending`
+**Status:** `text_done`
+
+**Proposed reply:**
+
+We thank the reviewer for saying that the list of propositions was
+confusing.
+
+The subsection now opens with the three questions the theory is meant to
+answer: how to read the two terms of the objective, when a minimizer
+exists, and which factors condition recovery of the full window. The
+MAP/Tikhonov and existence arguments are identified there as classical
+interpretations, not as new theorems. Their formal statements were moved
+to the appendix, each immediately before its proof. In the body, one
+paragraph states the MAP reading and its limits, and another states what
+existence does and does not give, including the distinction between a
+global minimizer and the numerical solution. Before the conditional
+local-recovery proposition, the text names the four factors in the bound:
+representation error, noise and observed discrepancy, deviation from the
+conditioned code, and local separability. That proposition remains in the
+body, with its hypotheses. The paragraph after it states that the result
+is conditional, that it does not prove S-REC on the trained decoder, that
+the diagnostics do not certify the condition for every pair of windows,
+and that the global-minimizer statement is separate from the
+inexact-optimizer extension. No new guarantee and no new experiment were
+added. This comment overlaps R3-05, which asks how the classical arguments
+help the application. That request is answered in its own reply.
+
+Where the text was changed: Method, subsection Interpretation and
+theoretical context; Appendix MAP and Tikhonov interpretation; Appendix
+Existence of a minimizer.
 
 ## R3-P16 -- Meaning of 30 dB
 

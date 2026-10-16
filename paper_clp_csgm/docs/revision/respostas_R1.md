@@ -208,7 +208,8 @@ were added, and the main tables were not switched to MLP.
 
 **Proposed reply:**
 
-We thank the reviewer for stressing that Proposition 3 is conditional and
+We thank the reviewer for stressing that the conditional local-recovery
+proposition is conditional and
 does not prove S-REC for the trained decoder. That distinction was already
 stated in the Method section and in Interpretation, scope, and limitations,
 and the appendix diagnostics already say that they do not prove S-REC. The

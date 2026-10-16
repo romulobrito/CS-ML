@@ -584,10 +584,43 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Shared reply: none. `R3-A03` explains the two mappings and the arrows.
 - Not done: `R3-06`; `R3-P08`.
 
+### R3-05
+
+- State: `text_done`
+- Reviewer request: MAP/Tikhonov and existence are standard arguments; say
+  how they help interpret the application.
+- Change made: the body states three questions, then explains the MAP
+  reading and the existence result, including what each does not guarantee.
+  The formal statements moved to the appendix, each before its proof. The
+  conditional local-recovery proposition stays in the body. Its S-REC limit
+  is unchanged. No new theorem and no new experiment.
+- Checked: compiled pages 12--15 and appendix pages 45 and 47. No undefined
+  or duplicate labels. Equations are displayed and are not cut. Proposition
+  numbers follow source order: conditional local recovery is first, then
+  MAP, then existence.
+- Files: `sections/03_method.tex`; `sections/09_appendix.tex`.
+- Shared reply: none. `R3-P15` uses the same reorganization and answers the
+  order of the propositions. `R1-M07` stays text_done; its caveat is
+  preserved, and its reply now names the proposition rather than the old
+  number.
+- Not done: `R3-06`; `R3-P08`.
+
+### R3-P15
+
+- State: `text_done`
+- Reviewer request: the list of propositions was confusing.
+- Change made: section 3.4 opens with the purpose of each result. Classical
+  statements are in the appendix. Four factors are named before the
+  conditional local-recovery proposition, and the limits follow it.
+- Checked: same pages as `R3-05`.
+- Files: `sections/03_method.tex`; `sections/09_appendix.tex`.
+- Shared reply: none. `R3-05` answers the role of the classical arguments.
+- Not done: `R3-06`; `R3-P08`.
+
 ## Queue (not yet processed)
 
-R3-05 .. R3-06,
+R3-06,
 R3-A01 .. R3-A05, R3-P01 .. R3-P08, R3-P11 .. R3-P19, AE-01.
 R1-m05 remains deferred. `R1-m03`, `R3-A03`, and `R3-P14` are text_done.
-`R3-06` and `R3-P08` remain pending.
+`R3-05` and `R3-P15` are text_done. `R3-06` and `R3-P08` remain pending.
 `R3-P09` and `R3-P10` are text_done. `R3-P16` remains pending.

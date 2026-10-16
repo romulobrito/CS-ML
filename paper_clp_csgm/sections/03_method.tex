@@ -150,8 +150,14 @@ $\boldsymbol{r}=M_{\Omega}G(\boldsymbol{z})-\widetilde{\boldsymbol{b}}$,
 
 The right-hand side is the data term of
 Eq.~\eqref{eq:clp_csgm_objective} divided by $\sigma_{\eta}^{2}$.
-Proposition~\ref{prop:map} places the MAP weight
-$\sigma_{\eta}^{2}/\sigma_{z}^{2}$ on that original-scale term. The factor
+By Eq.~\eqref{eq:weighted_residual_identity}, that data term equals
+$\|M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z})-\boldsymbol{b}\|_2^2$.
+Proposition~\ref{prop:map} reads
+$\|M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z})-\boldsymbol{b}\|_2^2
++\lambda\|\boldsymbol{z}-\boldsymbol{z}_0\|_2^2$
+as a MAP objective in which the data term has coefficient one and
+$\lambda=\sigma_{\eta}^{2}/\sigma_{z}^{2}$ multiplies the latent penalty.
+The factor
 $\sigma_z^{2}I_k$ in that proposition is the isotropic hypothesis behind
 the Euclidean latent penalty. It is not an estimated covariance of the
 residuals of $h$. Ridge standardizes the latent codes while fitting $h$
@@ -451,7 +457,8 @@ M_{\Omega}G(\boldsymbol{z})
 \end{equation}
 
 The latent-prior-only variant returns the decoded prediction of the
-conditional prior, $G(\boldsymbol{z}_0)$, with no latent search. In that
+conditional prior, $G_{\mathrm{orig}}(\boldsymbol{z}_0)$, with no latent
+search. In that
 variant $\boldsymbol{z}_0$ is not an initialization, because no trajectory is
 optimized. The
 measurement-only variant uses only the sparse measurements and recovers
@@ -463,73 +470,26 @@ are reported in Section~\ref{subsec:ablation_analysis}.
 \subsection{Interpretation and theoretical context}
 \label{subsec:interpretation_scope}
 
-The theoretical results required to interpret CLP-CSGM are stated below.
+The results below answer three questions about the method. How should the
+two terms of the objective be interpreted? Under what conditions does the
+problem have a minimizer? Which factors condition recovery of the full
+window from the sparse observations? The MAP/Tikhonov reading and the
+existence argument are classical. They are used to interpret the
+formulation and are not presented as new theoretical contributions.
 Complete proofs appear in Appendix~\ref{app:theory}.
 
-\begin{proposition}[MAP and Tikhonov interpretation]
-\label{prop:map}
-Assume
-$p(\boldsymbol{b}\mid\boldsymbol{z},\boldsymbol{u})
-=p(\boldsymbol{b}\mid\boldsymbol{z})$ and
-
-$\boldsymbol{b}\mid\boldsymbol{z}
-\sim
-\mathcal{N}
-\left(
-M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z}),
-\sigma_{\eta}^{2}I_m
-\right)$,
-while
-$\boldsymbol{z}\mid\boldsymbol{u}
-\sim
-\mathcal{N}
-\left(
-\boldsymbol{z}_0,
-\sigma_z^{2}I_k
-\right)$,
-where
-$\boldsymbol{z}_0=h(\boldsymbol{u})$,
-$\sigma_{\eta}>0$, and $\sigma_z>0$.
-Then every MAP estimator satisfies
-
-\begin{equation}
-\widehat{\boldsymbol{z}}_{\mathrm{MAP}}
-\in
-\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
-\left\{
-\left\|
-D_{\Omega}
-\left(
-M_{\Omega}G(\boldsymbol{z})
--
-\widetilde{\boldsymbol{b}}
-\right)
-\right\|_2^2
-+
-\lambda
-\left\|
-\boldsymbol{z}
--
-\boldsymbol{z}_0
-\right\|_2^2
-\right\},
-\qquad
-\lambda
-=
-\frac{\sigma_{\eta}^{2}}{\sigma_z^{2}}.
-\label{eq:map_tikhonov_objective}
-\end{equation}
-
-By Eq.~\eqref{eq:weighted_residual_identity}, this data term is the
-original-scale residual. The ratio
-$\sigma_{\eta}^{2}/\sigma_{z}^{2}$ is the MAP weight on that scale. It is
-not the weight of the unweighted standardized residual, because the diagonal
-entries of $D_y$ vary by coordinate. Thus, CLP-CSGM is a
-Tikhonov-regularized latent inverse problem. Its center is
-the log-conditioned anchor, not the origin
-\citep{tikhonov1963solution,burger2014map}. The likelihood induces the
-data-fidelity term, while the conditional prior induces the latent penalty.
-\end{proposition}
+Under the Gaussian hypotheses in Proposition~\ref{prop:map}, the objective
+admits a MAP interpretation. The quadratic penalty is centered at the
+conditioned code $\boldsymbol{z}_0=h(\boldsymbol{u})$, not at the origin
+\citep{tikhonov1963solution,burger2014map}. In that reading the data term
+has coefficient one, and
+$\lambda=\sigma_{\eta}^{2}/\sigma_{z}^{2}$ multiplies the latent penalty.
+The data term is the original-scale residual, which
+Eq.~\eqref{eq:weighted_residual_identity} identifies with the standardized
+residual weighted by $D_{\Omega}$. The reported experiments do not estimate
+this variance ratio. Validation selects $\lambda$, as stated in
+Section~\ref{subsec:test_time_reconstruction}. The MAP reading explains the
+form of the penalty. It does not demonstrate empirical superiority.
 
 \begin{remark}[Relation to classical CSGM]
 \label{rem:csgm_relation}
@@ -537,41 +497,17 @@ Setting $\lambda=0$ recovers the measurement-only CSGM problem in
 Eq.~\eqref{eq:measurement_only_ablation}
 \citep{bora2017compressed}. Increasing $\lambda$ shifts the reconstruction
 toward the decoded prediction of the conditional prior,
-$G(\boldsymbol{z}_0)$, by penalizing departures
-from $\boldsymbol{z}_0=h(\boldsymbol{u})$ more strongly.
+$G_{\mathrm{orig}}(\boldsymbol{z}_0)$, by penalizing departures
+from $\boldsymbol{z}_0=h(\boldsymbol{u})$ more strongly. That shift is not
+a claim that a larger $\lambda$ improves the reconstruction.
 \end{remark}
 
-
-\begin{proposition}[Existence of a minimizer]
-\label{prop:existence}
-Assume that $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$ is continuous and
-$\lambda>0$. For fixed $M_{\Omega}$, $D_{\Omega}$,
-$\widetilde{\boldsymbol{b}}\in\mathbb{R}^{m}$, and
-$\boldsymbol{z}_0\in\mathbb{R}^{k}$, the objective
-$\mathcal{J}(\boldsymbol{z})
-=
-\left\|
-D_{\Omega}
-\left(
-M_{\Omega}G(\boldsymbol{z})
--
-\widetilde{\boldsymbol{b}}
-\right)
-\right\|_2^2
-+
-\lambda\|\boldsymbol{z}-\boldsymbol{z}_0\|_2^2$
-is continuous and coercive. Consequently,
-
-\begin{equation}
-\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
-\mathcal{J}(\boldsymbol{z})
-\neq
-\varnothing.
-\label{eq:existence_argmin}
-\end{equation}
-\end{proposition}
-
-For any global minimizer $\widehat{\boldsymbol{z}}$,
+Proposition~\ref{prop:existence} is a classical existence result. If the
+decoder is continuous and $\lambda>0$, the objective is continuous and
+coercive, so it attains a minimum. The result does not give uniqueness,
+convexity, or convergence of Adam to a global minimizer. It is stated for
+$\lambda>0$ and does not extend automatically to the measurement-only case
+$\lambda=0$. For any global minimizer $\widehat{\boldsymbol{z}}$,
 $\mathcal{J}(\widehat{\boldsymbol{z}})
 \leq
 \mathcal{J}(\boldsymbol{z}_0)
@@ -584,13 +520,16 @@ M_{\Omega}G(\boldsymbol{z}_0)
 \widetilde{\boldsymbol{b}}
 \right)
 \right\|_2^2$.
-Exact minimization therefore cannot worsen the optimized objective relative to
-the latent-prior-only candidate, although it does not guarantee lower error with
-respect to the unknown target. For
+Exact minimization therefore cannot worsen the optimized objective relative
+to the latent-prior-only candidate. It does not guarantee lower error with
+respect to the unknown target. For the numerical solution
 $\widehat{\boldsymbol{z}}_{\mathrm{num}}$, this comparison holds only when
+the computed values satisfy
 $\mathcal{J}(\widehat{\boldsymbol{z}}_{\mathrm{num}})
 \leq
 \mathcal{J}(\boldsymbol{z}_0)$.
+$\widehat{\boldsymbol{z}}_{\mathrm{num}}$ remains a numerical solution, not
+a certified global minimizer.
 
 
 \begin{remark}[Representation error and decoder mismatch]
@@ -644,6 +583,17 @@ conditional code $\boldsymbol{z}_0$ determines where the latent penalty is
 centered.
 \end{remark}
 
+Four factors enter the bound in
+Proposition~\ref{prop:conditional_local_recovery}. Representation error is
+the difference between the true window and a window the decoder can
+represent. Noise and observed discrepancy combine the measurement
+perturbations with the part of that representation error present at the
+observed coordinates. Deviation from the conditioned code is the distance
+between a reference code $\boldsymbol{z}^{\dagger}$ and the penalty center
+$\boldsymbol{z}_0$. Local separability is the ability of the observed
+coordinates to distinguish different windows produced by the decoder in
+the region under consideration. The statement below assigns symbols to
+these factors. It does not add further definitions.
 
 \begin{proposition}[Conditional local recovery interpretation]
 \label{prop:conditional_local_recovery}
@@ -748,13 +698,20 @@ G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})
 \end{equation}
 \end{proposition}
 
-Proposition~\ref{prop:conditional_local_recovery} is a sufficient conditional
-interpretation, not a verified guarantee for the trained decoder. The latent
-penalty localizes the S-REC condition around $\boldsymbol{z}_0$, while the bound
-separates representation error, measurement residual/noise, prior mismatch, and
-local separability, following the decoder-range view of generative compressed
-sensing \citep{candes2006stable,bora2017compressed}. Coordinate restriction is
-not proved to satisfy S-REC on the trained range; this depends on local decoder
-secants. The proof, inexact-optimizer extension, and empirical separability
-diagnostics appear in Appendix~\ref{app:conditional_local_recovery} and
-Appendix~\ref{app:separability}.
+Proposition~\ref{prop:conditional_local_recovery} organizes factors that
+can contribute to the reconstruction error. It is a sufficient conditional
+interpretation, not a verified guarantee for the trained decoder. The
+latent penalty localizes the S-REC condition around $\boldsymbol{z}_0$,
+and the bound follows the decoder-range view of generative compressed
+sensing \citep{candes2006stable,bora2017compressed}. The bound depends on
+the local separability condition stated above. Coordinate restriction is
+not proved to satisfy S-REC on the trained decoder range; this depends on
+local decoder secants. The empirical separability diagnostics in
+Appendix~\ref{app:separability} do not certify that condition for every
+pair of windows. The statement above is for a global minimizer. The
+extension to an inexact numerical optimizer is a separate argument in
+Appendix~\ref{app:conditional_local_recovery}. The result does not
+demonstrate superiority over interpolation, linear regression, or the
+other comparators. Increasing $\lambda$ does not necessarily tighten the
+bound or improve the reconstruction, because an unsuitable center
+$\boldsymbol{z}_0$ can also introduce bias.
