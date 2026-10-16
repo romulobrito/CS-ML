@@ -9,11 +9,12 @@ scale changes. The decoder and the dense-log starting map are fit once per
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Sequence, Tuple
 
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -36,6 +37,7 @@ from csgm_m2_module import (
 from scripts.run_r3m03_simple_baselines import (
     CHANNELS,
     EXPECTED_COUNTS,
+    SMOOTH_ALPHAS,
     TEST_PATH,
     TRAIN_PATH,
     VAL_FRAC,
@@ -43,6 +45,7 @@ from scripts.run_r3m03_simple_baselines import (
     _interpolate,
     _mean_window_rmse,
     _omega_positions,
+    _select_smooth_alpha,
 )
 from sir_cs_pipeline import build_measurement_matrix
 from sir_cs_pipeline_optimized import Config
@@ -372,5 +375,262 @@ def main() -> None:
     print("wrote", detail_path)
 
 
+SPARSE_METHOD_NAMES = ("interp", "smooth")
+SPARSE_OUT_DIR = ROOT_DIR / "outputs" / "reviewer_revision" / "r3m03_sparse_methods"
+SAVED_SWEEP = OUT_DIR / "tables" / "detail_by_seed.csv"
+INTERP_MATCH_ATOL = 1.0e-8
+
+
+def _parse_methods(argv: Sequence[str]) -> Tuple[List[str], str]:
+    """Read a comma-separated method list. CLP is not recomputed here."""
+    parser = argparse.ArgumentParser(
+        description="Sparse comparators on the saved noise-sweep stream."
+    )
+    parser.add_argument(
+        "--methods",
+        required=True,
+        help="Comma-separated subset of: interp, smooth.",
+    )
+    parser.add_argument(
+        "--tag",
+        default="",
+        help="Output folder name. Default is the method list.",
+    )
+    args = parser.parse_args(list(argv))
+    names = [item.strip() for item in str(args.methods).split(",") if item.strip()]
+    if not names:
+        raise ValueError("Pass at least one method.")
+    unknown = [item for item in names if item not in SPARSE_METHOD_NAMES]
+    if unknown:
+        raise ValueError("Unknown methods: " + ",".join(unknown))
+    ordered: List[str] = []
+    for name in SPARSE_METHOD_NAMES:
+        if name in names and name not in ordered:
+            ordered.append(name)
+    tag = str(args.tag).strip() or "_".join(ordered)
+    return ordered, tag
+
+
+def _load_saved_sweep() -> pd.DataFrame:
+    """CLP and interpolation scores from the sweep that was already run."""
+    if not SAVED_SWEEP.is_file():
+        raise FileNotFoundError(str(SAVED_SWEEP))
+    frame = pd.read_csv(SAVED_SWEEP)
+    required = {
+        "step",
+        "seed",
+        "measurement_ratio",
+        "noise_std",
+        "interp_rmse",
+        "clp_rmse",
+        "prior_only_rmse",
+        "lambda",
+    }
+    missing = sorted(required.difference(frame.columns))
+    if missing:
+        raise ValueError("Saved sweep is missing columns: " + ",".join(missing))
+    return frame
+
+
+def _run_sparse_methods(methods: Sequence[str], tag: str) -> None:
+    """Score the requested sparse methods without refitting CLP.
+
+    Interpolation is always recomputed as a stream check against the saved
+    sweep. It is written as a result only when requested.
+    """
+    saved = _load_saved_sweep()
+    out_dir = SPARSE_OUT_DIR / tag
+    tables = out_dir / "tables"
+    tables.mkdir(parents=True, exist_ok=True)
+    records: List[Dict[str, float]] = []
+    for step in STEPS:
+        data = _load_split(int(step))
+        length = int(data["Y_test"].shape[1])
+        for seed in SEEDS:
+            for rho in RHOS:
+                (
+                    measurement,
+                    _clean_train,
+                    clean_val,
+                    clean_test,
+                    _unit_train,
+                    unit_val,
+                    unit_test,
+                ) = _draw_unit_noise(
+                    data["Y_train"],
+                    data["Y_val"],
+                    data["Y_test"],
+                    int(seed),
+                    float(rho),
+                )
+                positions = _omega_positions(measurement)
+                for noise_std in NOISE_STDS:
+                    b_val = _scale_noise(clean_val, unit_val, float(noise_std))
+                    b_test = _scale_noise(clean_test, unit_test, float(noise_std))
+                    interp = _interpolate(b_test, positions, length)
+                    interp_score = _mean_window_rmse(data["Y_test"], interp)
+                    row: Dict[str, float] = {
+                        "step": int(step),
+                        "seed": int(seed),
+                        "measurement_ratio": float(rho),
+                        "noise_std": float(noise_std),
+                        "interp_check_rmse": float(interp_score),
+                        "m_obs": int(measurement.shape[0]),
+                    }
+                    if "interp" in methods:
+                        row["interp_rmse"] = float(interp_score)
+                    if "smooth" in methods:
+                        _curve, alpha, val_score = _select_smooth_alpha(
+                            b_val,
+                            data["Y_val"],
+                            b_test,
+                            positions,
+                            length,
+                            SMOOTH_ALPHAS,
+                        )
+                        row["smooth_rmse"] = _mean_window_rmse(data["Y_test"], _curve)
+                        row["smooth_alpha"] = float(alpha)
+                        row["smooth_val_rmse"] = float(val_score)
+                    records.append(row)
+                    print(
+                        "step",
+                        step,
+                        "seed",
+                        seed,
+                        "rho",
+                        rho,
+                        "noise",
+                        noise_std,
+                        "methods",
+                        ",".join(methods),
+                        flush=True,
+                    )
+    detail = pd.DataFrame(records)
+    merged = detail.merge(
+        saved[
+            [
+                "step",
+                "seed",
+                "measurement_ratio",
+                "noise_std",
+                "interp_rmse",
+                "clp_rmse",
+                "prior_only_rmse",
+                "lambda",
+            ]
+        ].rename(columns={"interp_rmse": "saved_interp_rmse"}),
+        on=["step", "seed", "measurement_ratio", "noise_std"],
+        how="left",
+        validate="one_to_one",
+    )
+    if int(merged["saved_interp_rmse"].isna().sum()) != 0:
+        raise RuntimeError("Sparse rows did not match the saved noise sweep.")
+    gap = np.max(
+        np.abs(
+            merged["interp_check_rmse"].to_numpy(dtype=np.float64)
+            - merged["saved_interp_rmse"].to_numpy(dtype=np.float64)
+        )
+    )
+    if float(gap) > INTERP_MATCH_ATOL:
+        raise RuntimeError(
+            "Recomputed interpolation differs from the saved sweep by {0}.".format(gap)
+        )
+    detail_path = tables / "detail_by_seed.csv"
+    merged.to_csv(detail_path, index=False)
+    summary = _summarize_sparse(merged, methods)
+    summary.to_csv(tables / "summary_by_cell.csv", index=False)
+    lines = [
+        "Sparse comparators on the R3-03 noise-sweep stream.",
+        "Methods requested: {0}.".format(",".join(methods)),
+        "CLP was not refit. clp_rmse is joined from the saved sweep.",
+        "Interpolation was recomputed and matched the saved sweep.",
+        "Max absolute interpolation difference {0:.3e}.".format(float(gap)),
+        "Smoothing objective: ||M y - b||^2 + alpha ||D2 y||^2.",
+        "D2 is the second difference along the window depth index.",
+        "Finite alpha grid {0}.".format(SMOOTH_ALPHAS),
+        "The straight-line limit is also a candidate.",
+        "Alpha is chosen by validation mean-window RMSE.",
+        "The smoother uses only the sparse observations, not the dense logs.",
+        "Steps {0}, seeds {1}, rho {2}, noise {3}.".format(
+            STEPS, SEEDS, RHOS, NOISE_STDS
+        ),
+    ]
+    (out_dir / "PROTOCOL.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    frozen = {
+        "methods": list(methods),
+        "smooth_alphas": list(SMOOTH_ALPHAS),
+        "smooth_linear_limit": True,
+        "steps": list(STEPS),
+        "seeds": list(SEEDS),
+        "rhos": list(RHOS),
+        "noise_stds": list(NOISE_STDS),
+        "saved_sweep": str(SAVED_SWEEP),
+        "interp_match_atol": INTERP_MATCH_ATOL,
+        "interp_max_abs_diff": float(gap),
+    }
+    (out_dir / "config_frozen.json").write_text(
+        json.dumps(frozen, indent=2) + "\n", encoding="utf-8"
+    )
+    print(summary.to_string(index=False))
+    print("wrote", detail_path)
+
+
+def _summarize_sparse(detail: pd.DataFrame, methods: Sequence[str]) -> pd.DataFrame:
+    """Cell means for the requested sparse methods against the saved CLP."""
+    rows: List[Dict[str, float]] = []
+    grouped = detail.groupby(["step", "measurement_ratio", "noise_std"], sort=True)
+    for keys, frame in grouped:
+        step, rho, noise_std = keys
+        row: Dict[str, float] = {
+            "step": int(step),
+            "measurement_ratio": float(rho),
+            "noise_std": float(noise_std),
+            "clp_rmse": float(frame["clp_rmse"].mean()),
+            "n_seeds": int(frame.shape[0]),
+        }
+        if "interp" in methods:
+            delta = frame["interp_rmse"] - frame["clp_rmse"]
+            row["interp_rmse"] = float(frame["interp_rmse"].mean())
+            row["clp_wins_vs_interp"] = int(
+                np.sum(frame["clp_rmse"] < frame["interp_rmse"])
+            )
+            row["delta_interp_minus_clp"] = float(delta.mean())
+        if "smooth" in methods:
+            delta_smooth = frame["smooth_rmse"] - frame["clp_rmse"]
+            row["smooth_rmse"] = float(frame["smooth_rmse"].mean())
+            row["clp_wins_vs_smooth"] = int(
+                np.sum(frame["clp_rmse"] < frame["smooth_rmse"])
+            )
+            row["smooth_wins_vs_clp"] = int(
+                np.sum(frame["smooth_rmse"] < frame["clp_rmse"])
+            )
+            row["delta_smooth_minus_clp"] = float(delta_smooth.mean())
+            finite = frame["smooth_alpha"].replace([np.inf, -np.inf], np.nan)
+            finite_values = finite.to_numpy(dtype=np.float64)
+            if int(np.sum(np.isfinite(finite_values))) == 0:
+                row["smooth_alpha_min"] = float("inf")
+                row["smooth_alpha_max_finite"] = float("nan")
+            else:
+                row["smooth_alpha_min"] = float(np.nanmin(finite_values))
+                row["smooth_alpha_max_finite"] = float(np.nanmax(finite_values))
+            row["n_alpha_at_grid_min"] = int(
+                np.sum(np.isclose(frame["smooth_alpha"], float(SMOOTH_ALPHAS[0])))
+            )
+            row["n_alpha_at_largest_finite"] = int(
+                np.sum(np.isclose(frame["smooth_alpha"], float(SMOOTH_ALPHAS[-1])))
+            )
+            row["n_at_linear_limit"] = int(np.sum(np.isinf(frame["smooth_alpha"])))
+            if "interp" in methods:
+                row["smooth_wins_vs_interp"] = int(
+                    np.sum(frame["smooth_rmse"] < frame["interp_rmse"])
+                )
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        selected, tag = _parse_methods(sys.argv[1:])
+        _run_sparse_methods(selected, tag)
+    else:
+        main()

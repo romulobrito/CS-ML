@@ -9,6 +9,7 @@ the offset-0 placement runs. ASCII only.
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -100,6 +101,137 @@ def _interpolate(observations: np.ndarray, positions: np.ndarray, length: int) -
     for i in range(int(observed.shape[0])):
         out[i] = np.interp(grid, xp, observed[i, order])
     return out
+
+
+# Discrete smoothing spline: ||M y - b||^2 + alpha ||D2 y||^2.
+# The finite grid continues past the old ceiling of 1e6. The linear limit
+# is the alpha -> infinity member: a straight line fit to the observations.
+SMOOTH_ALPHAS = (
+    1.0e-4,
+    1.0e-3,
+    1.0e-2,
+    1.0e-1,
+    1.0,
+    10.0,
+    100.0,
+    1.0e3,
+    1.0e4,
+    1.0e5,
+    1.0e6,
+    1.0e7,
+    1.0e8,
+    1.0e9,
+    1.0e10,
+    1.0e11,
+    1.0e12,
+)
+SMOOTH_LINEAR_LIMIT = float("inf")
+
+
+def _smooth_factors(length: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Null space of D2, a complement, and D2 on that complement."""
+    n_depth = int(length)
+    if n_depth < 3:
+        raise ValueError("Smoothing needs a window of length at least 3.")
+    depth = np.arange(n_depth, dtype=np.float64)
+    center = float(np.mean(depth))
+    scale = float(np.std(depth))
+    if scale <= 0.0:
+        raise ValueError("Depth index has no spread.")
+    depth = (depth - center) / scale
+    null_space = np.column_stack(
+        [np.ones(n_depth, dtype=np.float64), depth]
+    )
+    orthogonal, _r_factor = np.linalg.qr(null_space, mode="complete")
+    free = orthogonal[:, 2:]
+    diff = np.zeros((n_depth - 2, n_depth), dtype=np.float64)
+    for i in range(n_depth - 2):
+        diff[i, i] = 1.0
+        diff[i, i + 1] = -2.0
+        diff[i, i + 2] = 1.0
+    rough = diff @ free
+    if int(rough.shape[0]) != int(rough.shape[1]):
+        raise RuntimeError("Roughness block is not square.")
+    return null_space, free, rough
+
+
+def _smooth_observations(
+    observations: np.ndarray,
+    positions: np.ndarray,
+    length: int,
+    alpha: float,
+    factors: Tuple[np.ndarray, np.ndarray, np.ndarray],
+) -> np.ndarray:
+    """Fit one roughness-penalized curve per window, using only sparse b.
+
+    A finite alpha solves ||M y - b||^2 + alpha ||D2 y||^2. The linear limit
+    keeps only the straight line that best matches the observations.
+    Dense logs are not used.
+    """
+    observed = np.asarray(observations, dtype=np.float64)
+    index = np.asarray(positions, dtype=np.int64)
+    n_depth = int(length)
+    if observed.ndim != 2 or int(observed.shape[1]) != int(index.size):
+        raise ValueError("Observations must have one column per Omega row.")
+    if (not math.isinf(float(alpha))) and float(alpha) <= 0.0:
+        raise ValueError("Smoothing alpha must be positive.")
+    null_space, free, rough = factors
+    if null_space.shape != (n_depth, 2):
+        raise ValueError("Null-space shape does not match the window length.")
+    n_windows = int(observed.shape[0])
+    n_obs = int(index.size)
+    if math.isinf(float(alpha)):
+        design = null_space[index, :]
+        coeff, _residual, rank, _singular = np.linalg.lstsq(
+            design, observed.T, rcond=None
+        )
+        if int(rank) < 2:
+            raise RuntimeError("Observed depths do not identify a straight line.")
+        curve = null_space @ coeff
+        return np.asarray(curve.T, dtype=np.float64)
+    design = np.zeros((n_obs + n_depth - 2, n_depth), dtype=np.float64)
+    design[:n_obs, :2] = null_space[index, :]
+    design[:n_obs, 2:] = free[index, :]
+    design[n_obs:, 2:] = math.sqrt(float(alpha)) * rough
+    target = np.zeros((design.shape[0], n_windows), dtype=np.float64)
+    target[:n_obs, :] = observed.T
+    coeff, _residual, rank, _singular = np.linalg.lstsq(design, target, rcond=None)
+    if int(rank) < n_depth:
+        raise RuntimeError("Smoothing system lost rank at alpha {0}.".format(alpha))
+    curve = null_space @ coeff[:2, :] + free @ coeff[2:, :]
+    return np.asarray(curve.T, dtype=np.float64)
+
+
+def _select_smooth_alpha(
+    b_val: np.ndarray,
+    y_val: np.ndarray,
+    b_test: np.ndarray,
+    positions: np.ndarray,
+    length: int,
+    alphas: Tuple[float, ...] = SMOOTH_ALPHAS,
+) -> Tuple[np.ndarray, float, float]:
+    """Alpha with the lowest validation mean-window RMSE, then the test curve.
+
+    The candidates are the finite grid and the straight-line limit.
+    """
+    if len(alphas) == 0:
+        raise ValueError("Smoothing alpha grid is empty.")
+    factors = _smooth_factors(int(length))
+    candidates = tuple(float(alpha) for alpha in alphas) + (SMOOTH_LINEAR_LIMIT,)
+    best_alpha = float(candidates[0])
+    best_score = float("inf")
+    for alpha in candidates:
+        val_hat = _smooth_observations(
+            b_val, positions, int(length), float(alpha), factors
+        )
+        score = _mean_window_rmse(y_val, val_hat)
+        if score < best_score:
+            best_score = float(score)
+            best_alpha = float(alpha)
+    test_hat = _smooth_observations(
+        b_test, positions, int(length), best_alpha, factors
+    )
+    return test_hat, best_alpha, best_score
 
 
 def _fit_linear_family(
