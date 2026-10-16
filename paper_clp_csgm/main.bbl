@@ -1,4 +1,4 @@
-\begin{thebibliography}{46}
+\begin{thebibliography}{47}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -160,6 +160,13 @@ David~L. Donoho.
 Darwin~V. Ellis and Julian~M. Singer.
 \newblock \emph{Well Logging for Earth Scientists}.
 \newblock Springer, 2 edition, 2007.
+
+\bibitem[Hansen(2010)]{hansen2010discrete}
+Per~Christian Hansen.
+\newblock \emph{Discrete Inverse Problems: Insight and Algorithms}.
+\newblock Society for Industrial and Applied Mathematics, Philadelphia, PA,
+  2010.
+\newblock \doi{10.1137/1.9780898718836}.
 
 \bibitem[He et~al.(2025)He, Zhang, Wu, Zhang, Zhang, Zhuo, Song, Dai, and
   Dang]{he2025porosity}

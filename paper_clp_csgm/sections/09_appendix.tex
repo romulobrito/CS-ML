@@ -344,7 +344,7 @@ so
 \]
 Thus both \(\hat z\) and \(z^\dagger\) belong to \(B(z_0,R^\dagger)\).
 
-The local S-REC on \(\mathcal{M}_{R^\dagger}\) therefore applies to
+The local S-REC on \(\mathcal{R}_{\mathrm{orig},R^\dagger}\) therefore applies to
 \(G_{\mathrm{orig}}(\hat z)\) and \(G_{\mathrm{orig}}(z^\dagger)\), giving
 \[
   \gamma_R\|G_{\mathrm{orig}}(\hat z)-G_{\mathrm{orig}}(z^\dagger)\|_2-\delta_R
@@ -958,9 +958,10 @@ steps $16$ and $32$ and at step $8$ for $\rho=0.20$. At step $8$ for
 $\rho=0.05$ and $\rho=0.10$, interpolation still has the lower mean.
 At $0.10$ and $0.20$, CLP-CSGM Ridge is lower in all nine cells and in all
 three seeds. Figure~\ref{fig:crosswell_rmse_vs_noise} shows this ordering
-with one panel per step. The interpolation error grows because the
-interpolated curve follows the measurements. The CLP-CSGM error moves less
-and stays near the dense-log window.
+with one panel per step. The smaller change in the CLP-CSGM RMSE is not
+attributed here to the conditional penalty alone. This supplement does not
+separate that penalty from the decoder restriction or from the validation
+choice of the weight.
 Fig.~\ref{fig:crosswell_noise_panels} shows one held-out interval at the
 published noise and at noise $0.05$. The two panels use separate horizontal
 scales. Panel (b) is not one of the larger sensitivity levels. In this
@@ -1000,8 +1001,10 @@ $6$ coordinates in a window of length $64$. CLP-CSGM Ridge then stays
 between the two, at $0.0508$ and $0.0456$. At $\rho=0.20$ the same window
 observes $13$ coordinates, and CLP-CSGM Ridge has mean RMSE $0.0372$
 against an interpolation RMSE of $0.0423$. At steps $16$ and $32$ the
-dense-log window itself has mean RMSE $0.0426$ and $0.0432$, already near
-the interpolation error at this noise. The pattern agrees with the ablation
+dense-log window itself has mean RMSE $0.0426$ and $0.0432$, and
+interpolation at this noise has errors of similar magnitude. Those similar
+magnitudes do not show that the two reconstructions lie close to each
+other. The pattern agrees with the ablation
 in Section~\ref{subsec:ablation_analysis}, where the conditional code
 $\boldsymbol{z}_0$ is not
 helpful at step $8$.

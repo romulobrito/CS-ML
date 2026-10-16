@@ -76,45 +76,42 @@ the lowest full-window RMSE in all nine cells and in all $27$ seed
 comparisons. CLP-CSGM Ridge is lower than both direct linear maps at step
 $16$, $\rho=0.20$, and at step $32$ for every $\rho$.
 
-Figure~\ref{fig:crosswell_rmse_vs_noise} uses the same windows and changes
-only the noise. Each panel is one step and each curve is one measurement
-fraction, so the nine cells are not averaged together. The comparison is
-depth interpolation against CLP-CSGM Ridge. The noise value is the standard
-deviation of the added Gaussian, in the units of the $V_c$ curve. The
-held-out curve has standard deviation $0.035$ on that same scale.
+Figure~\ref{fig:crosswell_rmse_vs_noise} and
+Table~\ref{tab:crosswell_noise_sweep} keep the evaluation windows and
+observation coordinates fixed, while varying the added Gaussian noise and
+reselecting the regularization weight by validation at each noise level.
+At the reference noise level, $\sigma_\eta=0.01$, depth interpolation
+achieves lower mean RMSE than CLP-CSGM in all nine configurations. As the
+perturbation increases, the RMSE of CLP-CSGM grows less: it is lower than
+interpolation in seven of the nine configurations at $\sigma_\eta=0.05$,
+and in all nine at $\sigma_\eta=0.10$ and $0.20$.
 
-At noise $0.01$, about $0.29$ times that deviation, interpolation has the
-lower error in all nine configurations. The margin is large at step $8$
-and $\rho=0.05$: the mean RMSE is $0.0178$ for interpolation and $0.0456$
-for CLP-CSGM Ridge. The closest cell is step $16$ and $\rho=0.20$, with
-means $0.0112$ and $0.0159$. At this level the measurements remain a
-slightly perturbed copy
-of the same smooth curve, so connecting them along depth is enough.
+This behavior is consistent with the role of regularization in balancing
+agreement with noisy observations against prior information
+\cite{hansen2010discrete}. Interpolation passes through the perturbed
+observations, whereas CLP-CSGM allows measurement residuals, restricts
+reconstruction to the decoder range, and penalizes departures from the
+conditional latent prediction. These mechanisms can limit the response to
+measurement perturbations, but can also introduce bias when the learned
+representation or conditional prediction does not describe the target
+accurately. Related generative compressed-sensing theory explicitly
+accounts for representation error, measurement noise, and optimization
+error under suitable assumptions \cite{bora2017compressed}. That theory
+provides context for this interpretation, rather than a guarantee for the
+coordinate-sampling experiments considered here.
 
-At noise $0.05$, about $1.43$ times the held-out deviation, CLP-CSGM Ridge
-has the lower mean RMSE at steps $16$ and $32$ and at step $8$ for
-$\rho=0.20$. At step $8$ for $\rho=0.05$ and $\rho=0.10$, interpolation
-keeps the lower mean. At $0.10$ and $0.20$, about $2.86$ and $5.71$ times
-that deviation, CLP-CSGM Ridge has the lower error in all nine
-configurations and in all three seeds. Across those nine cells,
-interpolation means lie between $0.0820$ and $0.0864$ at noise $0.10$ and
-between $0.1625$ and $0.1706$ at noise $0.20$, while CLP-CSGM Ridge remains
-between $0.0381$ and $0.0557$. These noise levels were used for sensitivity
-analysis and were not calibrated to field measurement uncertainties.
-
-The interpolation error grows because the interpolated curve follows the
-measurements. Once the noise reaches the scale of the curve, that
-dependence raises the full-window error. CLP-CSGM Ridge moves less and
-stays near the window predicted from the dense logs alone, which is why it
-has the lower error at $0.10$ and $0.20$. At step $8$ for $\rho=0.05$ and
-$\rho=0.10$, that starting window already has higher error than the
-interpolation at noise $0.05$, and the CLP-CSGM mean stays between the two.
-The decoder can still represent the curve, so that pattern does not isolate
-the dense-log window as the only cause. The evidence for this ordering is
-the refit in Table~\ref{tab:crosswell_noise_sweep}. AE
-$[\boldsymbol{u},\boldsymbol{b}]$, ordinary least squares, and direct ridge
-were not rerun across the sweep, so the result is the comparison with
-depth interpolation.
+The present sweep does not isolate the contributions of the decoder
+restriction, the conditional penalty, and validation-based parameter
+selection. Nor does it establish superiority over noise-aware alternatives
+such as smoothing, which were not evaluated. The held-out target curve has
+a standard deviation of approximately $0.035$; the added noise levels
+$0.05$, $0.10$, and $0.20$ are approximately $1.4$, $2.9$, and $5.7$ times
+this value, respectively. These larger perturbations therefore provide a
+controlled sensitivity analysis rather than a calibrated representation of
+field measurement uncertainty. AE $[\boldsymbol{u},\boldsymbol{b}]$,
+ordinary least squares, and direct ridge were not rerun across the sweep,
+so the comparison in the figure is with depth interpolation. The added
+noise is not the 30dB filename label.
 
 The decoder and the dense-log map are fit once per step and seed. The
 penalty weight is then selected on validation for each measurement fraction
@@ -123,7 +120,9 @@ The sensitivity sweep uses a different, wider grid. It omits the
 factor-of-three candidates of the published grid and adds $1$, $10$, and
 $100$. The weight selected at $0.01$ and at $0.05$ also belongs to the
 published grid. That membership does not mean the two searches were the
-same. At noise $0.20$, some cells select $100$, the largest candidate in
+same. At noise $0.10$, step $16$ and $\rho=0.10$, one seed selects
+the weight $1$, above the published grid and still inside the sweep.
+At noise $0.20$, some cells select $100$, the largest candidate in
 the sweep grid. That choice is the best value among the candidates that
 were tried, not an optimum outside the grid. The points at noise $0.01$
 belong to this same refit. The ordering between interpolation and CLP-CSGM

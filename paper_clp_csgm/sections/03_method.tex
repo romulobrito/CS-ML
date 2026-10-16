@@ -168,9 +168,8 @@ The refinement objective keeps the standardized residual and the diagonal
 weight $D_{\Omega}$. The decoder
 $G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$, with $k<N$, supplies
 standardized windows, and $G_{\mathrm{orig}}$ supplies the corresponding
-windows in the original target units. We assume that those original-scale
-windows are adequately approximated by
-$\operatorname{Im}(G_{\mathrm{orig}})$, and that
+windows in the original target units. We assume that target windows are
+adequately approximated by the windows $G_{\mathrm{orig}}$ can return, and that
 $h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ provides a useful anchor
 $\boldsymbol{z}_0=h(\boldsymbol{u})$. These assumptions are assessed empirically
 through reconstruction, ablations, and prior sensitivity.
@@ -224,15 +223,22 @@ E_{\theta_E}
 where $\gamma_{\mathrm{AE}}\geq 0$ is the regularization weight. After
 training, we write $E=E_{\widehat{\theta}_E}$ and
 $G=G_{\widehat{\theta}_G}$. The frozen decoder defines the learned
-target-window class
+target-window classes
 
 \begin{equation}
-\mathcal{M}
-=
-\operatorname{Im}(G)
+\mathcal{R}_{G}
 =
 \left\{
 G(\boldsymbol{z}):
+\boldsymbol{z}\in\mathbb{R}^{k}
+\right\}
+\subseteq
+\mathbb{R}^{N},
+\qquad
+\mathcal{R}_{\mathrm{orig}}
+=
+\left\{
+G_{\mathrm{orig}}(\boldsymbol{z}):
 \boldsymbol{z}\in\mathbb{R}^{k}
 \right\}
 \subseteq
@@ -240,12 +246,14 @@ G(\boldsymbol{z}):
 \label{eq:decoder_range}
 \end{equation}
 
-This set is the range of the standardized decoder. The windows returned
-to the original target units form $\operatorname{Im}(G_{\mathrm{orig}})$.
+$\mathcal{R}_{G}$ is the range of the standardized decoder.
+$\mathcal{R}_{\mathrm{orig}}$ is that class in the original target units.
+$M_{\Omega}$ selects observed coordinates and is not either set.
 Target-well reconstruction therefore optimizes only
 $\boldsymbol{z}\in\mathbb{R}^{k}$ and produces
 $\widehat{\boldsymbol{y}}
-=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$; it does not update the network
+=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})
+\in\mathcal{R}_{\mathrm{orig}}$; it does not update the network
 parameters or search over arbitrary vectors in $\mathbb{R}^{N}$.
 The encoder is used to train the decoder and to build the codes on which
 the dense-log map is fit. Inference does not encode the unknown window.
@@ -311,7 +319,7 @@ same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
     $\boldsymbol{z}_0$ to $G_{\mathrm{orig}}(\boldsymbol{z}_0)$, and the
     other maps $\widehat{\boldsymbol{z}}$ to
     $\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$.
-    The blue curve illustrates $\operatorname{Im}(G_{\mathrm{orig}})$, the
+    The blue curve illustrates $\mathcal{R}_{\mathrm{orig}}$, the
     set of decoder outputs in the original target units. $M_{\Omega}$
     selects the observed coordinates and is not that set. The measurement
     residual is the gap between $M_{\Omega}\widehat{\boldsymbol{y}}$ and
@@ -537,7 +545,7 @@ a certified global minimizer.
 Every CLP-CSGM reconstruction in the original target units satisfies
 $\widehat{\boldsymbol{y}}
 =G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})
-\in\operatorname{Im}(G_{\mathrm{orig}})$.
+\in\mathcal{R}_{\mathrm{orig}}$.
 Consequently, for an unknown target window
 $\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$, the error of any such
 reconstruction is bounded below by the oracle representation error
@@ -546,10 +554,10 @@ reconstruction is bounded below by the oracle representation error
 \operatorname{dist}
 \left(
 \boldsymbol{y}^{\star},
-\operatorname{Im}(G_{\mathrm{orig}})
+\mathcal{R}_{\mathrm{orig}}
 \right)
 :=
-\inf_{\boldsymbol{y}'\in\operatorname{Im}(G_{\mathrm{orig}})}
+\inf_{\boldsymbol{y}'\in\mathcal{R}_{\mathrm{orig}}}
 \left\|
 \boldsymbol{y}^{\star}
 -
@@ -567,7 +575,7 @@ G_{\mathrm{orig}}(\boldsymbol{z})
 
 Thus, even with noiseless observations and exact global optimization, latent
 refinement cannot remove mismatch between
-$\boldsymbol{y}^{\star}$ and $\operatorname{Im}(G_{\mathrm{orig}})$. This
+$\boldsymbol{y}^{\star}$ and $\mathcal{R}_{\mathrm{orig}}$. This
 structural error is represented by $\boldsymbol{r}^{\dagger}$ in
 Proposition~\ref{prop:conditional_local_recovery} and is distinct from the
 latent-prior mismatch
@@ -640,7 +648,7 @@ R^{\dagger}
 \end{equation}
 
 Let
-$\mathcal{M}_{R^{\dagger}}
+$\mathcal{R}_{\mathrm{orig},R^{\dagger}}
 =
 G_{\mathrm{orig}}(B(\boldsymbol{z}_0,R^{\dagger}))$, where
 $B(\boldsymbol{z}_0,R^{\dagger})
@@ -651,7 +659,7 @@ $B(\boldsymbol{z}_0,R^{\dagger})
 \leq R^{\dagger}
 \right\}$.
 The constants $\gamma_R>0$ and $\delta_R\geq0$ below refer to pairs of
-windows in this original-scale image. They are not constants of the
+windows in $\mathcal{R}_{\mathrm{orig},R^{\dagger}}$. They are not constants of the
 standardized decoder $G$. If
 
 \begin{equation}
@@ -670,7 +678,7 @@ M_{\Omega}
 \forall\,
 \boldsymbol{y}_1,\boldsymbol{y}_2
 \in
-\mathcal{M}_{R^{\dagger}},
+\mathcal{R}_{\mathrm{orig},R^{\dagger}},
 \label{eq:local_srec_condition}
 \end{equation}
 

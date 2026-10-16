@@ -456,15 +456,29 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   0.05 and 0.10, the dense-log window has RMSE 0.0564, above interpolation
   at 0.0456 and 0.0442, while G(E(y)) is 0.0073. CLP stays between those
   values at 0.0508 and 0.0456. At rho 0.20, with thirteen measurements, the
-  CLP mean is 0.0372 and interpolation is 0.0423.
+  CLP mean is 0.0372 and interpolation is 0.0423. A later editorial
+  pass replaces the Results explanation that attributed the smaller RMSE
+  increase to the dense-log window alone. The revised text cites Hansen
+  (2010) for the role of regularization and Bora et al. (2017), already in
+  the bibliography, as context rather than a recovery guarantee for these
+  coordinate masks. The sweep is not said to isolate the decoder
+  restriction, the conditional penalty, or validation-based weight
+  selection. Smoothing was not evaluated. The lambda-grid notes stay: the
+  sweep grid differs from the published grid; one seed selects 1 at noise
+  0.10; some cells select 100 at noise 0.20, the largest candidate tried.
+  The added noise remains distinct from the 30dB label. No numerical result
+  was changed.
 - Files: `sections/03_method.tex`; `sections/05_experiments.tex`;
   `sections/06_results.tex`; `sections/09_appendix.tex`;
+  `references.bib`;
   `tables/robustness_crosswell_simple_baselines.tex`;
   `tables/robustness_crosswell_noise_sweep.tex`;
   `figures/crosswell_vc_noise_panels_step32_rho020_seed7.png`;
   `figures/crosswell_vc_rmse_vs_noise.png`.
 - Shared reply: none. `R3-04` is answered in its own entry. This item
   does not close it.
+- Not done: a smoothing comparator; a field-calibrated noise model; a
+  definition of the 30dB label (`R3-P16`).
 
 ### R3-04
 
@@ -500,10 +514,16 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   searches were the same. At noise 0.10, step 16 and rho 0.10, one seed
   selects the weight 1. At noise 0.20 some cells select 100, the largest
   candidate that was tried. That choice is not an optimum outside the
-  grid. The algorithm and the reported numbers are unchanged.
+  grid. The algorithm and the reported numbers are unchanged. The Results
+  noise discussion now separates the observed RMSE ordering from a single
+  cause. It cites Hansen (2010) and the existing Bora et al. (2017) entry
+  as context, and it states that the sweep does not isolate the decoder
+  restriction, the conditional penalty, or the validation choice of the
+  weight. No smoother was added.
 - Files: `sections/03_method.tex`; `sections/05_experiments.tex`;
   `sections/06_results.tex`; `sections/07_discussion.tex`;
-  `sections/09_appendix.tex`; `tables/implementation_summary.tex`.
+  `sections/09_appendix.tex`; `references.bib`;
+  `tables/implementation_summary.tex`.
 - Shared reply: the same evidence is restated under `R3-P09`. `R3-P10`
   is answered in its own entry. `R3-P16` stays pending.
 - Not done: a field-calibrated noise model and a definition of the 30dB
@@ -557,7 +577,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Change made: the figure shows two horizontal decoding arrows, from
   \(z_0\) to \(G_{\mathrm{orig}}(z_0)\) and from \(\widehat{z}\) to
   \(G_{\mathrm{orig}}(\widehat{z})\), both on the blue curve
-  \(\operatorname{Im}(G_{\mathrm{orig}})\). The vertical arrow is latent
+  \(\mathcal{R}_{\mathrm{orig}}\). The vertical arrow is latent
   refinement. The caption states that the drawing is schematic and is not
   a measured numerical trajectory.
 - Checked: compiled page 10. Both codes meet the curve. Labels, including
@@ -566,7 +586,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `figures/view_conditional_latent_prior_final.pdf`.
 - Shared reply: none. `R3-P14` uses the same figure and answers a different
   question.
-- Not done: `R3-06`; `R3-P08`.
+- Not done: `R3-06`.
 
 ### R3-P14
 
@@ -576,13 +596,13 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   confused the index operator with the decoder range.
 - Change made: the tilde is on the dense-log argument of \(h\). The lower
   arrow ends at \(G_{\mathrm{orig}}(\widehat{z})\) on the blue curve.
-  \(M_{\Omega}\) selects coordinates. \(\operatorname{Im}(G_{\mathrm{orig}})\)
+  \(M_{\Omega}\) selects coordinates. \(\mathcal{R}_{\mathrm{orig}}\)
   is that curve. The caption states that they are not the same object.
 - Checked: same page-10 inspection as `R3-A03`.
 - Files: `sections/03_method.tex`;
   `figures/view_conditional_latent_prior_final.pdf`.
 - Shared reply: none. `R3-A03` explains the two mappings and the arrows.
-- Not done: `R3-06`; `R3-P08`.
+- Not done: `R3-06`.
 
 ### R3-05
 
@@ -606,7 +626,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   order of the propositions. `R1-M07` stays text_done; its caveat is
   preserved, and its reply now names the proposition rather than the old
   number.
-- Not done: `R3-06`; `R3-P08`.
+- Not done: `R3-06`.
 
 ### R3-P15
 
@@ -618,13 +638,63 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Checked: same pages as `R3-05`.
 - Files: `sections/03_method.tex`; `sections/09_appendix.tex`.
 - Shared reply: none. `R3-05` answers the role of the classical arguments.
-- Not done: `R3-06`; `R3-P08`.
+- Not done: `R3-06`.
+
+### R3-A02
+
+- State: `text_done`
+- Reviewer request: distinguish the sampling operator \(M_{\Omega}\) from the
+  decoder output set.
+- Change made: text only. The output set is no longer \(\mathcal{M}\) or
+  \(\operatorname{Im}(G)\). \(\mathcal{R}_{G}\) is the range of the
+  standardized decoder. \(\mathcal{R}_{\mathrm{orig}}\) is that class in
+  the original target units. \(\mathcal{R}_{\mathrm{orig},R^{\dagger}}\)
+  is the local original-scale image \(G_{\mathrm{orig}}(B(z_0,R^{\dagger}))\).
+  Each symbol is defined before use. The reconstruction is stated to lie in
+  \(\mathcal{R}_{\mathrm{orig}}\). The Figure 1 caption names the blue curve
+  \(\mathcal{R}_{\mathrm{orig}}\) and states that \(M_{\Omega}\) is not that
+  set. The figure file was not regenerated. No new experiment.
+- Checked: compiled PDF, 80 pages. Page 9, equation (8), defines both ranges
+  on one line inside the margin, before Figure 1. Page 10 caption uses
+  \(\mathcal{R}_{\mathrm{orig}}\) for the curve the drawing already labels.
+  Page 14 defines \(\mathcal{R}_{\mathrm{orig},R^{\dagger}}\) before
+  equation (15). Appendix page 51 uses that symbol. Page 48 still shows the
+  existence objective on two lines inside the margin. No undefined or
+  duplicate references.
+- Files: `sections/02_related_work.tex`; `sections/03_method.tex`;
+  `sections/07_discussion.tex`; `sections/09_appendix.tex`.
+- Shared reply: none. `R3-P08` uses the same symbols and answers the
+  imaginary-part reading. `R3-A03` and `R3-P14` stay text_done; their
+  replies now name the curve \(\mathcal{R}_{\mathrm{orig}}\).
+- Not done: `R3-06`.
+
+### R3-P08
+
+- State: `text_done`
+- Reviewer request: \(\operatorname{Im}(G)\) can be read as the imaginary
+  part; use another symbol for the range.
+- Change made: text only. \(\operatorname{Im}(G)\) and
+  \(\operatorname{Im}(G_{\mathrm{orig}})\) were removed. The related-work
+  sentence now says "range" and does not use the symbol before the
+  definition in Method. The three sets are \(\mathcal{R}_{G}\),
+  \(\mathcal{R}_{\mathrm{orig}}\), and
+  \(\mathcal{R}_{\mathrm{orig},R^{\dagger}}\), matched to the standardized
+  range, the original-scale range, and the local recovery set. The identity
+  \(I_m\) in the Gaussian noise model was left unchanged. No new experiment.
+- Checked: same pages as `R3-A02`. A search of the manuscript sources found
+  no remaining \(\operatorname{Im}\) and no remaining \(\mathcal{M}\).
+- Files: `sections/02_related_work.tex`; `sections/03_method.tex`;
+  `sections/07_discussion.tex`; `sections/09_appendix.tex`.
+- Shared reply: none. `R3-A02` answers the distinction between \(M_{\Omega}\)
+  and the output set.
+- Not done: `R3-06`.
 
 ## Queue (not yet processed)
 
 R3-06,
-R3-A01, R3-A02, R3-A04, R3-A05,
-R3-P01 .. R3-P08, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
+R3-A01, R3-A04, R3-A05,
+R3-P01 .. R3-P07, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
 R1-m05 remains deferred. `R1-m03`, `R3-A03`, and `R3-P14` are text_done.
-`R3-05` and `R3-P15` are text_done. `R3-06` and `R3-P08` remain pending.
+`R3-05` and `R3-P15` are text_done. `R3-A02` and `R3-P08` are text_done.
+`R3-06` remains pending.
 `R3-P09` and `R3-P10` are text_done. `R3-P16` remains pending.

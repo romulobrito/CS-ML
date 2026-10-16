@@ -100,9 +100,9 @@ The experiment uses the same cross-well grid as the paper. We added linear regre
 
 At the published noise, interpolation has the lowest error in every cell. The measurements are a slightly perturbed copy of the same curve, so connecting them is enough. CLP-CSGM is ahead of both linear maps only in the few-window cells: at step 16 with the largest measurement fraction, and at step 32.
 
-When the noise rises to the same order as the variation of the curve, the interpolation advantage falls in the few-window cells, and also at step 8 with the largest measurement fraction. The interpolation error grows because the curve follows the measurements. The CLP-CSGM error moves less and stays near the window predicted from the other logs. The penalty weight selected for this comparison stays inside the published grid.
+When the noise rises to the same order as the variation of the curve, the interpolation advantage falls in the few-window cells, and also at step 8 with the largest measurement fraction. The penalty weight selected for this comparison stays inside the published grid.
 
-At step 8, with the two smaller measurement fractions, interpolation still has the lower mean at that noise. The decoder can represent the curve. The window predicted from the other logs alone already starts above the interpolation error, and the CLP-CSGM error stays between that window and the interpolation. With the larger measurement fraction, the CLP-CSGM mean falls below the interpolation. At steps 16 and 32 the starting window is already near the interpolation error. That pattern is compatible with a weak dense-log window. It does not isolate that window as the only cause.
+At step 8, with the two smaller measurement fractions, interpolation still has the lower mean at that noise. The decoder can represent the curve. The window predicted from the other logs alone has a larger error than the interpolation, and the CLP-CSGM error stays between those two error values. With the larger measurement fraction, the CLP-CSGM mean falls below the interpolation. At steps 16 and 32 the dense-log window has an error of similar magnitude to the interpolation. Similar magnitudes do not show that the reconstructions are close to each other. That pattern is compatible with a weak dense-log window. It does not isolate that window as the only cause.
 
 At the two larger noise levels, CLP-CSGM has the lower error in every cell. These noise levels were used for sensitivity analysis and were not calibrated to field measurement uncertainties. At the largest of them, the noise is several times the variation of the curve.
 
@@ -110,7 +110,13 @@ Results also shows this ordering in one figure, with one panel per step and one 
 
 The detail is in the appendix Direct linear maps, depth interpolation, and measurement noise, with the two tables and one depth example. The Results paragraph states the cell-level ordering next to that figure. The Abstract states that interpolation has lower error in all nine configurations at the reference noise 0.01, and that under larger perturbations that comparison changes. Those noise levels were used for sensitivity analysis and were not calibrated to field measurement uncertainties. The Conclusion keeps the step-8 exceptions at noise 0.05 and states that AE, ordinary least squares, and direct ridge were not rerun across the sweep and that no smoother was added. The Experimental setup announces the experiment, and the Method explains the encoder. These runs are not merged into the submitted tables. This wording does not close the question of how the published noise level was chosen.
 
-Where the text was changed: Abstract (the sentence on interpolation at noise 0.01); Method (the generative-decoder paragraph); Experimental setup (the paragraph after the sparse-coordinate placement check); Results (the paragraph after the sparse-coordinate placement conclusion, and the RMSE-versus-noise figure); Conclusion (the noise paragraph); Appendix Direct linear maps, depth interpolation, and measurement noise.
+We have revised the discussion of the noise-sensitivity results to distinguish the observed RMSE ordering from its possible explanation. The revised Results text relates the smaller RMSE increase of CLP-CSGM to the general role of regularization \cite{hansen2010discrete} and discusses representation, noise, and optimization errors in the context of generative compressed sensing \cite{bora2017compressed}.
+
+We explicitly state that the sweep does not isolate the effects of the decoder restriction, the conditional penalty, and validation-based parameter selection, and that these references do not provide a recovery guarantee for our coordinate-sampling experiments. The revised text retains the advantage of interpolation at the reference noise level and identifies the larger perturbations as a controlled sensitivity analysis. No experiments or numerical results were changed.
+
+Changes were made in the Results discussion accompanying the RMSE-versus-noise figure, in the appendix Direct linear maps, depth interpolation, and measurement noise, with the Hansen reference added to the bibliography.
+
+Where the text was changed: Abstract (the sentence on interpolation at noise 0.01); Method (the generative-decoder paragraph); Experimental setup (the paragraph after the sparse-coordinate placement check); Results (the discussion accompanying the RMSE-versus-noise figure); Conclusion (the noise paragraph); Appendix Direct linear maps, depth interpolation, and measurement noise.
 
 **Shared reply:** none. `R3-04` is answered in its own entry. This reply does not close it.
 
@@ -126,7 +132,13 @@ The MAP statement identifies lambda with the ratio of the noise variance to the 
 
 The later noise sweep is a sensitivity check of the adopted noise level, not the reason that level was chosen. The sensitivity sweep uses a different, wider grid: 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, and 100. It omits the factor-of-three candidates from the published grid. At 0.01 and 0.05 every selected weight also belongs to the published grid. That membership does not mean the two searches were the same. At noise 0.10, step 16 and measurement fraction 0.10, one seed selects the weight 1, which is above the published grid and still inside the sweep. At noise 0.20, some cells select 100, the largest candidate that was tried. That selection is not an optimum outside the searched grid. The interpolation and CLP-CSGM ordering depends on the noise level and the configuration, as already reported next to the RMSE-versus-noise figure and the noise-sweep table. No new experiments were added, and the algorithm and the reported numbers are unchanged.
 
-Where the text was changed: Method, subsection Test-time reconstruction (the latent-refinement objective and the residual identity); Method, subsection Interpretation and theoretical context (the MAP proposition and the existence objective); Experimental setup, subsection Training, validation, and test protocol; Results (the sentence on the sweep grid); Discussion (the measurement-term sentence); Appendix MAP and Tikhonov interpretation; Appendix Existence of a minimizer; Appendix Direct linear maps, depth interpolation, and measurement noise; the implementation-summary table.
+We have revised the discussion of the noise-sensitivity results to distinguish the observed RMSE ordering from its possible explanation. The revised Results text relates the smaller RMSE increase of CLP-CSGM to the general role of regularization \cite{hansen2010discrete} and discusses representation, noise, and optimization errors in the context of generative compressed sensing \cite{bora2017compressed}.
+
+We explicitly state that the sweep does not isolate the effects of the decoder restriction, the conditional penalty, and validation-based parameter selection, and that these references do not provide a recovery guarantee for our coordinate-sampling experiments. The revised text retains the advantage of interpolation at the reference noise level and identifies the larger perturbations as a controlled sensitivity analysis. No experiments or numerical results were changed.
+
+Changes were made in the Results discussion accompanying the RMSE-versus-noise figure, in the appendix Direct linear maps, depth interpolation, and measurement noise, with the Hansen reference added to the bibliography. This addition does not define the 30dB label and does not add a smoothing comparator.
+
+Where the text was changed: Method, subsection Test-time reconstruction (the latent-refinement objective and the residual identity); Method, subsection Interpretation and theoretical context (the MAP proposition and the existence objective); Experimental setup, subsection Training, validation, and test protocol; Results (the discussion accompanying the RMSE-versus-noise figure); Discussion (the measurement-term sentence); Appendix MAP and Tikhonov interpretation; Appendix Existence of a minimizer; Appendix Direct linear maps, depth interpolation, and measurement noise; the implementation-summary table.
 
 ## R3-05 -- Role of the theory section
 
@@ -177,7 +189,34 @@ Existence of a minimizer.
 
 ## R3-A02 -- Separate sampling operator and output set
 
-**Status:** `pending`
+**Status:** `text_done`
+
+**Proposed reply:**
+
+We thank the reviewer for asking that the sampling operator be distinguished
+from the decoder output set.
+
+\(M_{\Omega}\) remains the coordinate-restriction operator: each row selects
+one observed depth. The output set is no longer written \(\mathcal{M}\) or
+\(\operatorname{Im}(G)\). The range of the standardized decoder is
+\(\mathcal{R}_{G}=\{G(\boldsymbol{z}):\boldsymbol{z}\in\mathbb{R}^{k}\}\).
+The same windows in the original target units are
+\(\mathcal{R}_{\mathrm{orig}}=\{G_{\mathrm{orig}}(\boldsymbol{z}):\boldsymbol{z}\in\mathbb{R}^{k}\}\).
+The local set in the recovery condition is
+\(\mathcal{R}_{\mathrm{orig},R^{\dagger}}=G_{\mathrm{orig}}(B(\boldsymbol{z}_0,R^{\dagger}))\).
+Each symbol is defined before it is used. The reconstruction is stated to lie
+in \(\mathcal{R}_{\mathrm{orig}}\), not in the sampling operator. Figure 1
+was not redrawn. Its caption now names the blue curve
+\(\mathcal{R}_{\mathrm{orig}}\) and states that \(M_{\Omega}\) is not that
+set. This comment overlaps R3-P08, which asks that \(\operatorname{Im}\) not
+be read as an imaginary part. That request is answered in its own reply.
+
+Where the text was changed: Related work, subsection Classical and generative
+compressed sensing; Method, subsection Learned model components (the range
+definition and Figure 1); Method, subsection Interpretation and theoretical
+context (the representation-error remark and the conditional local-recovery
+proposition); Interpretation, scope, and limitations; Appendix Conditional
+local recovery interpretation.
 
 ## R3-A03 -- Redraw Figure 1
 
@@ -194,7 +233,7 @@ Figure 1 draws both mappings. One horizontal arrow applies
 \(G_{\mathrm{orig}}\) to the refined code and ends at
 \(\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})\).
 Both outputs lie on the blue curve. That curve is
-\(\operatorname{Im}(G_{\mathrm{orig}})\), the set of decoder outputs in the
+\(\mathcal{R}_{\mathrm{orig}}\), the set of decoder outputs in the
 original target units. The vertical arrow is latent refinement from
 \(\boldsymbol{z}_0\) to \(\widehat{\boldsymbol{z}}\). The drawing is
 schematic and does not show a measured numerical trajectory.
@@ -241,7 +280,32 @@ objective/clarity request is not closed)
 
 ## R3-P08 -- Im(G) may look like the imaginary part
 
-**Status:** `pending`
+**Status:** `text_done`
+
+**Proposed reply:**
+
+We thank the reviewer for noting that \(\operatorname{Im}(G)\) can be read
+as the imaginary part of \(G\).
+
+That symbol has been removed. The range of the standardized decoder is
+written \(\mathcal{R}_{G}\). Decoder outputs in the original target units
+are written \(\mathcal{R}_{\mathrm{orig}}\). The local original-scale set
+in the recovery condition is written
+\(\mathcal{R}_{\mathrm{orig},R^{\dagger}}\). Each symbol is defined before
+use, and the sets themselves are unchanged. The related-work sentence that
+used \(\operatorname{Im}(G)\) now says "range" and does not introduce the
+symbol before its definition. Figure 1 was not regenerated. The caption
+uses \(\mathcal{R}_{\mathrm{orig}}\) for the curve the drawing already
+labels. This comment overlaps R3-A02, which asks that the sampling operator
+be kept distinct from the output set. That request is answered in its own
+reply.
+
+Where the text was changed: Related work, subsection Classical and generative
+compressed sensing; Method, subsection Learned model components (the range
+definition and Figure 1); Method, subsection Interpretation and theoretical
+context (the representation-error remark and the conditional local-recovery
+proposition); Interpretation, scope, and limitations; Appendix Conditional
+local recovery interpretation.
 
 ## R3-P09 -- Measurement noise and lambda
 
@@ -300,9 +364,9 @@ upper horizontal arrow decodes \(\boldsymbol{z}_0\) to
 \(G_{\mathrm{orig}}(\boldsymbol{z}_0)\). The lower horizontal arrow decodes
 \(\widehat{\boldsymbol{z}}\) and ends at
 \(\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})\) on
-the blue curve. \(M_{\Omega}\) and \(\operatorname{Im}(G_{\mathrm{orig}})\)
+the blue curve. \(M_{\Omega}\) and \(\mathcal{R}_{\mathrm{orig}}\)
 are different objects. \(M_{\Omega}\) selects the observed coordinates.
-\(\operatorname{Im}(G_{\mathrm{orig}})\) is the blue curve, the set of
+\(\mathcal{R}_{\mathrm{orig}}\) is the blue curve, the set of
 decoder outputs in the original target units. The drawing no longer
 identifies them with one symbol.
 
