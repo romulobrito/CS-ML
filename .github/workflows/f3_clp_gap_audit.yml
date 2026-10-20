@@ -20,6 +20,7 @@ jobs:
           pip install 'numpy<3' pandas 'scipy<2' 'scikit-learn<2' torch
       - name: Run original CLP against noise-aware baselines
         env:
+          PYTHONPATH: '.'
           PYTHONUNBUFFERED: '1'
           OMP_NUM_THREADS: '1'
           MKL_NUM_THREADS: '1'
