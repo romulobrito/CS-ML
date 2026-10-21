@@ -1,0 +1,40 @@
+name: F3 CLP uncertainty and robust-data audit
+on:
+  push:
+    branches: [audit/f3-uncertainty-20261020]
+permissions:
+  contents: read
+jobs:
+  scientific-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'numpy<3' pandas 'scipy<2' 'scikit-learn<2' matplotlib torch
+      - name: Smoke test
+        env:
+          PYTHONPATH: '.'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+        run: python scripts/f3_gap_audit/uncertainty_study.py --quick --out outputs/f3_clp_uncertainty_smoke
+      - name: Run full experiment
+        env:
+          PYTHONPATH: '.'
+          PYTHONUNBUFFERED: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+        run: python scripts/f3_gap_audit/uncertainty_study.py --out outputs/f3_clp_uncertainty
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: f3-clp-uncertainty-experiments
+          path: |
+            outputs/f3_clp_uncertainty/
+            outputs/f3_clp_uncertainty_smoke/
+          if-no-files-found: warn

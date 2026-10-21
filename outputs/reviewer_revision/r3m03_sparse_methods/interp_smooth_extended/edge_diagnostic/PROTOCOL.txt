@@ -1,8 +1,0 @@
-Inside/outside diagnostic for the extended smoother.
-Interior: depths from the first to the last observation, inclusive.
-Outside: depths beyond that span. Interpolation holds the nearest sample there.
-The smoother does not. CLP curves were not recomputed.
-Smoother full-window RMSE was checked against interp_smooth_extended.
-Figures: the named step-32 seed-7 rho-0.10 noise-0.20 case,
-and every cell whose mean smoother RMSE is at least 0.30.
-Figures plotted: 4.
