@@ -1,0 +1,53 @@
+name: Geolink full-fold oracle diagnostic (non-operational)
+on:
+  push:
+    branches:
+      - audit/geolink-oracle-diagnostic-20261021
+permissions:
+  contents: read
+jobs:
+  oracle-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -q 'numpy<3' 'scikit-learn<2' pandas matplotlib torch
+      - name: Download verified official dataset
+        run: |
+          mkdir -p /tmp/geolink
+          curl --fail --location --silent --show-error --retry 3 --connect-timeout 20 --max-time 1800 \
+          -o /tmp/geolink/public-processed-datasets.tar.gz \
+          "https://zenodo.org/records/10987946/files/public-processed-datasets.tar.gz?download=1"
+          echo "67a659043770fab643d60d4d8fd674da50d178797f49e664d8c9abdc532a7aa6  /tmp/geolink/public-processed-datasets.tar.gz" | sha256sum --check
+      - name: Smoke scientific diagnostic code
+        env:
+          PYTHONPATH: '.'
+          PYTHONUNBUFFERED: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+          OPENBLAS_NUM_THREADS: '2'
+        run: |
+          python scripts/geolink_fullscale/oracle_audit.py --quick --out outputs/geolink_oracle_smoke
+      - name: Full original 3-seed diagnostic
+        env:
+          PYTHONPATH: '.'
+          PYTHONUNBUFFERED: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+          OPENBLAS_NUM_THREADS: '2'
+        run: |
+          python scripts/geolink_fullscale/oracle_audit.py --out outputs/geolink_oracle_audit
+      - name: Upload scientific diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: geolink-oracle-audit-fold0
+          path: |
+            outputs/geolink_oracle_audit/
+            outputs/geolink_oracle_smoke/
+          if-no-files-found: warn
