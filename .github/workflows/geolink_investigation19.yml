@@ -16,7 +16,7 @@ jobs:
           python-version: '3.11'
       - name: Scientific dependencies
         run: |
-          pip install -q 'numpy<3' 'scikit-learn<2' pandas torch
+          pip install -q 'numpy<3' 'scikit-learn<2' pandas matplotlib scipy torch
       - name: Download and verify full official Geolink data
         run: |
           mkdir -p /tmp/geolink
