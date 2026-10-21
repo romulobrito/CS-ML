@@ -1,0 +1,54 @@
+name: Geolink Investigation 19 recovery decomposition
+on:
+  push:
+    branches:
+      - audit/geolink-recovery-decomposition-20261021
+permissions:
+  contents: read
+jobs:
+  scientific-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Scientific dependencies
+        run: |
+          pip install -q 'numpy<3' 'scikit-learn<2' pandas torch
+      - name: Download and verify full official Geolink data
+        run: |
+          mkdir -p /tmp/geolink
+          curl --fail --location --silent --show-error --retry 3 \
+            --connect-timeout 20 --max-time 1800 \
+            -o /tmp/geolink/public-processed-datasets.tar.gz \
+            "https://zenodo.org/records/10987946/files/public-processed-datasets.tar.gz?download=1"
+          echo "67a659043770fab643d60d4d8fd674da50d178797f49e664d8c9abdc532a7aa6  /tmp/geolink/public-processed-datasets.tar.gz" | sha256sum --check
+      - name: Smoke verification
+        env:
+          PYTHONPATH: '.'
+          PYTHONUNBUFFERED: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+          OPENBLAS_NUM_THREADS: '2'
+        run: |
+          python scripts/geolink_fullscale/investigation19.py --quick --out outputs/investigation19_smoke
+      - name: Full three-seed investigation
+        env:
+          PYTHONPATH: '.'
+          PYTHONUNBUFFERED: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+          OPENBLAS_NUM_THREADS: '2'
+        run: |
+          python scripts/geolink_fullscale/investigation19.py --out outputs/investigation19_full
+      - name: Archive diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: geolink-investigation19-validation-recovery
+          path: |
+            outputs/investigation19_smoke/
+            outputs/investigation19_full/
+          if-no-files-found: warn
