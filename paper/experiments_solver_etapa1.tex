@@ -1,0 +1,89 @@
+% Step 1 (roadmap): FISTA vs SPGL1 on the same synthetic protocol as Phase~0.
+% Source numbers: outputs/solver_comparison/runs/20260417_114526/summary.csv
+% Figures: paper/figures/solver_comparison/runs/20260417_114526/ (same filenames 01--10 as Phase~0).
+% All ASCII.
+
+\section{Experiments: classical sparse solvers (Step~1)}
+\label{sec:exp_solver_etapa1}
+
+This section documents a \emph{Step~1} comparison aligned with the project roadmap: the sparse recovery block is run with two classical solvers, FISTA (penalized $\ell_1$) and SPGL1 (LASSO mode via PyLops), while holding the Phase~0 data protocol fixed.
+The goal is to separate formulation quality from optimizer choice before exploring trainable solvers or external baselines.
+
+\subsection{Protocol}
+\label{sec:solver_protocol}
+
+We reuse the Phase~0 configuration in Section~\ref{sec:exp_protocol}: ten seeds
+$\{7,13,23,29,31,37,41,43,47,53\}$, $\rho \in \{0.20,0.30,0.40,0.50,0.60\}$, $N=128$, $m=\lfloor \rho N\rfloor$, Gaussian $M$, identity $\Psi$, and the same noise levels.
+The implementation profile is \texttt{solver\_comparison} with \texttt{dual\_cs\_solver=True}, which evaluates
+\texttt{hybrid\_fista}, \texttt{hybrid\_spgl1}, \texttt{cs\_only\_fista}, \texttt{cs\_only\_spgl1}, and \texttt{ml\_only} (weighted hybrid is disabled in this profile).
+
+\paragraph{Sparse optimization.}
+FISTA selects $\lambda$ on the validation grid
+$\{10^{-4},3\!\cdot\!10^{-4},10^{-3},3\!\cdot\!10^{-3},10^{-2},3\!\cdot\!10^{-2}\}$.
+SPGL1 runs in LASSO mode ($\tau>0$, $\sigma=0$) with
+$\tau \in \{10^{-4},3\!\cdot\!10^{-4},10^{-3},3\!\cdot\!10^{-3},10^{-2},3\!\cdot\!10^{-2},10^{-1}\}$.
+Software: \texttt{pylops} matrix operator with dense $A=M\Psi$ and the \texttt{spgl1} Python package required by the PyLops wrapper.
+
+\paragraph{Artifacts.}
+The frozen run used for tables and figures in this draft is
+\texttt{outputs/solver\_comparison/runs/20260417\_114526/} (CSVs, \texttt{PROTOCOL.txt}, logs).
+Figures are copied under \texttt{paper/figures/solver\_comparison/runs/20260417\_114526/} with filenames \texttt{01\_\ldots 10\_} matching the Phase~0 dashboard.
+
+\subsection{Main quantitative comparison}
+\label{sec:solver_main_table}
+
+Table~\ref{tab:solver_rmse} reports test RMSE (mean $\pm$ std across seeds).
+The best hybrid row at each $\rho$ is in bold; \texttt{cs\_only\_*} rows are excluded from bolding.
+
+\begin{table}[t]
+  \centering
+  \caption{Test RMSE (mean $\pm$ std across ten seeds) versus $\rho=m/N$ for Step~1.
+  Frozen run \texttt{20260417\_114526}. Lowest RMSE among \texttt{hybrid\_*} methods at each $\rho$ in bold.}
+  \label{tab:solver_rmse}
+  \begin{tabular}{@{}lccccc@{}}
+    \toprule
+    $\rho$ & \texttt{ml\_only} & \texttt{hybrid\_fista} & \texttt{hybrid\_spgl1} & \texttt{cs\_only\_fista} & \texttt{cs\_only\_spgl1} \\
+    \midrule
+    $0.20$ & $0.369 \pm 0.011$ & $\mathbf{0.336 \pm 0.011}$ & $0.368 \pm 0.011$ & $0.625 \pm 0.015$ & $0.690 \pm 0.013$ \\
+    $0.30$ & $0.369 \pm 0.011$ & $\mathbf{0.319 \pm 0.011}$ & $0.367 \pm 0.011$ & $0.593 \pm 0.016$ & $0.690 \pm 0.013$ \\
+    $0.40$ & $0.369 \pm 0.011$ & $\mathbf{0.296 \pm 0.011}$ & $0.367 \pm 0.011$ & $0.553 \pm 0.015$ & $0.689 \pm 0.013$ \\
+    $0.50$ & $0.369 \pm 0.011$ & $\mathbf{0.272 \pm 0.011}$ & $0.367 \pm 0.011$ & $0.508 \pm 0.013$ & $0.689 \pm 0.013$ \\
+    $0.60$ & $0.369 \pm 0.011$ & $\mathbf{0.245 \pm 0.010}$ & $0.367 \pm 0.011$ & $0.455 \pm 0.015$ & $0.689 \pm 0.013$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Reading Table~\ref{tab:solver_rmse}.}
+\texttt{hybrid\_fista} matches the Phase~0 \texttt{hybrid} behavior: it improves monotonically with $\rho$ and beats \texttt{ml\_only} at every ratio.
+\texttt{hybrid\_spgl1} is essentially \emph{flat} near the ml-only RMSE ($\approx 0.367$) across $\rho$, so the SPGL1 LASSO instantiation tested here does not realize the hybrid gain seen under FISTA.
+\texttt{cs\_only\_fista} improves with $\rho$ but remains far above hybrid methods; \texttt{cs\_only\_spgl1} stays near $0.69$ with almost no $\rho$ sensitivity, consistent with failed reconstruction (relative $\ell_2$ near one in the logs).
+
+\subsection{Figures}
+\label{sec:solver_figures}
+
+Figure~\ref{fig:solver_rmse_mae_rel} mirrors the Phase~0 dashboard for Step~1 methods (curves versus $\rho$, gains, parity, residuals, traces).
+PNG assets for this run live in the repository tree \texttt{paper/figures/solver\_comparison/runs/} with the same \texttt{run\_id} as in Table~\ref{tab:solver_rmse}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.32\linewidth]{figures/solver_comparison/runs/20260417_114526/01_rmse_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{figures/solver_comparison/runs/20260417_114526/02_mae_vs_measurement_ratio.png}
+  \includegraphics[width=0.32\linewidth]{figures/solver_comparison/runs/20260417_114526/03_relative_l2_vs_measurement_ratio.png}
+  \caption{Step~1: RMSE, MAE, and relative $\ell_2$ versus $\rho$ for FISTA/SPGL1 variants. Error bars: std across seeds. \texttt{ml\_only} is flat in $\rho$.}
+  \label{fig:solver_rmse_mae_rel}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.48\linewidth]{figures/solver_comparison/runs/20260417_114526/06_gain_rmse_over_ml_only.png}
+  \includegraphics[width=0.48\linewidth]{figures/solver_comparison/runs/20260417_114526/09_parity_ground_truth_vs_prediction.png}
+  \caption{Step~1: RMSE gain over ml-only (left) and parity plot (right).}
+  \label{fig:solver_gain_parity}
+\end{figure}
+
+\subsection{Takeaway}
+\label{sec:solver_takeaway}
+
+Under this frozen synthetic protocol, \textbf{FISTA remains the preferred classical sparse solver} for the hybrid and \texttt{cs\_only} baselines.
+The tested SPGL1 configuration does not improve hybrid error relative to FISTA; the hybrid SPGL1 curve is numerically close to ml-only, while \texttt{cs\_only\_spgl1} is strongly degraded.
+This supports keeping FISTA as the default classical block in subsequent roadmap steps (trainable solvers, robustness sweeps) unless a revised SPGL1 parameterization or scaling study changes the conclusion.

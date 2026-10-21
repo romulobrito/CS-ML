@@ -1,0 +1,22 @@
+Transform-domain equivalence test
+============================================================
+
+Hypothesis: with orthonormal Psi and L2 loss, 
+  learning u -> y and learning u -> alpha (with 
+  reconstruction y_hat = alpha_hat @ Psi.T) yield 
+  essentially the same test RMSE.
+
+Threshold for 'equivalent': |delta_rmse| / rmse_y < 5%.
+
+step= 8 family=mlp    | y_target rmse=0.02254  alpha_target rmse=0.03271  delta=+45.17%
+step= 8 family=ridge  | y_target rmse=0.01482  alpha_target rmse=0.01482  delta=+0.00%
+step=16 family=mlp    | y_target rmse=0.02467  alpha_target rmse=0.04139  delta=+67.75%
+step=16 family=ridge  | y_target rmse=0.01436  alpha_target rmse=0.01436  delta=-0.00%
+step=32 family=mlp    | y_target rmse=0.02610  alpha_target rmse=0.03811  delta=+46.04%
+step=32 family=ridge  | y_target rmse=0.01443  alpha_target rmse=0.01443  delta=-0.00%
+
+Cells with |delta| <= 5%: 3 / 6
+
+VERDICT: NOT CONFIRMED: alpha space differs from y space in 3 cells. Worth investigating further (could indicate optimization advantage, regularization interaction, or implementation issue).
+
+Total run time: 19.8s

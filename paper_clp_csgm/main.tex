@@ -1,0 +1,159 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
+
+\usepackage{setspace}
+\usepackage{lineno}
+
+% Float tuning for a manuscript with many figures and compact result tables.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.82}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.74}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{10pt plus 2pt minus 2pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+
+\graphicspath{{figures/}}
+
+\newtheorem{assumption}{Assumption}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\newcommand{\keywords}[1]{%
+  \vspace{0.5em}
+  \noindent\textbf{Keywords:} #1\par
+}
+
+
+\title{Conditional Latent-Prior Generative Compressed Sensing for Petrophysical Target-Log Reconstruction}
+
+\author{%
+Romulo Brito da Silva\textsuperscript{1,3,*},
+Irineu de Azevedo Lima Neto\textsuperscript{3}\\
+Diego Passos\textsuperscript{4},
+Herson Oliveira da Rocha\textsuperscript{1,2,3}\\
+Roseane Marchezi Missagia\textsuperscript{1},\\
+Marco Antonio Rodrigues de Ceia\textsuperscript{1}\\[0.5em]
+\parbox{0.95\textwidth}{\centering\small
+\textsuperscript{1}LENEP, North Fluminense State University (UENF),
+Rodovia Amaral Peixoto, km 163, Imboassica,
+Macaé, RJ 27925-310, Brazil\\
+\textsuperscript{2}Polytechnic Institute (IPLOI), Campus Macaé,
+Federal University of Rio de Janeiro (UFRJ), Macaé, Brazil\\
+\textsuperscript{3}Scientific Computing Supporting Foundation (FACC),
+Petrópolis, Brazil\\
+\textsuperscript{4}Instituto Superior de Engenharia de Lisboa,
+Instituto Politécnico de Lisboa, Lisbon, Portugal\\[0.35em]
+\textsuperscript{*}Corresponding author at:
+LENEP/UENF, Rodovia Amaral Peixoto, km 163, Imboassica,
+Macaé, RJ 27925-310, Brazil.
+E-mail: \texttt{romulobrito@lenep.uenf.br}}
+}
+\date{}
+
+\begin{document}
+\doublespacing
+\linenumbers
+\maketitle
+
+\begin{abstract}
+Reconstructing a petrophysical target curve is difficult when dense auxiliary
+logs are available along the well but the target is observed only at selected
+depths. Direct models can use those sparse observations as input features,
+yet they do not require the reconstruction to honor them as measurements.
+We introduce Conditional Latent-Prior Compressed Sensing with Generative
+Models (CLP-CSGM). A decoder trained on windows of the target curve supplies
+the windows the reconstruction may use. Dense auxiliary logs predict a
+conditional latent code, $z_0$. Latent refinement balances disagreement with
+the sparse measurements against proximity to $z_0$. That code is the
+reference for this balance, not only a starting value. A residual at the
+observed depths can remain.
+The cross-well evaluation uses public Dutch North Sea logs, with three wells
+for model development and one well held out. The main targets are derived:
+clay volume from gamma ray by the Larionov relation, and a processed,
+density-derived porosity. Sparse observations are coordinate subsamples of
+these same curves rather than independently acquired core or laboratory
+measurements.
+CLP-CSGM has lower mean root-mean-square error than the direct autoencoder
+in seven of nine cross-well configurations, with the gains concentrated in
+the smallest training set. This comparison is a conditional advantage over
+that autoencoder, not superiority over every comparator. At the reference
+noise standard deviation 0.01, depth interpolation of the sparse measurements
+has lower error than CLP-CSGM in all nine configurations. Under larger
+perturbations that interpolation comparison changes. These noise levels were
+used for sensitivity analysis and were not calibrated to field measurement
+uncertainties. In a supplementary laboratory-porosity check, the direct
+autoencoder has the lower mean error. The benefit depends on the regime, and
+broader validation is still required.
+\end{abstract}
+
+\keywords{compressed sensing; generative model; inverse problem;
+well-log reconstruction; petrophysics; sparse assimilation}
+
+\vspace{0.5em}
+\section*{Computer Code Availability}
+
+CLP-CSGM (Conditional Latent-Prior Compressed Sensing with Generative Models)
+was developed by Romulo Brito da Silva, LENEP, North Fluminense State
+University, Rodovia Amaral Peixoto, km 163, Imboassica, Macae,
+RJ 27925-310, Brazil (contact: \texttt{romulobrito@lenep.uenf.br} ;
+telephone: +55 21 99101-3308).
+First publicly released in 2026, it is implemented in Python 3.10 using
+NumPy 1.26, pandas 2.3, Matplotlib 3.7, scikit-learn 1.6, PyTorch 2.6,
+and PyWavelets 1.4. The source repository occupies approximately 10~MB,
+excluding datasets and experiment outputs, and runs on a multi-core CPU
+with at least 8~GB of RAM; CUDA is optional.
+
+Source code, installation instructions, dependencies, benchmark scripts,
+and documentation are available at
+\url{https://github.com/romulobrito/CLP--CSGM} under the MIT License.
+The repository covers the cross-well clay-volume and F03-4 porosity
+benchmarks, structural ablations, latent-prior sensitivity, and
+supplementary diagnostics. Processed well-log tables are not redistributed;
+the README specifies the required inputs and reproduction steps.
+
+\vspace{0.35em}
+\noindent\textbf{Data availability.}
+The F3-derived benchmarks follow \citet{zhang2025rockphysicslogs}; users
+must obtain the tabulated inputs from the cited releases or portals under
+the applicable licenses. The Lapa dataset follows
+\citet{alvarez2025nonlinear}, whose underlying field data cannot be shared
+publicly. Supplementary analyses therefore require locally authorized inputs.
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_method}
+\input{sections/04_data_and_eda}
+\input{sections/05_experiments}
+\input{sections/06_results}
+\input{sections/07_discussion}
+\input{sections/08_conclusion}
+
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\appendix
+\input{sections/09_appendix}
+
+\end{document}

@@ -1,0 +1,2501 @@
+=== SIR-CS start | profile=solver_comparison | jobs=50 | seeds=[7, 13, 23, 29, 31, 37, 41, 43, 47, 53] | measurement_ratios=[0.2, 0.3, 0.4, 0.5, 0.6] | output_dir=outputs/solver_comparison/runs/20260417_114526 ===
+--- job 1/50 seed=7 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.334657 (4.68s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.351661 (4.65s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.370496 (4.37s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.381261 (4.09s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.385038 (4.78s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.384909 (4.07s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.368668 (0.23s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.368667 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.368658 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.368638 (0.23s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.368569 (0.23s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.368377 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.367755 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.591969 (4.75s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.615959 (4.27s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.651363 (4.42s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.679029 (4.52s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.692854 (4.63s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.694458 (4.84s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (27.4s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.659672 (0.18s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.659672 (0.21s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.659662 (0.25s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.659642 (0.26s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.659574 (0.27s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.659381 (0.24s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.658755 (0.26s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.7s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=7 m/N=0.20 block_time=90.8s
+--- job 2/50 seed=7 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.314630 (4.23s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.332490 (4.87s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.348660 (4.49s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.356635 (4.67s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.358533 (4.25s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.357409 (4.19s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.7s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.368668 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.368668 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.368655 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.368629 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.368540 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.368287 (0.23s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.367451 (0.27s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.560225 (4.26s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.590214 (4.86s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.626449 (4.68s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.648503 (4.50s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.656861 (4.51s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.656828 (4.36s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (27.2s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.659672 (0.13s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.659672 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.659661 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.659637 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.659558 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.659334 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.658586 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=7 m/N=0.30 block_time=85.8s
+--- job 3/50 seed=7 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.293441 (4.41s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.311783 (4.29s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.324913 (4.55s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.330293 (4.88s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.331006 (4.11s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.329420 (4.14s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.368668 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.368668 (0.14s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.368653 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.368622 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.368513 (0.23s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.368208 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.367186 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.521854 (4.26s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.553416 (4.07s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.586690 (4.07s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.603793 (4.12s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.609518 (4.10s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.608749 (4.08s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.7s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.659672 (0.13s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.659672 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.659661 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.659634 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.659546 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.659298 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.658470 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=7 m/N=0.40 block_time=83.4s
+--- job 4/50 seed=7 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.271721 (4.23s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.288693 (4.28s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.299326 (4.17s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.302818 (4.20s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.302051 (4.15s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.299344 (4.14s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.368668 (0.13s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.368668 (0.14s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.368652 (0.20s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.368618 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.368502 (0.30s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.368174 (0.24s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.367078 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.481000 (4.15s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.514988 (4.12s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.544596 (4.12s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.556050 (4.13s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.558756 (4.19s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.556388 (4.09s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.8s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.659672 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.659672 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.659662 (0.18s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.659631 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.659538 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.659274 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.658386 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=7 m/N=0.50 block_time=69.7s
+--- job 5/50 seed=7 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.239202 (4.32s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.255829 (4.23s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.264835 (4.20s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.266896 (4.20s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.266759 (4.18s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.266377 (4.21s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.3s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.368668 (0.13s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.368668 (0.13s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.368651 (0.20s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.368615 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.368491 (0.20s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.368143 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.366984 (0.25s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.426975 (4.34s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.460918 (4.21s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.485658 (4.23s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.494510 (4.27s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.495471 (4.25s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.492956 (4.22s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.5s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.659672 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.659672 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.659664 (0.18s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.659629 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.659531 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.659254 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.658314 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=7 m/N=0.60 block_time=70.2s
+--- job 6/50 seed=13 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.340846 (3.83s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.354572 (3.78s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.371536 (3.81s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.382653 (3.80s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.386318 (3.76s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.385808 (3.80s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (22.8s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373410 (0.13s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373408 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373399 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373378 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373305 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.373101 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.372454 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.644445 (3.86s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.665871 (3.80s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.698063 (3.95s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.722168 (3.79s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.734180 (3.85s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.736041 (3.77s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (23.0s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.706447 (0.13s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.706447 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.706439 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.706422 (0.20s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.706364 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.706202 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.705675 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=13 m/N=0.20 block_time=65.5s
+--- job 7/50 seed=13 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.322844 (3.89s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.338872 (3.88s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.355773 (3.86s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.362555 (3.89s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.364054 (3.89s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.362965 (3.94s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (23.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373410 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373409 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373396 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373369 (0.20s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373275 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.373011 (0.22s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.372140 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.607692 (4.03s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.633084 (3.91s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.667555 (3.87s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.689790 (3.92s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.698988 (4.14s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.699270 (4.12s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.0s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.706447 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.706447 (0.16s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.706436 (0.23s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.706414 (0.24s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.706337 (0.23s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.706120 (0.22s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.705393 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=13 m/N=0.30 block_time=67.3s
+--- job 8/50 seed=13 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.298464 (4.56s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.317762 (4.43s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.332448 (4.26s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.337774 (4.35s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.338351 (4.36s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.336273 (4.34s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.3s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373410 (0.17s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373409 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373394 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373362 (0.23s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373250 (0.25s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.372934 (0.23s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.371889 (0.28s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.566995 (4.33s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.599823 (4.63s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.631963 (4.36s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.647983 (4.18s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.652821 (4.36s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.651566 (4.33s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.2s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.706447 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.706447 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.706437 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.706411 (0.20s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.706328 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.706095 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.705307 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=13 m/N=0.40 block_time=73.7s
+--- job 9/50 seed=13 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.275849 (4.26s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.294688 (4.21s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.307375 (4.24s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.310811 (4.34s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.310194 (4.23s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.307250 (4.34s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373410 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373409 (0.14s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373393 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373358 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373239 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.372903 (0.22s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.371777 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.524719 (4.20s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.560406 (4.19s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.590202 (4.33s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.601946 (4.31s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.604712 (4.27s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.603070 (4.21s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.5s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.706447 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.706447 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.706438 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.706409 (0.23s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.706321 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.706073 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.705236 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=13 m/N=0.50 block_time=72.7s
+--- job 10/50 seed=13 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.246220 (4.64s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.264237 (4.56s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.274735 (4.47s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.277896 (4.49s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.277229 (4.49s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.275532 (4.49s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (27.1s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373410 (0.19s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373410 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373392 (0.23s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373357 (0.30s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373234 (0.26s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.372883 (0.25s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.371695 (0.28s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.7s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.465041 (4.73s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.500626 (4.59s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.531279 (4.69s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.543306 (4.61s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.545061 (4.67s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.542893 (4.62s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (27.9s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.706447 (0.17s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.706447 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.706439 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.706408 (0.23s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.706319 (0.23s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.706068 (0.23s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.705215 (0.24s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=13 m/N=0.60 block_time=80.2s
+--- job 11/50 seed=23 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.359997 (4.31s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.377216 (4.36s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.396995 (4.34s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.409185 (4.29s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.413329 (4.26s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.412983 (4.16s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.7s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.396236 (0.17s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.396236 (0.17s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.396226 (0.23s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.396206 (0.25s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.396137 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.395945 (0.23s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.395324 (0.26s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.620151 (4.26s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.643363 (4.19s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.675737 (4.24s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.701137 (4.33s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.713356 (4.22s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.715839 (4.22s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.5s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.681427 (0.17s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.681427 (0.15s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.681418 (0.23s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.681400 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.681338 (0.23s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.681163 (0.23s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.680580 (0.24s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=23 m/N=0.20 block_time=74.3s
+--- job 12/50 seed=23 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.342032 (4.47s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.361471 (4.43s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.379593 (4.35s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.388366 (4.68s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.390984 (4.61s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.389471 (4.33s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.9s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.396236 (0.17s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.396236 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.396225 (0.23s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.396203 (0.24s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.396127 (0.23s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.395915 (0.23s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.395210 (0.27s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.582972 (4.40s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.614338 (4.51s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.651266 (4.48s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.674417 (4.47s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.682662 (4.64s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.682407 (4.42s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.9s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.681427 (0.17s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.681427 (0.16s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.681417 (0.24s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.681396 (0.24s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.681323 (0.24s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.681118 (0.23s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.680439 (0.24s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=23 m/N=0.30 block_time=76.1s
+--- job 13/50 seed=23 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.317606 (4.46s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.339409 (4.61s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.356561 (4.39s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.362905 (4.45s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.363241 (4.42s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.360997 (4.23s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.396236 (0.16s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.396236 (0.14s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.396223 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.396196 (0.27s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.396102 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.395841 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.394988 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.547270 (4.15s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.581121 (4.34s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.614212 (4.45s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.630478 (4.46s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.635327 (4.29s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.633751 (4.22s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.9s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.681427 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.681427 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.681416 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.681391 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.681307 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.681071 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.680271 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=23 m/N=0.40 block_time=74.4s
+--- job 14/50 seed=23 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.290305 (4.34s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.310761 (4.35s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.324465 (4.37s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.328604 (4.24s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.328257 (4.58s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.325573 (4.27s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.396236 (0.16s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.396236 (0.14s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.396221 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.396189 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.396080 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.395773 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.394760 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.501984 (4.28s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.538012 (4.23s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.569281 (4.58s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.582695 (4.39s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.585436 (4.30s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.583165 (4.30s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.1s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.681427 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.681427 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.681417 (0.19s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.681387 (0.23s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.681294 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.681032 (0.22s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.680153 (0.23s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=23 m/N=0.50 block_time=71.8s
+--- job 15/50 seed=23 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.259872 (4.41s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.277376 (4.42s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.288323 (4.37s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.291588 (4.57s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.291321 (4.44s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.290529 (4.40s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.396236 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.396236 (0.14s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.396220 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.396187 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.396072 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.395749 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.394676 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.448617 (4.32s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.484902 (4.36s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.512537 (4.33s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.522800 (4.52s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.524253 (4.32s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.521011 (4.35s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.2s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.681427 (0.17s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.681427 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.681418 (0.19s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.681386 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.681290 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.681019 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.680105 (0.25s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=23 m/N=0.60 block_time=72.7s
+--- job 16/50 seed=29 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.342863 (4.89s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.356683 (4.36s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.373278 (4.04s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.383799 (4.03s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.387995 (3.98s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.387436 (4.01s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.3s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373427 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373425 (0.18s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373416 (0.23s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373394 (0.22s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373319 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.373111 (0.22s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.372434 (0.25s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.620766 (3.92s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.644293 (4.79s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.681635 (4.10s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.714987 (3.99s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.732398 (3.92s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.737019 (3.91s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.6s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.694645 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.694645 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.694635 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.694616 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.694548 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.694359 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.693736 (0.21s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=29 m/N=0.20 block_time=72.4s
+--- job 17/50 seed=29 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.327526 (4.23s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.341664 (4.59s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.355949 (4.70s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.362464 (4.41s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.364241 (4.44s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.363246 (4.28s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.7s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373427 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373426 (0.17s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373415 (0.23s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373393 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373315 (0.26s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.373094 (0.30s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.372369 (0.41s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.7s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.586547 (6.69s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.616045 (5.17s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.654555 (5.27s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.682278 (4.48s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.692831 (4.67s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.694005 (4.38s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (30.7s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.694645 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.694645 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.694635 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.694613 (0.30s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.694540 (0.28s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.694333 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.693643 (0.23s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=29 m/N=0.30 block_time=115.4s
+--- job 18/50 seed=29 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.302880 (4.29s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.319499 (4.33s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.334002 (4.35s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.339325 (4.28s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.340471 (4.40s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.338042 (4.18s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.8s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373427 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373426 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373413 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373386 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373293 (0.23s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.373030 (0.22s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.372147 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.548842 (4.39s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.585604 (4.17s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.623384 (4.57s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.644984 (4.47s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.651750 (4.52s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.651274 (4.49s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.6s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.694645 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.694645 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.694636 (0.23s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.694610 (0.23s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.694530 (0.24s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.694305 (0.22s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.693551 (0.24s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=29 m/N=0.40 block_time=77.6s
+--- job 19/50 seed=29 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.278667 (4.52s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.295210 (4.30s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.305759 (4.29s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.309502 (4.53s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.309473 (4.43s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.308022 (4.40s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.5s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373427 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373426 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373410 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373376 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373259 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.372929 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.371828 (0.25s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.501144 (4.26s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.537507 (4.28s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.573627 (4.38s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.591386 (4.38s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.596266 (4.27s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.594508 (4.40s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.0s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.694645 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.694645 (0.15s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.694637 (0.18s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.694607 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.694519 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.694269 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.693426 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=29 m/N=0.50 block_time=75.6s
+--- job 20/50 seed=29 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.251203 (4.55s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.265824 (4.43s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.274855 (4.67s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.277013 (4.46s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.276849 (4.57s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.276147 (4.54s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (27.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.373427 (0.17s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.373426 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.373409 (0.23s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.373373 (0.23s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.373248 (0.23s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.372896 (0.23s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.371714 (0.25s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.449392 (4.54s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.486680 (4.55s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.516265 (4.52s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.528178 (4.53s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.530106 (4.61s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.528792 (4.38s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (27.1s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.694645 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.694645 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.694638 (0.18s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.694603 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.694507 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.694234 (0.22s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.693310 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=29 m/N=0.60 block_time=86.3s
+--- job 21/50 seed=31 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.322783 (3.89s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.336826 (3.87s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.352321 (3.88s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.361481 (4.06s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.364239 (3.85s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.363739 (3.85s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (23.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.352870 (0.19s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.352868 (0.20s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.352859 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.352838 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.352765 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.352562 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.351897 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.623523 (3.88s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.644709 (4.01s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.675542 (3.99s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.700080 (3.87s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.711866 (4.01s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.714960 (3.97s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (23.7s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.684344 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.684344 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.684335 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.684316 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.684250 (0.20s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.684064 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.683456 (0.24s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=31 m/N=0.20 block_time=70.1s
+--- job 22/50 seed=31 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.308313 (4.08s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.324123 (4.06s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.338043 (4.13s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.344507 (4.07s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.346182 (4.09s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.344900 (4.32s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (24.8s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.352870 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.352869 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.352858 (0.25s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.352833 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.352747 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.352507 (0.22s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.351715 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.593394 (4.00s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.621058 (4.06s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.652580 (4.22s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.672694 (4.17s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.681344 (4.10s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.681639 (4.15s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.7s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.684344 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.684344 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.684334 (0.22s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.684313 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.684241 (0.28s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.684039 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.683355 (0.24s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=31 m/N=0.30 block_time=73.0s
+--- job 23/50 seed=31 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.281713 (4.41s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.298677 (4.40s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.312080 (4.34s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.317525 (4.44s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.317992 (4.37s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.315801 (4.28s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.352870 (0.16s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.352869 (0.17s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.352855 (0.23s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.352826 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.352723 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.352435 (0.36s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.351465 (0.32s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.7s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.546664 (4.24s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.578042 (4.24s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.608843 (4.37s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.624050 (4.15s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.627915 (4.22s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.626718 (4.23s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.4s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.684344 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.684344 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.684333 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.684307 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.684221 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.683979 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.683161 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=31 m/N=0.40 block_time=87.2s
+--- job 24/50 seed=31 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.252667 (4.46s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.269367 (4.48s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.280014 (4.35s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.283629 (4.37s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.283262 (4.36s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.280457 (4.40s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.352870 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.352869 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.352853 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.352818 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.352697 (0.23s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.352357 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.351243 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.502333 (4.30s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.535111 (4.32s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.564533 (4.29s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.577431 (4.34s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.579905 (4.47s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.577750 (4.30s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.0s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.684344 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.684344 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.684334 (0.19s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.684304 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.684210 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.683945 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.683051 (0.23s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=31 m/N=0.50 block_time=75.7s
+--- job 25/50 seed=31 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.229207 (4.43s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.243233 (4.34s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.251231 (4.32s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.253243 (4.36s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.253057 (4.48s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.252387 (4.44s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.352870 (0.16s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.352869 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.352852 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.352815 (0.23s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.352688 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.352329 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.351129 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.455048 (4.29s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.487892 (4.45s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.513553 (4.40s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.524767 (4.31s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.526701 (4.32s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.524946 (4.35s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.1s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.684344 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.684344 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.684335 (0.18s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.684301 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.684201 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.683918 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.682972 (0.23s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=31 m/N=0.60 block_time=75.6s
+--- job 26/50 seed=37 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.331682 (3.97s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.346750 (3.91s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.363336 (3.92s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.375313 (3.91s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.379362 (3.87s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.379189 (3.93s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (23.5s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.362766 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.362765 (0.17s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.362755 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.362734 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.362659 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.362452 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.361799 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.631288 (3.93s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.654835 (3.98s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.688588 (3.94s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.715426 (3.97s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.729680 (3.94s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.733520 (4.00s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (23.8s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698461 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698461 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698452 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698434 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698373 (0.20s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698202 (0.20s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697630 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=37 m/N=0.20 block_time=69.4s
+--- job 27/50 seed=37 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.310859 (4.12s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.328176 (4.09s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.344483 (4.05s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.352859 (4.06s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.355366 (4.08s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.353837 (4.15s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (24.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.362766 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.362765 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.362753 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.362726 (0.22s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.362633 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.362374 (0.22s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.361522 (0.25s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.598638 (4.10s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.628095 (4.14s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.663144 (4.14s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.683755 (4.07s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.691871 (4.06s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.692162 (4.12s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.6s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698461 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698461 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698450 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698427 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698349 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698130 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697399 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=37 m/N=0.30 block_time=72.4s
+--- job 28/50 seed=37 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.289208 (4.20s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.304903 (4.13s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.318624 (4.20s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.323885 (4.19s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.324895 (4.19s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.322601 (4.32s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.362766 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.362765 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.362751 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.362720 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.362612 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.362308 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.361293 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.566838 (4.15s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.599983 (4.18s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.631193 (4.17s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.646913 (4.24s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.651480 (4.20s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.650253 (4.25s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.2s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698461 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698461 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698451 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698428 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698352 (0.20s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698138 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697426 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=37 m/N=0.40 block_time=73.0s
+--- job 29/50 seed=37 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.265691 (4.42s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.282106 (4.25s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.293138 (4.24s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.297168 (4.32s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.297219 (4.22s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.295589 (4.22s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.7s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.362766 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.362765 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.362749 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.362715 (0.22s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.362597 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.362265 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.361173 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.519634 (4.42s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.551864 (4.27s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.582819 (4.38s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.596040 (4.22s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.598925 (4.28s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.596095 (4.23s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.8s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698461 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698461 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698452 (0.19s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698424 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698339 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698100 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697301 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=37 m/N=0.50 block_time=74.5s
+--- job 30/50 seed=37 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.237022 (4.62s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.251873 (4.54s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.260594 (4.52s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.263651 (4.52s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.263254 (4.57s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.262208 (4.53s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (27.3s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.362766 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.362766 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.362749 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.362715 (0.22s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.362596 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.362257 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.361127 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.465717 (4.53s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.500843 (4.67s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.527265 (4.62s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.537509 (4.63s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.539032 (4.69s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.537466 (4.54s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (27.7s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698461 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698461 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698453 (0.18s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698419 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698322 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698048 (0.22s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697122 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=37 m/N=0.60 block_time=78.4s
+--- job 31/50 seed=41 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.369688 (4.03s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.385599 (3.95s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.404120 (3.88s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.415191 (3.89s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.420415 (3.95s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.420264 (3.89s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (23.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.404372 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.404371 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.404362 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.404341 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.404269 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.404068 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.403397 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.641548 (3.90s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.663395 (3.93s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.694657 (3.93s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.718391 (3.96s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.730003 (3.92s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.731885 (3.90s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (23.6s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.703846 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.703846 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.703837 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.703819 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.703756 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.703581 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.703000 (0.21s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=41 m/N=0.20 block_time=65.6s
+--- job 32/50 seed=41 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.354287 (4.11s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.372594 (4.02s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.388875 (4.04s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.396352 (3.99s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.398266 (4.00s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.396950 (4.04s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (24.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.404372 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.404372 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.404360 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.404335 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.404249 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.404008 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.403210 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.616746 (4.04s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.646943 (4.01s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.679929 (4.02s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.698952 (4.12s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.706309 (4.16s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.706225 (3.99s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.3s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.703846 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.703846 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.703836 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.703816 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.703749 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.703559 (0.20s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.702918 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=41 m/N=0.30 block_time=66.9s
+--- job 33/50 seed=41 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.331836 (4.18s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.349134 (4.12s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.362917 (4.28s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.368782 (4.11s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.369791 (4.09s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.367676 (4.09s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (24.9s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.404372 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.404372 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.404358 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.404330 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.404233 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.403961 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.403053 (0.23s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.576738 (4.15s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.611726 (4.16s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.645379 (4.15s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.662009 (4.16s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.666638 (4.30s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.665306 (4.19s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.1s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.703846 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.703846 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.703837 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.703815 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.703743 (0.23s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.703540 (0.22s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.702853 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=41 m/N=0.40 block_time=69.5s
+--- job 34/50 seed=41 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.307439 (4.35s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.324412 (4.33s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.336431 (4.29s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.340559 (4.36s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.340207 (4.50s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.337262 (5.55s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (27.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.404372 (0.25s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.404372 (0.19s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.404356 (0.33s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.404325 (0.30s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.404214 (0.29s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.403904 (0.30s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.402871 (0.32s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (2.0s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.534307 (7.77s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.567442 (5.82s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.597295 (4.78s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.610206 (4.73s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.612915 (4.61s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.611010 (4.72s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (32.4s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.703846 (0.20s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.703846 (0.23s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.703837 (0.23s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.703811 (0.24s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.703731 (0.26s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.703505 (0.25s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.702740 (0.24s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.6s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=41 m/N=0.50 block_time=97.6s
+--- job 35/50 seed=41 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.275708 (5.18s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.292244 (4.82s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.301179 (4.81s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.303496 (4.57s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.302803 (4.68s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.302762 (4.71s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (28.8s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.404372 (0.16s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.404372 (0.14s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.404356 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.404323 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.404210 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.403892 (0.23s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.402833 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.483028 (4.42s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.518600 (4.55s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.543303 (4.40s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.553064 (4.31s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.554329 (4.42s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.551637 (4.51s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.6s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.703846 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.703846 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.703838 (0.18s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.703808 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.703719 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.703470 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.702622 (0.32s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=41 m/N=0.60 block_time=87.2s
+--- job 36/50 seed=43 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.354194 (4.68s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.368582 (4.39s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.384127 (4.02s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.393894 (3.86s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.397638 (3.86s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.397214 (3.93s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (24.7s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.386217 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.386216 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.386207 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.386186 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.386114 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.385914 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.385266 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.643439 (3.84s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.666312 (3.84s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.698563 (3.83s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.722963 (3.89s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.735274 (3.82s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.737699 (3.79s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (23.0s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.709427 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.709427 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.709418 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.709399 (0.20s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.709333 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.709148 (0.20s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.708551 (0.21s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=43 m/N=0.20 block_time=84.3s
+--- job 37/50 seed=43 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.337608 (4.08s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.353673 (4.01s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.368682 (3.98s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.374862 (4.03s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.376543 (4.01s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.375099 (4.04s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (24.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.386217 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.386217 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.386204 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.386178 (0.22s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.386087 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.385832 (0.22s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.384986 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.611766 (4.04s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.641867 (4.10s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.675923 (4.06s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.697578 (4.26s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.705498 (4.09s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.705542 (4.00s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.5s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.709427 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.709427 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.709417 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.709393 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.709315 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.709094 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.708361 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=43 m/N=0.30 block_time=67.3s
+--- job 38/50 seed=43 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.315155 (4.16s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.332111 (4.31s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.344433 (4.24s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.348983 (4.17s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.349514 (4.22s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.347347 (4.26s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.386217 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.386217 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.386202 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.386173 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.386069 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.385779 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.384807 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.566610 (4.18s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.598870 (4.13s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.633171 (4.12s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.650379 (4.14s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.655280 (4.14s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.653531 (4.15s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.9s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.709427 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.709427 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.709417 (0.19s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.709389 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.709302 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.709055 (0.22s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.708220 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=43 m/N=0.40 block_time=68.5s
+--- job 39/50 seed=43 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.290903 (4.20s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.308738 (4.30s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.320026 (4.47s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.323102 (4.84s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.322198 (4.89s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.320089 (4.49s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (27.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.386217 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.386217 (0.14s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.386200 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.386167 (0.23s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.386050 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.385720 (0.24s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.384611 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.523909 (4.34s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.559333 (4.30s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.589944 (4.41s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.602548 (4.35s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.604547 (4.38s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.602545 (4.43s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.2s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.709427 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.709427 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.709418 (0.19s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.709387 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.709294 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.709032 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.708148 (0.23s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=43 m/N=0.50 block_time=72.5s
+--- job 40/50 seed=43 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.263936 (4.61s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.280118 (4.61s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.287890 (4.61s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.289891 (4.46s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.289754 (4.63s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.290328 (4.48s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (27.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.386217 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.386217 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.386199 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.386163 (0.22s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.386037 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.385682 (0.29s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.384498 (0.31s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.6s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.475878 (4.51s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.511024 (4.54s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.537893 (4.72s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.546743 (5.41s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.548349 (5.16s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.546131 (5.30s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (29.6s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.709427 (0.22s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.709427 (0.16s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.709419 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.709384 (0.24s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.709285 (0.24s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.709005 (0.26s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.708065 (0.28s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.6s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=43 m/N=0.60 block_time=80.1s
+--- job 41/50 seed=47 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.332077 (4.00s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.347114 (3.83s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.363301 (3.82s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.372794 (3.90s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.376167 (3.79s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.375746 (3.82s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (23.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.365074 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.365073 (0.18s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.365064 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.365043 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.364972 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.364775 (0.30s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.364148 (0.28s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.648987 (3.76s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.672805 (3.79s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.705931 (3.82s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.731743 (3.82s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.743406 (3.79s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.745566 (3.85s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (22.8s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.713117 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.713117 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.713107 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.713088 (0.20s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.713021 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.712832 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.712210 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=47 m/N=0.20 block_time=99.7s
+--- job 42/50 seed=47 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.317359 (4.44s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.333701 (4.46s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.347596 (4.54s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.354402 (4.44s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.355998 (4.18s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.354349 (4.49s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.365074 (0.21s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.365073 (0.20s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.365062 (0.28s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.365039 (0.38s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.364960 (0.29s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.364738 (0.26s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.364015 (0.31s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.9s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.613169 (4.67s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.643969 (4.63s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.678605 (4.59s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.702463 (4.39s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.712454 (4.32s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.713288 (4.13s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.7s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.713117 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.713117 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.713107 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.713087 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.713017 (0.20s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.712822 (0.23s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.712166 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=47 m/N=0.30 block_time=85.6s
+--- job 43/50 seed=47 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.297897 (4.22s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.315898 (4.22s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.328167 (4.50s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.332970 (4.80s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.333672 (4.81s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.332415 (4.67s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (27.2s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.365074 (0.19s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.365073 (0.19s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.365060 (0.27s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.365032 (0.26s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.364933 (0.26s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.364657 (0.27s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.363742 (0.30s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.7s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.571687 (4.78s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.608069 (4.64s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.644648 (4.74s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.662102 (4.64s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.667203 (4.27s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.665800 (4.26s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (27.3s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.713117 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.713117 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.713107 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.713081 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.712999 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.712766 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.711980 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=47 m/N=0.40 block_time=84.5s
+--- job 44/50 seed=47 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.274208 (4.28s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.290893 (4.20s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.301521 (4.18s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.304766 (4.29s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.304816 (4.19s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.302629 (4.25s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.365074 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.365073 (0.19s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.365058 (0.24s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.365026 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.364914 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.364600 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.363573 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.532379 (4.16s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.566760 (4.44s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.597708 (4.32s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.612327 (4.26s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.616010 (4.23s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.614306 (4.21s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (25.6s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.713117 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.713117 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.713108 (0.19s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.713078 (0.22s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.712989 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.712738 (0.20s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.711887 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=47 m/N=0.50 block_time=73.5s
+--- job 45/50 seed=47 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.257245 (4.60s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.270368 (4.64s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.276790 (4.47s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.277967 (4.49s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.277346 (4.84s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.275661 (5.02s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (28.1s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.365074 (0.16s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.365073 (0.18s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.365057 (0.25s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.365024 (0.24s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.364908 (0.26s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.364585 (0.24s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.363489 (0.27s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.6s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.484094 (4.71s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.518671 (4.50s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.545999 (4.74s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.556513 (4.78s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.557903 (4.70s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.555451 (4.57s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (28.0s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.713117 (0.16s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.713117 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.713109 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.713076 (0.29s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.712983 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.712720 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.711821 (0.24s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.5s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=47 m/N=0.60 block_time=83.7s
+--- job 46/50 seed=53 measurement_ratio=0.20 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=26 measurement_kind=gaussian | A.shape=(26, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.347370 (4.57s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.363197 (3.81s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.379891 (3.85s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.389712 (3.76s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.392774 (3.87s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.392365 (3.77s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (23.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.380186 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.380185 (0.17s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.380176 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.380157 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.380089 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.379901 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.379282 (0.27s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.628873 (3.82s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.654597 (3.96s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.689513 (3.89s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.717771 (3.84s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.732243 (3.80s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.735043 (3.77s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (23.1s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698683 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698683 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698673 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698653 (0.20s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698583 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698385 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697723 (0.21s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=53 m/N=0.20 block_time=79.6s
+--- job 47/50 seed=53 measurement_ratio=0.30 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=38 measurement_kind=gaussian | A.shape=(38, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.332903 (4.19s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.350717 (4.09s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.366345 (4.54s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.373192 (4.16s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.374884 (4.01s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.373788 (4.15s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.1s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.380186 (0.14s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.380185 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.380174 (0.20s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.380152 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.380074 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.379855 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.379137 (0.24s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.602133 (4.00s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.635324 (4.04s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.671073 (4.11s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.692729 (4.12s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.700705 (4.47s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.700995 (3.96s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.7s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698683 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698683 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698673 (0.20s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698651 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698575 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698361 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697651 (0.21s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=53 m/N=0.30 block_time=71.6s
+--- job 48/50 seed=53 measurement_ratio=0.40 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=51 measurement_kind=gaussian | A.shape=(51, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.306908 (4.12s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.325051 (4.10s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.338920 (4.74s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.344303 (4.06s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.345055 (4.21s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.343278 (4.11s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (25.4s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.380186 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.380185 (0.15s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.380172 (0.22s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.380145 (0.21s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.380051 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.379786 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.378915 (0.25s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.559941 (4.13s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.594611 (4.10s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.628697 (4.12s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.645137 (4.06s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.649917 (4.20s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.649151 (4.13s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (24.7s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698683 (0.15s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698683 (0.13s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698674 (0.21s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698649 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698571 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698348 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697606 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=53 m/N=0.40 block_time=71.1s
+--- job 49/50 seed=53 measurement_ratio=0.50 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=64 measurement_kind=gaussian | A.shape=(64, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.280869 (4.33s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.299031 (4.31s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.310670 (4.54s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.314140 (4.55s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.313956 (4.24s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.311851 (4.62s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (26.6s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.380186 (0.15s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.380185 (0.16s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.380171 (0.21s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.380141 (0.22s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.380037 (0.21s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.379746 (0.21s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.378763 (0.25s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.4s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.511720 (4.43s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.547037 (4.49s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.578705 (4.35s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.591638 (4.43s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.594585 (4.30s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.592179 (4.26s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (26.3s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698683 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698683 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698674 (0.19s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698646 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698559 (0.22s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698314 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697493 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=53 m/N=0.50 block_time=76.1s
+--- job 50/50 seed=53 measurement_ratio=0.60 ---
+  [data] train=1200 val=300 test=300 N=128
+  [setup] m=77 measurement_kind=gaussian | A.shape=(77, 128)
+  [train] baseline MLP done
+  [train] alpha predictor MLP done
+  [val] arrays for lambda selection | n_sel=300 | noise_std=0.02
+    [cs] hybrid_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] hybrid_fista grid 1/6 lam=0.0001 rmse=0.254308 (4.52s)
+    [cs] hybrid_fista grid 2/6 lam=0.0003 rmse=0.270976 (5.09s)
+    [cs] hybrid_fista grid 3/6 lam=0.001 rmse=0.280606 (5.23s)
+    [cs] hybrid_fista grid 4/6 lam=0.003 rmse=0.283091 (5.35s)
+    [cs] hybrid_fista grid 5/6 lam=0.01 rmse=0.282159 (5.53s)
+    [cs] hybrid_fista grid 6/6 lam=0.03 rmse=0.281639 (5.12s)
+    [cs] hybrid_fista (fista) best_lam=0.0001 (30.8s total)
+    [cs] hybrid_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] hybrid_spgl1 grid 1/7 tau=0.0001 rmse=0.380186 (0.19s)
+    [cs] hybrid_spgl1 grid 2/7 tau=0.0003 rmse=0.380185 (0.19s)
+    [cs] hybrid_spgl1 grid 3/7 tau=0.001 rmse=0.380169 (0.28s)
+    [cs] hybrid_spgl1 grid 4/7 tau=0.003 rmse=0.380135 (0.23s)
+    [cs] hybrid_spgl1 grid 5/7 tau=0.01 rmse=0.380016 (0.22s)
+    [cs] hybrid_spgl1 grid 6/7 tau=0.03 rmse=0.379683 (0.32s)
+    [cs] hybrid_spgl1 grid 7/7 tau=0.1 rmse=0.378557 (0.50s)
+    [cs] hybrid_spgl1 (spgl1) best_tau=0.1 (1.9s total)
+    [cs] cs_only_fista (fista) start | n_sel=300 | grid=6 lam
+    [cs] cs_only_fista grid 1/6 lam=0.0001 rmse=0.457665 (4.67s)
+    [cs] cs_only_fista grid 2/6 lam=0.0003 rmse=0.493650 (4.45s)
+    [cs] cs_only_fista grid 3/6 lam=0.001 rmse=0.521851 (4.50s)
+    [cs] cs_only_fista grid 4/6 lam=0.003 rmse=0.532861 (4.43s)
+    [cs] cs_only_fista grid 5/6 lam=0.01 rmse=0.533609 (4.45s)
+    [cs] cs_only_fista grid 6/6 lam=0.03 rmse=0.530410 (4.49s)
+    [cs] cs_only_fista (fista) best_lam=0.0001 (27.0s total)
+    [cs] cs_only_spgl1 (spgl1) start | n_sel=300 | grid=7 tau
+    [cs] cs_only_spgl1 grid 1/7 tau=0.0001 rmse=0.698683 (0.14s)
+    [cs] cs_only_spgl1 grid 2/7 tau=0.0003 rmse=0.698683 (0.14s)
+    [cs] cs_only_spgl1 grid 3/7 tau=0.001 rmse=0.698675 (0.18s)
+    [cs] cs_only_spgl1 grid 4/7 tau=0.003 rmse=0.698645 (0.21s)
+    [cs] cs_only_spgl1 grid 5/7 tau=0.01 rmse=0.698555 (0.21s)
+    [cs] cs_only_spgl1 grid 6/7 tau=0.03 rmse=0.698303 (0.21s)
+    [cs] cs_only_spgl1 grid 7/7 tau=0.1 rmse=0.697458 (0.22s)
+    [cs] cs_only_spgl1 (spgl1) best_tau=0.1 (1.3s total)
+  [val] sparse regularization grid search finished for enabled methods
+  [test] evaluating 300 test samples (sparse recovery per method)...
+  [test] progress 1/300
+  [test] progress 50/300
+  [test] progress 100/300
+  [test] progress 150/300
+  [test] progress 200/300
+  [test] progress 250/300
+  [test] progress 300/300
+  [done] seed=53 m/N=0.60 block_time=82.1s

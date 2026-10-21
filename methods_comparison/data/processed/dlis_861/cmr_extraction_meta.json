@@ -1,0 +1,10 @@
+{
+  "source_file": "3-brsa-861-sps_8_cmr_ecs.dlis",
+  "tdep_scale": 393.700000000002,
+  "n_raw": 3348,
+  "n_cropped": 152,
+  "depth_min_m": 5205.156210312394,
+  "depth_max_m": 5233.92176784351,
+  "gr_corr_with_sonic": 0.9871224170712952,
+  "generated_utc": "2026-06-26T20:48:46Z"
+}

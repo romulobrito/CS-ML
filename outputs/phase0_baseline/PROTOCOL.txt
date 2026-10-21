@@ -1,0 +1,12 @@
+Phase 0 baseline protocol (roadmap_proximos_passos.md Fase 0).
+ASCII log; UTF-8 optional for user-facing strings elsewhere.
+
+seeds (10, fixed list): [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+measurement_ratios: [0.2, 0.3, 0.4, 0.5, 0.6]
+l1_lambda_grid: [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03]
+residual_basis: identity | residual_k: 6 | residual_mode: support_from_u
+measurement_kind: gaussian | noise stds: measurement 0.02, output 0.01
+n_train/n_val/n_test: 1200/300/300 | p_input: 12 | n_output: 128
+
+Artifacts: detailed_results.csv, summary_by_seed.csv, summary.csv, config.json
+Figures: ../paper/figures/phase0_baseline/ (relative to save_dir)

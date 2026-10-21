@@ -1,0 +1,20 @@
+{
+  "n_samples": 10,
+  "ref_pressure_mpa": 22.1,
+  "mae_vp_km_s": 1.2343218,
+  "rmse_vp_km_s": 1.3744700030730392,
+  "mape_vp_pct": 26.261550508535482,
+  "bias_vp_km_s": 1.2164364,
+  "pearson_r_vp": 0.1801578820359765,
+  "mae_vpvs": 0.15317884645017388,
+  "bias_vpvs": 0.15317884645017388,
+  "mean_vp_lab_km_s": 5.0527999999999995,
+  "mean_vp_dem_km_s": 6.2692364,
+  "mean_abs_vp_rel_error_pct": 26.261550508535475,
+  "median_abs_vp_rel_error_pct": 29.785791806382278,
+  "max_abs_vp_rel_error_pct": 56.54549502357254,
+  "min_abs_vp_rel_error_pct": 1.5052516411378505,
+  "n_ct_missing_in_rockphys": 0,
+  "generated_utc": "2026-07-26T16:42:00Z",
+  "smoke": false
+}

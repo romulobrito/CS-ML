@@ -1,0 +1,58 @@
+{
+  "n_plugs": 10,
+  "robust_exclude": false,
+  "excluded_samples": [],
+  "gain_threshold_mape_pp": 2.0,
+  "m1_in_sample": {
+    "mae_vp_km_s": 0.4556381,
+    "rmse_vp_km_s": 0.5215701950973617,
+    "mape_vp_pct": 9.13837175843966,
+    "bias_vp_km_s": -0.005892300000000139,
+    "pearson_r_vp": 0.572054895584393,
+    "mean_vp_lab_km_s": 5.0527999999999995,
+    "mean_vp_pred_km_s": 5.0469077
+  },
+  "m2a_oracle_in_sample": {
+    "mae_vp_km_s": 0.1735912344786356,
+    "rmse_vp_km_s": 0.3675796683160336,
+    "mape_vp_pct": 2.972454411284169,
+    "bias_vp_km_s": -0.1607396622202198,
+    "pearson_r_vp": 0.8566407499369401,
+    "mean_vp_lab_km_s": 5.0527999999999995,
+    "mean_vp_pred_km_s": 4.89206033777978
+  },
+  "m2b_forward_in_sample": {
+    "mae_vp_km_s": 0.43357378243621253,
+    "rmse_vp_km_s": 0.5367915216860926,
+    "mape_vp_pct": 8.711517821069714,
+    "bias_vp_km_s": 0.03620558444784794,
+    "pearson_r_vp": 0.5275500404940219,
+    "mean_vp_lab_km_s": 5.0527999999999995,
+    "mean_vp_pred_km_s": 5.089005584447849
+  },
+  "m1_loo": {
+    "mae_vp_km_s": 0.7495031,
+    "rmse_vp_km_s": 0.8538191005417366,
+    "mape_vp_pct": 14.846039927576996,
+    "bias_vp_km_s": -0.06944649999999997,
+    "pearson_r_vp": 0.07050188423382898,
+    "mean_vp_lab_km_s": 5.0527999999999995,
+    "mean_vp_pred_km_s": 4.9833535
+  },
+  "m2b_forward_loo": {
+    "mae_vp_km_s": 0.6180324538557713,
+    "rmse_vp_km_s": 0.7758281461868162,
+    "mape_vp_pct": 11.975737972389659,
+    "bias_vp_km_s": -0.10755629508988415,
+    "pearson_r_vp": -0.04265864168357644,
+    "mean_vp_lab_km_s": 5.0527999999999995,
+    "mean_vp_pred_km_s": 4.945243704910116
+  },
+  "delta_mape_in_sample_m2b_forward_vs_m1_pp": 0.4268539373699465,
+  "delta_mape_loo_m2b_forward_vs_m1_pp": 2.8703019551873368,
+  "m2a_oracle_note": "M2a/M2b oracle invert AR_micro to lab Vp; diagnostic ceiling only",
+  "primary_metric": "m2b_forward in-sample and LOO vs M1",
+  "recommendation": "keep_monoscale",
+  "recommendation_rationale": "LOO gain 2.87 p.p. without in-sample gain; not enough for profile.",
+  "generated_utc": "2026-07-26T16:50:38Z"
+}

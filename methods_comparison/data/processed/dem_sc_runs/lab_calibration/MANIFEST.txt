@@ -1,0 +1,31 @@
+Well 861 -- DEM lab inverse calibration (Etapa 2e)
+Generated: 2026-07-26T16:56:51Z
+
+Method: per-HFU fit minimizing RMSE(Vp_DEM, Vp_lab).
+Scenarios tested: alpha_only vs alpha+matrix_scale; best RMSE chosen.
+Robust mode (exclude F2911V): False
+
+Global Vp metrics (all CT plugs with lab):
+  BEFORE  MAPE=26.3%  RMSE=1.374 km/s  r=0.180
+  AFTER   MAPE=9.1%  RMSE=0.522 km/s  r=0.572
+
+HFU calibrated parameters:
+  HFU1: alpha 0.554 -> 0.950, scale K/G=0.697, scenario=alpha_matrix_scale, RMSE 1.187->0.645 km/s
+  HFU2: alpha 0.554 -> 0.182, scale K/G=0.709, scenario=alpha_matrix_scale, RMSE 1.655->0.340 km/s
+  HFU3: alpha 0.615 -> 0.950, scale K/G=0.721, scenario=alpha_matrix_scale, RMSE 1.063->0.546 km/s
+
+Profile extrapolation table: ../hfu_calibration/hfu_lab_calibrated.csv
+
+Planning: methods_comparison/planning/etapa2_dem_sc_vpvs_poco861.md
+
+--- Leave-one-plug-out validation ---
+Uncalibrated MAPE: 26.3%  RMSE: 1.374 km/s
+In-sample MAPE:    9.1%  RMSE: 0.522 km/s
+LOO MAPE:          14.8%  RMSE: 0.854 km/s  r: 0.071
+
+LOO is the honest generalization estimate (each plug predicted
+with HFU params fit on the remaining plugs only).
+
+tables/loo_validation.csv
+figures/loo_error_by_sample.png
+figures/mape_insample_vs_loo.png

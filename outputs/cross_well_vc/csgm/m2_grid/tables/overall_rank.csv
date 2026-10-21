@@ -1,0 +1,6 @@
+method,rmse_mean_all_cells,relative_l2_mean_all_cells,cells,method_label
+ridge_prior_csgm,0.01397350577927988,0.18131034285249956,9,CLP-CSGM Ridge
+ae_regression_ub,0.019050173700215,0.2546405430298015,9,"AE [u,b]"
+ml_only,0.02402749616764521,0.3293177994485653,9,ML only
+pca_regression_ub,0.14653639782837483,2.082198286409187,9,"PCA [u,b]"
+mlp_concat_ub,0.201119169408444,2.7930062943154077,9,"MLP [u,b]"

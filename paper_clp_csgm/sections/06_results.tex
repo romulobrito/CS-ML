@@ -1,0 +1,464 @@
+\section{Results}
+\label{sec:results}
+
+All comparisons follow the paired protocol of
+Section~\ref{sec:experiments}: within each $(\mathrm{seed},\rho)$ cell, the
+methods share partitions, sampled coordinates, and noisy sparse observations.
+Method orderings in this section refer to the reported mean metrics across the
+paired seeds.
+
+\subsection{Cross-well low-data results}
+\label{subsec:crosswell_results}
+
+Table~\ref{tab:crosswell_clp_vs_ae} compares CLP-CSGM Ridge with AE
+$[\boldsymbol{u},\boldsymbol{b}]$, the direct baseline with the lowest
+unweighted mean RMSE across the grid. CLP-CSGM Ridge has lower mean RMSE in
+seven of the nine cells; the exceptions are step $8$ with
+$\rho\in\{0.05,0.10\}$. It has lower mean RMSE at every tested ratio for steps
+$16$ and $32$. Across the three tested step sizes, the descriptive RMSE gap
+shifts progressively in favor of CLP-CSGM as training support decreases.
+At step $32$, the RMSE reductions relative to AE are approximately $32\%$ at
+$\rho=0.10$ and $57\%$ at $\rho=0.20$.
+
+Across the complete grid, the unweighted mean of the nine cell-level mean RMSE
+values decreases from $0.03496$ for AE
+$[\boldsymbol{u},\boldsymbol{b}]$ to $0.02862$ for CLP-CSGM Ridge, a reduction
+of approximately $18.1\%$. The ordering still depends on the amount of
+training data: the direct AE has lower mean RMSE in the two cells with the
+largest training pool, step $8$ at $\rho=0.05$ and $\rho=0.10$.
+
+\begin{table}[!htbp]
+    \centering
+    \caption{Cross-well $V_c$ comparison between CLP-CSGM Ridge and
+    AE $[\boldsymbol{u},\boldsymbol{b}]$. Values are RMSE mean and standard
+    deviation across seeds; a negative gap favors CLP-CSGM.}
+    \label{tab:crosswell_clp_vs_ae}
+    \small
+    \adjustbox{max width=\linewidth}{
+        \input{tables/results_crosswell_clp_vs_ae.tex}
+    }
+\end{table}
+
+Table~\ref{tab:paired_delta_crosswell} reports the paired seed-wise difference
+$\Delta\mathrm{RMSE}=\mathrm{RMSE}_{\mathrm{AE}}-\mathrm{RMSE}_{\mathrm{CLP}}$
+with Student-$t$ half-widths ($\mathrm{df}=2$). At steps $16$ and $32$, where
+training support is smallest, the
+mean paired gap is positive at every $\rho$ and CLP-CSGM Ridge wins all three
+seeds; at step $8$, where the development pool is largest, AE $[\boldsymbol{u},\boldsymbol{b}]$ wins the two
+smallest $\rho$ cells, matching the mean-RMSE ordering in Table~\ref{tab:crosswell_clp_vs_ae}.
+Several of these three-seed intervals include zero.
+Appendix~\ref{app:crosswell_seed_panel} repeats the same pairwise comparison
+on ten seeds: none of those intervals include zero. The CLP-CSGM advantage
+remains in the few-window cells (steps $16$ and $32$); AE remains better at
+step $8$ for $\rho=0.05$ and $\rho=0.10$.
+Appendix~\ref{app:crosswell_explicit_mask} repeats the three-seed grid with
+one extra direct AE that sees an explicit window mask. The mask does not
+remove the CLP-CSGM advantage at steps $16$ and $32$. At step $8$ the masked
+AE remains better at $\rho=0.05$ and $\rho=0.10$, and the mask does not
+uniformly lower the direct AE error.
+
+Appendix~\ref{app:crosswell_omega_placement} redraws the sparse coordinates
+five times while the model seeds stay at $\{7,23,41\}$. The published cell
+winner is unchanged in all nine cells. At steps $16$ and $32$, CLP-CSGM Ridge
+has lower RMSE than AE $[\boldsymbol{u},\boldsymbol{b}]$ in every draw. At
+step $8$, AE remains better at $\rho=0.05$ in every draw and at $\rho=0.10$
+on the majority of draws; CLP-CSGM remains better at $\rho=0.20$ on the
+majority of draws. The advantage where training support is smallest therefore
+holds for every tested placement. Step $8$, where that support is largest,
+remains the less stable regime.
+
+Appendix~\ref{app:crosswell_simple_baselines} compares those same nine cells
+with ordinary least squares and ridge regression from
+$[\boldsymbol{u},\boldsymbol{b}]$, and with linear interpolation of the
+sparse measurements along depth. The linear maps are scored at the published
+noise standard deviation $0.01$. At that reference level, interpolation has
+the lowest full-window RMSE in all nine cells and in all $27$ seed
+comparisons. CLP-CSGM Ridge is lower than both direct linear maps at step
+$16$, $\rho=0.20$, and at step $32$ for every $\rho$.
+
+Figure~\ref{fig:crosswell_rmse_vs_noise} and
+Table~\ref{tab:crosswell_noise_sweep} keep the evaluation windows and
+observation coordinates fixed, while varying the added Gaussian noise and
+reselecting the regularization weight by validation at each noise level.
+At the reference noise level, $\sigma_\eta=0.01$, depth interpolation
+achieves lower mean RMSE than CLP-CSGM in all nine configurations. As the
+perturbation increases, the RMSE of CLP-CSGM grows less: it is lower than
+interpolation in seven of the nine configurations at $\sigma_\eta=0.05$,
+and in all nine at $\sigma_\eta=0.10$ and $0.20$.
+
+This behavior is consistent with the role of regularization in balancing
+agreement with noisy observations against prior information
+\cite{hansen2010discrete}. Interpolation passes through the perturbed
+observations, whereas CLP-CSGM allows measurement residuals, restricts
+reconstruction to the decoder range, and penalizes departures from the
+conditional latent prediction. These mechanisms can limit the response to
+measurement perturbations, but can also introduce bias when the learned
+representation or conditional prediction does not describe the target
+accurately. Related generative compressed-sensing theory explicitly
+accounts for representation error, measurement noise, and optimization
+error under suitable assumptions \cite{bora2017compressed}. That theory
+provides context for this interpretation, rather than a guarantee for the
+coordinate-sampling experiments considered here.
+
+The present sweep does not isolate the contributions of the decoder
+restriction, the conditional penalty, and validation-based parameter
+selection. Nor does it establish superiority over noise-aware alternatives
+such as smoothing, which were not evaluated. The held-out target curve has
+a standard deviation of approximately $0.035$; the added noise levels
+$0.05$, $0.10$, and $0.20$ are approximately $1.4$, $2.9$, and $5.7$ times
+this value, respectively. These larger perturbations therefore provide a
+controlled sensitivity analysis rather than a calibrated representation of
+field measurement uncertainty. AE $[\boldsymbol{u},\boldsymbol{b}]$,
+ordinary least squares, and direct ridge were not rerun across the sweep,
+so the comparison in the figure is with depth interpolation. The added
+noise is not the 30dB filename label.
+
+The decoder and the dense-log map are fit once per step and seed. The
+penalty weight is then selected on validation for each measurement fraction
+and each noise level, so the curves are not a fixed-penalty reconstruction.
+The sensitivity sweep uses a different, wider grid. It omits the
+factor-of-three candidates of the published grid and adds $1$, $10$, and
+$100$. The weight selected at $0.01$ and at $0.05$ also belongs to the
+published grid. That membership does not mean the two searches were the
+same. At noise $0.10$, step $16$ and $\rho=0.10$, one seed selects
+the weight $1$, above the published grid and still inside the sweep.
+At noise $0.20$, some cells select $100$, the largest candidate in
+the sweep grid. That choice is the best value among the candidates that
+were tried, not an optimum outside the grid. The points at noise $0.01$
+belong to this same refit. The ordering between interpolation and CLP-CSGM
+Ridge matches the published comparison at that noise, while a cell mean can
+differ slightly from the published CLP-CSGM value. At step $16$ and
+$\rho=0.20$, the published mean is $0.01771$ and the refit mean is
+$0.0159$. These runs are not merged into the submitted tables.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\linewidth]{crosswell_vc_rmse_vs_noise.png}
+    \caption{Mean full-window RMSE of depth interpolation and CLP-CSGM Ridge.
+    The horizontal axis is logarithmic. Each panel is one step and each
+    measurement fraction is a separate curve. Open circles are interpolation
+    and squares are CLP-CSGM Ridge. Values are means over seeds $\{7,23,41\}$.
+    The dotted line is the held-out $V_c$ standard deviation $0.035$, on the
+    same scale as the noise. Noise $0.05$ is about $1.43$ times that
+    deviation. The shaded region marks $0.10$ and $0.20$, about $2.86$ and
+    $5.71$ times that deviation. These noise levels were used for
+    sensitivity analysis and were not calibrated to field measurement
+    uncertainties.
+    The decoder and the dense-log map are fit once per step and seed. The
+    penalty weight is selected on validation for each measurement fraction
+    and each noise level. The points at noise $0.01$ belong to this refit.
+    Cell means and seed-level win counts are reported in
+    Table~\ref{tab:crosswell_noise_sweep}.}
+    \label{fig:crosswell_rmse_vs_noise}
+\end{figure}
+
+Taken with the ten-seed panel, the two checks separate the randomness behind
+the three-seed intervals: more seeds, each with its own coordinate draw, and
+more coordinate draws at fixed model seeds. Both leave the submitted
+three-seed tables unchanged. Overlapping windows are not counted as extra
+independent samples.
+
+\begin{table}[!htbp]
+    \centering
+    \caption{Paired seed-level
+    $\Delta\mathrm{RMSE}=\mathrm{RMSE}_{\mathrm{AE}}-\mathrm{RMSE}_{\mathrm{CLP}}$
+    on the cross-well $V_c$ grid ($n=3$ seeds). SE is the seed-level standard
+    error; the $95\%$ half-width uses Student-$t$ with $\mathrm{df}=2$. Positive
+    mean $\Delta\mathrm{RMSE}$ favors CLP-CSGM Ridge. Wins count seeds with
+    strictly lower RMSE for each method.}
+    \label{tab:paired_delta_crosswell}
+    \small
+    \adjustbox{max width=\linewidth}{
+        \input{tables/paired_delta_crosswell_clp_vs_ae.tex}
+    }
+\end{table}
+
+Figure~\ref{fig:crosswell_all_methods} places the pairwise result within the full
+benchmark. The mean RMSE of direct MLP and PCA increases sharply as training
+support decreases, whereas AE has the lowest unweighted mean RMSE among the
+direct baselines. Table~\ref{tab:crosswell_clp_vs_ae} therefore focuses on the
+most competitive direct comparator in this grid.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\linewidth]{results_crosswell_rmse_vs_rho.png}
+    \caption{Cross-well $V_c$ RMSE for the main methods. CLP-CSGM Ridge has the
+    lowest mean RMSE in the medium-to-severe low-data cells, while the mean RMSE
+    of direct MLP and PCA increases as training windows become scarce. Error
+    bars are Student-$t$ $95\%$ half-widths across seeds ($\mathrm{df}=2$).}
+    \label{fig:crosswell_all_methods}
+\end{figure}
+
+Figure~\ref{fig:crosswell_depth_profile} shows one held-out F03-4 profile
+for step $16$, seed $7$, and $\rho=0.20$. In this displayed example,
+CLP-CSGM Ridge follows the broad variations of the processed reference more
+closely than AE $[\boldsymbol{u},\boldsymbol{b}]$. Direct MLP and PCA
+predictions exhibit larger oscillations. Their panels use wider horizontal
+scales than the reference, so that comparison is qualitative. The individual
+window in Fig.~\ref{fig:sparse_recon_crosswell} is a different configuration:
+step $16$, seed $7$, $\rho=0.10$, and window index 0. There, CLP-CSGM Ridge
+is closer to the reference, the autoencoder prediction is positively offset,
+and local deviations remain. These examples illustrate differences in
+reconstruction behavior within the displayed configurations. They do not
+establish a uniform advantage across the benchmark, and they are not a
+statistical-significance claim. The profile is consistent with the aggregate
+RMSE for this cell. Uniform window-level comparisons remain based on the
+aggregate metrics.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\linewidth]{10_depth_profile_crosswell_vc.png}
+    \caption{Held-out F03-4 $V_c$ reconstruction at step $16$, seed $7$, and
+    $\rho=0.20$. The target is the processed Larionov-derived curve, and the
+    sparse observations are coordinate subsamples of that curve. The MLP and
+    PCA panels use wider horizontal scales than the reference panel.}
+    \label{fig:crosswell_depth_profile}
+\end{figure}
+
+The paired step-$16$ checks in
+Appendix~\ref{app:crosswell_gr_embargo}
+(Table~\ref{tab:crosswell_gr_embargo_robustness}) show that including gamma ray
+reduces absolute error and that the embargo changes training support, but
+neither modification reverses the ordering of CLP-CSGM Ridge against AE
+$[\boldsymbol{u},\boldsymbol{b}]$ and measurement-only CSGM at the tested
+ratios.
+
+\subsection{Single-well F03 GR-only results}
+\label{subsec:f03_gr_only_results}
+
+The F03-4 benchmark uses gamma ray as the only dense log. Table~\ref{tab:f03_results} shows that CLP-CSGM Ridge
+achieves mean RMSE $0.01390$ across the tested grid, compared with $0.01434$
+for AE $[\boldsymbol{u},\boldsymbol{b}]$. CLP-CSGM Ridge has lower mean RMSE at
+$\rho\in\{0.20,0.30\}$, the methods are nearly tied at $\rho=0.50$, and AE has
+lower mean RMSE at $\rho\in\{0.40,0.60\}$. In this benchmark, the largest
+advantage of explicit latent refinement occurs at the sparsest ratios. Direct
+AE fusion becomes competitive as more entries of $\boldsymbol{b}$ are
+available.
+
+\begin{table}[!htbp]
+    \centering
+    \caption{Single-well F03-4 GR-only porosity benchmark: mean RMSE by
+    measurement ratio $\rho$. The prior-only and measurement-only rows are
+    structural reference variants.}
+    \label{tab:f03_results}
+    \small
+    \adjustbox{max width=\linewidth}{
+        \input{tables/results_f03_gr_only_compact.tex}
+    }
+\end{table}
+
+Figure~\ref{fig:f03_gr_only_rmse} displays the complete comparison with
+seed-level Student-$t$ $95\%$ half-widths ($\mathrm{df}=2$).
+Table~\ref{tab:paired_delta_f03} reports the paired
+$\Delta\mathrm{RMSE}=\mathrm{RMSE}_{\mathrm{AE}}-\mathrm{RMSE}_{\mathrm{CLP}}$
+on the same three seeds: the mean gap is positive at $\rho=0.20$ and
+$\rho=0.30$ (CLP wins all seeds), near zero at $\rho=0.50$, and negative at
+$\rho\in\{0.40,0.60\}$ (AE wins all seeds). With $n=3$, several paired
+intervals include zero. The F03 ordering therefore changes with how many
+depths are measured, and the three-seed intervals are not a large-sample
+significance claim. RMSE variability, MAE, and relative
+$\ell_2$ error are reported in
+Appendix~\ref{app:f03_full_table}
+(Table~\ref{tab:f03_results_full}) and
+Appendix~\ref{app:f03_metric_views}
+(Figs.~\ref{fig:f03_mae}--\ref{fig:f03_rell2}); these metrics retain the same
+regime-dependent interpretation.
+
+\begin{table}[!htbp]
+    \centering
+    \caption{Paired seed-level
+    $\Delta\mathrm{RMSE}=\mathrm{RMSE}_{\mathrm{AE}}-\mathrm{RMSE}_{\mathrm{CLP}}$
+    on the F03-4 GR-only porosity benchmark ($n=3$ seeds). SE is the seed-level
+    standard error; the $95\%$ half-width uses Student-$t$ with
+    $\mathrm{df}=2$. Positive mean $\Delta\mathrm{RMSE}$ favors CLP-CSGM
+    Ridge.}
+    \label{tab:paired_delta_f03}
+    \small
+    \adjustbox{max width=\linewidth}{
+        \input{tables/paired_delta_f03_clp_vs_ae.tex}
+    }
+\end{table}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.72\linewidth]
+    {results_f03_gr_only_rmse_vs_rho.png}
+    \caption{F03-4 GR-only porosity RMSE by measurement ratio. CLP-CSGM Ridge
+    has the lowest mean RMSE at the sparsest ratios, while AE
+    $[\boldsymbol{u},\boldsymbol{b}]$ becomes competitive as more target
+    observations are available. Error bars are Student-$t$ $95\%$ half-widths
+    across seeds ($\mathrm{df}=2$).}
+    \label{fig:f03_gr_only_rmse}
+\end{figure}
+
+The stress tests in Appendix~\ref{app:f03_stress}
+(Table~\ref{tab:f03_stress}) extend the sparse grid to
+$\rho\in\{0.05,0.10,0.20\}$. CLP-CSGM Ridge retains lower mean RMSE than AE
+under increased noise and a smaller training pool, while the ordering becomes
+less stable with a coarse sliding step and fewer test windows.
+
+Figure~\ref{fig:f03_depth} shows the depth-profile reconstruction at
+$\rho=0.20$, the main-grid ratio at which CLP-CSGM Ridge has its largest mean
+RMSE advantage over the direct AE baseline.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.90\linewidth]
+    {10_depth_profile_porosity.png}
+    \caption{F03-4 depth-profile reconstruction at $\rho=0.20$. The target is
+    the processed density-derived porosity curve, and the sparse observations
+    are coordinate subsamples of that curve. In this displayed profile,
+    CLP-CSGM Ridge follows parts of the broad trend and smooths local
+    variations. The panels do not share one horizontal scale.}
+    \label{fig:f03_depth}
+\end{figure}
+
+The porosity example is more mixed than the clay-volume profile. In this
+displayed profile, CLP-CSGM Ridge follows parts of the broad trend and smooths
+local variations. Because the profile combines predictions from overlapping
+windows, the view is qualitative. Pointwise recovery and validation against
+independent core-porosity measurements fall outside this visualization. The
+displayed window in Fig.~\ref{fig:sparse_recon_f03} uses the corresponding
+configuration seed $7$, $\rho=0.20$, and window index 0. There, both
+CLP-CSGM Ridge and AE $[\boldsymbol{u},\boldsymbol{b}]$ miss the central
+depression of the reference. The pooled parity plot in
+Fig.~\ref{fig:f03_parity} prints a correlation of $0.4632$ for CLP-CSGM Ridge
+and $0.3720$ for the autoencoder. Those values describe the points drawn on
+that figure. They do not establish statistical significance, and
+overlapping-window predictions are not independent observations. The method
+uses $m=13$ observations per length-$64$ window and achieves a mean RMSE of
+approximately $0.016$ at $\rho=0.20$. This profile is consistent with the
+lower mean RMSE in Table~\ref{tab:f03_results} at that ratio. The profile is
+illustrative. The aggregate results still place the benefit of explicit latent
+refinement at the sparse end of this weak-context grid.
+
+The limited-sample Lapa permeability case in
+Appendix~\ref{app:lapa_case} provides supplementary evidence. The prior-guided
+CLP-CSGM variants have lower mean RMSE than the direct baselines that use
+$[\boldsymbol{u},\boldsymbol{b}]$ across the tested grid. Their comparison with
+measurement-only CSGM is ratio-dependent.
+
+Appendix~\ref{app:phi_lab_861} scores laboratory porosity on held-out
+coordinates of one cored interval. CLP-CSGM is not superior on the mean: the
+direct AE has the lower RMSE at $\rho=0.25$ and $\rho=0.50$ ($0.0537$ and
+$0.0523$, against $0.0602$ and $0.0580$ for CLP-CSGM Ridge). Laboratory
+measurements still correct the log-only anchor, which CLP-CSGM Ridge beats in
+every split. That correction is enough on the two shallower blocks, where the
+test logs remain close to the support that fits the anchor and CLP-CSGM Ridge
+has the lower block-mean RMSE. It does not close the gap on the deepest block,
+where the logs shift and the decoded prediction $G(\boldsymbol{z}_0)$ differs substantially from the target windows. The
+block RMSE, the log summaries, and the split counts are in
+Appendix~\ref{app:phi_lab_861}.
+
+\subsection{Ablation analysis}
+\label{subsec:ablation_analysis}
+
+The structural ablations drop one term at a time.
+Prior-only returns the decoded prediction of the conditional prior,
+$G(h(\boldsymbol{u}))$, with no latent search. Measurement-only
+sets $\lambda=0$ and searches the decoder range using only the sparse
+measurements \citep{bora2017compressed}. The comparison shows what each
+term contributes
+(Remark~\ref{rem:csgm_relation}).
+
+In the cross-well benchmark, CLP-CSGM Ridge has lower mean RMSE than prior-only
+in all nine cells, with reductions from $20.5\%$ to $60.6\%$
+(Table~\ref{tab:ablation_crosswell}). It also has lower mean RMSE than
+measurement-only CSGM in seven cells. The exceptions are step $8$ with
+$\rho\in\{0.05,0.10\}$, where measurement-only CSGM has lower mean RMSE and the
+Ridge code $\boldsymbol{z}_0$ is not beneficial. At steps $16$ and $32$, the full model has
+lower mean RMSE than both ablations at every tested ratio.
+
+\begin{table}[t]
+    \centering
+    \caption{Cross-well $V_c$ ablation results. Gains are relative RMSE
+    reductions of CLP-CSGM Ridge with respect to the corresponding structural
+    ablation; negative gain indicates that measurement-only CSGM has lower mean
+    RMSE.}
+    \label{tab:ablation_crosswell}
+    \small
+    \adjustbox{max width=\linewidth}{
+        \input{tables/ablation_crosswell_wide.tex}
+    }
+\end{table}
+
+In the F03-4 GR-only benchmark, CLP-CSGM Ridge has lower mean RMSE than both
+ablations at every tested ratio (Table~\ref{tab:ablation_f03}). Its reduction
+relative to prior-only
+increases from approximately $18.5\%$ at $\rho=0.20$ to $37.7\%$ at
+$\rho=0.60$, while its largest gains over measurement-only occur at the
+sparsest ratios. Both terms contribute. The cross-well exceptions show that
+the conditional code $\boldsymbol{z}_0$ is not helpful in every cell.
+
+\begin{table}[t]
+    \centering
+    \caption{Single-well F03-4 GR-only ablation results. Gains are relative
+    RMSE reductions of CLP-CSGM Ridge with respect to the corresponding
+    structural ablation.}
+    \label{tab:ablation_f03}
+    \small
+    \adjustbox{max width=\linewidth}{
+        \input{tables/ablation_f03_wide.tex}
+    }
+\end{table}
+
+\subsection{Latent-prior model sensitivity}
+\label{subsec:latent_prior_sensitivity}
+
+Tables~\ref{tab:prior_class_crosswell} and~\ref{tab:prior_class_f03} compare
+Ridge and MLP implementations of $h$ while keeping the remaining pipeline
+fixed. This sensitivity analysis is limited to these two prior classes. Signed
+Ridge gain is defined as
+$100(\mathrm{RMSE}_{\mathrm{MLP}}-\mathrm{RMSE}_{\mathrm{Ridge}})
+ /\mathrm{RMSE}_{\mathrm{MLP}}$; positive values favor Ridge.
+
+In the cross-well benchmark, MLP has lower mean RMSE in all nine cells. The
+relative difference is largest at sparse measurement ratios and decreases as
+$\rho$ increases; at step $16$, for example, signed Ridge gain changes from
+approximately $-82\%$ at
+$\rho=0.05$ to $-26\%$ at $\rho=0.20$. Ridge remains the headline comparator
+for the reason in Section~\ref{sec:discussion}: a fixed linear reference, not
+a claim that it dominates MLP on this grid.
+
+\begin{table}[t]
+    \centering
+    \caption{Cross-well $V_c$ latent-prior sensitivity. Positive signed Ridge
+    gain favors Ridge, whereas negative values favor MLP.}
+    \label{tab:prior_class_crosswell}
+    \small
+    \adjustbox{max width=\linewidth}{
+        \input{tables/ablation_prior_class_crosswell_wide.tex}
+    }
+\end{table}
+
+In the F03-4 GR-only benchmark, Ridge has lower mean RMSE at every tested ratio,
+but the relative difference decreases from approximately $14.3\%$ at
+$\rho=0.20$ to $1.7\%$ at $\rho=0.60$.
+
+\begin{table}[t]
+    \centering
+    \caption{Single-well F03-4 GR-only latent-prior sensitivity. Signed Ridge
+    gain follows the definition used in
+    Table~\ref{tab:prior_class_crosswell}.}
+    \label{tab:prior_class_f03}
+    \small
+    \adjustbox{max width=\linewidth}{
+        \input{tables/ablation_prior_class_f03_wide.tex}
+    }
+\end{table}
+
+Which map is better depends on the dataset and on how many depths are
+measured, and the difference shrinks as more target values enter
+$\boldsymbol{b}$. Ridge stays the reported reference because it is a fixed
+linear map, not because it wins every cell. The rankings support choosing
+that map on validation data for the intended test, rather than after seeing
+the held-out result.
+
+\paragraph{Supplementary diagnostics.}
+Appendix~\ref{app:validation_generalization_diagnostics} audits validation,
+selected $\lambda$, and per-window errors;
+Appendix~\ref{app:sparse_recon_examples} shows realized sparse-measurement
+windows; Appendix~\ref{app:separability} assesses empirical decoder-range
+separation; and Appendix~\ref{app:runtime} reports inference cost. These
+analyses serve interpretive and reproducibility purposes and are separate from
+the benchmark comparisons.

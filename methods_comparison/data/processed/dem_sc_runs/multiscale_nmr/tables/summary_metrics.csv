@@ -1,0 +1,3 @@
+model,n_valid,mae_vp_km_s,rmse_vp_km_s,mape_vp_pct,bias_vp_km_s,pearson_r_vp
+M1_monoscale_gassmann,87,0.344603,0.477009,7.284548,0.271114,0.420821
+M3_multiscale_nmr_gassmann,87,0.405002,0.466312,8.459781,0.035503,0.448297

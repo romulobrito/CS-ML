@@ -1,0 +1,33 @@
+name: F3 CLP gap-regime audit
+on:
+  push:
+    branches:
+      - audit/f3-clp-regimes-20261020
+permissions:
+  contents: read
+jobs:
+  scientific-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'numpy<3' pandas 'scipy<2' 'scikit-learn<2' matplotlib torch
+      - name: Run original CLP against noise-aware baselines
+        env:
+          PYTHONPATH: '.'
+          PYTHONUNBUFFERED: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+        run: python scripts/f3_gap_audit/run_crosswell_gap.py --out outputs/f3_gap_clp_audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: f3-clp-original-paired-gap-results
+          path: outputs/f3_gap_clp_audit/
+          if-no-files-found: warn

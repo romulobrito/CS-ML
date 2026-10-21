@@ -1,0 +1,26 @@
+\begin{tabular}{llp{0.46\linewidth}}
+\toprule
+Phase & Module & Implementation \\
+\midrule
+Offline training &
+Standardization &
+Training-set mean and standard deviation for \(u\) and \(y\); reused unchanged on validation and test windows. \\
+&
+Autoencoder \((E,G)\) &
+MLP with one hidden layer (width 128) in encoder and decoder, latent dimension \(k=16\), ReLU activations, linear output; 200 epochs, Adam \citep{kingma2015adam} (\(10^{-3}\)), weight decay \(10^{-5}\), batch size 64. \\
+&
+Latent prior \(h(u)\) &
+Ridge regressor with \(\alpha=1.0\) on standardized \((u,z)\) pairs (main experiments). Sensitivity variant: MLP with two hidden layers (width 128), \(L_2\) penalty \(10^{-4}\), learning rate \(10^{-3}\), max.\ 500 iterations, early stopping. \\
+\midrule
+Target-well inference &
+Latent refinement &
+Adam \citep{kingma2015adam} for 400 iterations, learning rate \(0.05\), three restarts (first start at \(z_0=h(u)\); two further starts at \(z_0\) plus \(\mathcal{N}(0,0.05^{2}I)\); penalty center remains \(z_0\)); \(\lambda\) selected by validation RMSE from \(\{10^{-4},3{\cdot}10^{-4},10^{-3},3{\cdot}10^{-3},10^{-2},3{\cdot}10^{-2},10^{-1}\}\) for the original-scale residual, not computed as \(\sigma_{\eta}^{2}/\sigma_{z}^{2}\). \\
+&
+Reconstruction &
+\(\hat{y}=G(\hat{z})\) after inverse standardization to the original target scale. \\
+\midrule
+Direct baselines &
+\([u,b]\) regressors &
+ML only and MLP \([u,b]\): sklearn MLP with two hidden layers (width 128), max.\ 500 iterations, learning rate \(10^{-3}\), \(L_2\) penalty \(10^{-4}\), early stopping. PCA \([u,b]\): PCA score grid \(\{8,16,24,32,48,64\}\) with the same MLP head. AE \([u,b]\): separate MLP autoencoder (\(k=32\), hidden width 128, 120 epochs) plus MLP from \([u,b]\) to latent codes. \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,21 @@
+Direct [u,b] benchmark (+ optional full LFISTA branch).
+run_id: smoke_csgm_branch
+elapsed_seconds: 75.1
+residual_basis: identity
+measurement_kind: gaussian
+measurement_noise_std: 0.02
+residual_k: 6
+
+tables/
+  detailed_results.csv
+  summary_by_seed.csv
+  summary.csv
+  includes CSGM M2 rows (ridge_prior_csgm/mlp_prior_csgm when enabled)
+  PROTOCOL.txt
+
+figures/
+
+focus_tables:
+  tables/summary_focus_direct_ub.csv
+  tables/summary_by_seed_focus_direct_ub.csv
+  PROTOCOL.txt

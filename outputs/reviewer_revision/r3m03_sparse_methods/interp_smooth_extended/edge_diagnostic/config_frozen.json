@@ -1,0 +1,12 @@
+{
+  "source_detail": "/home/romulo/Documentos/cs-regressor/outputs/reviewer_revision/r3m03_sparse_methods/interp_smooth_extended/tables/detail_by_seed.csv",
+  "focus": [
+    [
+      32,
+      7,
+      0.1,
+      0.2
+    ]
+  ],
+  "huge_rmse": 0.3
+}

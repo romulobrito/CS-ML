@@ -1,0 +1,16 @@
+Well 861 -- Etapa 2g: DEM multiscale NMR
+Generated: 2026-07-26T16:49:10Z
+
+Source CMR: /home/romulo/Documentos/cs-regressor/methods_comparison/data/processed/dlis_861/tables/cmr_log_861.csv
+Source Gassmann: /home/romulo/Documentos/cs-regressor/methods_comparison/data/processed/dlis_861_gassmann/tables/dem_vs_sonic_validation.csv
+HFU params: /home/romulo/Documentos/cs-regressor/methods_comparison/data/processed/dem_sc_runs/hfu_calibration/hfu_lab_calibrated.csv
+AR_micro per HFU: {1: 0.5125, 2: 0.034, 3: 0.569}
+AR_meso per HFU: {1: 0.5542590000000001, 2: 0.553722, 3: 0.614844}
+PVT: Kf=2.2 GPa, rho_f=1.03 g/cc, Sw=1.0
+
+N valid rows: 87
+M1 MAPE: 7.28%
+M3 MAPE: 8.46%
+Delta MAPE (M1-M3): -1.18 p.p.
+Recommendation: keep_monoscale
+Rationale: M3 MAPE gain -1.18 p.p. < threshold 2.0

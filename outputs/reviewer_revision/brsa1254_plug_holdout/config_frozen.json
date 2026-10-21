@@ -1,0 +1,32 @@
+{
+  "pass_name": "12a2_quad",
+  "frame_name": "50",
+  "resistivity": "RT10",
+  "n_kept": 161,
+  "n_dropped": 0,
+  "block_sizes": [
+    53,
+    54,
+    54
+  ],
+  "val_plugs": 16,
+  "window_len": 8,
+  "window_step": 1,
+  "rhos": [
+    0.25,
+    0.5
+  ],
+  "seeds": [
+    7,
+    23,
+    41
+  ],
+  "u_columns": [
+    "gr",
+    "rhob",
+    "nphi",
+    "rt"
+  ],
+  "target": "log10_k",
+  "models_trained_by_this_script": false
+}

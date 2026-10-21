@@ -1,0 +1,217 @@
+{
+  "fast_all_plugs": [
+    {
+      "model": "G_huber",
+      "mape_vp_pct": 10.411603,
+      "mape_vs_pct": 10.757118,
+      "mae_vpvs": 0.095913,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -2.173637
+    },
+    {
+      "model": "G_huber_orient",
+      "mape_vp_pct": 10.797504,
+      "mape_vs_pct": 11.526455,
+      "mae_vpvs": 0.123741,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.787736
+    },
+    {
+      "model": "P0",
+      "mape_vp_pct": 12.58524,
+      "mape_vs_pct": 12.193279,
+      "mae_vpvs": 0.113353,
+      "frac_alpha_at_bound": 0.5,
+      "d_mape_vp_vs_p0": 0.0
+    },
+    {
+      "model": "P1",
+      "mape_vp_pct": 11.303976,
+      "mape_vs_pct": 11.100328,
+      "mae_vpvs": 0.073443,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.281263
+    },
+    {
+      "model": "P2",
+      "mape_vp_pct": 11.415863,
+      "mape_vs_pct": 11.940008,
+      "mae_vpvs": 0.100051,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.169377
+    },
+    {
+      "model": "P3_w0p05",
+      "mape_vp_pct": 11.213653,
+      "mape_vs_pct": 12.190399,
+      "mae_vpvs": 0.118356,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.371586
+    },
+    {
+      "model": "P3_w0p1",
+      "mape_vp_pct": 11.337128,
+      "mape_vs_pct": 10.251875,
+      "mae_vpvs": 0.101071,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.248112
+    },
+    {
+      "model": "P3_w0p25",
+      "mape_vp_pct": 11.551867,
+      "mape_vs_pct": 11.244209,
+      "mae_vpvs": 0.083982,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.033373
+    },
+    {
+      "model": "P3_w0p5",
+      "mape_vp_pct": 11.169063,
+      "mape_vs_pct": 10.767423,
+      "mae_vpvs": 0.048606,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -1.416177
+    },
+    {
+      "model": "P3_w1",
+      "mape_vp_pct": 11.338674,
+      "mape_vs_pct": 10.792934,
+      "mae_vpvs": 0.04494,
+      "frac_alpha_at_bound": 0.2,
+      "d_mape_vp_vs_p0": -1.246566
+    }
+  ],
+  "fast_no_f2911v": [
+    {
+      "model": "G_huber",
+      "mape_vp_pct": 9.37826,
+      "mape_vs_pct": 9.896271,
+      "mae_vpvs": 0.141016,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -0.873453
+    },
+    {
+      "model": "G_huber_orient",
+      "mape_vp_pct": 9.303196,
+      "mape_vs_pct": 9.892666,
+      "mae_vpvs": 0.140289,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -0.948517
+    },
+    {
+      "model": "P0",
+      "mape_vp_pct": 10.251713,
+      "mape_vs_pct": 10.427746,
+      "mae_vpvs": 0.118474,
+      "frac_alpha_at_bound": 0.333333,
+      "d_mape_vp_vs_p0": 0.0
+    },
+    {
+      "model": "P1",
+      "mape_vp_pct": 9.460404,
+      "mape_vs_pct": 9.973894,
+      "mae_vpvs": 0.138096,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -0.79131
+    },
+    {
+      "model": "P2",
+      "mape_vp_pct": 9.007154,
+      "mape_vs_pct": 10.260679,
+      "mae_vpvs": 0.151728,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -1.244559
+    },
+    {
+      "model": "P3_w0p05",
+      "mape_vp_pct": 9.233958,
+      "mape_vs_pct": 9.830668,
+      "mae_vpvs": 0.142521,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -1.017755
+    },
+    {
+      "model": "P3_w0p1",
+      "mape_vp_pct": 9.555318,
+      "mape_vs_pct": 9.614153,
+      "mae_vpvs": 0.136959,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -0.696395
+    },
+    {
+      "model": "P3_w0p25",
+      "mape_vp_pct": 10.205898,
+      "mape_vs_pct": 9.433016,
+      "mae_vpvs": 0.110471,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -0.045815
+    },
+    {
+      "model": "P3_w0p5",
+      "mape_vp_pct": 10.643885,
+      "mape_vs_pct": 9.025513,
+      "mae_vpvs": 0.08915,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": 0.392172
+    },
+    {
+      "model": "P3_w1",
+      "mape_vp_pct": 10.171424,
+      "mape_vs_pct": 8.54572,
+      "mae_vpvs": 0.065914,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -0.080289
+    }
+  ],
+  "nested_key_models": [
+    {
+      "model": "G_huber",
+      "mape_vp_pct": 10.411603,
+      "mape_vs_pct": 10.757118,
+      "mae_vpvs": 0.095913,
+      "frac_alpha_at_bound": 0.0,
+      "d_mape_vp_vs_p0": -2.173637
+    },
+    {
+      "model": "G_huber_orient",
+      "mape_vp_pct": 10.797504,
+      "mape_vs_pct": 11.526455,
+      "mae_vpvs": 0.123741,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.787736
+    },
+    {
+      "model": "P0",
+      "mape_vp_pct": 12.58524,
+      "mape_vs_pct": 12.193279,
+      "mae_vpvs": 0.113353,
+      "frac_alpha_at_bound": 0.5,
+      "d_mape_vp_vs_p0": 0.0
+    },
+    {
+      "model": "P1",
+      "mape_vp_pct": 11.032317,
+      "mape_vs_pct": 11.358648,
+      "mae_vpvs": 0.118775,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.552922
+    },
+    {
+      "model": "P2",
+      "mape_vp_pct": 11.423233,
+      "mape_vs_pct": 12.964424,
+      "mae_vpvs": 0.127607,
+      "frac_alpha_at_bound": 0.1,
+      "d_mape_vp_vs_p0": -1.162006
+    },
+    {
+      "model": "P3_w0p5",
+      "mape_vp_pct": 11.298808,
+      "mape_vs_pct": 10.33698,
+      "mae_vpvs": 0.057708,
+      "frac_alpha_at_bound": 0.5,
+      "d_mape_vp_vs_p0": -1.286431
+    }
+  ],
+  "recommendation": "Keep P1 (Huber hier Vp) over P0; prefer global Huber when all plugs included; orientation helps mainly without F2911V; Vs weight w~0.5 OK if Vp stays below P0; do not jump to equal-weight M3."
+}

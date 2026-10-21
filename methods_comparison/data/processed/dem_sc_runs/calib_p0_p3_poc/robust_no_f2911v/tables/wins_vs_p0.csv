@@ -1,0 +1,11 @@
+model,n_groups_beats_p0_vp
+G_huber,5
+G_huber_orient,5
+P0,0
+P1,5
+P2,5
+P3_w0p05,5
+P3_w0p1,5
+P3_w0p25,5
+P3_w0p5,4
+P3_w1,4

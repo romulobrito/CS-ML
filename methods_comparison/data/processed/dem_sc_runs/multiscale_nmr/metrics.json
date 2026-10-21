@@ -1,0 +1,18 @@
+{
+  "n_valid": 87,
+  "m1_mae_km_s": 0.3446025057471265,
+  "m1_rmse_km_s": 0.4770086349558431,
+  "m1_mape_pct": 7.284548169215593,
+  "m1_bias_km_s": 0.271114,
+  "m1_pearson_r": 0.42082138079269005,
+  "m3_mae_km_s": 0.4050022580610706,
+  "m3_rmse_km_s": 0.46631187555564035,
+  "m3_mape_pct": 8.459781425408703,
+  "m3_bias_km_s": 0.035502915626923516,
+  "m3_pearson_r": 0.4482974569422434,
+  "delta_mape_m3_vs_m1_pp": -1.1752332561931107,
+  "gain_threshold_pp": 2.0,
+  "recommendation": "keep_monoscale",
+  "recommendation_rationale": "M3 MAPE gain -1.18 p.p. < threshold 2.0",
+  "generated_utc": "2026-07-26T16:49:09Z"
+}

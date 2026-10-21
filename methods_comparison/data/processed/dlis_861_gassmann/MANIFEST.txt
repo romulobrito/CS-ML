@@ -1,0 +1,6 @@
+Well 861 -- Etapa 2b Gassmann profile + DLIS validation
+Generated: 2026-07-26T16:57:15Z
+PVT: formation_brine (Kf=2.2 GPa, rho_f=1.03 g/cc, Sw=1.0)
+Rows OK: 87/87
+Dry bias Vp vs sonic (km/s): 0.302
+Saturated bias Vp vs sonic (km/s): 0.271

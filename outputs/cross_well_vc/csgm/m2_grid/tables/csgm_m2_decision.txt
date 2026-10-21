@@ -1,0 +1,23 @@
+CSGM M2 grid decision report
+============================================================
+
+Method: ridge_prior_csgm
+Grid: step in [8, 16, 32] | rho in [0.05, 0.1, 0.2] | seeds in [7, 23, 41]
+
+step= 8 rho=0.05 | csgm=0.01541 ae=0.01709 ml=0.02215 sir=0.04560 gap_vs_ae=-9.84%
+step= 8 rho=0.10 | csgm=0.01432 ae=0.01635 ml=0.02215 sir=0.04482 gap_vs_ae=-12.41%
+step= 8 rho=0.20 | csgm=0.01167 ae=0.01633 ml=0.02215 sir=0.04085 gap_vs_ae=-28.53%
+step=16 rho=0.05 | csgm=0.01493 ae=0.01891 ml=0.02423 sir=0.05028 gap_vs_ae=-21.02%
+step=16 rho=0.10 | csgm=0.01391 ae=0.01803 ml=0.02423 sir=0.04967 gap_vs_ae=-22.81%
+step=16 rho=0.20 | csgm=0.01247 ae=0.01808 ml=0.02423 sir=0.04590 gap_vs_ae=-31.00%
+step=32 rho=0.05 | csgm=0.01562 ae=0.02132 ml=0.02571 sir=0.05813 gap_vs_ae=-26.72%
+step=32 rho=0.10 | csgm=0.01484 ae=0.02501 ml=0.02571 sir=0.05750 gap_vs_ae=-40.67%
+step=32 rho=0.20 | csgm=0.01259 ae=0.02035 ml=0.02571 sir=0.05249 gap_vs_ae=-38.15%
+
+Cells evaluated: 9
+CSGM wins vs ae_regression_ub: 9 / 9
+Average gap vs ae_regression_ub: -25.68%
+Best gap vs ae_regression_ub: -40.67%
+VERDICT: GO: CSGM M2 wins in enough cells to justify full method integration.
+
+Elapsed: 277.4s

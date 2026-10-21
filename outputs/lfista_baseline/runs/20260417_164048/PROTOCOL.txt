@@ -1,0 +1,15 @@
+LFISTA lab protocol (roadmap Etapa 2 prototype, sir_cs_lfista.py).
+PyTorch background MLP + LFISTAUnrolled; frozen then joint training.
+
+run_id: 20260417_164048
+profile: phase2_lfista
+save_dir (relative): outputs/lfista_baseline/runs/20260417_164048
+plots_subdir (relative to save_dir): ../../../../paper/figures/lfista_baseline/runs/20260417_164048
+
+seeds: [7, 13, 23, 29, 31, 37, 41, 43, 47, 53]
+measurement_ratios: [0.2, 0.3, 0.4, 0.5, 0.6]
+lfista_steps (K): 8
+device: cuda
+
+Figures: paper/figures/lfista_baseline/runs/20260417_164048/
+Symlink: outputs/lfista_baseline/LATEST -> runs/20260417_164048

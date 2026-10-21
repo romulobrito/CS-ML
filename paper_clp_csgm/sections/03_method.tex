@@ -1,0 +1,725 @@
+\section{Method}
+\label{sec:method}
+
+CLP-CSGM uses three pieces. A decoder, trained on windows of the target
+curve, supplies the windows the reconstruction may use. The conditional map
+predicts a latent code $\boldsymbol{z}_0$ from the dense auxiliary logs. This
+code provides an informed initialization and serves as the reference for the
+quadratic penalty during latent refinement. Latent refinement balances
+agreement with the sparse observations against deviation from
+$\boldsymbol{z}_0$. A residual at the observed depths can remain. The decoder
+range and the quadratic penalty are different components.
+This section defines the measurement model, the objective, the comparisons
+that drop one piece, and the error bound.
+
+\subsection{Problem setup}
+\label{subsec:problem_setup}
+
+Let $\boldsymbol{y}\in\mathbb{R}^{N}$ denote a target-property window of $N$
+depth samples and let $\boldsymbol{u}\in\mathbb{R}^{p}$ denote the vectorized
+dense-log channels over the same interval. Target values are observed at the
+ordered coordinate set
+$\Omega=\{\omega_1,\ldots,\omega_m\}\subset\{1,\ldots,N\}$, where
+$1\leq m<N$ and the measurement ratio is $\rho=m/N$.
+
+The coordinate-restriction operator
+$M_{\Omega}:\mathbb{R}^{N}\rightarrow\mathbb{R}^{m}$ is represented by
+
+\begin{equation}
+M_{\Omega}
+=
+\begin{bmatrix}
+\boldsymbol{e}_{\omega_1}^{\top}\\
+\vdots\\
+\boldsymbol{e}_{\omega_m}^{\top}
+\end{bmatrix}
+\in\mathbb{R}^{m\times N},
+\qquad
+M_{\Omega}\boldsymbol{y}
+=
+\begin{bmatrix}
+y_{\omega_1}\\
+\vdots\\
+y_{\omega_m}
+\end{bmatrix},
+\label{eq:measurement_operator}
+\end{equation}
+
+where $\boldsymbol{e}_i$ is the $i$-th canonical basis vector of
+$\mathbb{R}^{N}$. Coordinate restriction is widely used to represent incomplete
+seismic, ultrasonic, and sparse-sensor observations
+\citep{herrmann2008nonparametric,deAssis2022CompressiveSF,
+dasilva2025csshredenhancingshredrobust}.
+
+The sparse target measurements satisfy
+
+\begin{equation}
+\boldsymbol{b}
+=
+M_{\Omega}\boldsymbol{y}
++
+\boldsymbol{\eta},
+\qquad
+\boldsymbol{b},\boldsymbol{\eta}\in\mathbb{R}^{m},
+\label{eq:measurement_model}
+\end{equation}
+
+where $\boldsymbol{\eta}$ is additive noise. Under the Gaussian model,
+$\boldsymbol{\eta}\sim
+\mathcal{N}(\boldsymbol{0},\sigma_{\eta}^{2}I_m)$; the noiseless case has
+$\boldsymbol{\eta}=\boldsymbol{0}$.
+
+The dense logs and the sparse measurements do different jobs. The dense-log
+vector $\boldsymbol{u}$ predicts the code
+$\boldsymbol{z}_0=h(\boldsymbol{u})$. The measurements $\boldsymbol{b}$ enter
+only as the penalized mismatch in Eq.~\eqref{eq:clp_csgm_objective}.
+The first latent trajectory starts at $\boldsymbol{z}_0$, and the penalty
+center remains $\boldsymbol{z}_0$.
+
+
+
+\paragraph{Standardization and modeling assumptions.}
+All preprocessing statistics are computed from training windows only. Let
+$\boldsymbol{\mu}_y,\boldsymbol{s}_y$ and
+$\boldsymbol{\mu}_u,\boldsymbol{s}_u$ be the componentwise training means and
+standard deviations, with $D_y=\operatorname{diag}(\boldsymbol{s}_y)$ and
+$D_u=\operatorname{diag}(\boldsymbol{s}_u)$. These two matrices rescale each
+coordinate by its training standard deviation. They are not estimated
+covariance matrices of the profiles, and this rescaling leaves any
+correlation already present between coordinates unchanged. We use
+$\widetilde{\boldsymbol{y}}=D_y^{-1}(\boldsymbol{y}-\boldsymbol{\mu}_y)$ and
+$\widetilde{\boldsymbol{u}}=D_u^{-1}(\boldsymbol{u}-\boldsymbol{\mu}_u)$.
+Sparse measurements are standardized with
+$D_{\Omega}=M_{\Omega}D_yM_{\Omega}^{\top}$ and
+$\widetilde{\boldsymbol{b}}=D_{\Omega}^{-1}
+(\boldsymbol{b}-M_{\Omega}\boldsymbol{\mu}_y)$; near-zero standard deviations
+use the implementation safeguard. The decoder $G$ returns a standardized
+window. The same window in the original target units is
+
+\begin{equation}
+G_{\mathrm{orig}}(\boldsymbol{z})
+=
+\boldsymbol{\mu}_y
++
+D_yG(\boldsymbol{z}),
+\label{eq:g_orig}
+\end{equation}
+
+and a standardized prediction returns to that scale by
+
+\begin{equation}
+\widehat{\boldsymbol{y}}
+=
+\boldsymbol{\mu}_y
++
+D_y\widehat{\widetilde{\boldsymbol{y}}}.
+\label{eq:inverse_target_standardization}
+\end{equation} For a fixed set
+of observed coordinates, Eq.~\eqref{eq:measurement_model} adds noise with
+$\boldsymbol{\eta}\sim\mathcal{N}(\boldsymbol{0},\sigma_{\eta}^{2}I_m)$.
+Independence across coordinates and a common variance are assumptions of
+this synthetic benchmark noise. They are not a demonstrated description of
+instrumental noise, and this manuscript does not identify them with the
+30dB filename label. The standardized noise is
+$\widetilde{\boldsymbol{\eta}}=D_{\Omega}^{-1}\boldsymbol{\eta}$. Because
+$D_{\Omega}$ is diagonal,
+
+\begin{equation}
+\operatorname{Cov}(\widetilde{\boldsymbol{\eta}})
+=
+\sigma_{\eta}^{2}D_{\Omega}^{-1}D_{\Omega}^{-\top}
+=
+\sigma_{\eta}^{2}D_{\Omega}^{-2}.
+\label{eq:standardized_noise_covariance}
+\end{equation}
+
+This diagonal transformation preserves the independence of the added
+Gaussian noise. When the training standard deviations differ across
+coordinates, the standardized variances differ as well. For
+$\boldsymbol{r}=M_{\Omega}G(\boldsymbol{z})-\widetilde{\boldsymbol{b}}$,
+
+\begin{equation}
+\boldsymbol{r}^{\top}
+\operatorname{Cov}(\widetilde{\boldsymbol{\eta}})^{-1}
+\boldsymbol{r}
+=
+\frac{1}{\sigma_{\eta}^{2}}
+\|D_{\Omega}\boldsymbol{r}\|_2^2.
+\label{eq:standardized_noise_likelihood}
+\end{equation}
+
+The right-hand side is the data term of
+Eq.~\eqref{eq:clp_csgm_objective} divided by $\sigma_{\eta}^{2}$.
+By Eq.~\eqref{eq:weighted_residual_identity}, that data term equals
+$\|M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z})-\boldsymbol{b}\|_2^2$.
+Proposition~\ref{prop:map} reads
+$\|M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z})-\boldsymbol{b}\|_2^2
++\lambda\|\boldsymbol{z}-\boldsymbol{z}_0\|_2^2$
+as a MAP objective in which the data term has coefficient one and
+$\lambda=\sigma_{\eta}^{2}/\sigma_{z}^{2}$ multiplies the latent penalty.
+The factor
+$\sigma_z^{2}I_k$ in that proposition is the isotropic hypothesis behind
+the Euclidean latent penalty. It is not an estimated covariance of the
+residuals of $h$. Ridge standardizes the latent codes while fitting $h$
+and returns $\boldsymbol{z}_0$ to the encoder scale.
+
+Where a later equation omits tildes, its coordinates are those written there.
+The refinement objective keeps the standardized residual and the diagonal
+weight $D_{\Omega}$. The decoder
+$G:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$, with $k<N$, supplies
+standardized windows, and $G_{\mathrm{orig}}$ supplies the corresponding
+windows in the original target units. We assume that target windows are
+adequately approximated by the windows $G_{\mathrm{orig}}$ can return, and that
+$h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ provides a useful anchor
+$\boldsymbol{z}_0=h(\boldsymbol{u})$. These assumptions are assessed empirically
+through reconstruction, ablations, and prior sensitivity.
+
+
+
+\subsection{Learned model components}
+\label{subsec:learned_priors}
+
+Offline training fits an autoencoder on standardized target windows and a
+latent-prior predictor on paired dense-log windows and encoded targets. All
+learned components remain frozen during target-well reconstruction.
+
+\paragraph{Generative decoder.}
+Let
+$E_{\theta_E}:\mathbb{R}^{N}\rightarrow\mathbb{R}^{k}$ and
+$G_{\theta_G}:\mathbb{R}^{k}\rightarrow\mathbb{R}^{N}$, with $k<N$, denote
+the encoder and decoder. Given standardized training targets
+$\{\widetilde{\boldsymbol{y}}_i\}_{i=1}^{n_{\mathrm{tr}}}$, their parameters
+are obtained from
+
+\begin{equation}
+\begin{aligned}
+(\widehat{\theta}_E,\widehat{\theta}_G)
+\in
+\operatorname*{arg\,min}_{\theta_E,\theta_G}
+\;&
+\frac{1}{n_{\mathrm{tr}}}
+\sum_{i=1}^{n_{\mathrm{tr}}}
+\left\|
+\widetilde{\boldsymbol{y}}_i
+-
+G_{\theta_G}
+\left(
+E_{\theta_E}
+\left(
+\widetilde{\boldsymbol{y}}_i
+\right)
+\right)
+\right\|_2^2
+\\
+&+
+\gamma_{\mathrm{AE}}
+\left(
+\|\theta_E\|_2^2+\|\theta_G\|_2^2
+\right),
+\end{aligned}
+\label{eq:autoencoder_training_objective}
+\end{equation}
+
+where $\gamma_{\mathrm{AE}}\geq 0$ is the regularization weight. After
+training, we write $E=E_{\widehat{\theta}_E}$ and
+$G=G_{\widehat{\theta}_G}$. The frozen decoder defines the learned
+target-window classes
+
+\begin{equation}
+\mathcal{R}_{G}
+=
+\left\{
+G(\boldsymbol{z}):
+\boldsymbol{z}\in\mathbb{R}^{k}
+\right\}
+\subseteq
+\mathbb{R}^{N},
+\qquad
+\mathcal{R}_{\mathrm{orig}}
+=
+\left\{
+G_{\mathrm{orig}}(\boldsymbol{z}):
+\boldsymbol{z}\in\mathbb{R}^{k}
+\right\}
+\subseteq
+\mathbb{R}^{N}.
+\label{eq:decoder_range}
+\end{equation}
+
+$\mathcal{R}_{G}$ is the range of the standardized decoder.
+$\mathcal{R}_{\mathrm{orig}}$ is that class in the original target units.
+$M_{\Omega}$ selects observed coordinates and is not either set.
+Target-well reconstruction therefore optimizes only
+$\boldsymbol{z}\in\mathbb{R}^{k}$ and produces
+$\widehat{\boldsymbol{y}}
+=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})
+\in\mathcal{R}_{\mathrm{orig}}$; it does not update the network
+parameters or search over arbitrary vectors in $\mathbb{R}^{N}$.
+The encoder is used to train the decoder and to build the codes on which
+the dense-log map is fit. Inference does not encode the unknown window.
+In the reported model, $k=16$ is the dimension of that code.
+A reconstruction $G(E(\boldsymbol{y}))$ that is given the full target window
+checks whether the decoder can represent that window. It uses target values
+that inference does not have, so it is not one of the compared predictors.
+Appendix~\ref{app:crosswell_simple_baselines} reports that check.
+
+\paragraph{Log-conditioned latent prior.}
+Each training target is encoded as
+$\boldsymbol{z}_i=E(\widetilde{\boldsymbol{y}}_i)$, and
+$h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ is fitted from
+$\{(\widetilde{\boldsymbol{u}}_i,\boldsymbol{z}_i)\}_{i=1}^{n_{\mathrm{tr}}}$.
+For the Ridge variant,
+$h(\widetilde{\boldsymbol{u}})
+=W\widetilde{\boldsymbol{u}}+\boldsymbol{c}$, with parameters
+
+\begin{equation}
+(\widehat{W},\widehat{\boldsymbol{c}})
+\in
+\operatorname*{arg\,min}_{W,\boldsymbol{c}}
+\left\{
+\frac{1}{n_{\mathrm{tr}}}
+\sum_{i=1}^{n_{\mathrm{tr}}}
+\left\|
+\boldsymbol{z}_i
+-
+W\widetilde{\boldsymbol{u}}_i
+-
+\boldsymbol{c}
+\right\|_2^2
++
+\alpha\|W\|_F^2
+\right\},
+\label{eq:ridge_latent_training_objective}
+\end{equation}
+
+where $\alpha\geq 0$ controls the Ridge penalty
+\citep{hoerl1970ridge}. After fitting,
+$h(\widetilde{\boldsymbol{u}})
+=\widehat{W}\widetilde{\boldsymbol{u}}
++\widehat{\boldsymbol{c}}$, and, suppressing tildes, the contextual anchor is
+$\boldsymbol{z}_0=h(\boldsymbol{u})\in\mathbb{R}^{k}$. The decoder $G$
+determines which target windows can be represented, and $h$ uses dense-log
+context to center the latent search. CLP-CSGM is this scheme; the class of
+$h$ is a configuration choice. Ridge is the primary reference because it is a
+linear map from the dense logs to $\boldsymbol{z}_0$, not because it is the
+best map in every test. An MLP variant of $h$ is reported with the
+same pipeline in Section~\ref{subsec:latent_prior_sensitivity}.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]
+    {figures/view_conditional_latent_prior_final.pdf}
+    \caption{Geometry of the conditional latent code, in the original target
+    units. Dense logs determine $\boldsymbol{z}_0=h(\boldsymbol{u})$. That
+    code initializes the first trajectory and remains the center of the
+    quadratic penalty. The vertical arrow is latent refinement from
+    $\boldsymbol{z}_0$ to $\widehat{\boldsymbol{z}}$. The drawing is
+    schematic and does not show a measured numerical trajectory. The two
+    horizontal arrows are decoding by $G_{\mathrm{orig}}$: one maps
+    $\boldsymbol{z}_0$ to $G_{\mathrm{orig}}(\boldsymbol{z}_0)$, and the
+    other maps $\widehat{\boldsymbol{z}}$ to
+    $\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})$.
+    The blue curve illustrates $\mathcal{R}_{\mathrm{orig}}$, the
+    set of decoder outputs in the original target units. $M_{\Omega}$
+    selects the observed coordinates and is not that set. The measurement
+    residual is the gap between $M_{\Omega}\widehat{\boldsymbol{y}}$ and
+    $\boldsymbol{b}$. Refinement balances that residual against deviation
+    from $\boldsymbol{z}_0$, and the observations need not be met exactly.}
+    \label{fig:conditional_prior_geometry}
+\end{figure}
+
+\subsection{Test-time reconstruction}
+\label{subsec:test_time_reconstruction}
+
+At inference time, $G$ and $h$ remain fixed, and only the latent code of the
+current target window is optimized. Given standardized dense logs
+$\widetilde{\boldsymbol{u}}\in\mathbb{R}^{p}$ and sparse target observations
+$\widetilde{\boldsymbol{b}}\in\mathbb{R}^{m}$, define
+$\boldsymbol{z}_0=h(\widetilde{\boldsymbol{u}})$. CLP-CSGM computes
+
+\begin{equation}
+\begin{aligned}
+\widehat{\boldsymbol{z}}_{\mathrm{num}}
+&\in
+\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\left\{
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2
++
+\lambda
+\left\|
+\boldsymbol{z}
+-
+\boldsymbol{z}_0
+\right\|_2^2
+\right\},
+\\
+\widehat{\boldsymbol{y}}
+&=
+G_{\mathrm{orig}}\left(\widehat{\boldsymbol{z}}_{\mathrm{num}}\right).
+\end{aligned}
+\label{eq:clp_csgm_objective}
+\end{equation}
+
+The first term penalizes disagreement with the sparse observations and the
+second penalizes deviation from $\boldsymbol{z}_0$. Their sum does not force
+the observations to be met exactly, so a residual at the observed depths can
+remain. Because each row of $M_{\Omega}$ selects one window coordinate,
+
+\begin{equation}
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2
+=
+\left\|
+M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z})
+-
+\boldsymbol{b}
+\right\|_2^2.
+\label{eq:weighted_residual_identity}
+\end{equation}
+
+The left-hand side is the data term in
+Eq.~\eqref{eq:clp_csgm_objective}. The right-hand side is the squared
+residual in the original target units, which is the residual evaluated by
+the implementation. The diagonal entries of $D_y$ are the training standard
+deviations of the window coordinates. On the cross-well $V_c$ training
+windows those entries are not equal: the ratio of the largest to the
+smallest is about $1.13$ at step $8$, $1.23$ at step $16$, and $1.40$ at
+step $32$. A single factor therefore does not convert a penalty weight
+between the unweighted standardized residual and this objective. The
+implementation also divides both terms by the number of windows. Multiplying
+the entire objective by the same positive factor leaves its minimizers
+unchanged. $\lambda\geq0$ is selected on validation
+windows for each measurement ratio and seed.
+Proposition~\ref{prop:map} identifies $\lambda$ with
+$\sigma_{\eta}^{2}/\sigma_{z}^{2}$ when the likelihood is an isotropic
+Gaussian in those original target units. That is the scale of
+Eq.~\eqref{eq:weighted_residual_identity}. The same ratio does not apply to
+the unweighted standardized residual
+$\|M_{\Omega}G(\boldsymbol{z})-\widetilde{\boldsymbol{b}}\|_2^2$. The
+reported experiments do not compute $\lambda$ from those variances. For
+each seed and each measurement ratio, validation full-window RMSE selects
+one candidate from
+$\{10^{-4},3\cdot10^{-4},10^{-3},3\cdot10^{-3},10^{-2},3\cdot10^{-2},10^{-1}\}$,
+and that choice is fixed before the test score is computed. The selected
+$\lambda$ is the validation choice for the original-scale objective.
+Because $G$ is nonlinear, the
+objective is generally nonconvex and is solved with Adam
+\citep{kingma2015adam}. The first run starts from $\boldsymbol{z}_0$. Each
+additional restart starts at $\boldsymbol{z}_0$ plus an independent draw from
+$\mathcal{N}(\boldsymbol{0},0.05^{2}I)$, with the same shape as
+$\boldsymbol{z}_0$. The penalty center remains $\boldsymbol{z}_0$ on every
+restart and every iteration, and the lowest-objective candidate is
+retained. Thus $\widehat{\boldsymbol{z}}_{\mathrm{num}}$ is a numerical
+solution, not a certified global minimizer.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]
+    {figures/pipeline_CLP-CSGM_v4.png}
+    \caption{CLP-CSGM workflow. Offline, standardized target windows train the
+    autoencoder $(E,G)$, and paired dense-log windows fit the latent-prior
+    predictor $h$. At inference, $\boldsymbol{u}_{\ast}$ determines
+    $\boldsymbol{z}_0=h(\boldsymbol{u}_{\ast})$, sparse observations
+    $\boldsymbol{b}_{\ast}$ enter latent refinement as a measurement penalty
+    through $M_{\Omega}$,
+    and the decoded result is returned to the original target scale.
+    OpenAI's ChatGPT, using the GPT-5.5 model, was used to assist in generating
+    the initial explanatory schematic and visual layout. The final figure was
+    reviewed, edited, and validated by the authors.}
+    \label{fig:clp_csgm_workflow}
+\end{figure}
+
+\paragraph{Ablation variants.}
+The \emph{latent-prior-only} variant suppresses refinement and uses
+$\widehat{\boldsymbol{z}}_{\mathrm{prior}}=\boldsymbol{z}_0$, followed by
+$\widehat{\boldsymbol{y}}_{\mathrm{prior}}
+=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}}_{\mathrm{prior}})$.
+The \emph{measurement-only CSGM} variant sets $\lambda=0$ and computes
+
+\begin{equation}
+\widehat{\boldsymbol{z}}_{\mathrm{meas}}
+\in
+\operatorname*{arg\,min}_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z})
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2.
+\label{eq:measurement_only_ablation}
+\end{equation}
+
+The latent-prior-only variant returns the decoded prediction of the
+conditional prior, $G_{\mathrm{orig}}(\boldsymbol{z}_0)$, with no latent
+search. In that
+variant $\boldsymbol{z}_0$ is not an initialization, because no trajectory is
+optimized. The
+measurement-only variant uses only the sparse measurements and recovers
+measurement-only generative compressed sensing \citep{bora2017compressed}.
+Comparison with the full objective in
+Eq.~\eqref{eq:clp_csgm_objective} shows what each piece contributes. Results
+are reported in Section~\ref{subsec:ablation_analysis}.
+
+\subsection{Interpretation and theoretical context}
+\label{subsec:interpretation_scope}
+
+The results below answer three questions about the method. How should the
+two terms of the objective be interpreted? Under what conditions does the
+problem have a minimizer? Which factors condition recovery of the full
+window from the sparse observations? The MAP/Tikhonov reading and the
+existence argument are classical. They are used to interpret the
+formulation and are not presented as new theoretical contributions.
+Complete proofs appear in Appendix~\ref{app:theory}.
+
+Under the Gaussian hypotheses in Proposition~\ref{prop:map}, the objective
+admits a MAP interpretation. The quadratic penalty is centered at the
+conditioned code $\boldsymbol{z}_0=h(\boldsymbol{u})$, not at the origin
+\citep{tikhonov1963solution,burger2014map}. In that reading the data term
+has coefficient one, and
+$\lambda=\sigma_{\eta}^{2}/\sigma_{z}^{2}$ multiplies the latent penalty.
+The data term is the original-scale residual, which
+Eq.~\eqref{eq:weighted_residual_identity} identifies with the standardized
+residual weighted by $D_{\Omega}$. The reported experiments do not estimate
+this variance ratio. Validation selects $\lambda$, as stated in
+Section~\ref{subsec:test_time_reconstruction}. The MAP reading explains the
+form of the penalty. It does not demonstrate empirical superiority.
+
+\begin{remark}[Relation to classical CSGM]
+\label{rem:csgm_relation}
+Setting $\lambda=0$ recovers the measurement-only CSGM problem in
+Eq.~\eqref{eq:measurement_only_ablation}
+\citep{bora2017compressed}. Increasing $\lambda$ shifts the reconstruction
+toward the decoded prediction of the conditional prior,
+$G_{\mathrm{orig}}(\boldsymbol{z}_0)$, by penalizing departures
+from $\boldsymbol{z}_0=h(\boldsymbol{u})$ more strongly. That shift is not
+a claim that a larger $\lambda$ improves the reconstruction.
+\end{remark}
+
+Proposition~\ref{prop:existence} is a classical existence result. If the
+decoder is continuous and $\lambda>0$, the objective is continuous and
+coercive, so it attains a minimum. The result does not give uniqueness,
+convexity, or convergence of Adam to a global minimizer. It is stated for
+$\lambda>0$ and does not extend automatically to the measurement-only case
+$\lambda=0$. For any global minimizer $\widehat{\boldsymbol{z}}$,
+$\mathcal{J}(\widehat{\boldsymbol{z}})
+\leq
+\mathcal{J}(\boldsymbol{z}_0)
+=
+\left\|
+D_{\Omega}
+\left(
+M_{\Omega}G(\boldsymbol{z}_0)
+-
+\widetilde{\boldsymbol{b}}
+\right)
+\right\|_2^2$.
+Exact minimization therefore cannot worsen the optimized objective relative
+to the latent-prior-only candidate. It does not guarantee lower error with
+respect to the unknown target. For the numerical solution
+$\widehat{\boldsymbol{z}}_{\mathrm{num}}$, this comparison holds only when
+the computed values satisfy
+$\mathcal{J}(\widehat{\boldsymbol{z}}_{\mathrm{num}})
+\leq
+\mathcal{J}(\boldsymbol{z}_0)$.
+$\widehat{\boldsymbol{z}}_{\mathrm{num}}$ remains a numerical solution, not
+a certified global minimizer.
+
+
+\begin{remark}[Representation error and decoder mismatch]
+\label{rem:representation_error}
+Every CLP-CSGM reconstruction in the original target units satisfies
+$\widehat{\boldsymbol{y}}
+=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})
+\in\mathcal{R}_{\mathrm{orig}}$.
+Consequently, for an unknown target window
+$\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$, the error of any such
+reconstruction is bounded below by the oracle representation error
+
+\begin{equation}
+\operatorname{dist}
+\left(
+\boldsymbol{y}^{\star},
+\mathcal{R}_{\mathrm{orig}}
+\right)
+:=
+\inf_{\boldsymbol{y}'\in\mathcal{R}_{\mathrm{orig}}}
+\left\|
+\boldsymbol{y}^{\star}
+-
+\boldsymbol{y}'
+\right\|_2
+=
+\inf_{\boldsymbol{z}\in\mathbb{R}^{k}}
+\left\|
+\boldsymbol{y}^{\star}
+-
+G_{\mathrm{orig}}(\boldsymbol{z})
+\right\|_2.
+\label{eq:oracle_decoder_error}
+\end{equation}
+
+Thus, even with noiseless observations and exact global optimization, latent
+refinement cannot remove mismatch between
+$\boldsymbol{y}^{\star}$ and $\mathcal{R}_{\mathrm{orig}}$. This
+structural error is represented by $\boldsymbol{r}^{\dagger}$ in
+Proposition~\ref{prop:conditional_local_recovery} and is distinct from the
+latent-prior mismatch
+$\|\boldsymbol{z}^{\dagger}-\boldsymbol{z}_0\|_2$.
+
+An inaccurate code
+$\boldsymbol{z}_0=h(\boldsymbol{u})$ may bias the search toward a suboptimal
+latent region, because it initializes the first trajectory and remains the
+center of the penalty. The data-fidelity term can partially correct this bias when the
+sparse observations are informative and $\lambda$ does not dominate the
+objective. The decoder range determines what can be represented; the
+conditional code $\boldsymbol{z}_0$ determines where the latent penalty is
+centered.
+\end{remark}
+
+Four factors enter the bound in
+Proposition~\ref{prop:conditional_local_recovery}. Representation error is
+the difference between the true window and a window the decoder can
+represent. Noise and observed discrepancy combine the measurement
+perturbations with the part of that representation error present at the
+observed coordinates. Deviation from the conditioned code is the distance
+between a reference code $\boldsymbol{z}^{\dagger}$ and the penalty center
+$\boldsymbol{z}_0$. Local separability is the ability of the observed
+coordinates to distinguish different windows produced by the decoder in
+the region under consideration. The statement below assigns symbols to
+these factors.
+
+\begin{proposition}[Conditional local recovery interpretation]
+\label{prop:conditional_local_recovery}
+Let
+$\boldsymbol{y}^{\star}\in\mathbb{R}^{N}$ satisfy
+$\boldsymbol{b}
+=M_{\Omega}\boldsymbol{y}^{\star}+\boldsymbol{\eta}$, let
+$\boldsymbol{z}_0=h(\boldsymbol{u})$, $\lambda>0$, and let
+$\widehat{\boldsymbol{z}}$ be any global minimizer of
+Eq.~\eqref{eq:clp_csgm_objective}. The residual
+$\|M_{\Omega}G_{\mathrm{orig}}(\boldsymbol{z})-\boldsymbol{b}\|_2^2$
+is the right-hand side of Eq.~\eqref{eq:weighted_residual_identity}.
+For any reference code
+$\boldsymbol{z}^{\dagger}\in\mathbb{R}^{k}$, define
+
+\begin{equation}
+\begin{aligned}
+\boldsymbol{r}^{\dagger}
+&=
+\boldsymbol{y}^{\star}
+-
+G_{\mathrm{orig}}(\boldsymbol{z}^{\dagger}),
+&
+\boldsymbol{e}^{\dagger}
+&=
+M_{\Omega}\boldsymbol{r}^{\dagger}
++
+\boldsymbol{\eta},
+\\
+\Delta^{\dagger}
+&=
+\left(
+\|\boldsymbol{e}^{\dagger}\|_2^2
++
+\lambda
+\|\boldsymbol{z}^{\dagger}-\boldsymbol{z}_0\|_2^2
+\right)^{1/2},
+&
+R^{\dagger}
+&=
+\frac{\Delta^{\dagger}}{\sqrt{\lambda}}.
+\end{aligned}
+\label{eq:local_recovery_quantities}
+\end{equation}
+
+Let
+$\mathcal{R}_{\mathrm{orig},R^{\dagger}}
+=
+G_{\mathrm{orig}}(B(\boldsymbol{z}_0,R^{\dagger}))$, where
+$B(\boldsymbol{z}_0,R^{\dagger})
+=
+\left\{
+\boldsymbol{z}\in\mathbb{R}^{k}:
+\|\boldsymbol{z}-\boldsymbol{z}_0\|_2
+\leq R^{\dagger}
+\right\}$.
+The constants $\gamma_R>0$ and $\delta_R\geq0$ below refer to pairs of
+windows in $\mathcal{R}_{\mathrm{orig},R^{\dagger}}$. They are not constants of the
+standardized decoder $G$. If
+
+\begin{equation}
+\left\|
+M_{\Omega}
+(\boldsymbol{y}_1-\boldsymbol{y}_2)
+\right\|_2
+\geq
+\gamma_R
+\left\|
+\boldsymbol{y}_1-\boldsymbol{y}_2
+\right\|_2
+-
+\delta_R,
+\qquad
+\forall\,
+\boldsymbol{y}_1,\boldsymbol{y}_2
+\in
+\mathcal{R}_{\mathrm{orig},R^{\dagger}},
+\label{eq:local_srec_condition}
+\end{equation}
+
+then
+
+\begin{equation}
+\left\|
+G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})
+-
+\boldsymbol{y}^{\star}
+\right\|_2
+\leq
+\|\boldsymbol{r}^{\dagger}\|_2
++
+\frac{
+\Delta^{\dagger}
++
+\|\boldsymbol{e}^{\dagger}\|_2
++
+\delta_R
+}{
+\gamma_R
+}.
+\label{eq:local_recovery_bound}
+\end{equation}
+\end{proposition}
+
+Proposition~\ref{prop:conditional_local_recovery} organizes factors that
+can contribute to the reconstruction error. It is a sufficient conditional
+interpretation, not a verified guarantee for the trained decoder. The
+latent penalty localizes the S-REC condition around $\boldsymbol{z}_0$,
+and the bound follows the decoder-range view of generative compressed
+sensing \citep{candes2006stable,bora2017compressed}. The bound depends on
+the local separability condition stated above. Coordinate restriction is
+not proved to satisfy S-REC on the trained decoder range; this depends on
+local decoder secants. The empirical separability diagnostics in
+Appendix~\ref{app:separability} do not certify that condition for every
+pair of windows. The statement above is for a global minimizer. The
+extension to an inexact numerical optimizer is a separate argument in
+Appendix~\ref{app:conditional_local_recovery}. The result does not
+demonstrate superiority over interpolation, linear regression, or the
+other comparators. Increasing $\lambda$ does not necessarily tighten the
+bound or improve the reconstruction, because an unsuitable center
+$\boldsymbol{z}_0$ can also introduce bias.

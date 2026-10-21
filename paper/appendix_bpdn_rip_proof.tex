@@ -1,0 +1,215 @@
+% Appendix: proof of Theorem~\ref{thm:stable_sparse_hybrid_residual}
+% following Candes, Romberg, and Tao, arXiv:math/0503066, Section~2.2 (Theorem~2).
+% Block size is \mathsf{M}=3|T_0| to avoid confusion with the measurement matrix $M$.
+
+\section{Complete proof of Theorem~\ref{thm:stable_sparse_hybrid_residual}}
+\label{sec:appendix_bpdn_rip_proof}
+
+Fix $A\in\mathbb{R}^{m\times N}$, $\alpha^\star\in\mathbb{R}^N$, and $z=A\alpha^\star+w$ with $\|w\|_2\le \varepsilon$.
+Let $\widehat{\alpha}$ solve \eqref{eq:bpdn} with the same $\varepsilon$, and set $h:=\widehat{\alpha}-\alpha^\star$.
+Let $T_0\subset\{1,\ldots,N\}$ index $k$ largest magnitudes of $\alpha^\star$ (ties broken arbitrarily), so $|T_0|=k$.
+Let $\alpha^\star_k$ agree with $\alpha^\star$ on $T_0$ and vanish on $T_0^c$; this is a best $k$-sparse approximation in the usual basis model.
+Then $\|\alpha^\star_{T_0^c}\|_1=\|\alpha^\star-\alpha^\star_k\|_1$.
+Define the block size
+\begin{equation}
+  \mathsf{M} := 3|T_0|
+  \label{eq:def_block_size_Msf}
+\end{equation}
+and $\rho := |T_0|/\mathsf{M}=1/3$.
+Partition $T_0^c$ into disjoint sets $T_1,T_2,\ldots$ of cardinalities $\mathsf{M}$ (except possibly the last), arranged so that $(|h_i|)_{i\in T_1}$ dominates $(|h_i|)_{i\in T_2}$, etc., on $T_0^c$.
+Set $T_{01}:=T_0\cup T_1$.
+
+\subsection{Tube and cone constraints}
+
+\begin{lemma}[Tube constraint]
+\label{lem:appendix_tube}
+One has $\|Ah\|_2\le 2\varepsilon$.
+\end{lemma}
+
+\begin{proof}
+By the triangle inequality,
+$\|Ah\|_2=\|A(\widehat{\alpha}-\alpha^\star)\|_2\le \|A\widehat{\alpha}-z\|_2+\|z-A\alpha^\star\|_2\le 2\varepsilon$.
+\end{proof}
+
+\begin{lemma}[Cone constraint]
+\label{lem:appendix_cone_compressible}
+One has
+\begin{equation}
+  \|h_{T_0^c}\|_1 \le \|h_{T_0}\|_1 + 2\|\alpha^\star_{T_0^c}\|_1.
+  \label{eq:appendix_cone_compressible}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Feasibility of $\alpha^\star$ and optimality of $\widehat{\alpha}$ for the $\ell_1$ objective give $\|\widehat{\alpha}\|_1\le \|\alpha^\star\|_1$.
+Write $\widehat{\alpha}=\alpha^\star+h$.
+For any index set $T$,
+\[
+  \|\alpha^\star+h\|_1
+  =
+  \|(\alpha^\star+h)_T\|_1 + \|(\alpha^\star+h)_{T^c}\|_1
+  \ge
+  \|\alpha^\star_T\|_1 - \|h_T\|_1 + \|h_{T^c}\|_1 - \|\alpha^\star_{T^c}\|_1,
+\]
+by the reverse triangle inequality on each block.
+Thus
+\[
+  \|\alpha^\star\|_1
+  \ge
+  \|\widehat{\alpha}\|_1
+  \ge
+  \|\alpha^\star_{T_0}\|_1 - \|h_{T_0}\|_1 + \|h_{T_0^c}\|_1 - \|\alpha^\star_{T_0^c}\|_1.
+\]
+Rearranging and using $\|\alpha^\star\|_1=\|\alpha^\star_{T_0}\|_1+\|\alpha^\star_{T_0^c}\|_1$ yields \eqref{eq:appendix_cone_compressible}.
+\end{proof}
+
+\subsection{Tail bounds}
+
+\begin{lemma}[Summed tail block norms]
+\label{lem:appendix_sum_tail}
+One has
+\begin{equation}
+  \sum_{j\ge 2}\|h_{T_j}\|_2 \le \frac{\|h_{T_0^c}\|_1}{\sqrt{\mathsf{M}}}.
+  \label{eq:appendix_sum_tail_blocks}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For $j\ge 2$, each $p\in T_j$ satisfies $|h_p|\le \min_{q\in T_{j-1}}|h_q|\le \|h_{T_{j-1}}\|_1/\mathsf{M}$.
+Hence $\|h_{T_j}\|_2^2\le |T_j|\cdot (\|h_{T_{j-1}}\|_1/\mathsf{M})^2\le \|h_{T_{j-1}}\|_1^2/\mathsf{M}$, so $\|h_{T_j}\|_2\le \|h_{T_{j-1}}\|_1/\sqrt{\mathsf{M}}$.
+Summing over $j\ge 2$ yields
+\[
+  \sum_{j\ge 2}\|h_{T_j}\|_2
+  \le
+  \frac{1}{\sqrt{\mathsf{M}}}\sum_{j\ge 1}\|h_{T_j}\|_1
+  =
+  \frac{\|h_{T_0^c}\|_1}{\sqrt{\mathsf{M}}}.
+\]
+\end{proof}
+
+\begin{lemma}[Tail $\ell_2$ norm on $T_{01}^c$]
+\label{lem:appendix_tail_T01c}
+Define $\eta:=\|\alpha^\star_{T_0^c}\|_1/\sqrt{|T_0|}$.
+Then
+\begin{equation}
+  \|h_{T_{01}^c}\|_2 \le \frac{\|h_{T_0}\|_1 + 2\|\alpha^\star_{T_0^c}\|_1}{\sqrt{\mathsf{M}}}
+  \le
+  \sqrt{\rho}\,\bigl(\|h_{T_0}\|_2 + 2\eta\bigr).
+  \label{eq:appendix_tail_T01c_bound}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Since $T_{01}^c=\bigcup_{j\ge 2}T_j$, one has $\|h_{T_{01}^c}\|_2\le \sum_{j\ge 2}\|h_{T_j}\|_2$.
+Apply Lemma~\ref{lem:appendix_sum_tail} and Lemma~\ref{lem:appendix_cone_compressible} to get
+$\|h_{T_{01}^c}\|_2\le (\|h_{T_0}\|_1+2\|\alpha^\star_{T_0^c}\|_1)/\sqrt{\mathsf{M}}$.
+Finally, $\|h_{T_0}\|_1\le \sqrt{|T_0|}\,\|h_{T_0}\|_2$ and $\|\alpha^\star_{T_0^c}\|_1=\sqrt{|T_0|}\,\eta$.
+\end{proof}
+
+\begin{lemma}[Global $\ell_2$ bound]
+\label{lem:appendix_global_l2}
+One has
+\begin{equation}
+  \|h\|_2 \le (1+\sqrt{\rho})\,\|h_{T_{01}}\|_2 + 2\sqrt{\rho}\,\eta.
+  \label{eq:appendix_global_l2}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+By the triangle inequality, $\|h\|_2\le \|h_{T_{01}}\|_2+\|h_{T_{01}^c}\|_2$.
+Also $\|h_{T_0}\|_2\le \|h_{T_{01}}\|_2$.
+Insert Lemma~\ref{lem:appendix_tail_T01c}.
+\end{proof}
+
+\subsection{Sensing lower bound on the head block}
+
+\begin{lemma}[Head sensing inequality]
+\label{lem:appendix_head_sensing}
+Assume RIP of orders $\mathsf{M}+|T_0|$ and $\mathsf{M}$ with constants $\delta_{\mathsf{M}+|T_0|}$ and $\delta_{\mathsf{M}}$.
+Define
+\begin{equation}
+  C_{|T_0|,\mathsf{M}}
+  :=
+  \sqrt{1-\delta_{\mathsf{M}+|T_0|}}
+  -
+  \sqrt{\rho}\,\sqrt{1+\delta_{\mathsf{M}}}.
+  \label{eq:def_C_TM}
+\end{equation}
+Then
+\begin{equation}
+  \|Ah\|_2
+  \ge
+  C_{|T_0|,\mathsf{M}}\,\|h_{T_{01}}\|_2
+  -
+  2\sqrt{\rho}\,\sqrt{1+\delta_{\mathsf{M}}}\,\eta.
+  \label{eq:appendix_Ah_lower}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Since $h=h_{T_{01}}+\sum_{j\ge 2}h_{T_j}$, the reverse triangle inequality gives
+\[
+  \|Ah\|_2
+  \ge
+  \|A h_{T_{01}}\|_2 - \sum_{j\ge 2}\|A h_{T_j}\|_2.
+\]
+The vector $h_{T_{01}}$ is $(\mathsf{M}+|T_0|)$-sparse and each $h_{T_j}$ is $\mathsf{M}$-sparse, so RIP implies
+$\|A h_{T_{01}}\|_2\ge \sqrt{1-\delta_{\mathsf{M}+|T_0|}}\,\|h_{T_{01}}\|_2$
+and $\|A h_{T_j}\|_2\le \sqrt{1+\delta_{\mathsf{M}}}\,\|h_{T_j}\|_2$.
+Lemma~\ref{lem:appendix_sum_tail} and Lemma~\ref{lem:appendix_cone_compressible} yield
+\[
+  \sum_{j\ge 2}\|h_{T_j}\|_2
+  \le
+  \frac{\|h_{T_0}\|_1+2\|\alpha^\star_{T_0^c}\|_1}{\sqrt{\mathsf{M}}}
+  \le
+  \sqrt{\rho}\,\bigl(\|h_{T_0}\|_2+2\eta\bigr),
+\]
+as in the proof of Lemma~\ref{lem:appendix_tail_T01c}.
+Combine the estimates.
+\end{proof}
+
+\subsection{Positivity and conclusion}
+
+\begin{lemma}[Positivity of $C_{|T_0|,\mathsf{M}}$]
+\label{lem:appendix_C_positive}
+If $\delta_{3k}+3\delta_{4k}<2$ and $|T_0|=k$, then $C_{|T_0|,\mathsf{M}}>0$.
+\end{lemma}
+
+\begin{proof}
+Here $\mathsf{M}=3|T_0|=3k$, so $\mathsf{M}+|T_0|=4k$ and $\delta_{\mathsf{M}+|T_0|}=\delta_{4k}$, $\delta_{\mathsf{M}}=\delta_{3k}$.
+Thus
+\[
+  C_{|T_0|,\mathsf{M}}
+  =
+  \sqrt{1-\delta_{4k}} - \sqrt{\tfrac{1}{3}}\,\sqrt{1+\delta_{3k}}.
+\]
+Squaring the strict inequality $\sqrt{1-\delta_{4k}}>\sqrt{(1+\delta_{3k})/3}$ (both sides nonnegative) and rearranging yields $2>\delta_{3k}+3\delta_{4k}$, which is assumed.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:stable_sparse_hybrid_residual}]
+Lemma~\ref{lem:appendix_tube} gives $\|Ah\|_2\le 2\varepsilon$.
+Lemma~\ref{lem:appendix_head_sensing} combined with Lemma~\ref{lem:appendix_C_positive} implies
+\[
+  \|h_{T_{01}}\|_2
+  \le
+  \frac{2}{C_{|T_0|,\mathsf{M}}}\,\varepsilon
+  +
+  \frac{2\sqrt{\rho}\,\sqrt{1+\delta_{\mathsf{M}}}}{C_{|T_0|,\mathsf{M}}}\,\eta.
+\]
+Lemma~\ref{lem:appendix_global_l2} yields
+\[
+  \|h\|_2
+  \le
+  (1+\sqrt{\rho})\Bigl(\frac{2}{C_{|T_0|,\mathsf{M}}}\,\varepsilon + \frac{2\sqrt{\rho}\,\sqrt{1+\delta_{\mathsf{M}}}}{C_{|T_0|,\mathsf{M}}}\,\eta\Bigr)
+  +
+  2\sqrt{\rho}\,\eta.
+\]
+Absorb the final $2\sqrt{\rho}\,\eta$ into the $\eta$-term by enlarging the coefficient (still depending only on $\delta_{3k},\delta_{4k}$).
+With $|T_0|=k$, one has $\eta=\|\alpha^\star-\alpha^\star_k\|_1/\sqrt{k}$.
+This establishes \eqref{eq:alpha_recovery_bound} after renaming constants.
+Finally, Proposition~\ref{prop:residual_reduction_identity} gives $\varepsilon=\|w\|_2=\|M e_{\mathrm{bg}}(u)+M\xi+\eta\|_2$ as in \eqref{eq:effective_noise_eps}--\eqref{eq:alpha_recovery_bound_expanded}.
+\end{proof}
+
+\paragraph{Remark.}
+The argument above is the compressible case in Cand\`es--Romberg--Tao (2005, Section~2.2), written with the notation of the hybrid residual model.
+Numerical constants recorded there (for example under $\delta_{4k}\le 1/5$) apply verbatim after identifying their $S$ with our~$k$.

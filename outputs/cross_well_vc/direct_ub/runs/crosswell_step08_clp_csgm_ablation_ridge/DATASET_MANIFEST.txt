@@ -1,0 +1,22 @@
+Cross-well Vc benchmark: multi-well sliding-window dataset.
+
+train_path: /home/romulo/Documentos/cs-regressor/data/F02-1,F03-2,F06-1_6logs_30dB.txt
+test_path:  /home/romulo/Documentos/cs-regressor/data/F03-4_6logs_30dB.txt
+noise_level: 30dB/30dB
+
+target: VC
+train_wells: F02-1, F03-2, F06-1
+test_wells:  F03-4
+
+u_channels (in order): SONIC, RHOB, GR, AI, VP
+u = [SONIC segment || RHOB segment || GR segment || AI segment || VP segment] in R^{5*L}; y = VC segment in R^L.
+
+window_len (L, n_output): 64
+step: 8
+val_frac (tail per train well): 0.1
+n_train n_val n_test (windows): 104 11 97
+
+train_wells_rows: {"F02-1": 165, "F03-2": 811, "F06-1": 122}
+test_wells_rows:  {"F03-4": 832}
+
+Alpha_{train,val,test} = Y_{...} @ Psi (orthonormal L x L basis).

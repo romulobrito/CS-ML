@@ -1,0 +1,28 @@
+Well 9-BRSA-1254-RJS plug holdout.
+Question: do dense logs help estimate held-out laboratory plugs?
+Score: RMSE of log10(k) on reserved plugs, once per plug.
+No dense permeability curve is built for training or for the score.
+Pass choice used depth coverage only: 12a2_quad, frame 50, resistivity RT10.
+Matched plugs: 161. Dropped for depth or non-finite logs: 0.
+Target: log10 of positive longitudinal permeability, direction VH1.
+Context u: gr, rhob, nphi, rt. Laboratory porosity and density stay out.
+NMR permeability is not used.
+Blocks are contiguous in depth with sizes 53, 54, 54.
+numpy.array_split would instead yield 54, 54, 53; those sizes are not used.
+Each block is the test once.
+Validation: the 16 deepest plugs of the deeper training block.
+Those validation plugs are excluded from decoder training.
+Scalers and the direct regression use the training plugs only.
+Inside a test or validation block, rho in {0.25, 0.50} marks observed plugs.
+Seeds 7, 23, 41 draw the masks. The mask is not chosen from the test score.
+Mask stream: seed + 1009 * fold + 17 * round(100 * rho), plus 50 on validation.
+Train windows: 8 successive training plugs, step 1, fully inside the train set.
+Interpolation and smoothing use physical depth in meters.
+Smoothing alpha and CLP lambda are chosen on validation plugs only.
+The same observed plugs are given to every comparator.
+This run does not edit the F3 grid or the manuscript.
+It does not claim a general win.
+
+block 0: n=53, depth 4935.05 to 4952.85 m
+block 1: n=54, depth 4953.15 to 4981.40 m
+block 2: n=54, depth 4982.00 to 5005.45 m

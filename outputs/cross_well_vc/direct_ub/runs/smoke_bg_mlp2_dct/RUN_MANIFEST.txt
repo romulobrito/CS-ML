@@ -1,0 +1,35 @@
+Direct [u,b] benchmark: hybrid_lfista_joint vs mlp_concat / PCA / AE (joint-only mode).
+run_id: smoke_bg_mlp2_dct
+elapsed_seconds: 177.5
+residual_basis: dct
+measurement_kind: subsample
+measurement_noise_std: 0.005
+residual_k: 6
+
+tables/
+  detailed_results.csv
+  summary_by_seed.csv
+  summary.csv
+  summary_focus_lfista_joint_vs_ub.csv
+  summary_by_seed_focus_lfista_joint_vs_ub.csv
+  PROTOCOL.txt
+
+figures/
+  figures/01_rmse_vs_measurement_ratio.png
+  figures/02_mae_vs_measurement_ratio.png
+  figures/03_relative_l2_vs_measurement_ratio.png
+  figures/04_support_f1_vs_measurement_ratio.png
+  figures/05_rmse_grouped_bars_by_ratio.png
+  figures/06_gain_rmse_over_ml_only.png
+  figures/07_gain_mae_over_ml_only.png
+  figures/08_example_ground_truth_vs_models.png
+  figures/09_parity_ground_truth_vs_prediction.png
+  figures/10_depth_profile_target.png
+  tables/depth_profile_test_block.npz
+  tables/parity_pooled.npz
+
+focus_tables:
+  tables/summary_focus_lfista_joint_vs_ub.csv
+  tables/summary_by_seed_focus_lfista_joint_vs_ub.csv
+  PROTOCOL.txt
+  DATASET_MANIFEST.txt

@@ -1,0 +1,19 @@
+{
+  "well_id": "861",
+  "generated_utc": "2026-07-23T21:47:53Z",
+  "nested_lambda": true,
+  "exclude_samples": [],
+  "huber_delta": 0.15,
+  "lambda_beta": 10.0,
+  "w_s_grid": [
+    0.0,
+    0.05,
+    0.1,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "lexicographic_winner": "G_huber",
+  "criterion": "Keep increment if Vp OOF <= P0 and Vs or Vp/Vs improves; majority of depth groups; less bound hitting.",
+  "pred_cache_size": 1438840
+}

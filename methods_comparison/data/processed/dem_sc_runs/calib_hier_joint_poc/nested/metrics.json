@@ -1,0 +1,26 @@
+{
+  "well_id": "861",
+  "generated_utc": "2026-07-23T20:03:09Z",
+  "n_plugs": 10,
+  "n_depth_groups": 8,
+  "depth_tol_m": 0.15,
+  "nested_lambda": true,
+  "exclude_samples": [],
+  "lambda_grid": [
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "models": [
+    "M0",
+    "M1",
+    "M2",
+    "M3"
+  ],
+  "m3_median_lambda_alpha": 50.5,
+  "m3_median_lambda_s": 100.0,
+  "joint_gain_m3_vs_m0_pct": -1.9763190232138144,
+  "pred_cache_size": 897046,
+  "criterion_note": "Success if M3 cuts joint_rel_sq OOF by ~10%+ vs M0, improves most depth groups, and Vp does not degrade materially."
+}

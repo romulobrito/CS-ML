@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+.env
+
+# LaTeX auxiliary (keep .tex and optional main.pdf tracked)
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Local / runtime
+agent.log
+*.pid
+*_run.log
+outputs/full_run_log.txt
+nohup.out
+.DS_Store
+
+# Duplicate figure tree if pipeline wrote under outputs/
+outputs/paper/
+
+# External benchmark Stage 1 runs (large CSVs/PNGs; regenerate with sir_cs_benchmark_stage1.py)
+outputs/external_benchmark_stage1/runs/
+
+# Direct [u,b] benchmark runs (sir_cs_benchmark_direct_ub.py)
+outputs/direct_ub_benchmark/runs/
+
+# Psi-axis pilot (identity vs dct), sir_cs_benchmark_direct_ub.py + scripts/run_direct_ub_psi_pilot.sh
+outputs/direct_ub_psi_ablation/
+
+# M-axis pilot (gaussian vs subsample M, often with dct), scripts/run_direct_ub_dct_m_pilot.sh
+outputs/direct_ub_dct_m_ablation/
+
+# Direct UB measurement-noise robustness (scripts/run_direct_ub_dct_subsample_noise_robustness.sh)
+outputs/direct_ub_robustness/
+
+# Robustness Phase 3 sweep outputs (large; regenerate with run_robustness_phase3_sweep.py)
+outputs/robustness_phase3/
+
+# Generated robustness PNG tree under paper/ (large; copy from outputs after runs)
+paper/figures/robustness_phase3/
+
+# Residual-k robustness: parity npz copies are large; keep PNGs in git, regenerate npz from runs
+paper/figures/direct_ub_robustness_residual_k/parity_pooled_k*.npz
+
+# Real well F03 benchmark runs (sir_cs_benchmark_real_well_direct_ub.py)
+outputs/real_well_f03/
+
+# Local chat notes
+passos_chatgpt

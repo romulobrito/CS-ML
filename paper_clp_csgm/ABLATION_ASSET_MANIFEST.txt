@@ -1,0 +1,11 @@
+CLP-CSGM ablation assets
+
+tables/ablation_crosswell_summary.csv
+tables/ablation_crosswell_wide.csv
+tables/ablation_crosswell_wide.tex
+tables/ablation_f03_summary.csv
+tables/ablation_f03_wide.csv
+tables/ablation_f03_wide.tex
+figures/ablation_crosswell_rmse.png
+figures/ablation_f03_rmse.png
+figures/ablation_prior_class_ridge_vs_mlp.png

@@ -1,0 +1,20 @@
+{
+  "n_profile_rows": 87,
+  "n_matched_vp": 87,
+  "match_fraction": 1.0,
+  "mae_vp_km_s": 0.4097896091954023,
+  "rmse_vp_km_s": 0.5400132552987851,
+  "mape_vp_pct": 8.653587474976085,
+  "bias_vp_km_s": 0.3018471034482758,
+  "pearson_r_vp": 0.34043885809425006,
+  "mean_vp_sonic_km_s": 4.900076149425288,
+  "mean_vp_dem_km_s": 5.201923252873563,
+  "median_abs_vp_rel_error_pct": 6.681825967477182,
+  "n_matched_vpvs": 87,
+  "mae_vpvs": 0.07302826436781606,
+  "bias_vpvs": 0.049677252873563206,
+  "mean_vpvs_sonic": 1.7680656091954023,
+  "mean_vpvs_dem": 1.8177428620689653,
+  "generated_utc": "2026-07-26T16:57:08Z",
+  "merge_tol_m": 0.25
+}

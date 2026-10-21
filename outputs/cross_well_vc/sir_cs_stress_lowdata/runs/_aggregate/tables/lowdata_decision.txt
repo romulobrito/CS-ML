@@ -1,0 +1,22 @@
+SIR-CS low-data triage decision report
+============================================================
+
+Total cells (step x rho): 9
+Cells where SIR-CS is the winner: 0
+Cells where SIR-CS is within 5% of winner: 0
+Cells where SIR-CS is within 10% of winner: 0
+Average SIR-CS gap to winner (%): 160.79
+Minimum SIR-CS gap to winner (%): 129.95
+
+VERDICT: NO-GO for JRM in this task family (SIR-CS gap too large in all cells; pivot to a different y or scenario).
+
+Per-cell breakdown:
+  step= 8 (n_tr~104) rho=0.05 | winner=ae_regression_ub       rmse_win=0.0171 sir_cs=0.0456 gap=166.78%
+  step= 8 (n_tr~104) rho=0.10 | winner=ae_regression_ub       rmse_win=0.0163 sir_cs=0.0448 gap=174.21%
+  step= 8 (n_tr~104) rho=0.20 | winner=ae_regression_ub       rmse_win=0.0163 sir_cs=0.0408 gap=150.19%
+  step=16 (n_tr~ 52) rho=0.05 | winner=ae_regression_ub       rmse_win=0.0189 sir_cs=0.0503 gap=165.92%
+  step=16 (n_tr~ 52) rho=0.10 | winner=ae_regression_ub       rmse_win=0.0180 sir_cs=0.0497 gap=175.56%
+  step=16 (n_tr~ 52) rho=0.20 | winner=ae_regression_ub       rmse_win=0.0181 sir_cs=0.0459 gap=153.91%
+  step=32 (n_tr~ 27) rho=0.05 | winner=ae_regression_ub       rmse_win=0.0213 sir_cs=0.0581 gap=172.67%
+  step=32 (n_tr~ 27) rho=0.10 | winner=ae_regression_ub       rmse_win=0.0250 sir_cs=0.0575 gap=129.95%
+  step=32 (n_tr~ 27) rho=0.20 | winner=ae_regression_ub       rmse_win=0.0203 sir_cs=0.0525 gap=157.95%

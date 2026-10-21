@@ -1,0 +1,7 @@
+model,mape,bias,r,source
+M0_dry,16.212527,0.616031,-0.153109,production
+M3_nested_median_dry,13.343794,0.467256,-0.170681,"lambda~(50.5,100)"
+M3_lam1_dry,13.835436,0.483384,-0.178844,"lambda=(1,1)"
+M0_gassmann,15.36933,0.585313,-0.165083,production
+M3_lam1_gassmann,14.525093,0.538551,-0.17972,"lambda=(1,1)"
+M3_nested_median_gassmann,14.189074,0.522839,-0.171955,"lambda~(50.5,100)"
