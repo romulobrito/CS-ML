@@ -1,0 +1,105 @@
+name: Independent petrophysical target data inventory
+on:
+  push:
+    branches: [audit/independent-target-inventory-20261021]
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -q 'numpy<3' openpyxl
+      - name: Inspect repository laboratory-property database
+        shell: bash
+        run: |
+          python - <<'PY'
+          import openpyxl,collections,json,re
+          path='methods_comparison/data/ROCKPHYS_Database_04_12_2024 (7).xlsx'
+          wb=openpyxl.load_workbook(path,read_only=True,data_only=True)
+          rows=[]
+          for ws in wb:
+              preview=list(ws.iter_rows(max_row=min(9,ws.max_row),values_only=True))
+              tokens=[[str(c)[:90] if c is not None else '' for c in row[:18]] for row in preview[:4]]
+              head=next((r for r in preview if any(re.search(r'well|po[çc]o|poco|depth|prof|poro|permea',str(x),re.I) for x in r if x is not None)),None)
+              head=[str(x) if x is not None else '' for x in head] if head else []
+              wells=[];wc=next((j for j,x in enumerate(head) if re.search(r'well|po[çc]o|poco',x,re.I)),None)
+              if wc is not None:
+                  for row in ws.iter_rows(min_row=2,values_only=True):
+                      if wc<len(row) and row[wc] is not None:wells.append(str(row[wc]))
+              rows.append({'sheet':ws.title,'n_rows':ws.max_row,'n_columns':ws.max_column,'preview':tokens,'matched_well_column':head[wc] if wc is not None else None,'n_wells':len(set(wells)),'well_counts':collections.Counter(wells).most_common(15)})
+          print('ROCKPHYS_DB_INVENTORY',json.dumps(rows,ensure_ascii=False))
+          PY
+      - name: Fetch official Geolink multiwell benchmark data
+        shell: bash
+        run: |
+          mkdir -p /tmp/geolink outputs/geolink_source_inventory
+          curl --fail --location --silent --show-error \
+            --retry 3 --connect-timeout 20 --max-time 1800 \
+            -o /tmp/geolink/public-processed-datasets.tar.gz \
+            "https://zenodo.org/records/10987946/files/public-processed-datasets.tar.gz?download=1"
+          echo "e984ba81a8bf5840d12e66600abd9226  /tmp/geolink/public-processed-datasets.tar.gz" | md5sum --check
+      - name: Audit fold identity and extract deterministic subset
+        shell: bash
+        run: |
+          python - <<'PY'
+          import numpy as np,tarfile,io,json,pathlib,collections,hashlib
+          p=pathlib.Path('/tmp/geolink/public-processed-datasets.tar.gz')
+          out=pathlib.Path('outputs/geolink_source_inventory');out.mkdir(parents=True,exist_ok=True)
+          sha=hashlib.sha256()
+          with p.open('rb') as f:
+              for b in iter(lambda:f.read(2**20),b''):sha.update(b)
+          result={'archive_sha256':sha.hexdigest(),'archive_bytes':p.stat().st_size,'folds':{}}
+          with tarfile.open(p,'r:gz') as tf:
+              members=[m for m in tf.getmembers() if m.isfile()]
+              result['n_members']=len(members)
+              result['geolink_names_and_sizes']=[{'name':m.name,'size':m.size} for m in members if 'geolink' in m.name.lower()][:120]
+              for fold in range(5):
+                  prefix='geolink_fold_'+str(fold)+'_well_log_'
+                  fold_m=[m for m in members if prefix in pathlib.Path(m.name).name]
+                  d={}
+                  for suffix in ['sliced_train.npy','sliced_val.npy','slices_meta_train.json','slices_meta_val.json']:
+                      fmatches=[m for m in fold_m if pathlib.Path(m.name).name.endswith(suffix)]
+                      if len(fmatches)!=1:raise RuntimeError((fold,suffix,len(fmatches)))
+                      with tf.extractfile(fmatches[0]) as ff: payload=ff.read()
+                      d[suffix]=np.load(io.BytesIO(payload),allow_pickle=False) if suffix.endswith('.npy') else json.loads(payload)
+                  for name in ('train','val'):
+                      arr=d['sliced_'+name+'.npy'];meta=d['slices_meta_'+name+'.json']
+                      if len(meta)!=len(arr):raise RuntimeError(('meta alignment',fold,name,len(meta),len(arr)))
+                      wells=[str(v[0]) for v in meta]
+                      result['folds'].setdefault(str(fold),{})[name]={
+                          'shape':list(arr.shape),'dtype':str(arr.dtype),'num_wells':len(set(wells)),
+                          'min':np.nanmin(arr,axis=(0,1)).tolist(),'max':np.nanmax(arr,axis=(0,1)).tolist(),
+                          'nan_fraction':float(np.isnan(arr).mean()),'metadata_examples':meta[:2],
+                          'well_distribution':collections.Counter(wells).most_common(5)}
+                  a={str(x[0]) for x in d['slices_meta_train.json']};b={str(x[0]) for x in d['slices_meta_val.json']}
+                  result['folds'][str(fold)]['well_overlap']=len(a&b)
+                  if a&b:raise RuntimeError('Well contamination!')
+                  if fold==0:
+                      # tiny fixed raw slice subset. Select indices without reading target values.
+                      for part,cap in [('train',100),('val',60)]:
+                          arr=d['sliced_'+part+'.npy'];meta=d['slices_meta_'+part+'.json'];wells=np.array([str(x[0]) for x in meta])
+                          rng=np.random.default_rng(17076 if part=='train' else 17077)
+                          chosen=[]
+                          for well in sorted(set(wells)):
+                              idx=np.flatnonzero(wells==well);chosen.append(int(rng.choice(idx)))
+                          if len(chosen)>cap:chosen=list(rng.choice(chosen,size=cap,replace=False))
+                          remaining=np.setdiff1d(np.arange(len(wells)),np.asarray(chosen,dtype=int))
+                          if len(chosen)<cap:chosen+=list(rng.choice(remaining,size=min(len(remaining),cap-len(chosen)),replace=False))
+                          chosen=np.sort(chosen)
+                          np.save(out/('geolink_fold_0_well_log_sliced_'+part+'.npy'),arr[chosen])
+                          (out/('geolink_fold_0_well_log_slices_meta_'+part+'.json')).write_text(json.dumps([meta[int(i)] for i in chosen]))
+                          result['folds']['0'][part+'_subset']={'rows':len(chosen),'n_wells':len(set(wells[chosen])),'selection':'well_ID_only_seeded'}
+          (out/'inventory.json').write_text(json.dumps(result,indent=2,default=str))
+          print('GEOLINK_INVENTORY',json.dumps(result,default=str)[:26000],flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: independent-target-source-audit
+          path: outputs/geolink_source_inventory/
+          if-no-files-found: warn
