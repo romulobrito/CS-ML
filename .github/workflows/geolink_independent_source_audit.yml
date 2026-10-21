@@ -23,12 +23,12 @@ jobs:
           wb=openpyxl.load_workbook(path,read_only=True,data_only=True)
           rows=[]
           for ws in wb:
-              preview=list(ws.iter_rows(max_row=min(9,ws.max_row),values_only=True))
+              preview=list(ws.iter_rows(max_row=min(9,ws.max_row or 9),values_only=True))
               tokens=[[str(c)[:90] if c is not None else '' for c in row[:18]] for row in preview[:4]]
               head=next((r for r in preview if any(re.search(r'well|po[çc]o|poco|depth|prof|poro|permea',str(x),re.I) for x in r if x is not None)),None)
               head=[str(x) if x is not None else '' for x in head] if head else []
               wells=[];wc=next((j for j,x in enumerate(head) if re.search(r'well|po[çc]o|poco',x,re.I)),None)
-              if wc is not None:
+              if wc is not None and (ws.max_row or 0) < 200000:
                   for row in ws.iter_rows(min_row=2,values_only=True):
                       if wc<len(row) and row[wc] is not None:wells.append(str(row[wc]))
               rows.append({'sheet':ws.title,'n_rows':ws.max_row,'n_columns':ws.max_column,'preview':tokens,'matched_well_column':head[wc] if wc is not None else None,'n_wells':len(set(wells)),'well_counts':collections.Counter(wells).most_common(15)})
