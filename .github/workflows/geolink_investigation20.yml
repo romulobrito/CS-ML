@@ -1,0 +1,54 @@
+name: Geolink Investigation 20 latent prior regularization
+on:
+  push:
+    branches:
+      - audit/geolink-prior-lambda-diagnosis-20261021
+permissions:
+  contents: read
+jobs:
+  regularization-study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 160
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -q 'numpy<3' 'scikit-learn<2' pandas scipy matplotlib torch
+      - name: Fetch official Geolink fold 0 and verify SHA256
+        run: |
+          mkdir -p /tmp/geolink
+          curl --fail --location --silent --show-error --retry 3 \
+            --connect-timeout 20 --max-time 1800 \
+            -o /tmp/geolink/public-processed-datasets.tar.gz \
+            "https://zenodo.org/records/10987946/files/public-processed-datasets.tar.gz?download=1"
+          echo "67a659043770fab643d60d4d8fd674da50d178797f49e664d8c9abdc532a7aa6  /tmp/geolink/public-processed-datasets.tar.gz" | sha256sum --check
+      - name: Run smoke test
+        env:
+          PYTHONPATH: '.'
+          PYTHONUNBUFFERED: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+          OPENBLAS_NUM_THREADS: '2'
+        run: |
+          python scripts/geolink_fullscale/investigation20.py --quick --out outputs/investigation20_smoke
+      - name: Run complete original and stratified folds
+        env:
+          PYTHONPATH: '.'
+          PYTHONUNBUFFERED: '1'
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+          OPENBLAS_NUM_THREADS: '2'
+        run: |
+          python scripts/geolink_fullscale/investigation20.py --out outputs/investigation20_full
+      - name: Archive metrics and provenance even on errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: geolink-investigation20-prior-lambda
+          path: |
+            outputs/investigation20_smoke/
+            outputs/investigation20_full/
+          if-no-files-found: warn
