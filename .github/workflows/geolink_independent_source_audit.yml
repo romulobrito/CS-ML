@@ -79,7 +79,7 @@ jobs:
                   a={str(x[0]) for x in d['slices_meta_train.json']};b={str(x[0]) for x in d['slices_meta_val.json']}
                   result['folds'][str(fold)]['well_overlap']=len(a&b)
                   if a&b:raise RuntimeError('Well contamination!')
-                  if fold==0:
+                  if True:
                       # tiny fixed raw slice subset. Select indices without reading target values.
                       for part,cap in [('train',100),('val',60)]:
                           arr=d['sliced_'+part+'.npy'];meta=d['slices_meta_'+part+'.json'];wells=np.array([str(x[0]) for x in meta])
@@ -91,9 +91,9 @@ jobs:
                           remaining=np.setdiff1d(np.arange(len(wells)),np.asarray(chosen,dtype=int))
                           if len(chosen)<cap:chosen+=list(rng.choice(remaining,size=min(len(remaining),cap-len(chosen)),replace=False))
                           chosen=np.sort(chosen)
-                          np.save(out/('geolink_fold_0_well_log_sliced_'+part+'.npy'),arr[chosen])
-                          (out/('geolink_fold_0_well_log_slices_meta_'+part+'.json')).write_text(json.dumps([meta[int(i)] for i in chosen]))
-                          result['folds']['0'][part+'_subset']={'rows':len(chosen),'n_wells':len(set(wells[chosen])),'selection':'well_ID_only_seeded'}
+                          np.save(out/(f'geolink_fold_{fold}_well_log_sliced_'+part+'.npy'),arr[chosen])
+                          (out/(f'geolink_fold_{fold}_well_log_slices_meta_'+part+'.json')).write_text(json.dumps([meta[int(i)] for i in chosen]))
+                          result['folds'][str(fold)][part+'_subset']={'rows':len(chosen),'n_wells':len(set(wells[chosen])),'selection':'well_ID_only_seeded'}
           (out/'inventory.json').write_text(json.dumps(result,indent=2,default=str))
           print('GEOLINK_INVENTORY',json.dumps(result,default=str)[:26000],flush=True)
           PY
