@@ -22,6 +22,15 @@ from scripts.geolink_fullscale.run_fold0 import (
   hidden_stats,csv_write,SEEDS,OBS_COUNTS,L,ARCHIVE_SHA256
 )
 
+def csv_write(path,rows):
+    """CSV with the union of fields: train rows do not have oracle columns."""
+    if not rows:return
+    columns=list(dict.fromkeys(k for r in rows for k in r))
+    with open(path,"w",newline="",encoding="utf-8") as f:
+        w=csv.DictWriter(f,fieldnames=columns)
+        w.writeheader()
+        w.writerows(rows)
+
 def numerics(v):
     a=np.asarray(v,dtype=float).ravel()
     return dict(n=int(a.size),mean=float(np.mean(a)),sd=float(np.std(a)),
