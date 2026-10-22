@@ -1,0 +1,9 @@
+python 3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]
+platform Linux-6.8.0-138-generic-x86_64-with-glibc2.35
+torch 2.6.0+cu124
+numpy 1.26.4
+pandas 2.3.3
+scipy 1.15.1
+sklearn 1.6.1
+base_sha 14759285a6ab0462e4f2b215ddd9e32f39e34b5a
+max_abs_prior_prediction_gap 4.44089e-16

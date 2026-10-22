@@ -1,0 +1,13 @@
+{
+  "base_sha": "14759285a6ab0462e4f2b215ddd9e32f39e34b5a",
+  "split_sha256": "cb49e87157394ccd79eddd6033c39a11718583373c09f929e9e160671084131c",
+  "masks_sha256": "a1eca3c687bf6bc422f872dd604317dbf57bf50a3ffa8327a0bb0473bd693ea4",
+  "max_abs_prior_prediction_gap": 4.440892098500626e-16,
+  "max_abs_direct_prediction_gap": 1.8318679906315083e-15,
+  "residual_rules": [
+    "nearest observed residual",
+    "depth interpolation of observed residual"
+  ],
+  "rules_tuned_on_test": false,
+  "prior_field_depends_on_mask": false
+}
