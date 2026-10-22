@@ -1,0 +1,27 @@
+{
+  "base_sha": "f6b6159e910c2529a9f750057fcab676b6bcf769",
+  "n_plugs": 161,
+  "seeds": [
+    7,
+    23,
+    41
+  ],
+  "rhos": [
+    0.25,
+    0.5
+  ],
+  "window_len": 8,
+  "latent_dim": 4,
+  "hidden_dim": 32,
+  "ae_epochs": 80,
+  "csgm_iters": 200,
+  "csgm_restarts": 2,
+  "csgm_opt_lr": 0.05,
+  "oracle_starts": 12,
+  "oracle_iters": 600,
+  "lambda_source": "lambda_extension/tables/selection_by_cell.csv extended_choice",
+  "masks_sha256": "a1eca3c687bf6bc422f872dd604317dbf57bf50a3ffa8327a0bb0473bd693ea4",
+  "split_sha256": "cb49e87157394ccd79eddd6033c39a11718583373c09f929e9e160671084131c",
+  "oracle_uses_test_targets": true,
+  "oracle_selects_clp": false
+}

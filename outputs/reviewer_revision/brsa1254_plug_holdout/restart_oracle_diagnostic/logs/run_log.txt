@@ -1,0 +1,21 @@
+base_sha f6b6159e910c2529a9f750057fcab676b6bcf769
+masks_sha256 a1eca3c687bf6bc422f872dd604317dbf57bf50a3ffa8327a0bb0473bd693ea4
+split_sha256 cb49e87157394ccd79eddd6033c39a11718583373c09f929e9e160671084131c
+fold 0 seed 7 rho 0.25 collective 0.9960 individual 0.9924 oracle 0.4029
+fold 0 seed 7 rho 0.5 collective 0.8109 individual 0.8100 oracle 0.3853
+fold 0 seed 23 rho 0.25 collective 1.0967 individual 1.0974 oracle 0.3508
+fold 0 seed 23 rho 0.5 collective 1.4354 individual 1.4354 oracle 0.5289
+fold 0 seed 41 rho 0.25 collective 1.2449 individual 1.2449 oracle 0.4690
+fold 0 seed 41 rho 0.5 collective 1.0564 individual 1.0563 oracle 0.5013
+fold 1 seed 7 rho 0.25 collective 1.6569 individual 1.6569 oracle 0.9692
+fold 1 seed 7 rho 0.5 collective 1.9679 individual 1.9679 oracle 0.8327
+fold 1 seed 23 rho 0.25 collective 1.6574 individual 1.6574 oracle 0.9041
+fold 1 seed 23 rho 0.5 collective 1.7749 individual 1.7749 oracle 0.9709
+fold 1 seed 41 rho 0.25 collective 2.0905 individual 2.0889 oracle 0.9153
+fold 1 seed 41 rho 0.5 collective 1.6899 individual 1.6899 oracle 0.7619
+fold 2 seed 7 rho 0.25 collective 1.5060 individual 1.5060 oracle 0.8058
+fold 2 seed 7 rho 0.5 collective 1.4714 individual 1.4714 oracle 0.8418
+fold 2 seed 23 rho 0.25 collective 1.3458 individual 1.3458 oracle 0.8978
+fold 2 seed 23 rho 0.5 collective 1.2452 individual 1.2452 oracle 0.8327
+fold 2 seed 41 rho 0.25 collective 1.4339 individual 1.4339 oracle 0.7228
+fold 2 seed 41 rho 0.5 collective 1.4163 individual 1.4163 oracle 0.6581
