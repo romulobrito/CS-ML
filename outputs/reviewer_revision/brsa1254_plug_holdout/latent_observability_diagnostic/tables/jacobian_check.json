@@ -1,0 +1,7 @@
+{
+  "max_abs_error": 2.148278936964232e-07,
+  "max_relative_error": 2.747012438497225e-06,
+  "kink_abs_error": 2.0914819232054072e-07,
+  "relu_at_zero": "pytorch_and_analytical_use_zero_subgradient",
+  "n_samples": 8.0
+}

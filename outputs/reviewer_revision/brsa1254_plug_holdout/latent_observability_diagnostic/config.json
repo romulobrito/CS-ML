@@ -1,0 +1,19 @@
+{
+  "base_sha": "a25d94a544827cd906f188828eac7a0318fe4e21",
+  "split_sha256": "cb49e87157394ccd79eddd6033c39a11718583373c09f929e9e160671084131c",
+  "masks_sha256": "a1eca3c687bf6bc422f872dd604317dbf57bf50a3ffa8327a0bb0473bd693ea4",
+  "reproduction_max_abs_rmse": 1.4524759017753297e-07,
+  "jacobian_check": {
+    "max_abs_error": 2.148278936964232e-07,
+    "max_relative_error": 2.747012438497225e-06,
+    "kink_abs_error": 2.0914819232054072e-07,
+    "relu_at_zero": "pytorch_and_analytical_use_zero_subgradient",
+    "n_samples": 8.0
+  },
+  "objective": "(||M G(z) - b||^2 + lambda ||z - z0||^2) / n_group",
+  "curvature": "sigma(J_M)^2 + lambda",
+  "relu_kink": "subgradient 0, matching torch.nn.ReLU",
+  "rank_relative_tolerance": 1e-05,
+  "lambda_source": "lambda_extension validation choice",
+  "oracle_not_used": true
+}

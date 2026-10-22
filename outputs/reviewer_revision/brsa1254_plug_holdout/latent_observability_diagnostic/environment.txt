@@ -1,0 +1,7 @@
+python 3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]
+platform Linux-6.8.0-138-generic-x86_64-with-glibc2.35
+torch 2.6.0+cu124
+numpy 1.26.4
+pandas 2.3.3
+sklearn 1.6.1
+base_sha a25d94a544827cd906f188828eac7a0318fe4e21

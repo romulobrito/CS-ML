@@ -1,0 +1,22 @@
+base_sha a25d94a544827cd906f188828eac7a0318fe4e21
+split_sha256 cb49e87157394ccd79eddd6033c39a11718583373c09f929e9e160671084131c
+masks_sha256 a1eca3c687bf6bc422f872dd604317dbf57bf50a3ffa8327a0bb0473bd693ea4
+jacobian_max_abs 2.14828e-07 kink 2.09148e-07
+fold 0 seed 7 rho 0.25 prior 1.14595 clp 0.99597
+fold 0 seed 7 rho 0.5 prior 1.01203 clp 0.81087
+fold 0 seed 23 rho 0.25 prior 1.17930 clp 1.09672
+fold 0 seed 23 rho 0.5 prior 1.59275 clp 1.43535
+fold 0 seed 41 rho 0.25 prior 1.34970 clp 1.24488
+fold 0 seed 41 rho 0.5 prior 1.43857 clp 1.05643
+fold 1 seed 7 rho 0.25 prior 1.64110 clp 1.65692
+fold 1 seed 7 rho 0.5 prior 1.78854 clp 1.96786
+fold 1 seed 23 rho 0.25 prior 1.65859 clp 1.65739
+fold 1 seed 23 rho 0.5 prior 1.77492 clp 1.77492
+fold 1 seed 41 rho 0.25 prior 1.77777 clp 2.09051
+fold 1 seed 41 rho 0.5 prior 1.65838 clp 1.68990
+fold 2 seed 7 rho 0.25 prior 1.41761 clp 1.50601
+fold 2 seed 7 rho 0.5 prior 1.47687 clp 1.47140
+fold 2 seed 23 rho 0.25 prior 1.34582 clp 1.34582
+fold 2 seed 23 rho 0.5 prior 1.12104 clp 1.24525
+fold 2 seed 41 rho 0.25 prior 1.37011 clp 1.43387
+fold 2 seed 41 rho 0.5 prior 1.35996 clp 1.41631

@@ -1,0 +1,15 @@
+scope,metric,correlation,n_rows,pre_recovery
+eighteen_cells_exploratory,underdetermined_fraction,0.025397991818621398,18.0,1.0
+eighteen_cells_exploratory,mean_rank,-0.05431366333762847,18.0,1.0
+eighteen_cells_exploratory,mean_effective_dim,-0.3812118485493482,16.0,1.0
+eighteen_cells_exploratory,median_observable_condition,0.07912185587950572,18.0,1.0
+eighteen_cells_exploratory,median_regularized_condition,-0.33539212716019773,16.0,1.0
+eighteen_cells_exploratory,mean_latent_displacement,0.1561330115619233,18.0,0.0
+eighteen_cells_exploratory,fraction_numerical_deficiency,,18.0,1.0
+six_block_rho_means,underdetermined_fraction,0.055517041200962285,6.0,1.0
+six_block_rho_means,mean_rank,-0.07818800405541959,6.0,1.0
+six_block_rho_means,mean_effective_dim,-0.5283516684104796,6.0,1.0
+six_block_rho_means,median_observable_condition,0.10044616486423155,6.0,1.0
+six_block_rho_means,median_regularized_condition,-0.45016270715198226,6.0,1.0
+six_block_rho_means,mean_latent_displacement,-0.046944513514954905,6.0,0.0
+six_block_rho_means,fraction_numerical_deficiency,,6.0,1.0
