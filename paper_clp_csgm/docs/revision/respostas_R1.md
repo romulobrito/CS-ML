@@ -51,30 +51,31 @@ R1-M11.
 
 **Proposed reply:**
 
-We thank the reviewer for noting that three development wells and one
-held-out well form a controlled test and cannot support broad claims of
-cross-well robustness or operational transfer. The original submission already
-named F02-1, F03-2, and F06-1 as the development wells and F03-4 as the
-held-out well in the experimental protocol, but the Abstract, Introduction,
-and Conclusions did not restrict the language to that single-holdout design.
-
-We have revised the text accordingly. The Abstract now states that the
-cross-well evaluation uses three wells for model development and one well
-held out. It does not name the wells, and it does not repeat the
-operational-transfer sentence. That sentence remains in the Introduction
-and in the Conclusion. The experimental protocol states that reported
-cross-well performance refers to this single held-out well. The Conclusions
-state that the cross-well comparison is a controlled single-holdout
-benchmark and is not evidence of operational cross-well or multi-field
+We thank the reviewer for highlighting the limitations associated with the
+number of wells used in the cross-well evaluation. We agree that three
+development wells and a single held-out well provide a controlled benchmark
+but do not establish general cross-well robustness or operational
 transferability.
+
+We have revised the manuscript to make this distinction explicit. The
+Abstract now states that the cross-well evaluation uses three wells for
+model development and one well held out. It does not name the wells. The
+Introduction states that the tests use three development wells and hold out
+F03-4. Experimental setup, subsection Cross-well clay-volume, names F02-1,
+F03-2, and F06-1 as the development wells and states that reported
+cross-well performance refers to this single held-out well. The Conclusion
+states that the cross-well comparison is a controlled single-holdout
+benchmark on F03-4 and is not evidence of operational cross-well or
+multi-field transferability. It also states that broader assessment will
+require larger multi-well datasets, independently calibrated targets, and
+geological labels.
 
 Where the text was changed: the Abstract; the Introduction (third
 contribution); Experimental setup, subsection Cross-well clay-volume (the
 single held-out well); and the Conclusion (single-holdout paragraph).
 
-No additional wells or resampling experiments were added for this comment.
-Requests for further held-out wells or repeated resampling are addressed
-under R1-M03.
+No additional held-out wells were added for this comment. Requests for
+further held-out wells or repeated resampling are addressed under R1-M03.
 
 ---
 
