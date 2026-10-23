@@ -1,0 +1,11 @@
+python 3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]
+platform Linux-6.8.0-138-generic-x86_64-with-glibc2.35
+torch 2.6.0+cu124
+numpy 1.26.4
+pandas 2.3.3
+scipy 1.15.1
+sklearn 1.6.1
+base_sha 6e98a85d5c66e57410803eada2a88e63bbe8f338
+reference_max_abs_prior_only 4.44089e-16
+reference_max_abs_clp_extended 4.44089e-16
+reference_max_abs_direct_regression 4.44089e-16

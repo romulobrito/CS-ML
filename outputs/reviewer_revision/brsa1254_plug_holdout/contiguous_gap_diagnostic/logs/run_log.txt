@@ -1,0 +1,3 @@
+reference_max_abs_prior_only 4.44089e-16
+reference_max_abs_clp_extended 4.44089e-16
+reference_max_abs_direct_regression 4.44089e-16

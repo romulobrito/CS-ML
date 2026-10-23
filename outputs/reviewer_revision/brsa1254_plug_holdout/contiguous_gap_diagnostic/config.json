@@ -1,0 +1,35 @@
+{
+  "base_sha": "6e98a85d5c66e57410803eada2a88e63bbe8f338",
+  "split_sha256": "cb49e87157394ccd79eddd6033c39a11718583373c09f929e9e160671084131c",
+  "random_masks_sha256": "a1eca3c687bf6bc422f872dd604317dbf57bf50a3ffa8327a0bb0473bd693ea4",
+  "gap_rule": "one interval; offset from SeedSequence(seed, fold, round(100*rho), split code)",
+  "permeability_used_to_place_gap": false,
+  "lambda_selected_on": "validation contiguous gap",
+  "tie_rule": "no_update first, then increasing lambda; strict improvement",
+  "lambda_grid": [
+    0.0001,
+    0.0003,
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1,
+    0.3,
+    1.0,
+    3.0,
+    10.0,
+    30.0,
+    100.0
+  ],
+  "reference_cell": {
+    "fold_id": 0,
+    "seed": 7,
+    "rho": 0.25
+  },
+  "reference_max_abs": {
+    "prior_only": 4.440892098500626e-16,
+    "clp_extended": 4.440892098500626e-16,
+    "direct_regression": 4.440892098500626e-16
+  },
+  "random_mask_scores_mixed_into_summary": false
+}
