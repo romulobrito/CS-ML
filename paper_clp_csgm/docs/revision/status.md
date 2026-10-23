@@ -54,11 +54,11 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   forbid transfer language; Abstract/Introduction/Conclusion did not state
   the 3+1 design as a claim limit.
 - Change made: Abstract states three development wells and one held-out
-  well. It does not name the wells and does not repeat the
-  operational-transfer sentence. That limit remains in the Introduction
-  and in the Conclusion. Experiments state that reported cross-well
-  performance refers to this single held-out well. No new well and no new
-  experiment.
+  well and does not name them. Introduction names the three-plus-one design
+  and F03-4. Experiments state that reported cross-well performance refers
+  to this single held-out well. The explicit limit, that the comparison is
+  not evidence of operational cross-well or multi-field transferability, is
+  in the Conclusion. No new well and no new experiment.
 - Files: `main.tex`; `sections/01_introduction.tex`;
   `sections/05_experiments.tex`; `sections/08_conclusion.tex`
 - Shared reply: none. Nearby IDs (`R2-03`, `R3-02`, `R1-M03`, `R1-M11`,
