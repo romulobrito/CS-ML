@@ -53,8 +53,13 @@ drifting, and the measurement term can still correct it.
 The sensitivity results in
 Section~\ref{subsec:latent_prior_sensitivity} show that no single architecture
 for $h$ is uniformly preferable. MLP has lower mean RMSE in all nine
-multi-channel cross-well cells, whereas Ridge has lower mean RMSE at every
-tested ratio under the single-channel F03-4 setting. In both cases, the
+multi-channel cross-well cells. Across the nine cross-well configurations,
+the unweighted average of the cell-level mean RMSE values is $0.01759$ for
+MLP and $0.02862$ for Ridge, corresponding to a $38.6\%$ reduction relative
+to Ridge when computed from the unrounded values. This aggregate reduction is
+descriptive and differs from the cell-wise signed Ridge gains reported in the
+sensitivity table. Ridge has lower mean RMSE at every tested ratio under the
+single-channel F03-4 setting. In both cases, the
 difference decreases as $\rho$ increases, which is consistent with less
 dependence on $\boldsymbol{z}_0$ as more target observations
 become available. These comparisons distinguish the CLP-CSGM framework from its reference

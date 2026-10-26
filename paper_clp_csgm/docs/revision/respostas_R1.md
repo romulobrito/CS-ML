@@ -212,13 +212,24 @@ is better in all nine cross-well cells, and Ridge is better on the F03-4
 grid. The prior class should be selected on validation data for the intended
 regime, not by adopting whichever variant wins on the held-out test set.
 
+To quantify the magnitude of this sensitivity, the unweighted average of the
+nine cross-well cell-level mean RMSE values decreases from 0.02862 with Ridge
+to 0.01759 with MLP, a 38.6% reduction calculated using the unrounded values.
+This descriptive aggregate comparison is distinct from the cell-wise relative
+gains reported in the sensitivity table. In the GR-only benchmark, Ridge
+remains preferable, although its relative advantage decreases from
+approximately 14.3% to 1.7% as the measurement fraction increases.
+
 Where the text was changed: the Introduction (Ridge named as the linear
 reference, not as uniformly best); Method, subsection Learned model
 components (the scheme versus the choice of h); Results, subsection
 Latent-prior model sensitivity (MLP wins all nine cells; Ridge stays the
 headline comparator); Interpretation, scope, and limitations (why Ridge is
-retained, and that h is not chosen from the test ranking). No new experiments
-were added, and the main tables were not switched to MLP.
+retained, and that h is not chosen from the test ranking). The same
+Discussion section now states the unweighted nine-cell means, 0.01759 for
+MLP and 0.02862 for Ridge. Introduction, Method, and Results were not
+rewritten for that magnitude. No new experiments were added, the main tables
+were not switched to MLP, and MLP versus AE was not made a primary comparison.
 
 ---
 
