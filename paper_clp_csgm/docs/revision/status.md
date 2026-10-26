@@ -96,7 +96,9 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   the nine paired DeltaRMSE intervals include zero. AE still wins step 8
   at rho=0.05 and 0.10; CLP still wins the other seven cells. Appendix
   table `robustness_crosswell_seed_panel.tex`. Pointer in
-  `sections/05_experiments.tex`. Main 3-seed CSVs unchanged.
+  `sections/05_experiments.tex`. Main 3-seed CSVs unchanged. Wording only:
+  the n=3 interval sentence now names the main nine-cell benchmark, and the
+  step-8 appendix sentence calls 104 the training count.
 - Files: `outputs/reviewer_revision/r1m04_seed_panel/`;
   `paper_clp_csgm/tables/robustness_crosswell_seed_panel.csv|.tex`;
   `sections/09_appendix.tex`; `sections/05_experiments.tex`.
