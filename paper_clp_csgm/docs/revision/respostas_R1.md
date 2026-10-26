@@ -86,22 +86,32 @@ further held-out wells or repeated resampling are addressed under R1-M03.
 **Proposed reply:**
 
 We thank the reviewer for pointing out the small development support at the
-largest window step. We kept the main nine-cell grid unchanged and added a
-supplementary resampling check at step 32 only. The held-out well remains
-F03-4. The sparse observation set Omega is frozen to paper seed 7. We redrew
-the development train/validation split ten times with the same validation
-budget (n_train=27, n_val=3) and compared CLP-CSGM Ridge with AE [u,b] at
-rho in {0.05, 0.10, 0.20}.
+largest window step. The earlier statement of about 27 windows before the
+split referred to the training count. At step 32 the development pool has 30
+windows. Reserving 10 percent of each development well leaves 27 training
+windows and 3 validation windows.
+
+We kept the main nine-cell grid unchanged and added a supplementary
+resampling check at step 32 only. The held-out well remains F03-4. The sparse
+observation set Omega is frozen to paper seed 7. We redrew the development
+train/validation assignment ten times by random sampling within each
+development well, with the same validation budget, and compared CLP-CSGM
+Ridge with AE [u,b] at rho in {0.05, 0.10, 0.20}.
 
 CLP-CSGM Ridge has lower mean RMSE than AE [u,b] at every ratio (0.0342 vs
 0.0407 at rho=0.05; 0.0305 vs 0.0388 at rho=0.10; 0.0188 vs 0.0362 at
-rho=0.20) and lower RMSE in all ten splits. This check does not add a
-second held-out well.
+rho=0.20) and lower RMSE in all ten splits. Adjacent windows have length 64
+and step 32, so they share 32 depth samples. This redraw does not apply a
+boundary embargo, and a training window may overlap a validation window. The
+ten splits therefore assess sensitivity to the development partition. They
+are not ten independent wells, and this check does not add a second held-out
+well.
 
 Where the text was changed: Experimental setup, subsection Training,
-validation, and test protocol (pointer at step 32); Appendix, subsection
-Step-32 development-split resampling (table and interpretation). The main
-nine-cell tables in Results were not changed.
+validation, and test protocol (window counts and the step-32 pointer);
+Appendix, subsection Step-32 development-split resampling (table,
+interpretation, and the overlap limitation). The main nine-cell tables in
+Results were not changed.
 
 ---
 

@@ -70,11 +70,15 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 
 - State: `text_done`
 - Reviewer request: repeated resampling or extra held-out well for the
-  ~27-window step-32 cell.
+  step-32 cell. The development pool has 30 windows; 27 training and 3
+  validation remain after the 10 percent reservation. The earlier "about 27
+  before the split" was the training count.
 - Change made: 10 random development train/val splits, Omega frozen at seed
   7, F03-4 fixed, CLP Ridge vs AE. CLP lower RMSE in 10/10 splits at all
-  three rho. Appendix table
-  `robustness_crosswell_step32_dev_splits.tex`. Pointer in
+  three rho. Random-per-well redraw does not embargo the step-32 overlap of
+  32 depth samples, so the splits test the development partition rather than
+  independent wells. Appendix table
+  `robustness_crosswell_step32_dev_splits.tex`. Counts corrected in
   `sections/05_experiments.tex`. Main 9-cell CSV unchanged.
 - Files: `outputs/reviewer_revision/r1m03_step32_dev_splits/`;
   `paper_clp_csgm/tables/robustness_crosswell_step32_dev_splits.csv|.tex`;

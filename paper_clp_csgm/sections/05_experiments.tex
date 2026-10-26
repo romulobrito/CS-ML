@@ -85,12 +85,13 @@ and latent-prior predictor $h$. Validation targets select $\lambda$ and
 baseline-specific hyperparameters, and test targets are used only for final
 evaluation.
 
-In the cross-well benchmark, F02-1, F03-2, and F06-1 form the development pool,
-F03-4 is held out entirely for testing, and $10\%$ of the development windows
-are reserved for validation. Steps $\{8,16,32\}$ produce approximately
-$\{104,52,27\}$ windows before this split. At step $32$ the development pool is
-small; Appendix~\ref{app:crosswell_step32_dev_splits} redraws that pool ten
-times with the measurement pattern held fixed. CLP-CSGM Ridge has lower RMSE
+In the cross-well benchmark, F02-1, F03-2, and F06-1 form the development pool
+and F03-4 is held out entirely for testing. Steps $\{8,16,32\}$ produce
+$\{115,58,30\}$ development windows. Reserving $10\%$ of each development well
+for validation leaves $\{104,52,27\}$ training windows and $\{11,6,3\}$
+validation windows. At step $32$ that pool has $30$ windows;
+Appendix~\ref{app:crosswell_step32_dev_splits} redraws it ten times with the
+measurement pattern held fixed. CLP-CSGM Ridge has lower RMSE
 than AE $[\boldsymbol{u},\boldsymbol{b}]$ at every $\rho$ and in all ten splits.
 Because the validation tail is
 selected after window construction, boundary windows may overlap when

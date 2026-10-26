@@ -755,7 +755,11 @@ measurement-only ablations were not rerun.
 Table~\ref{tab:crosswell_step32_dev_splits} shows that CLP-CSGM Ridge has lower
 mean RMSE than AE $[u,b]$ at every tested $\rho$, and lower RMSE in all ten
 splits. This check does not add a second held-out well and does not vary
-$\Omega$; it only resamples the small development split.
+$\Omega$; it only resamples the small development split. Adjacent windows have
+length $64$ and step $32$, so they share $32$ depth samples. This
+random-per-well redraw does not apply a boundary embargo, and a training
+window may therefore overlap a validation window. The ten splits test
+sensitivity to that development partition. They are not ten independent wells.
 
 \subsection{Ten-seed CLP versus AE panel}
 \label{app:crosswell_seed_panel}
