@@ -832,6 +832,13 @@ has higher mean RMSE than AE $[\boldsymbol{u},\boldsymbol{b}]$. This check
 keeps $\Omega$ fixed inside each cell; it does not test sensitivity to
 observation placement. That placement check is
 Appendix~\ref{app:crosswell_omega_placement}.
+Because $\Omega$ is fixed within each seed and measurement ratio, the
+unmasked AE already receives those measurements in a stable column order.
+The masked input changes that representation rather than supplying coordinate
+information the unmasked AE lacked. The masked AE is also fit from a
+different initialization, with the training seed offset by $100$. This check
+concerns sensitivity to an explicit spatial encoding. It does not isolate
+the latent inverse formulation.
 
 \subsection{Sparse-coordinate placement}
 \label{app:crosswell_omega_placement}
