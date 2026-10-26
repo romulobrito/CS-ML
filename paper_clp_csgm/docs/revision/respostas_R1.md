@@ -373,21 +373,28 @@ The conditional map predicts z_0 = h(u) from the dense logs. This code
 initializes the first latent trajectory and remains the center of the
 quadratic penalty. The sparse values remain measurements. After training,
 latent refinement balances agreement with those measurements against
-deviation from z_0. A residual at the observed depths can remain. The
-difference is which quantity is unknown. In log completion, geomodel
-translation, and direct regression, the missing property values are what the
-trained model must produce. In CLP-CSGM those sparse values are already known
-measurements, and the unknown is the remainder of the target window. The
-inference step penalizes disagreement with those measurements. We do not
-compare numerical errors with the four studies, because the unknowns are not
-the same.
+deviation from z_0. A residual at the observed depths can remain. These
+tasks can all exploit available context, including observed portions of a
+well log or a partially masked property image. The principal distinction is
+therefore not the mere availability of known values, but how these values
+enter the reconstruction procedure. The cited completion and translation
+methods primarily learn mappings for gap filling or property prediction. In
+CLP-CSGM, dense auxiliary logs determine a conditional latent anchor, while
+the sparse target observations enter an explicit measurement-fidelity penalty
+during test-time latent refinement. This distinction concerns the inference
+formulation and does not establish superior predictive performance over the
+cited approaches, whose targets, observation patterns, and evaluation
+protocols differ. We do not compare numerical errors with the four studies.
 
 Where the text was changed: the Introduction (end of the first paragraph);
 Related work, subsection Petrophysical log prediction (the comparison of the
-three neighboring tasks with CLP-CSGM, including the closing sentences on
-which quantity is unknown); and Interpretation, scope, and
-limitations (the paragraph that states when the measurement term is the
-relevant formulation). Four entries were added to the bibliography.
+three neighboring tasks with CLP-CSGM; the closing sentences now distinguish
+how known values enter inference, not which quantity is unknown); and
+Interpretation, scope, and limitations (the paragraph that states when the
+measurement term is the relevant formulation). Four entries were added to
+the bibliography. This correction rewrote only the Related work closing
+sentences. Introduction, Discussion, and the bibliography were not changed
+again.
 
 No new experiments were added for this comment.
 
@@ -497,7 +504,7 @@ anchor term, and they no longer restate that role.
 Related work, subsection Petrophysical log prediction, no longer opens by
 repeating that direct regression treats sparse values as predictors. The
 comparison of the three neighboring tasks with CLP-CSGM stays there, including
-the statement of which quantity is unknown.
+how the sparse observations enter the inference procedure.
 
 Related work, subsection Conditional generative inverse problems and
 positioning, no longer restates the direct-fusion contrast before the
