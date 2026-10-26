@@ -208,13 +208,14 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   translates 2D geomodel property images. The IEEE Access study regresses
   porosity and shale volume from logs. None keeps a sparse target-property
   observation as an inference-time measurement.
-- Change made: comparison paragraphs in Related work, including the reason
-  the formulations differ (the missing values are the unknown in the four
-  studies; in CLP-CSGM the sparse values are known measurements and the
-  unknown is the rest of the window). One positioning sentence group in the
-  Introduction; one in Interpretation, scope, and limitations. Four
+- Change made: comparison paragraphs in Related work. The distinction is how
+  known values enter inference: the cited methods learn a mapping, while
+  CLP-CSGM keeps an explicit measurement-fidelity penalty at test time. It
+  is not that those studies lack known values. One positioning sentence group
+  in the Introduction; one in Interpretation, scope, and limitations. Four
   bibliography entries. Their reported errors were not copied into the
-  manuscript.
+  manuscript. Introduction, Discussion, and the bibliography were not edited
+  again for this wording.
 - Files: `sections/01_introduction.tex`; `sections/02_related_work.tex`;
   `sections/07_discussion.tex`; `references.bib`.
 - Evidence: publisher records and the PDFs in

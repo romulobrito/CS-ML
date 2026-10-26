@@ -40,11 +40,17 @@ $\boldsymbol{b}$ against deviation from $\boldsymbol{z}_0$. A residual at the
 observed depths can remain. Log completion and geomodel
 translation fill a curve or a map from context. Direct regression predicts the
 property from the logs. CLP-CSGM keeps an explicit measurement penalty
-at inference. The difference is which quantity is unknown. In log completion,
-geomodel translation, and direct regression, the missing property values are
-what the trained model must produce. In CLP-CSGM those sparse values are
-already known measurements, and the unknown is the remainder of the target
-window. The inference step penalizes disagreement with those measurements.
+at inference. These tasks can all exploit available context, including
+observed portions of a well log or a partially masked property image. The
+principal distinction is therefore not the mere availability of known values,
+but how these values enter the reconstruction procedure. The cited completion
+and translation methods primarily learn mappings for gap filling or property
+prediction. In CLP-CSGM, dense auxiliary logs determine a conditional latent
+anchor, while the sparse target observations enter an explicit
+measurement-fidelity penalty during test-time latent refinement. This
+distinction concerns the inference formulation and does not establish
+superior predictive performance over the cited approaches, whose targets,
+observation patterns, and evaluation protocols differ.
 
 The experiments use the processed F3 block data of
 \citet{zhang2025rockphysicslogs}, who combine supervised prediction with
