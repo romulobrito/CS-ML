@@ -120,10 +120,12 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   calibrated to field measurement uncertainties. The Abstract does not
   list steps, fractions, or the GR-only ratios. Those exceptions remain
   in the Results and in the Conclusion.
-- Files: `main.tex`; `sections/08_conclusion.tex`.
+- Files: `main.tex`; `sections/08_conclusion.tex`; `highlights.txt`.
 - Shared reply: none. Nearby IDs ask for different experiments or claim
   limits.
-- Not done: a separate Highlights file (the manuscript has none).
+- Not done: none in the manuscript body. Submission Highlights are the
+  five lines in `highlights.txt` (85 characters or fewer). They were not
+  inserted into the PDF.
 
 ### R1-M06
 

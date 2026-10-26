@@ -177,8 +177,17 @@ further experiments or for broader generalization.
 
 Where the text was changed: the Abstract (conditional-advantage paragraph)
 and the Conclusion (the paired-protocol paragraph and the noise paragraph).
-The manuscript has no separate Highlights section. No new experiments were
-added for this comment.
+The manuscript body has no Highlights section. The separate submission
+Highlights, each within 85 characters, are in highlights.txt:
+
+CLP-CSGM beats the direct AE in 7 of 9 cross-well cells.
+Gains are concentrated in the smaller training sets.
+With GR only, the direct AE is lower at higher fractions.
+At reference noise, interpolation is lower in all nine cells.
+The advantage is conditional, not superiority over every method.
+
+No new experiments were added for this comment, and the body was not
+edited again for the Highlights.
 
 ---
 
