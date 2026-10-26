@@ -288,12 +288,23 @@ rho=0.05 and rho=0.10, as the unmasked AE does. The mask shifts the direct
 AE only modestly and not always downward. This check keeps Omega fixed
 inside each cell.
 
+Because the observation coordinates are fixed within each seed-measurement-ratio
+configuration, the original direct AE already receives measurements with
+consistent positional identity. The explicit-mask variant therefore changes
+the input representation rather than introducing previously unavailable
+coordinate information. In addition, the masked AE uses a different training
+initialization (seed offset of 100). Consequently, this supplementary
+experiment evaluates sensitivity to an explicit spatial encoding, but it
+does not isolate the causal contribution of the latent inverse formulation.
+The observed differences should be interpreted within this limited scope.
+
 Where the text was changed: Experimental setup, subsection Training,
 validation, and test protocol (the main protocol is unchanged; one sentence
 points to the supplement); Results, subsection Cross-well low-data results
 (one sentence next to the three-seed paired comparison); Appendix,
-subsection Explicit-mask direct AE (table and interpretation). The published
-nine-cell tables were not extended with this method.
+subsection Explicit-mask direct AE (table, interpretation, and the closing
+limit on fixed coordinates and the seed offset). The published nine-cell
+tables were not extended with this method.
 
 ---
 

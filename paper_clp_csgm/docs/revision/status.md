@@ -160,7 +160,10 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   mask or coordinates explicitly.
 - Change made: supplement only. AE [u, b_placed, mask] on the 9-cell
   3-seed grid. Mask does not remove the CLP advantage at steps 16 and 32.
-  Main tables not extended.
+  Main tables not extended. Wording: Omega is fixed inside each cell, so
+  the mask changes the input representation rather than adding unknown
+  coordinates, and the masked AE is trained at seed+100. The supplement
+  does not isolate the latent inverse formulation.
 - Files: `outputs/reviewer_revision/r1m08_explicit_mask/`;
   `paper_clp_csgm/tables/robustness_crosswell_explicit_mask.csv|.tex`;
   `sections/05_experiments.tex`; `sections/06_results.tex`;
