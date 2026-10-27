@@ -1,0 +1,9 @@
+fold_id,seed,rho,comparator,clp_minus_comparator
+0.0,7.0,0.25,csgm_unconditioned,0.006475223175930706
+0.0,7.0,0.25,ae_regression_ub,-0.0022298357318246073
+0.0,7.0,0.25,prior_only,-0.02186137295272639
+0.0,7.0,0.25,depth_interpolation,0.00873925174045679
+0.0,7.0,0.5,csgm_unconditioned,0.006458885840323652
+0.0,7.0,0.5,ae_regression_ub,-0.0017356795364503567
+0.0,7.0,0.5,prior_only,-0.02336955167144676
+0.0,7.0,0.5,depth_interpolation,0.010294315286167907

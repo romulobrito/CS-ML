@@ -1,0 +1,37 @@
+{
+  "u_columns": [
+    "GR (API)",
+    "Res_Deep",
+    "Res_Shallow",
+    "Lithotype"
+  ],
+  "target": "Phi_lab (pu)",
+  "window_len": 8,
+  "step": 1,
+  "lambda_grid": [
+    0.0001,
+    0.0003,
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1
+  ],
+  "latent_dim": 4,
+  "hidden_dim": 32,
+  "ae_epochs": 80,
+  "csgm_iters": 200,
+  "csgm_restarts": 2,
+  "csgm_opt_lr": 0.05,
+  "csgm_ridge_alpha": 1.0,
+  "mask_seed": "seed * 1009 + fold * 17 + split_code * 10007",
+  "split_code": {
+    "train": 1,
+    "val": 2,
+    "test": 3
+  },
+  "aggregation": "mean_of_covering_windows",
+  "interpolation_edge": "nearest_measured_depth",
+  "same_well_blocks": true,
+  "script_sha256": "2c4b49bdcddedd6f1ffffdca4c0607ee8984a683e98b0f02464d5ca1d03647c4"
+}
