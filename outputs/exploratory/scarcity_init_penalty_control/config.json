@@ -1,0 +1,27 @@
+{
+  "contrast_sign": "effect columns are RMSE_with_factor minus RMSE_without_factor. Negative means the named factor has lower RMSE.",
+  "full_grid_executed": false,
+  "historical_restart_seed": 9207,
+  "lambda_source": "positive lambda selected on F06-1 in the preserved pilot",
+  "m_obs": [
+    4,
+    6,
+    13
+  ],
+  "manuscript": "not updated",
+  "mode": "pilot",
+  "nonconvex_caveat": "Shared perturbations remove the restart-seed difference. They do not remove non-convex optimization.",
+  "optimizer": {
+    "iters": 400,
+    "lr": 0.05,
+    "restarts": 3
+  },
+  "preserved_commit": "feef3a761c5ac2dfd6d298d56e497a83326e176b",
+  "preserved_results": "/home/romulo/Documentos/cs-regressor/outputs/exploratory/scarcity_nested_masks_ablation/tables/results_by_seed.csv",
+  "seed": 7,
+  "shared_restart_seed": 7,
+  "sizes_trained": [
+    24,
+    88
+  ]
+}

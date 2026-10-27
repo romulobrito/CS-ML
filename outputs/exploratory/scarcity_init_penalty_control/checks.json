@@ -1,0 +1,56 @@
+{
+  "passed": [
+    "split recovery matches the original function when start and anchor coincide",
+    "lambda 0 does not depend on the anchor",
+    "shared perturbations are reproducible and independent of the start",
+    "seed-7 permutation matches the preserved mask file",
+    "historical, full CLP, and init-only RMSE match the preserved pilot within 1e-5",
+    "the four new contrasts use one perturbation list per training budget"
+  ],
+  "reproduction_gaps": [
+    {
+      "n_train": 24.0,
+      "m_obs": 4.0,
+      "historical_abs_gap": 0.0,
+      "conditioned_penalty_abs_gap": 0.0,
+      "conditioned_init_abs_gap": 0.0
+    },
+    {
+      "n_train": 24.0,
+      "m_obs": 6.0,
+      "historical_abs_gap": 0.0,
+      "conditioned_penalty_abs_gap": 0.0,
+      "conditioned_init_abs_gap": 0.0
+    },
+    {
+      "n_train": 24.0,
+      "m_obs": 13.0,
+      "historical_abs_gap": 0.0,
+      "conditioned_penalty_abs_gap": 0.0,
+      "conditioned_init_abs_gap": 0.0
+    },
+    {
+      "n_train": 88.0,
+      "m_obs": 4.0,
+      "historical_abs_gap": 0.0,
+      "conditioned_penalty_abs_gap": 0.0,
+      "conditioned_init_abs_gap": 0.0
+    },
+    {
+      "n_train": 88.0,
+      "m_obs": 6.0,
+      "historical_abs_gap": 0.0,
+      "conditioned_penalty_abs_gap": 0.0,
+      "conditioned_init_abs_gap": 0.0
+    },
+    {
+      "n_train": 88.0,
+      "m_obs": 13.0,
+      "historical_abs_gap": 0.0,
+      "conditioned_penalty_abs_gap": 0.0,
+      "conditioned_init_abs_gap": 0.0
+    }
+  ],
+  "n_result_rows": 30,
+  "full_grid_executed": false
+}

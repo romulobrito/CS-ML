@@ -38,7 +38,7 @@ G(E(y)) is diagnostic. It does not select lambda, a budget, or a method.
 
 Executed: seed 7, budgets 24 and 88, observation counts 4, 6, and 13.
 Not executed: seeds 23 and 41, and the 56-window budget.
-No commit. The manuscript and the previous factorial directory were not changed.
+The words "no commit" described the state when this pilot finished, before these files were versioned in feef3a7. The manuscript and the previous factorial directory were not changed.
 
 On this single seed, full CLP has lower pooled test RMSE than direct AE in all six cells.
 The margin shrinks from 24 to 88 windows at every observation count.
