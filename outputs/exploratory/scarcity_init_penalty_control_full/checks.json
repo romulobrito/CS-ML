@@ -1,0 +1,20 @@
+{
+  "full_grid_executed": true,
+  "n_result_rows": 189,
+  "n_seeds": 3,
+  "passed": [
+    "synthetic nested-mask and split-anchor checks",
+    "recorded training indices remain nested",
+    "seed 7 permutation matches the preserved pilot",
+    "seed 7 lambda and RMSE match the preserved pilots at 24 and 88 windows",
+    "masks are nested and shared noise prefixes match",
+    "measurements and interpolation match across budgets",
+    "four latent configurations share one perturbation hash per budget",
+    "positive lambda is the F06-1 minimum and is shared by both penalized starts",
+    "F03-4 is not an argument of lambda selection",
+    "prior-only full RMSE is identical across observation counts",
+    "decoder weights are unchanged across observation counts",
+    "scalers are fit on the training subset only",
+    "restart choice remains the batch objective"
+  ]
+}

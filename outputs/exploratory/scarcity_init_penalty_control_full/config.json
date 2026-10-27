@@ -1,0 +1,38 @@
+{
+  "effect_sign": "Negative means the named factor has lower RMSE.",
+  "historical_seed_offset_rerun": false,
+  "interaction": "init_effect_with_penalty minus init_effect_without_penalty.",
+  "lambda_rule": "Unobserved RMSE on F06-1. The best positive lambda is used for both penalized starts. Lambda 0 is not assigned to those starts.",
+  "m_obs": [
+    4,
+    6,
+    13
+  ],
+  "manuscript": "not updated",
+  "paired_unit": "seed",
+  "preserved_pilots_overwritten": false,
+  "reference_commit": "1d490d2accccea0a08e65cb4302a72c45f887788",
+  "restart_rule": "The retained restart is the one with the lowest sum of the data term and the penalty term over the whole batch, divided by the number of windows. Restarts are not chosen separately for each window. This is the rule in csgm_recover_with_prior and it was not changed.",
+  "seeds": [
+    7,
+    23,
+    41
+  ],
+  "shared_factors": [
+    "decoder within each seed and budget",
+    "nested mask and noise field within each seed",
+    "measurements across budgets",
+    "restart perturbations across the four latent configurations"
+  ],
+  "sizes": [
+    24,
+    56,
+    88
+  ],
+  "val_dependence": {
+    "adjacent_shared_samples": 56,
+    "max_shared_samples": 56,
+    "n_windows": 8,
+    "overlapping_pairs": 28
+  }
+}
