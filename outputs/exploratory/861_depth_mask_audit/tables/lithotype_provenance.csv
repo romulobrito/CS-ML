@@ -1,0 +1,17 @@
+item,value
+legend_status,read
+legend_mentions_phi_lab,false
+lithotype_equals_hfu,false
+lithotype_is_phi_threshold_partition,false
+lithotype_is_fzi_threshold_partition,false
+lithotype_phi_ranges_overlap,true
+deriving_assignment_sites,none
+other_assignment_sites,methods_comparison/scripts/diagnose_861_ml.py:207 | scripts/dlis_prepare_well.py:526
+rqi_max_abs_error,4.441e-16
+fzi_max_abs_error,3.553e-15
+derived_columns_in_u,none
+porosity_proxies_in_u,none
+lithotype_label_1,Grainstone
+lithotype_label_2,Shrubs
+lithotype_label_3,Laminite
+lithotype_label_4,Spherulite

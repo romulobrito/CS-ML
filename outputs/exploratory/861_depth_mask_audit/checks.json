@@ -1,0 +1,78 @@
+{
+  "reference_commit": "2e657987ac2425aace4191e49e2b9affb6bda509",
+  "head": "2e657987ac2425aace4191e49e2b9affb6bda509",
+  "runner_sha256": "95925647bc270bc67c2343be34f707ad46f9563591f24c69f96023bab2cd2f1c",
+  "n_rows": 87,
+  "checks": [
+    {
+      "name": "head_matches_reference",
+      "passed": true,
+      "detail": "HEAD 2e657987ac2425aace4191e49e2b9affb6bda509"
+    },
+    {
+      "name": "omega_matches_published_file",
+      "passed": true,
+      "detail": "Redrawn local Omega matches heldout_rmse_detail.csv"
+    },
+    {
+      "name": "split_rows_disjoint",
+      "passed": true,
+      "detail": "Train, validation, and test row sets do not intersect"
+    },
+    {
+      "name": "test_rows_absent_from_fit_windows",
+      "passed": true,
+      "detail": "No test row is inside a training or validation window"
+    },
+    {
+      "name": "within_window_score_excludes_own_measurement",
+      "passed": true,
+      "detail": "Each window scores only offsets outside its own Omega"
+    },
+    {
+      "name": "physical_depth_has_both_roles",
+      "passed": true,
+      "detail": "Every published cell measures and scores the same depths"
+    },
+    {
+      "name": "clp_and_ae_share_omega",
+      "passed": true,
+      "detail": "One Omega and one b feed CLP and the direct AE"
+    },
+    {
+      "name": "recovery_uses_one_operator_per_call",
+      "passed": true,
+      "detail": "A per-window operator needs a separate call; restart choice is shared"
+    },
+    {
+      "name": "lithotype_not_a_phi_transform",
+      "passed": true,
+      "detail": "No right-hand side builds Lithotype from Phi_lab; ranges overlap; legend is facies text"
+    },
+    {
+      "name": "rqi_fzi_identities_and_exclusion",
+      "passed": true,
+      "detail": "RQI and FZI match the lab transform and stay out of u"
+    },
+    {
+      "name": "global_mask_removes_dual_role",
+      "passed": true,
+      "detail": "Counterfactual physical masks have no depth in both roles"
+    },
+    {
+      "name": "nonoverlap_removes_dual_role_and_drops_tail",
+      "passed": true,
+      "detail": "Step 8 scores each covered depth once and drops the deepest 5 rows"
+    },
+    {
+      "name": "published_summary_has_nine_cells",
+      "passed": true,
+      "detail": "The published mean uses 3 folds x 3 seeds, not 9 wells"
+    },
+    {
+      "name": "no_interpolation_or_unconditioned_csgm",
+      "passed": true,
+      "detail": "Those comparators are absent from the published runner"
+    }
+  ]
+}

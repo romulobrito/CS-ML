@@ -1,0 +1,4 @@
+fold_id,n_train_rows,n_val_rows,n_test_rows,n_train_windows,n_val_windows,n_test_windows,train_val_shared,train_test_shared,val_test_shared,train_test_adjacent,val_test_adjacent,train_test_gap_m,val_test_gap_m,test_depth_min_m,test_depth_max_m
+0.0,42.0,16.0,29.0,35.0,9.0,22.0,0.0,0.0,0.0,1.0,0.0,0.19000000000050932,14.480000000000473,5205.91,5214.48
+1.0,42.0,16.0,29.0,28.0,9.0,22.0,0.0,0.0,0.0,1.0,0.0,0.19000000000050932,5.329999999999927,5214.67,5223.63
+2.0,42.0,16.0,29.0,35.0,9.0,22.0,0.0,0.0,0.0,0.0,1.0,5.910000000000764,0.7600000000002183,5224.39,5233.72
