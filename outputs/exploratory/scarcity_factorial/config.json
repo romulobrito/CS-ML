@@ -1,0 +1,70 @@
+{
+  "channels": [
+    "sonic",
+    "rhob",
+    "ai",
+    "vp"
+  ],
+  "checks": [
+    "train wells disjoint from val and test",
+    "24 nested in 56 nested in 88",
+    "M, B_val, B_test, Y_test shared across budgets",
+    "scalers fit on the training subset only",
+    "lambda is the validation minimum",
+    "unobserved RMSE drops measured coordinates",
+    "one test array for every comparison",
+    "interpolation identical across budgets"
+  ],
+  "csgm_ae_epochs": 200,
+  "csgm_iters": 400,
+  "csgm_lambda_grid": [
+    0.0001,
+    0.0003,
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1
+  ],
+  "csgm_latent_dim": 16,
+  "csgm_restarts": 3,
+  "lambda_rule": "unobserved validation RMSE, matching run_r1m11",
+  "mode": "pilot",
+  "n_test": 97,
+  "n_train_pool": 107,
+  "n_val": 8,
+  "noise_std": 0.01,
+  "rhos": [
+    0.05,
+    0.2
+  ],
+  "seeds": [
+    7
+  ],
+  "sizes_indexed": [
+    24,
+    56,
+    88
+  ],
+  "sizes_trained": [
+    24,
+    88
+  ],
+  "step_reason": "Step 8 is the only published step with at least 88 windows in F02-1 and F03-2. Step 16 has 54.",
+  "target": "vc",
+  "test_well": "F03-4",
+  "train_wells": [
+    "F02-1",
+    "F03-2"
+  ],
+  "val_dependence": {
+    "adjacent_shared_samples": 56,
+    "max_shared_samples": 56,
+    "n_windows": 8,
+    "overlapping_pairs": 28
+  },
+  "val_interpretation": "F06-1 has few overlapping windows from one well. Lambda selection is not strong statistical evidence.",
+  "val_well": "F06-1",
+  "window_len": 64,
+  "window_step": 8
+}
