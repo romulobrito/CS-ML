@@ -419,6 +419,24 @@ def _fit_clp(
     return ae, prior, y_scaler, y_mean, y_scale
 
 
+def _decoder_reconstruction_rmse(
+    ae: csgm.TinyAE,
+    y_rows: np.ndarray,
+    y_mean: np.ndarray,
+    y_scale: np.ndarray,
+) -> float:
+    """RMSE of G(E(y)). This score is not used to choose lambda or a budget."""
+    import torch
+
+    standardized = (np.asarray(y_rows, dtype=np.float64) - y_mean[None, :]) / y_scale[None, :]
+    codes = csgm.encode_y(ae, standardized, device="cpu")
+    ae.eval()
+    with torch.no_grad():
+        decoded = ae.decode(torch.tensor(codes, dtype=torch.float32)).cpu().numpy()
+    restored = decoded * y_scale[None, :] + y_mean[None, :]
+    return rmse(y_rows, restored)
+
+
 def _predict_clp_and_prior(
     ae: csgm.TinyAE,
     prior: csgm.RidgePrior,
@@ -623,6 +641,7 @@ def main() -> None:
     result_rows: List[Dict[str, object]] = []
     lambda_rows: List[Dict[str, object]] = []
     index_rows: List[Dict[str, object]] = []
+    decoder_rows: List[Dict[str, object]] = []
     for size, idx in indices.items():
         for pool_index in idx.tolist():
             index_rows.append(
@@ -678,6 +697,28 @@ def main() -> None:
                 )
                 ae, prior, _y_scaler, y_mean, y_scale = _fit_clp(
                     x_train, y_train, int(seed), cfg
+                )
+                decoder_rows.append(
+                    {
+                        "seed": int(seed),
+                        "rho": float(rho),
+                        "n_train": int(size),
+                        "split": "train",
+                        "recon_rmse": _decoder_reconstruction_rmse(
+                            ae, y_train, y_mean, y_scale
+                        ),
+                    }
+                )
+                decoder_rows.append(
+                    {
+                        "seed": int(seed),
+                        "rho": float(rho),
+                        "n_train": int(size),
+                        "split": "test",
+                        "recon_rmse": _decoder_reconstruction_rmse(
+                            ae, y_test, y_mean, y_scale
+                        ),
+                    }
                 )
                 lam, lam_records = _select_lambda(
                     ae,
@@ -800,6 +841,11 @@ def main() -> None:
         ),
     )
     _save_table(
+        os.path.join(table_dir, "decoder_reconstruction.csv"),
+        decoder_rows,
+        ("seed", "rho", "n_train", "split", "recon_rmse"),
+    )
+    _save_table(
         os.path.join(table_dir, "selected_indices.csv"),
         index_rows,
         (
@@ -839,6 +885,10 @@ def main() -> None:
             "Lambda selection is not strong statistical evidence."
         ),
         "lambda_rule": "unobserved validation RMSE, matching run_r1m11",
+        "decoder_reconstruction": (
+            "G(E(y)) RMSE on train and test is recorded after fitting. "
+            "It does not select lambda, a budget, or a method."
+        ),
         "csgm_lambda_grid": list(cfg.csgm_lambda_grid),
         "csgm_latent_dim": int(cfg.csgm_latent_dim),
         "csgm_ae_epochs": int(cfg.csgm_ae_epochs),

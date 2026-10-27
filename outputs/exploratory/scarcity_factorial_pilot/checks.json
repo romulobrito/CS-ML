@@ -1,0 +1,13 @@
+{
+  "passed": [
+    "train wells disjoint from val and test",
+    "24 nested in 56 nested in 88",
+    "M, B_val, B_test, Y_test shared across budgets",
+    "scalers fit on the training subset only",
+    "lambda is the validation minimum",
+    "unobserved RMSE drops measured coordinates",
+    "one test array for every comparison",
+    "interpolation identical across budgets"
+  ],
+  "n_result_rows": 16
+}

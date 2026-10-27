@@ -28,8 +28,9 @@
   ],
   "csgm_latent_dim": 16,
   "csgm_restarts": 3,
+  "decoder_reconstruction": "G(E(y)) RMSE on train and test is recorded after fitting. It does not select lambda, a budget, or a method.",
   "lambda_rule": "unobserved validation RMSE, matching run_r1m11",
-  "mode": "pilot",
+  "mode": "full",
   "n_test": 97,
   "n_train_pool": 107,
   "n_val": 8,
@@ -39,7 +40,9 @@
     0.2
   ],
   "seeds": [
-    7
+    7,
+    23,
+    41
   ],
   "sizes_indexed": [
     24,
@@ -48,6 +51,7 @@
   ],
   "sizes_trained": [
     24,
+    56,
     88
   ],
   "step_reason": "Step 8 is the only published step with at least 88 windows in F02-1 and F03-2. Step 16 has 54.",
