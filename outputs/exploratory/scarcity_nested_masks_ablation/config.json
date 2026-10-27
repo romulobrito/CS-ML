@@ -1,0 +1,103 @@
+{
+  "decoder_reconstruction": "G(E(y)) does not select lambda, a budget, or a method.",
+  "decoder_sharing": "A, B, C, and D use one decoder per seed and training budget.",
+  "fixed_metric": "RMSE on the complement of Omega_13, common to all three fractions.",
+  "index_csv": "/home/romulo/Documentos/cs-regressor/outputs/exploratory/scarcity_factorial/tables/selected_indices.csv",
+  "index_sha256": "3bb2ec32140a60faafe9ec7e1c7853e1c76bb67f0e090bc9b8cde7e62f90bdef",
+  "lambda_grid": [
+    0.0,
+    1e-06,
+    3e-06,
+    1e-05,
+    3e-05,
+    0.0001,
+    0.0003,
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1
+  ],
+  "lambda_rule": "Unobserved validation RMSE. Full CLP uses the best strictly positive lambda. Lambda 0 with h(u) is clp_init_only. Lambda 0 with a zero code is measurement-only.",
+  "m_obs": [
+    4,
+    6,
+    13
+  ],
+  "manuscript": "not updated",
+  "mask_protocol": "Omega_4, Omega_6, and Omega_13 are prefixes of one permutation per seed.",
+  "mode": "pilot",
+  "n_test": 97,
+  "n_val": 8,
+  "noise_protocol": "One N(0, 0.01^2) field per split is drawn after the permutation. Each mask slices that field. Shared coordinates keep the same noise.",
+  "noise_std": 0.01,
+  "nonconvex_caveat": "Differences among A, B, and C are not isolated causal effects. Recovery is non-convex, and measurement-only uses a different restart seed.",
+  "optimizer": {
+    "iters": 400,
+    "lr": 0.05,
+    "measurement_only_seed_offset": 9200,
+    "restarts": 3
+  },
+  "paired_gain_sign": "clp_minus_comparator = RMSE_CLP - RMSE_comparator. Negative favors CLP.",
+  "previous_study_outputs": "not overwritten",
+  "profile_rule": "Depth-order first, middle, and last test windows, plus the test window with the largest CLP full-window RMSE at 24 training windows and 4 observations.",
+  "profile_windows": [
+    {
+      "clp_rmse_n24_m4": 0.02513135577991896,
+      "criterion": "depth_order_first",
+      "depth_end": 955.9500122,
+      "depth_start": 946.5,
+      "test_index": 0
+    },
+    {
+      "clp_rmse_n24_m4": 0.030028069808585165,
+      "criterion": "depth_order_middle",
+      "depth_end": 1013.550049,
+      "depth_start": 1004.1,
+      "test_index": 48
+    },
+    {
+      "clp_rmse_n24_m4": 0.016939725428062952,
+      "criterion": "depth_order_last",
+      "depth_end": 1071.150024,
+      "depth_start": 1061.7,
+      "test_index": 96
+    },
+    {
+      "clp_rmse_n24_m4": 0.05413511276062707,
+      "criterion": "max_clp_full_rmse_at_n24_m4",
+      "depth_end": 960.750061,
+      "depth_start": 951.3,
+      "test_index": 4
+    }
+  ],
+  "reference_commit": "cc57f2bd2babf4b3744bea53e92209bb92911fc9",
+  "seeds": [
+    7
+  ],
+  "sizes_indexed": [
+    24,
+    56,
+    88
+  ],
+  "sizes_trained": [
+    24,
+    88
+  ],
+  "test_well": "F03-4",
+  "test_windows_are_not_independent_replicates": true,
+  "train_wells": [
+    "F02-1",
+    "F03-2"
+  ],
+  "val_dependence": {
+    "adjacent_shared_samples": 56,
+    "max_shared_samples": 56,
+    "n_windows": 8,
+    "overlapping_pairs": 28
+  },
+  "val_interpretation": "F06-1 has eight overlapping windows from one well. Lambda selection is not strong statistical evidence.",
+  "val_well": "F06-1",
+  "window_len": 64,
+  "window_step": 8
+}

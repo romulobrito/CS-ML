@@ -1,0 +1,53 @@
+{
+  "passed": [
+    "synthetic nesting, shared-noise prefix, and positive-lambda rule",
+    "recorded 24 subset of 56 subset of 88, with the previous well quotas",
+    "train, validation, and test wells are disjoint",
+    "seed 7 mask redraw, nesting, and shared noise prefix",
+    "operators and measurements are identical across training budgets",
+    "interpolation is identical across budgets at a fixed mask",
+    "prior-only full and fixed RMSE are identical across fractions",
+    "decoder weights are unchanged across fractions and ablations",
+    "scalers are fit on the training subset only",
+    "positive lambda is the F06-1 unobserved minimum; lambda 0 is not assigned to full CLP",
+    "measurement-only call uses a zero code and lambda 0",
+    "unobserved RMSE drops measured coordinates; the fixed score uses the Omega_13 complement",
+    "one test array is used for every comparison",
+    "G(E(y)) is stored and is not an argument of lambda selection"
+  ],
+  "n_result_rows": 36,
+  "n_lambda_rows": 72,
+  "mode": "pilot",
+  "full_run_executed": false,
+  "index_sha256": "3bb2ec32140a60faafe9ec7e1c7853e1c76bb67f0e090bc9b8cde7e62f90bdef",
+  "profile_windows": [
+    {
+      "criterion": "depth_order_first",
+      "test_index": 0,
+      "depth_start": 946.5,
+      "depth_end": 955.9500122,
+      "clp_rmse_n24_m4": 0.02513135577991896
+    },
+    {
+      "criterion": "depth_order_middle",
+      "test_index": 48,
+      "depth_start": 1004.1,
+      "depth_end": 1013.550049,
+      "clp_rmse_n24_m4": 0.030028069808585165
+    },
+    {
+      "criterion": "depth_order_last",
+      "test_index": 96,
+      "depth_start": 1061.7,
+      "depth_end": 1071.150024,
+      "clp_rmse_n24_m4": 0.016939725428062952
+    },
+    {
+      "criterion": "max_clp_full_rmse_at_n24_m4",
+      "test_index": 4,
+      "depth_start": 951.3,
+      "depth_end": 960.750061,
+      "clp_rmse_n24_m4": 0.05413511276062707
+    }
+  ]
+}
