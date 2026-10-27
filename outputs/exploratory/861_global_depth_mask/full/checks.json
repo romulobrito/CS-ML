@@ -1,0 +1,75 @@
+{
+  "reference_commit": "92cfea4ca22770b302b7ba2eae7b5e29dca707a3",
+  "head": "d966b0c27fd88656a6cd372425e5cfb71095f054",
+  "scope": "full",
+  "aggregation": "mean_of_covering_windows",
+  "interpolation_edge": "nearest_measured_depth",
+  "measurement_noise_std": 0.0,
+  "checks": [
+    {
+      "name": "split_matches_audit_and_is_disjoint",
+      "passed": true,
+      "detail": "Row splits match the audit and do not overlap"
+    },
+    {
+      "name": "nested_physical_masks",
+      "passed": true,
+      "detail": "The 25% observed depths are inside the 50% set"
+    },
+    {
+      "name": "exclusive_depth_role",
+      "passed": true,
+      "detail": "Each test depth is observed or held out, not both"
+    },
+    {
+      "name": "holdout_depths_covered",
+      "passed": true,
+      "detail": "Every holdout depth sits in at least one test window"
+    },
+    {
+      "name": "holdout_absent_from_b",
+      "passed": true,
+      "detail": "No holdout row index is placed in a test measurement"
+    },
+    {
+      "name": "scalers_fit_on_train_only",
+      "passed": true,
+      "detail": "Feature and AE input scalers see only training windows"
+    },
+    {
+      "name": "same_test_observations",
+      "passed": true,
+      "detail": "CLP, AE, unconditioned CSGM, and interpolation share the mask"
+    },
+    {
+      "name": "lambda_from_validation_only",
+      "passed": true,
+      "detail": "Selected lambda is the positive validation minimum"
+    },
+    {
+      "name": "empty_window_fallback",
+      "passed": true,
+      "detail": "Empty CLP windows match the prior and empty free windows match z=0"
+    },
+    {
+      "name": "finite_depth_scores",
+      "passed": true,
+      "detail": "Depth RMSE and AE predictions are finite"
+    },
+    {
+      "name": "fixed_complement_is_nested",
+      "passed": true,
+      "detail": "Both fractions were scored on the 15 depths held out at fraction 0.50"
+    },
+    {
+      "name": "fallback_mean_matches_depth_table",
+      "passed": true,
+      "detail": "The mean of the window predictions matches the depth table"
+    },
+    {
+      "name": "saved_pilot_scores_reproduced",
+      "passed": true,
+      "detail": "Saved pilot RMSE gap 8.673617379884035e-17"
+    }
+  ]
+}

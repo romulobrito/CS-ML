@@ -44,7 +44,10 @@ import run_r1m11_861_phi_lab as published  # noqa: E402
 from sir_cs_pipeline_optimized import Config  # noqa: E402
 
 REFERENCE_COMMIT = "92cfea4ca22770b302b7ba2eae7b5e29dca707a3"
+PILOT_COMMIT = "d966b0c27fd88656a6cd372425e5cfb71095f054"
 OUT_ROOT = REPO_ROOT / "outputs" / "exploratory" / "861_global_depth_mask"
+PILOT_DIR = OUT_ROOT / "pilot"
+SCORE_ATOL = 1.0e-12
 AUDIT_SPLIT = (
     REPO_ROOT
     / "outputs"
@@ -360,6 +363,178 @@ def _scores(y_true: np.ndarray, y_pred: np.ndarray) -> Tuple[float, float]:
     return rmse, mae
 
 
+def _primary_from_depths(depths: pd.DataFrame) -> pd.DataFrame:
+    """Recompute holdout RMSE and MAE from saved depth predictions."""
+    rows: List[Dict[str, float]] = []
+    grouped = depths.groupby(["fold_id", "seed", "rho"], sort=True)
+    for (fold_id, seed, rho), part in grouped:
+        hold = part[part["role"] == "holdout"]
+        if int(hold.shape[0]) < 1:
+            raise ValueError("A cell has no holdout depths.")
+        for method in METHODS:
+            rmse, mae = _scores(
+                hold["phi_lab"].to_numpy(dtype=np.float64),
+                hold["pred_" + method].to_numpy(dtype=np.float64),
+            )
+            rows.append(
+                {
+                    "fold_id": float(fold_id),
+                    "seed": float(seed),
+                    "rho": float(rho),
+                    "method": method,
+                    "rmse_depth": rmse,
+                    "mae_depth": mae,
+                    "n_holdout": float(hold.shape[0]),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _fixed_complement(depths: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Score both fractions on the depths still held out at fraction 0.50.
+
+    The 25% observed set is a subset of the 50% set, so those depths are
+    holdout under both masks. This does not select lambda or a method.
+    """
+    metric_rows: List[Dict[str, float]] = []
+    paired_rows: List[Dict[str, float]] = []
+    grouped = depths.groupby(["fold_id", "seed"], sort=True)
+    for (fold_id, seed), part in grouped:
+        wide_hi = part[np.isclose(part["rho"].to_numpy(dtype=np.float64), 0.50)]
+        wide_lo = part[np.isclose(part["rho"].to_numpy(dtype=np.float64), 0.25)]
+        fixed = set(int(row) for row in wide_hi.loc[wide_hi["role"] == "holdout", "row_index"].tolist())
+        low_hold = set(int(row) for row in wide_lo.loc[wide_lo["role"] == "holdout", "row_index"].tolist())
+        if not fixed or not fixed.issubset(low_hold):
+            raise ValueError("The 50% holdout is not inside the 25% holdout.")
+        if len(fixed) != 15:
+            raise ValueError("A test block did not hold out 15 depths at fraction 0.50.")
+        for rho, sub in ((0.25, wide_lo), (0.50, wide_hi)):
+            block = sub[sub["row_index"].astype(int).isin(fixed)].sort_values("row_index")
+            if int(block.shape[0]) != len(fixed):
+                raise ValueError("Fixed complement rows are missing at fraction {}.".format(rho))
+            scores: Dict[str, float] = {}
+            for method in METHODS:
+                rmse, mae = _scores(
+                    block["phi_lab"].to_numpy(dtype=np.float64),
+                    block["pred_" + method].to_numpy(dtype=np.float64),
+                )
+                scores[method] = rmse
+                metric_rows.append(
+                    {
+                        "fold_id": float(fold_id),
+                        "seed": float(seed),
+                        "rho": float(rho),
+                        "method": method,
+                        "rmse_fixed": rmse,
+                        "mae_fixed": mae,
+                        "n_fixed": float(len(fixed)),
+                    }
+                )
+            for method in METHODS:
+                if method == "clp_csgm_ridge":
+                    continue
+                paired_rows.append(
+                    {
+                        "fold_id": float(fold_id),
+                        "seed": float(seed),
+                        "rho": float(rho),
+                        "comparator": method,
+                        "clp_minus_comparator": float(scores["clp_csgm_ridge"] - scores[method]),
+                    }
+                )
+    return pd.DataFrame(metric_rows), pd.DataFrame(paired_rows)
+
+
+def _fallback_effect(window_preds: pd.DataFrame, depths: pd.DataFrame) -> Tuple[pd.DataFrame, bool]:
+    """Compare the primary mean with a mean that drops empty windows.
+
+    A depth covered only by empty windows keeps the fallback. The match flag
+    is true when the mean of every window equals the saved depth prediction.
+    """
+    rows: List[Dict[str, float]] = []
+    matched = True
+    window_methods = [method for method in METHODS if method != "depth_interpolation"]
+    grouped = window_preds.groupby(["fold_id", "seed", "rho"], sort=True)
+    for (fold_id, seed, rho), preds in grouped:
+        truth = depths[
+            (depths["fold_id"] == fold_id)
+            & (depths["seed"] == seed)
+            & np.isclose(depths["rho"], rho)
+        ]
+        hold = truth[truth["role"] == "holdout"].sort_values("row_index")
+        for method in window_methods:
+            sub = preds[preds["method"] == method]
+            primary: List[float] = []
+            dropped: List[float] = []
+            fallback_only = 0
+            for row in hold["row_index"].tolist():
+                block = sub[sub["row_index"] == row]
+                if int(block.shape[0]) < 1:
+                    raise ValueError("Window predictions miss depth {}.".format(row))
+                all_mean = float(block["pred"].mean())
+                stored = float(hold.loc[hold["row_index"] == row, "pred_" + method].iloc[0])
+                if abs(all_mean - stored) > 1.0e-8:
+                    matched = False
+                data = block[block["empty_window"] == 0]
+                primary.append(all_mean)
+                if int(data.shape[0]) < 1:
+                    dropped.append(all_mean)
+                    fallback_only += 1
+                else:
+                    dropped.append(float(data["pred"].mean()))
+            rmse_all, _mae_all = _scores(hold["phi_lab"].to_numpy(dtype=np.float64), np.asarray(primary))
+            rmse_drop, _mae_drop = _scores(hold["phi_lab"].to_numpy(dtype=np.float64), np.asarray(dropped))
+            rows.append(
+                {
+                    "fold_id": float(fold_id),
+                    "seed": float(seed),
+                    "rho": float(rho),
+                    "method": method,
+                    "rmse_primary": rmse_all,
+                    "rmse_without_empty": rmse_drop,
+                    "n_fallback_only_depths": float(fallback_only),
+                }
+            )
+    return pd.DataFrame(rows), matched
+
+
+def _tree_digest(root: Path) -> str:
+    """Hash every file under a saved run so a later write can be detected."""
+    if not root.is_dir():
+        raise FileNotFoundError(str(root))
+    digest = hashlib.sha256()
+    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+        digest.update(path.relative_to(root).as_posix().encode("ascii"))
+        digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+def _verify_saved_pilot() -> Tuple[float, pd.DataFrame, pd.DataFrame]:
+    """Recompute the saved pilot scores. Raise if they differ."""
+    depths = pd.read_csv(PILOT_DIR / "tables" / "depth_predictions.csv")
+    saved = pd.read_csv(PILOT_DIR / "tables" / "metrics_by_cell.csv")
+    recomputed = _primary_from_depths(depths)
+    worst = 0.0
+    for record in recomputed.itertuples(index=False):
+        match = saved[
+            (saved["fold_id"] == record.fold_id)
+            & (saved["seed"] == record.seed)
+            & np.isclose(saved["rho"], record.rho)
+            & (saved["method"] == record.method)
+        ]
+        if int(match.shape[0]) != 1:
+            raise ValueError("Saved pilot metrics do not match the depth table.")
+        worst = max(
+            worst,
+            abs(float(match["rmse_depth"].iloc[0]) - float(record.rmse_depth)),
+            abs(float(match["mae_depth"].iloc[0]) - float(record.mae_depth)),
+        )
+    if worst > SCORE_ATOL:
+        raise ValueError("Saved pilot scores differ by {}.".format(worst))
+    fixed, paired = _fixed_complement(depths)
+    return worst, fixed, paired
+
+
 def _embed_matrix(
     y_windows: np.ndarray,
     starts: Sequence[int],
@@ -489,7 +664,13 @@ def _select_lambda(
     return best_lam, curve
 
 
-def _plot_profiles(depth_table: pd.DataFrame, metrics: pd.DataFrame, path: Path) -> None:
+def _plot_profiles(
+    depth_table: pd.DataFrame,
+    metrics: pd.DataFrame,
+    path: Path,
+    fold_id: int,
+    seed: int,
+) -> None:
     """Draw laboratory and reconstructed profiles with depth increasing downward."""
     rhos = list(RHOS)
     fig, axes = plt.subplots(1, len(rhos), figsize=(10.5, 6.5), sharey=True)
@@ -529,15 +710,17 @@ def _plot_profiles(depth_table: pd.DataFrame, metrics: pd.DataFrame, path: Path)
         axis.legend(fontsize=7, loc="best")
     axes[0].set_ylabel("Depth (m)")
     axes[0].invert_yaxis()
-    fig.suptitle("Well 861 fold 0 seed 7, mean prediction by physical depth")
+    fig.suptitle(
+        "Well 861 fold {} seed {}, mean prediction by physical depth".format(int(fold_id), int(seed))
+    )
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=140)
     plt.close(fig)
 
 
-def _plot_rmse(metrics: pd.DataFrame, path: Path) -> None:
-    """Bar chart of unique-depth RMSE. Lower is better."""
+def _plot_rmse(metrics: pd.DataFrame, path: Path, fold_id: int, seed: int) -> None:
+    """Bar chart of unique-depth RMSE for one block and seed."""
     fig, axis = plt.subplots(figsize=(8.5, 4.2))
     x_pos = np.arange(len(METHODS), dtype=np.float64)
     width = 0.36
@@ -548,13 +731,64 @@ def _plot_rmse(metrics: pd.DataFrame, path: Path) -> None:
     axis.set_xticks(x_pos)
     axis.set_xticklabels(list(METHODS), rotation=20, ha="right")
     axis.set_ylabel("RMSE by physical depth")
-    axis.set_title("Well 861 pilot, fold 0 seed 7")
+    axis.set_title("Well 861 fold {} seed {}".format(int(fold_id), int(seed)))
     axis.legend()
     axis.grid(True, axis="y", linewidth=0.3)
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=140)
     plt.close(fig)
+
+
+def _plot_summary(metrics: pd.DataFrame, fixed: pd.DataFrame, path: Path) -> None:
+    """Mean RMSE across the three seeds of one well, by block."""
+    fig, axes = plt.subplots(2, 3, figsize=(12.0, 6.5), sharey=True)
+    score_name = ("rmse_depth", "rmse_fixed")
+    frames = (metrics, fixed)
+    titles = ("Own holdout", "Fixed 50% complement")
+    for row_id, (frame, column, title) in enumerate(zip(frames, score_name, titles)):
+        for fold_id in FULL_FOLDS:
+            axis = axes[row_id, int(fold_id)]
+            part = frame[frame["fold_id"] == fold_id]
+            x_pos = np.arange(len(METHODS), dtype=np.float64)
+            width = 0.36
+            for offset, rho in enumerate(RHOS):
+                values = []
+                for method in METHODS:
+                    cell = part[np.isclose(part["rho"], rho) & (part["method"] == method)]
+                    values.append(float(cell[column].mean()))
+                axis.bar(
+                    x_pos + (offset - 0.5) * width,
+                    values,
+                    width=width,
+                    label="rho {}".format(rho) if fold_id == 0 else None,
+                )
+            axis.set_xticks(x_pos)
+            axis.set_xticklabels(list(METHODS), rotation=30, ha="right", fontsize=7)
+            axis.set_title("{} , fold {}".format(title, fold_id))
+            axis.grid(True, axis="y", linewidth=0.3)
+    axes[0, 0].set_ylabel("Mean RMSE across seeds")
+    axes[1, 0].set_ylabel("Mean RMSE across seeds")
+    axes[0, 0].legend(fontsize=7)
+    fig.suptitle("Well 861, one well, three depth blocks")
+    fig.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path, dpi=140)
+    plt.close(fig)
+
+
+def _plot_cell_set(depths: pd.DataFrame, metrics: pd.DataFrame, figure_dir: Path) -> None:
+    """Write one profile and one bar chart for every block and seed."""
+    figure_dir.mkdir(parents=True, exist_ok=True)
+    pairs = depths.groupby(["fold_id", "seed"], sort=True).size().reset_index()
+    for record in pairs.itertuples(index=False):
+        fold_id = int(record.fold_id)
+        seed = int(record.seed)
+        part = depths[(depths["fold_id"] == fold_id) & (depths["seed"] == seed)]
+        cell = metrics[(metrics["fold_id"] == fold_id) & (metrics["seed"] == seed)]
+        stem = "fold{}_seed{}".format(fold_id, seed)
+        _plot_profiles(part, cell, figure_dir / ("profiles_" + stem + ".png"), fold_id, seed)
+        _plot_rmse(cell, figure_dir / ("rmse_" + stem + ".png"), fold_id, seed)
 
 
 def _fmt(value: float, digits: int = 4) -> str:
@@ -564,93 +798,164 @@ def _fmt(value: float, digits: int = 4) -> str:
     return "{:.{}f}".format(float(value), digits)
 
 
+def _count_lower(paired: pd.DataFrame, comparator: str) -> Tuple[int, int]:
+    """Return how many cells have a lower CLP RMSE, and how many cells exist."""
+    part = paired[paired["comparator"] == comparator]
+    lower = int(np.sum(part["clp_minus_comparator"].to_numpy(dtype=np.float64) < -SCORE_ATOL))
+    return lower, int(part.shape[0])
+
+
 def _write_report(
     path: Path,
     head: str,
     metrics: pd.DataFrame,
     paired: pd.DataFrame,
+    fixed: pd.DataFrame,
+    fixed_paired: pd.DataFrame,
     checks: Sequence[Dict[str, object]],
     n_empty: pd.DataFrame,
+    fallback: pd.DataFrame,
+    pilot_gap: float,
+    pilot_fixed: pd.DataFrame,
 ) -> None:
-    """Write the pilot diagnosis from the computed tables."""
+    """Write the full-grid diagnosis. Test scores are not used to choose a model."""
     lines = [
-        "# Well 861 global depth-mask pilot",
+        "# Well 861 global depth-mask grid",
         "",
-        "Exploratory reconstruction of Phi_lab. No manuscript text was edited.",
-        "The published window-level results were not overwritten.",
+        "Exploratory reconstruction of Phi_lab on one well. The three blocks",
+        "are depth intervals of that well, not three independent wells.",
+        "No manuscript text was edited. The saved pilot directory was not",
+        "rewritten.",
         "",
-        "- Reference audit commit: `{}`".format(REFERENCE_COMMIT),
+        "- Audit commit: `{}`".format(REFERENCE_COMMIT),
+        "- Pilot commit: `{}`".format(PILOT_COMMIT),
         "- HEAD at run: `{}`".format(head if head else "unknown"),
-        "- Scope: fold 0, seed 7, fractions 0.25 and 0.50.",
-        "- The three depth blocks belong to the same well. This pilot uses",
-        "  only the shallowest block and is not a geological validation.",
-        "- Aggregation: mean of every window that covers the depth, including",
-        "  the documented empty-window fallback.",
-        "- Interpolation axis: Depth(m). Ends keep the nearest measured value.",
+        "- Blocks 0, 1, and 2. Seeds 7, 23, and 41. Fractions 0.25 and 0.50.",
+        "- Primary score: RMSE on the holdout of that fraction, after the mean",
+        "  of every covering window, including an empty-window fallback.",
+        "- Secondary score: the same predictions on the 15 depths that remain",
+        "  held out at fraction 0.50. Both fractions are scored on that fixed",
+        "  set. The set is not used to choose lambda.",
+        "- Interpolation uses Depth(m). Ends keep the nearest measured value.",
         "- No artificial measurement noise.",
-        "- Lambda is the validation depth RMSE minimum. Ties keep the smaller",
-        "  earlier grid value. Test scores are not an input.",
-        "- An empty CLP window decodes the conditional prior. That is the",
-        "  minimizer of a positive penalty with no data term.",
-        "- An empty unconditioned window decodes the zero latent code. A",
-        "  restart would be arbitrary because every latent has zero loss.",
-        "- An empty AE window uses a zero value-and-mask embedding.",
-        "- Per-window recovery selects the restart on that window's own loss.",
-        "  The published batch call selected one restart for the whole batch.",
-        "  Separate calls are required because each window has its own operator.",
+        "- Lambda is the validation minimum among positive grid values.",
         "",
-        "## Depth RMSE",
+        "## Saved pilot",
         "",
-        "The scored set is the holdout only. At fraction 0.25 that is 22",
-        "depths. At fraction 0.50 it is 15 depths. All 29 depths stay covered.",
+        "The pilot tables were reread and the holdout RMSE was recomputed.",
+        "The largest absolute gap from the saved RMSE and MAE is {:.3e}.".format(pilot_gap),
+        "That is the CSV round trip, not a new fit. Fixed-complement RMSE",
+        "for the saved pilot, fold 0 seed 7:",
         "",
     ]
     for rho in RHOS:
-        lines.append("Fraction {}:".format(rho))
-        part = metrics[np.isclose(metrics["rho"], rho)]
+        bits = []
+        part = pilot_fixed[np.isclose(pilot_fixed["rho"], rho)]
         for method in METHODS:
-            row = part.loc[part["method"] == method].iloc[0]
-            lines.append(
-                "- {}: RMSE {} , MAE {} , lambda {}".format(
-                    method,
-                    _fmt(float(row["rmse_depth"])),
-                    _fmt(float(row["mae_depth"])),
-                    _fmt(float(row["lambda"])) if np.isfinite(row["lambda"]) else "none",
-                )
-            )
-        lines.append("")
+            value = float(part.loc[part["method"] == method, "rmse_fixed"].iloc[0])
+            bits.append("{} {}".format(method, _fmt(value)))
+        lines.append("- Fraction {}: {}.".format(rho, "; ".join(bits)))
     lines.extend(
         [
-            "Negative `clp_minus_comparator` means the CLP depth RMSE is lower.",
+            "",
+            "## Where the conditional prior is lower",
+            "",
+            "A negative difference means the CLP depth RMSE is lower than the",
+            "comparator. Counts are cells of one well, 3 blocks times 3 seeds",
+            "times 2 fractions.",
             "",
         ]
     )
-    for record in paired.itertuples(index=False):
-        lines.append(
-            "- rho {} vs {}: {}".format(
-                record.rho,
-                record.comparator,
-                _fmt(float(record.clp_minus_comparator), 5),
+    for label, frame in (("own holdout", paired), ("fixed complement", fixed_paired)):
+        lines.append("{}:".format(label))
+        for method in METHODS:
+            if method == "clp_csgm_ridge":
+                continue
+            lower, total = _count_lower(frame, method)
+            lines.append(
+                "- CLP lower than {} in {} of {} cells.".format(method, lower, total)
             )
+        lines.append("")
+    lines.append("Mean primary RMSE across the three seeds:")
+    lines.append("")
+    for fold_id in FULL_FOLDS:
+        for rho in RHOS:
+            part = metrics[(metrics["fold_id"] == fold_id) & np.isclose(metrics["rho"], rho)]
+            bits = []
+            for method in METHODS:
+                values = part.loc[part["method"] == method, "rmse_depth"].to_numpy(dtype=np.float64)
+                bits.append("{} {}".format(method, _fmt(float(np.mean(values)))))
+            lines.append("- Fold {} fraction {}: {}.".format(fold_id, rho, "; ".join(bits)))
+    lines.extend(["", "Mean fixed-complement RMSE across the three seeds:", ""])
+    for fold_id in FULL_FOLDS:
+        for rho in RHOS:
+            part = fixed[(fixed["fold_id"] == fold_id) & np.isclose(fixed["rho"], rho)]
+            bits = []
+            for method in METHODS:
+                values = part.loc[part["method"] == method, "rmse_fixed"].to_numpy(dtype=np.float64)
+                bits.append("{} {}".format(method, _fmt(float(np.mean(values)))))
+            lines.append("- Fold {} fraction {}: {}.".format(fold_id, rho, "; ".join(bits)))
+    lines.extend(
+        [
+            "",
+            "## Empty windows",
+            "",
+            "An empty window has no observed depth. The CLP fallback decodes",
+            "the conditional prior. The unconditioned fallback decodes the zero",
+            "code. The AE fallback uses a zero embedding. The primary mean",
+            "keeps those predictions. The comparison below drops empty windows",
+            "when a depth still has another window, and keeps the fallback",
+            "only when every covering window is empty.",
+            "",
+        ]
+    )
+    total_empty = int(n_empty["n_empty_windows"].sum())
+    lines.append(
+        "Empty test windows across the grid: {} of {}.".format(
+            total_empty,
+            int(n_empty["n_test_windows"].sum()),
         )
-    lines.extend(["", "## Empty windows", ""])
+    )
     for record in n_empty.itertuples(index=False):
+        if int(record.n_empty_windows) < 1:
+            continue
         lines.append(
-            "- rho {}: {} of {} test windows have no observed depth.".format(
+            "- Fold {} seed {} fraction {}: {} of {} windows empty.".format(
+                int(record.fold_id),
+                int(record.seed),
                 record.rho,
                 int(record.n_empty_windows),
                 int(record.n_test_windows),
             )
         )
+    if total_empty == 0:
+        lines.append("No test window was empty, so the fallback did not enter a score.")
+    lines.extend(["", "Primary RMSE minus the RMSE that drops empty windows when possible:", ""])
+    for method in ("clp_csgm_ridge", "csgm_unconditioned", "ae_regression_ub", "prior_only"):
+        part = fallback[fallback["method"] == method]
+        delta = part["rmse_primary"].to_numpy(dtype=np.float64) - part["rmse_without_empty"].to_numpy(dtype=np.float64)
+        only = int(part["n_fallback_only_depths"].sum())
+        lines.append(
+            "- {}: mean delta {}, max abs delta {}, fallback-only depths {}.".format(
+                method,
+                _fmt(float(np.mean(delta)), 5),
+                _fmt(float(np.max(np.abs(delta))), 5),
+                only,
+            )
+        )
     lines.extend(
         [
             "",
-            "Train, validation, and test use separate nested masks. The direct",
-            "AE is trained at the same fraction on training rows only. Its",
-            "input is scaled u, the placed laboratory values, and a binary mask.",
-            "Held-out training depths are targets of that fit. Test depths are not.",
+            "## Limits",
             "",
-            "The 87-row table remains a log-grid derivative, not an assay ledger.",
+            "The blocks share one well and one core table. A win in one block",
+            "is not a win on a new well. The 87 rows are a log-grid derivative,",
+            "not an assay ledger. Lambda and the AE fit do not see the test",
+            "block. The fixed complement is reported after those choices.",
+            "",
+            "Conditioning helps in a cell when the CLP RMSE is lower than the",
+            "unconditioned CSGM. It does not, by itself, make the CLP better",
+            "than depth interpolation or the direct AE.",
             "",
             "## Checks",
             "",
@@ -659,13 +964,7 @@ def _write_report(
     for item in checks:
         state = "PASS" if bool(item["passed"]) else "FAIL"
         lines.append("- [{}] {}: {}".format(state, item["name"], item["detail"]))
-    lines.extend(
-        [
-            "",
-            "The full three-block grid was not run.",
-            "",
-        ]
-    )
+    lines.append("")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -684,8 +983,11 @@ def _run(full: bool) -> int:
         published.OUT_DIR.resolve(),
         (REPO_ROOT / "outputs" / "exploratory" / "861_depth_mask_audit").resolve(),
     }
-    if out_dir.resolve() in forbidden:
+    if out_dir.resolve() in forbidden or out_dir.resolve() == PILOT_DIR.resolve() and full:
         raise ValueError("Refusing to write into a protected directory.")
+    if (not full) and (out_dir / "REPORT.md").is_file():
+        raise ValueError("Refusing to overwrite the saved pilot.")
+    pilot_digest = _tree_digest(PILOT_DIR) if full else ""
     frame = published._load_frame(published.EXCEL_PATH)
     for name in list(published.EXCLUDED_POROSITY_PROXIES) + list(DERIVED_NOT_IN_U):
         if name in published.U_COLUMNS:
@@ -712,6 +1014,7 @@ def _run(full: bool) -> int:
     lambda_rows: List[Dict[str, float]] = []
     empty_rows: List[Dict[str, float]] = []
     window_rows: List[Dict[str, float]] = []
+    window_pred_rows: List[Dict[str, float]] = []
     geometry_ok = True
     exclusive_ok = True
     covered_ok = True
@@ -1048,6 +1351,20 @@ def _run(full: bool) -> int:
                             "empty_window": float(empty_clp[index]),
                         }
                     )
+                    for offset in range(published.WINDOW_LEN):
+                        row_index = int(start) + offset
+                        for method in ("clp_csgm_ridge", "csgm_unconditioned", "ae_regression_ub", "prior_only"):
+                            window_pred_rows.append(
+                                {
+                                    "fold_id": float(fold_id),
+                                    "seed": float(seed),
+                                    "rho": float(rho),
+                                    "row_index": float(row_index),
+                                    "method": method,
+                                    "pred": float(predictions[method][index, offset]),
+                                    "empty_window": float(empty_map[method][index]),
+                                }
+                            )
                 print(
                     "  rho",
                     rho,
@@ -1080,27 +1397,59 @@ def _run(full: bool) -> int:
             _record("finite_depth_scores", finite_ok, "Depth RMSE and AE predictions are finite"),
         ]
     )
+    metrics = pd.DataFrame(metric_rows)
+    paired = pd.DataFrame(paired_rows)
+    depths = pd.concat(depth_rows, ignore_index=True)
+    fixed, fixed_paired = _fixed_complement(depths)
+    window_preds = pd.DataFrame(window_pred_rows)
+    fallback, fallback_matched = _fallback_effect(window_preds, depths)
+    pilot_gap = 0.0
+    pilot_fixed = fixed.iloc[0:0].copy()
+    if full:
+        pilot_gap, pilot_fixed, _pilot_paired = _verify_saved_pilot()
+        if _tree_digest(PILOT_DIR) != pilot_digest:
+            raise ValueError("The saved pilot changed during the full run.")
+    checks.extend(
+        [
+            _record(
+                "fixed_complement_is_nested",
+                True,
+                "Both fractions were scored on the 15 depths held out at fraction 0.50",
+            ),
+            _record(
+                "fallback_mean_matches_depth_table",
+                fallback_matched,
+                "The mean of the window predictions matches the depth table",
+            ),
+            _record(
+                "saved_pilot_scores_reproduced" if full else "pilot_scope_has_no_prior_file",
+                True if full else (not (out_dir / "REPORT.md").is_file()),
+                "Saved pilot RMSE gap {}".format(pilot_gap) if full else "Pilot directory was not rewritten",
+            ),
+        ]
+    )
     out_dir.mkdir(parents=True, exist_ok=True)
     table_dir = out_dir / "tables"
     figure_dir = out_dir / "figures"
     table_dir.mkdir(parents=True, exist_ok=True)
-    metrics = pd.DataFrame(metric_rows)
-    paired = pd.DataFrame(paired_rows)
-    depths = pd.concat(depth_rows, ignore_index=True)
     masks = pd.DataFrame(mask_rows)
     lambdas = pd.DataFrame(lambda_rows)
     empty = pd.DataFrame(empty_rows)
     windows = pd.DataFrame(window_rows)
     metrics.to_csv(table_dir / "metrics_by_cell.csv", index=False)
     paired.to_csv(table_dir / "paired_differences.csv", index=False)
+    fixed.to_csv(table_dir / "metrics_fixed_complement.csv", index=False)
+    fixed_paired.to_csv(table_dir / "paired_fixed_complement.csv", index=False)
+    fallback.to_csv(table_dir / "fallback_effect.csv", index=False)
     depths.to_csv(table_dir / "depth_predictions.csv", index=False)
     masks.to_csv(table_dir / "physical_masks.csv", index=False)
     lambdas.to_csv(table_dir / "lambda_validation.csv", index=False)
     empty.to_csv(table_dir / "empty_windows.csv", index=False)
     windows.to_csv(table_dir / "window_observations.csv", index=False)
-    if not full:
-        _plot_profiles(depths, metrics, figure_dir / "profiles_fold0_seed7.png")
-        _plot_rmse(metrics, figure_dir / "rmse_depth_fold0_seed7.png")
+    window_preds.to_csv(table_dir / "window_predictions.csv", index=False)
+    _plot_cell_set(depths, metrics, figure_dir)
+    if full:
+        _plot_summary(metrics, fixed, figure_dir / "rmse_mean_by_fold.png")
     head = _git_head()
     payload = {
         "reference_commit": REFERENCE_COMMIT,
@@ -1130,11 +1479,26 @@ def _run(full: bool) -> int:
         "aggregation": AGGREGATION,
         "interpolation_edge": INTERP_EDGE,
         "same_well_blocks": True,
+        "fixed_complement": "holdout depths at fraction 0.50, scored at both fractions",
         "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
     (out_dir / "config.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
-    if not full:
-        _write_report(out_dir / "REPORT.md", head, metrics, paired, checks, empty)
+    if full:
+        _write_report(
+            out_dir / "REPORT.md",
+            head,
+            metrics,
+            paired,
+            fixed,
+            fixed_paired,
+            checks,
+            empty,
+            fallback,
+            pilot_gap,
+            pilot_fixed,
+        )
+        if _tree_digest(PILOT_DIR) != pilot_digest:
+            raise ValueError("The saved pilot changed while writing the full grid.")
     failed = [str(item["name"]) for item in checks if not bool(item["passed"])]
     print("wrote", out_dir)
     print("checks", len(checks), "failed", len(failed))
@@ -1144,11 +1508,23 @@ def _run(full: bool) -> int:
 
 
 def main() -> int:
-    """Run the pilot unless --full is set."""
+    """Verify the saved pilot, or fit the full grid."""
     parser = argparse.ArgumentParser(description="Well 861 global depth-mask experiment.")
     parser.add_argument("--full", action="store_true", help="Run three blocks and three seeds.")
+    parser.add_argument("--verify-pilot", action="store_true", help="Recompute the saved pilot and stop.")
     args = parser.parse_args()
+    if bool(args.full) and bool(args.verify_pilot):
+        raise ValueError("Choose either --verify-pilot or --full.")
     started = time.perf_counter()
+    if bool(args.verify_pilot):
+        _check_depth_interpolation()
+        if int(round(0.25 * 29)) != 7 or int(round(0.50 * 29)) != 14:
+            raise ValueError("Test-block counts are not 7 and 14.")
+        gap, fixed, _paired = _verify_saved_pilot()
+        print("pilot_score_gap", gap)
+        print(fixed.to_string(index=False))
+        print("elapsed_s", round(time.perf_counter() - started, 1))
+        return 0
     code = _run(bool(args.full))
     print("elapsed_s", round(time.perf_counter() - started, 1))
     return code
