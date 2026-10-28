@@ -757,9 +757,13 @@ mean RMSE than AE $[u,b]$ at every tested $\rho$, and lower RMSE in all ten
 splits. This check does not add a second held-out well and does not vary
 $\Omega$; it only resamples the small development split. Adjacent windows have
 length $64$ and step $32$, so they share $32$ depth samples. This
-random-per-well redraw does not apply a boundary embargo, and a training
-window may therefore overlap a validation window. The ten splits test
-sensitivity to that development partition. They are not ten independent wells.
+random-per-well redraw does not apply a boundary embargo. In each of the ten
+splits, all three validation windows share at least one depth sample with a
+training window of the same well ($30$ of $30$ validation windows). One
+validation window comes from F02-1 and two from F03-2; F06-1 has only two
+windows and stays in the training set. The ten splits test sensitivity to that
+development partition. They do not represent independent validation without
+shared samples, and they are not ten independent wells.
 
 \subsection{Ten-seed CLP versus AE panel}
 \label{app:crosswell_seed_panel}
@@ -786,14 +790,18 @@ and PCA, structural ablations, and the F03-4 grid were not rerun.
 
 Table~\ref{tab:crosswell_seed_panel} shows that none of the nine ten-seed
 intervals include zero. The CLP-CSGM Ridge advantage is concentrated where
-training support is smallest (steps $16$ and $32$, approximately $52$ and $27$
+training support is smallest (steps $16$ and $32$, $52$ and $27$ training
 windows): lower RMSE at every $\rho$. At step $8$, where the training set is
 largest ($104$ training windows), AE $[u,b]$ has lower RMSE at
 $\rho=0.05$ and $\rho=0.10$; CLP-CSGM Ridge has lower RMSE only at
 $\rho=0.20$. This is a low-training-support pattern, not a uniform gain at
 every small measurement ratio. The submitted three-seed tables are unchanged.
-Each of these seeds also draws its own coordinate set, so the panel does not
-separate training randomness from observation placement.
+Each interval describes variability across the ten seeds on the single
+held-out well F03-4. It is not evidence of generalization across wells. The
+nine intervals are separate cell summaries, not a simultaneous
+multiplicity-corrected test, and overlapping windows are not counted as extra
+independent samples. Each of these seeds also draws its own coordinate set, so
+the panel does not separate training randomness from observation placement.
 Appendix~\ref{app:crosswell_omega_placement} holds the model seeds fixed and
 redraws only that coordinate set.
 

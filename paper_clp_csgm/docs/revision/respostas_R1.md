@@ -102,8 +102,12 @@ CLP-CSGM Ridge has lower mean RMSE than AE [u,b] at every ratio (0.0342 vs
 0.0407 at rho=0.05; 0.0305 vs 0.0388 at rho=0.10; 0.0188 vs 0.0362 at
 rho=0.20) and lower RMSE in all ten splits. Adjacent windows have length 64
 and step 32, so they share 32 depth samples. This redraw does not apply a
-boundary embargo, and a training window may overlap a validation window. The
-ten splits therefore assess sensitivity to the development partition. They
+boundary embargo. In each of the ten splits, all three validation windows
+share at least one depth sample with a training window of the same well
+(30 of 30 validation windows). One validation window comes from F02-1 and
+two from F03-2; F06-1 has only two windows and stays in the training set.
+The ten splits therefore assess sensitivity to the development partition.
+They do not represent independent validation without shared samples. They
 are not ten independent wells, and this check does not add a second held-out
 well.
 
@@ -133,14 +137,18 @@ held-out well remains F03-4. Sparse coordinates Omega are redrawn per
 ablations, and the F03-4 grid were not rerun.
 
 With n=10 (Student-t, df=9), none of the nine paired DeltaRMSE intervals
-include zero. The expanded panel is favorable to CLP-CSGM Ridge in the
-intended low-training-support regime: lower RMSE at every rho for steps 16
-and 32 (about 52 and 27 windows; 9/10 or 10/10 seeds) and at step 8,
-rho=0.20 (7/10). The two exceptions are the largest training pool (step 8,
-about 104 windows) at rho=0.05 (AE better on 10/10 seeds) and rho=0.10
-(AE better on 8/10). Additional seeds therefore tighten the evidence that
-CLP-CSGM helps when training windows are scarce; they do not show a uniform
-gain at every small measurement ratio, nor overall superiority.
+include zero. Each interval describes variability across seeds on the single
+held-out well F03-4. It is not evidence of generalization across wells. The
+nine intervals are separate cell summaries, not a simultaneous test, and
+overlapping windows are not counted as independent samples. The expanded
+panel is favorable to CLP-CSGM Ridge in the intended low-training-support
+regime: lower RMSE at every rho for steps 16 and 32 (52 and 27 training
+windows; 9/10 or 10/10 seeds) and at step 8, rho=0.20 (7/10). The two
+exceptions are step 8, where the training count is 104, at rho=0.05 (AE
+better on 10/10 seeds) and rho=0.10 (AE better on 8/10). Additional seeds
+therefore tighten the evidence that CLP-CSGM helps when training windows are
+scarce; they do not show a uniform gain at every small measurement ratio,
+nor overall superiority.
 
 Where the text was changed: Experimental setup, subsection Baselines and
 evaluation metrics (pointer from the n=3 uncertainty paragraph); Results,

@@ -73,11 +73,17 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   step-32 cell. The development pool has 30 windows; 27 training and 3
   validation remain after the 10 percent reservation. The earlier "about 27
   before the split" was the training count.
-- Change made: 10 random development train/val splits, Omega frozen at seed
-  7, F03-4 fixed, CLP Ridge vs AE. CLP lower RMSE in 10/10 splits at all
-  three rho. Random-per-well redraw does not embargo the step-32 overlap of
-  32 depth samples, so the splits test the development partition rather than
-  independent wells. Appendix table
+- Change made: 10 random development train/val splits, Omega coordinates
+  drawn from seed 7, F03-4 fixed, CLP Ridge vs AE. Per-split summaries
+  reproduce the appendix means (CLP 0.0342428731, 0.0305056174, 0.0187939244
+  vs AE 0.0406650491, 0.0388075101, 0.0361629459) and CLP is lower in 10/10
+  splits at all three rho. The saved runs do not contain `omega_sets.csv`;
+  the coordinate draw is fixed by seed 7 before the noise stream, while the
+  same noise rows are reassociated when a development window changes role.
+  In each split, all 3 validation windows share a depth sample with a
+  training window of the same well (30 of 30). F06-1 has 2 windows and stays
+  in training. The splits test the development partition, not independent
+  validation and not ten wells. Appendix table
   `robustness_crosswell_step32_dev_splits.tex`. Counts corrected in
   `sections/05_experiments.tex`. Main 9-cell CSV unchanged.
 - Files: `outputs/reviewer_revision/r1m03_step32_dev_splits/`;
@@ -92,10 +98,16 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - State: `text_done`
 - Reviewer request: increase the seed count if feasible; several n=3
   intervals include zero and the ranking changes by regime.
-- Change made: 10-seed CLP Ridge vs AE on the 9-cell grid (CPU). None of
-  the nine paired DeltaRMSE intervals include zero. AE still wins step 8
-  at rho=0.05 and 0.10; CLP still wins the other seven cells. Appendix
-  table `robustness_crosswell_seed_panel.tex`. Pointer in
+- Change made: 10-seed CLP Ridge vs AE on the 9-cell grid (CPU). The 90
+  paired comparisons were recomputed from the three `summary_by_seed.csv`
+  files and match the appendix table. None of the nine Student-t intervals
+  (df=9) include zero. AE still wins step 8 at rho=0.05 (10/10) and
+  rho=0.10 (8/10); CLP wins the other seven cells, including step 8 at
+  rho=0.20 (7/10) and step 16 at rho=0.05 (9/10). Saved runs have no
+  `omega_sets.csv`; each seed redraws Omega and also refits the models, so
+  the panel does not isolate placement. The intervals are seed variability
+  on held-out F03-4, not cross-well generalization and not a simultaneous
+  test. Appendix table `robustness_crosswell_seed_panel.tex`. Pointer in
   `sections/05_experiments.tex`. Main 3-seed CSVs unchanged. Wording only:
   the n=3 interval sentence now names the main nine-cell benchmark, and the
   step-8 appendix sentence calls 104 the training count.
