@@ -50,10 +50,19 @@ the center of the quadratic penalty, while the sparse values enter as a
 penalized measurement residual. Second, the objective has a MAP/Tikhonov
 reading and a local error bound that separates decoder error, a code
 $\boldsymbol{z}_0$ far from a good code, noise, and whether
-nearby windows can be told apart from the measurements. Third, the tests use
-three development wells and hold out F03-4. They compare direct baselines,
-the decoded prediction of the conditional prior, a measurement-penalty-only
-search, and a ridge map against a multilayer perceptron for
-$\boldsymbol{z}_0$. That local bound
-separates those error sources under stated assumptions. It is not a verified
-S-REC guarantee for the trained decoder.
+nearby windows can be told apart from the measurements. Third, we characterize
+the regime-dependent behavior of the proposed reconstruction in a controlled
+cross-well benchmark, using three development wells and F03-4 as the single
+held-out test well. We compare the proposed method against direct predictors
+and examine the separate contributions of the conditional prior and
+sparse-measurement refinement through ablation studies. We also assess the
+influence of training support, measurement availability, and latent-prior
+architecture.
+
+CLP-CSGM has lower mean RMSE than the direct autoencoder in seven of the
+nine cross-well cells, and those gains concentrate where training support is
+smallest. Other comparators can have lower error in the same grid. With only
+F03-4 held out, these results stay inside that benchmark and do not establish
+general cross-well robustness or operational transferability. The local
+recovery bound remains conditional and does not certify S-REC for the trained
+decoder.
