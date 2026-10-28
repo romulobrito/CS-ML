@@ -1,0 +1,43 @@
+{
+  "branch": "research/brsa1254-contiguous-gap-audit",
+  "head": "690488b23dc476116f1ba461c072971bae422260",
+  "committed": false,
+  "pushed": false,
+  "main_modified": false,
+  "frozen_script": "research/geolink_structural_audit/frozen/run_geolink_gap_pilot.py",
+  "frozen_sha256": "695d015ebacf2effb1a59513753979133b32426501a9836c5b943f232637ce57",
+  "runner": "research/geolink_structural_audit/reproduce_and_export.py",
+  "evaluator": "research/geolink_structural_audit/evaluate_structure.py",
+  "torch": "2.6.0+cu124",
+  "numpy": "1.26.4",
+  "sklearn": "1.6.1",
+  "device": "cpu",
+  "cuda_note": "CUDA Error 304 on the first backward; tensors stayed on CPU",
+  "training_elapsed_s_approx": 32,
+  "retrained_after_export": false,
+  "data_zip_requested": "public-processed-datasets(1).zip",
+  "data_zip_used": "/home/romulo/Downloads/public-processed-datasets.zip",
+  "data_crc32": {
+    "geolink_fold_0_well_log_sliced_train.npy": "6be6d0a9",
+    "geolink_fold_0_well_log_sliced_val.npy": "ad9422a2",
+    "geolink_fold_0_well_log_slices_meta_train.json": "71aecff7",
+    "geolink_fold_0_well_log_slices_meta_val.json": "89500b06"
+  },
+  "continuation_audit_zip": "absent; geolink-investigation19-validation-recovery.zip was not used as a substitute",
+  "reference_pilot": "data_local/pilot/geo_gap_pilot",
+  "reproduction_gate": "mean of three seeds within 0.002 of the four-decimal table; non-neural methods and seeds 23/41 checked separately",
+  "largest_mean_abs_diff": 0.000800,
+  "largest_per_seed_abs_diff": 0.002346,
+  "largest_per_seed_cell": "seed 7, random, CSGM_sem_prior",
+  "seed7_cause": "frozen fit_ae on this machine matches the local prior RMSE 1.2082367999597543 and not the packaged 1.2075562365620085",
+  "bootstrap": {"unit": "well", "n_boot": 5000, "seed": 2026, "seeds_averaged_before_resample": true},
+  "edge_rule": "both endpoints unobserved and inside the region; edges 15-16 and 47-48 excluded",
+  "predictions": [
+    "predictions/seed7_random.npz",
+    "predictions/seed7_contiguous_gap.npz",
+    "predictions/seed23_random.npz",
+    "predictions/seed23_contiguous_gap.npz",
+    "predictions/seed41_random.npz",
+    "predictions/seed41_contiguous_gap.npz"
+  ]
+}

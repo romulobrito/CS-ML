@@ -1,0 +1,7 @@
+seed,mask,lambda_selected,lambda_ref,lambda_match
+7,contiguous_gap,0.01,0.01,True
+7,random,0.01,0.01,True
+23,contiguous_gap,0.1,0.1,True
+23,random,0.01,0.01,True
+41,contiguous_gap,0.01,0.01,True
+41,random,0.01,0.01,True

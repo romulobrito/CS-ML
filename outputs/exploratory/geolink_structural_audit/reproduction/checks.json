@@ -1,0 +1,11 @@
+{
+  "train_val_wells_disjoint": true,
+  "train_test_wells_disjoint": true,
+  "val_test_wells_disjoint": true,
+  "n_train": 56,
+  "n_validation": 55,
+  "n_test": 72,
+  "all_finite": true,
+  "gap_zero_observations": true,
+  "all_mask_counts": true
+}
