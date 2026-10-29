@@ -93,17 +93,22 @@ clay volume from gamma ray by the Larionov relation, and a processed,
 density-derived porosity. Sparse observations are coordinate subsamples of
 these same curves rather than independently acquired core or laboratory
 measurements.
-CLP-CSGM has lower mean root-mean-square error than the direct autoencoder
-in seven of nine cross-well configurations, with the gains concentrated in
-the smallest training set. This comparison is a conditional advantage over
-that autoencoder, not superiority over every comparator. At the reference
-noise standard deviation 0.01, depth interpolation of the sparse measurements
-has lower error than CLP-CSGM in all nine configurations. Under larger
-perturbations that interpolation comparison changes. These noise levels were
-used for sensitivity analysis and were not calibrated to field measurement
-uncertainties. In a supplementary laboratory-porosity check, the direct
-autoencoder has the lower mean error. The benefit depends on the regime, and
-broader validation is still required.
+CLP-CSGM has lower mean RMSE than the direct autoencoder in
+seven of nine cross-well configurations, chiefly when training
+support is limited, but loses in two. In the GR-only porosity
+benchmark, CLP-CSGM has lower mean RMSE at
+$\rho\in\{0.20,0.30\}$, whereas the autoencoder is lower at
+$\rho\in\{0.40,0.60\}$; their errors are nearly equal at
+$\rho=0.50$.
+
+At the reference noise standard deviation $0.01$, depth
+interpolation outperforms CLP-CSGM in all nine cross-well
+configurations. This ordering changes under larger measurement
+perturbations, which were not calibrated to field measurement
+uncertainties. A supplementary laboratory-porosity experiment
+also favors the direct autoencoder in mean RMSE. These findings
+show regime-dependent advantages rather than general
+superiority, and broader validation remains necessary.
 \end{abstract}
 
 \keywords{compressed sensing; generative model; inverse problem;
