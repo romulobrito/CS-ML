@@ -1,5 +1,5 @@
 CLP-CSGM beats the direct AE in 7 of 9 cross-well cells.
 Gains are concentrated in the smaller training sets.
-With GR only, the direct AE is lower at higher fractions.
+GR-only: CLP lower at 20%-30%; AE lower at 40% and 60%.
 At reference noise, interpolation is lower in all nine cells.
 The advantage is conditional, not superiority over every method.

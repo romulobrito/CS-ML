@@ -125,13 +125,14 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   advantage, not overall superiority; make Abstract/Highlights explicit.
 - Change made: the Abstract states the seven-of-nine result as a
   conditional advantage over the direct autoencoder, not superiority over
-  every comparator, with gains in the smallest training set. It states
-  that interpolation is lower in all nine configurations at the reference
+  every comparator, with the gains chiefly where training support is
+  limited and with losses in two cells. It now names the GR-only
+  observation fractions: CLP lower at rho 0.20 and 0.30, nearly equal at
+  rho 0.50, and AE lower at rho 0.40 and 0.60. It states that
+  interpolation is lower in all nine configurations at the reference
   noise 0.01, and that under larger perturbations that comparison changes.
   Those noise levels were used for sensitivity analysis and were not
-  calibrated to field measurement uncertainties. The Abstract does not
-  list steps, fractions, or the GR-only ratios. Those exceptions remain
-  in the Results and in the Conclusion.
+  calibrated to field measurement uncertainties.
 - Files: `main.tex`; `sections/08_conclusion.tex`; `highlights.txt`.
 - Shared reply: none. Nearby IDs ask for different experiments or claim
   limits.
@@ -141,15 +142,39 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 
 ### R1-M06
 
-- State: `text_done`
-- Reviewer request: explain why Ridge stays the primary reference when MLP
-  is better in all nine cross-well cells.
-- Change made: Introduction, Method, Results, and Discussion state that
-  Ridge is a fixed linear low-capacity reference, that MLP wins the
-  cross-well grid and Ridge wins F03-4, and that h is chosen on validation,
-  not after the test ranking. Main tables not switched to MLP.
+- State: `closed`
+- Reviewer request: explain why Ridge stays the primary reference when the
+  earlier comparison gave MLP a lower mean RMSE in every cross-well cell.
+- Inconsistency: the published cross-well MLP run added gamma ray, which
+  Ridge did not use, and the published F03-4 MLP run split windows before
+  depth rows (275 test windows versus 224). Those contrasts do not isolate
+  the class of h.
+- Controlled protocol: cross-well development F02-1, F03-2, and F06-1, test
+  F03-4, channels sonic, rhob, ai, vp, steps 8, 16, and 32, seeds 7, 23, and
+  41, same tail split and the same sparse observations. F03-4 GR-only uses
+  `data/F03-4_AC+GR+Porosity.txt`, GR only, depth-first split, and
+  798/224/224 windows for both priors.
+- Controlled result: unweighted cross-well RMSE 0.028623668 (Ridge) and
+  0.025383384 (MLP), a 11.3% reduction. MLP is lower in 7 of 9 cells and in
+  23 of 27 seed comparisons. Ridge is lower at step 32 for rho 0.10 and
+  0.20. On GR-only, Ridge is lower at all five ratios and in all 15 seed
+  comparisons, with relative reductions of about 15.6% to 19.7%.
+- Valid conclusion: the prior class changes accuracy, the preferred class
+  depends on the regime, and Ridge stays the fixed linear low-capacity
+  reference. The class is chosen on validation, not from the test ranking.
+  The main Ridge versus direct autoencoder comparison was not replaced.
+- Artifacts: `outputs/reviewer_revision/r1m06_prior_class_controlled/`;
+  `scripts/clp_csgm_r1m06_controlled_assets.py`;
+  `paper_clp_csgm/tables/ablation_prior_class_crosswell_summary.csv`,
+  `ablation_prior_class_crosswell_wide.csv`,
+  `ablation_prior_class_crosswell_wide.tex`,
+  `ablation_prior_class_f03_summary.csv`,
+  `ablation_prior_class_f03_wide.csv`,
+  `ablation_prior_class_f03_wide.tex`;
+  `paper_clp_csgm/figures/ablation_prior_class_ridge_vs_mlp.png`.
 - Files: `sections/01_introduction.tex`; `sections/03_method.tex`;
-  `sections/06_results.tex`; `sections/07_discussion.tex`.
+  `sections/06_results.tex`; `sections/07_discussion.tex`;
+  `sections/08_conclusion.tex`; `docs/revision/respostas_R1.md`.
 - Shared reply: none (R3 items are not the same request).
 
 ### R1-M07

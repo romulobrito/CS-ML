@@ -169,10 +169,13 @@ We thank the reviewer for asking that the seven-of-nine cross-well result,
 and the GR-only reversal at higher measurement ratios, be framed as a
 conditional advantage rather than overall superiority.
 
-The Abstract states that the seven-of-nine comparison is a conditional
-advantage over the direct autoencoder, not superiority over every
-comparator. The gains are placed in the smallest training set. The Abstract
-does not list steps, measurement fractions, or the GR-only ratios. Those
+The Abstract states that CLP-CSGM has lower mean RMSE than the direct
+autoencoder in seven of nine cross-well configurations, chiefly when
+training support is limited, and that it loses in two. This comparison
+remains a conditional advantage over that autoencoder, not superiority
+over every comparator. The Abstract names the GR-only regimes: CLP-CSGM
+has lower mean RMSE at rho in {0.20, 0.30}, the autoencoder is lower at
+rho in {0.40, 0.60}, and the errors are nearly equal at rho=0.50. Those
 exceptions remain in the Results and in the Conclusion. The Abstract also
 states that, at the reference noise standard deviation 0.01, depth
 interpolation has lower error than CLP-CSGM in all nine configurations, and
@@ -190,7 +193,7 @@ Highlights, each within 85 characters, are in highlights.txt:
 
 CLP-CSGM beats the direct AE in 7 of 9 cross-well cells.
 Gains are concentrated in the smaller training sets.
-With GR only, the direct AE is lower at higher fractions.
+GR-only: CLP lower at 20%-30%; AE lower at 40% and 60%.
 At reference noise, interpolation is lower in all nine cells.
 The advantage is conditional, not superiority over every method.
 
@@ -201,43 +204,45 @@ edited again for the Highlights.
 
 ## R1-M06 -- Why Ridge is the primary reference
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
 We thank the reviewer for noting that the latent prior is not a minor
-implementation detail. MLP has lower mean RMSE in all nine cross-well cells,
-whereas Ridge has lower mean RMSE throughout the single-well GR-only
-benchmark. That contrast shows that the class of h materially affects
-performance.
+implementation detail. An audit of the earlier comparison found that it did
+not isolate the class of h. In the cross-well runs, the MLP prior also
+received gamma ray, while the Ridge prior did not. In the single-well
+GR-only runs, the two priors used different depth partitions, with 224 and
+275 test windows. Those runs are not a controlled ablation.
 
-We have made this clearer in the text. CLP-CSGM is the reconstruction scheme
-(learned decoder, dense-log anchor h(u), and sparse-measurement consistency).
-Ridge is the primary reference because it is a linear low-capacity map, so
-the main tables use one fixed h across regimes. It is not presented as the
-best prior in every setting. The MLP comparison uses the same pipeline: MLP
-is better in all nine cross-well cells, and Ridge is better on the F03-4
-grid. The prior class should be selected on validation data for the intended
-regime, not by adopting whichever variant wins on the held-out test set.
+The comparison was repeated with the remaining experimental choices held
+fixed. In the controlled cross-well grid, both priors use the channels
+sonic, rhob, ai, and vp, without gamma ray, and the same windows and sparse
+observations. The MLP prior has lower mean RMSE in seven of the nine
+configurations. Ridge has lower mean RMSE at step 32 for measurement ratios
+0.10 and 0.20. The unweighted mean RMSE across the nine configurations
+decreases from 0.028623668 for Ridge to 0.025383384 for MLP, a relative
+reduction of 11.3%. The MLP advantage becomes smaller as the number of
+training windows decreases and is nearly absent at step 32. In the
+controlled F03-4 GR-only comparison, both priors use the same depth-first
+partition and the same 224 test windows. Ridge has lower mean RMSE at all
+five measurement ratios, with relative reductions of approximately 15.6% to
+19.7% compared with MLP.
 
-To quantify the magnitude of this sensitivity, the unweighted average of the
-nine cross-well cell-level mean RMSE values decreases from 0.02862 with Ridge
-to 0.01759 with MLP, a 38.6% reduction calculated using the unrounded values.
-This descriptive aggregate comparison is distinct from the cell-wise relative
-gains reported in the sensitivity table. In the GR-only benchmark, Ridge
-remains preferable, although its relative advantage decreases from
-approximately 14.3% to 1.7% as the measurement fraction increases.
+Ridge remains the primary reference because it is a linear low-capacity map,
+so the main tables use one fixed h across regimes. It is not presented as
+the best prior in every setting. The class of h should be selected on
+validation data for the intended regime, not by adopting whichever variant
+wins on the held-out test set. The controlled MLP results were not used to
+replace the main CLP-CSGM Ridge versus direct autoencoder comparison.
 
-Where the text was changed: the Introduction (Ridge named as the linear
-reference, not as uniformly best); Method, subsection Learned model
-components (the scheme versus the choice of h); Results, subsection
-Latent-prior model sensitivity (MLP wins all nine cells; Ridge stays the
-headline comparator); Interpretation, scope, and limitations (why Ridge is
-retained, and that h is not chosen from the test ranking). The same
-Discussion section now states the unweighted nine-cell means, 0.01759 for
-MLP and 0.02862 for Ridge. Introduction, Method, and Results were not
-rewritten for that magnitude. No new experiments were added, the main tables
-were not switched to MLP, and MLP versus AE was not made a primary comparison.
+Where the text was changed: the Introduction and Method, subsection Learned
+model components (the MLP comparison now states the same channels and the
+same split); Results, subsection Latent-prior model sensitivity
+(Tables for the cross-well and F03-4 prior-class comparisons, and the
+accompanying figure); Interpretation, scope, and limitations; and the
+Conclusion sentence on the opposite Ridge-MLP rankings. The main Ridge
+versus autoencoder tables were not changed.
 
 ---
 

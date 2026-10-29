@@ -51,28 +51,27 @@ tested ratio. The penalty around $\boldsymbol{z}_0$ keeps the search from
 drifting, and the measurement term can still correct it.
 
 The sensitivity results in
-Section~\ref{subsec:latent_prior_sensitivity} show that no single architecture
-for $h$ is uniformly preferable. MLP has lower mean RMSE in all nine
-multi-channel cross-well cells. Across the nine cross-well configurations,
-the unweighted average of the cell-level mean RMSE values is $0.01759$ for
-MLP and $0.02862$ for Ridge, corresponding to a $38.6\%$ reduction relative
-to Ridge when computed from the unrounded values. This aggregate reduction is
-descriptive and differs from the cell-wise signed Ridge gains reported in the
-sensitivity table. Ridge has lower mean RMSE at every tested ratio under the
-single-channel F03-4 setting. In both cases, the
-difference decreases as $\rho$ increases, which is consistent with less
-dependence on $\boldsymbol{z}_0$ as more target observations
-become available. These comparisons distinguish the CLP-CSGM framework from its reference
-implementation. Ridge remains the primary reported configuration because it is
-a fixed linear map: the main tables then use one $h$ in every cell, and $h$
-is not chosen after seeing the test ranking. The
-MLP results have the same experimental status. They show that a more flexible
-map improves the cross-well grid and that the preferred class changes with
-the test. The class of $h$, the latent dimension, and the regularization
-should be selected on validation data for the intended measurements, not by
-adopting whichever variant wins on the held-out test set. The
-experiments establish this sensitivity but do not identify which architectural
-property causes the opposite rankings.
+Section~\ref{subsec:latent_prior_sensitivity} show that the class of $h$
+materially changes reconstruction accuracy, and that no single architecture
+is uniformly preferable. In the controlled cross-well comparison, the MLP
+prior has lower mean RMSE in seven of the nine cells. That advantage becomes
+smaller as the number of training windows decreases and is nearly absent at
+step $32$, where Ridge has the lower mean at $\rho=0.10$ and $\rho=0.20$.
+The unweighted mean RMSE across those nine cells falls from $0.02862$ for
+Ridge to $0.02538$ for MLP, a relative reduction of $11.3\%$. On the
+controlled F03-4 GR-only grid, Ridge has lower mean RMSE at all five
+measurement ratios. These comparisons distinguish the CLP-CSGM framework
+from its reference implementation. Ridge remains the primary reported
+configuration because it is a fixed linear low-capacity map: the main tables
+then use one $h$ in every cell, and $h$ is not chosen after seeing the test
+ranking. The MLP results have the same experimental status. This MLP is the
+conditional map $h(\boldsymbol{u})$, not the direct regression MLP
+$[\boldsymbol{u},\boldsymbol{b}]$. The preferred class depends on the regime.
+The class of $h$, the latent dimension, and the regularization should be
+selected on validation data for the intended measurements, not by adopting
+whichever variant wins on the held-out test set. The experiments establish
+this empirical sensitivity to the class of $h$. They do not show that model
+capacity, taken alone, causes the differences.
 
 The empirical scope is limited by the construction of the benchmark targets.
 In the cross-well experiment, $V_c$ is a processed Larionov-derived curve.

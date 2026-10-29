@@ -408,19 +408,22 @@ the conditional code $\boldsymbol{z}_0$ is not helpful in every cell.
 \label{subsec:latent_prior_sensitivity}
 
 Tables~\ref{tab:prior_class_crosswell} and~\ref{tab:prior_class_f03} compare
-Ridge and MLP implementations of $h$ while keeping the remaining pipeline
-fixed. This sensitivity analysis is limited to these two prior classes. Signed
-Ridge gain is defined as
+Ridge and MLP implementations of $h$. This sensitivity analysis is limited to
+these two prior classes. Signed Ridge gain is defined as
 $100(\mathrm{RMSE}_{\mathrm{MLP}}-\mathrm{RMSE}_{\mathrm{Ridge}})
  /\mathrm{RMSE}_{\mathrm{MLP}}$; positive values favor Ridge.
 
-In the cross-well benchmark, MLP has lower mean RMSE in all nine cells. The
-relative difference is largest at sparse measurement ratios and decreases as
-$\rho$ increases; at step $16$, for example, signed Ridge gain changes from
-approximately $-82\%$ at
-$\rho=0.05$ to $-26\%$ at $\rho=0.20$. Ridge remains the headline comparator
-for the reason in Section~\ref{sec:discussion}: a fixed linear reference, not
-a claim that it dominates MLP on this grid.
+In the controlled cross-well comparison, both prior architectures use the
+same auxiliary channels, excluding gamma ray, and the same training,
+validation, test, and sparse-observation protocol. The MLP prior achieves
+lower mean RMSE in seven of the nine configurations. Ridge has lower mean
+RMSE at step $32$ for measurement ratios $0.10$ and $0.20$. The unweighted
+mean RMSE across the nine configurations decreases from $0.02862$ for Ridge
+to $0.02538$ for MLP, a relative reduction of $11.3\%$. The MLP advantage
+becomes smaller as training support decreases and is nearly absent at step
+$32$. Ridge remains the headline comparator for the reason in
+Section~\ref{sec:discussion}: a fixed linear reference, not a claim that it
+dominates MLP on this grid.
 
 \begin{table}[t]
     \centering
@@ -433,9 +436,12 @@ a claim that it dominates MLP on this grid.
     }
 \end{table}
 
-In the F03-4 GR-only benchmark, Ridge has lower mean RMSE at every tested ratio,
-but the relative difference decreases from approximately $14.3\%$ at
-$\rho=0.20$ to $1.7\%$ at $\rho=0.60$.
+In the controlled F03-4 GR-only comparison, both prior architectures use the
+same depth-first partition and the same $224$ test windows. Ridge achieves
+lower mean RMSE at all five measurement ratios, with relative reductions of
+approximately $15.6\%$ to $19.7\%$ compared with MLP. The prior architecture
+therefore affects reconstruction accuracy, but the preferred configuration
+depends on the evaluated data regime.
 
 \begin{table}[t]
     \centering
