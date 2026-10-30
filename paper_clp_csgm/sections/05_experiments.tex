@@ -15,7 +15,7 @@ sampled coordinates, and noise realizations.
     trajectory starts at that code and the penalty remains centered there.
     Partitions, measurement ratios, seeds, and
     sparse-observation draws are shared across methods, which are evaluated
-    using RMSE, MAE, and relative $\ell_2$ error. OpenAI's ChatGPT, using the GPT-5.5 model, was used to
+    using RMSE, mean absolute error (MAE), and relative $\ell_2$ error. OpenAI's ChatGPT, using the GPT-5.5 model, was used to
     assist in generating the initial explanatory schematic and visual layout.
     The final figure was reviewed, edited, and validated by the authors.}
     \label{fig:experimental_setup_overview}
@@ -75,7 +75,7 @@ The smaller Lapa pre-salt permeability case
 Appendix~\ref{app:lapa_case}. Appendix~\ref{app:phi_lab_861} reports a
 separate single-well check on laboratory porosity with depth-held-out blocks
 and within-window scoring of coordinates not supplied as measurements in each
-evaluated window. The direct AE has the lower mean RMSE. Laboratory
+evaluated window. The direct autoencoder (AE) has the lower mean RMSE. Laboratory
 measurements correct the decoded prediction of the conditional prior
 in every split, and that correction is enough where the test logs remain close
 to the support used to fit $h(\boldsymbol{u})$. The check is not part of the main grid.
@@ -111,7 +111,7 @@ overlap and preserves contiguous-depth generalization.
 For each seed and measurement ratio $\rho$, the number of observed coordinates
 is
 \[
-m=\max\{4,\operatorname{round}(\rho L)\}.
+m=\max\{4,\operatorname{round}(\rho N)\}.
 \]
 We use nearest-integer rounding, with half-integer ties resolved to the nearest
 even integer. One coordinate set
@@ -218,7 +218,8 @@ Eq.~\eqref{eq:inverse_target_standardization}.
 \label{subsec:baselines_metrics}
 
 The direct baselines are ML only, which uses only $\boldsymbol{u}$; MLP
-$[\boldsymbol{u},\boldsymbol{b}]$, which predicts the target directly; PCA
+$[\boldsymbol{u},\boldsymbol{b}]$, which predicts the target directly;
+principal component analysis (PCA)
 $[\boldsymbol{u},\boldsymbol{b}]$, which predicts target principal-component
 scores; and AE $[\boldsymbol{u},\boldsymbol{b}]$, which predicts codes of a
 separately trained target autoencoder. CLP-CSGM Ridge is the proposed reference

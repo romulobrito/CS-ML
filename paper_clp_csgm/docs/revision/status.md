@@ -332,7 +332,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Checked: compiled page 12. Panel labels and the refinement equation are
   readable. The boxes do not overlap.
 - Files: `sections/03_method.tex`; `figures/pipeline_CLP-CSGM_v4.png`.
-- Not done: `R3-06` (results organization and other figures). This entry
+- Not done: none from this entry. `R3-06` is closed. This entry
   does not close `R3-P08`.
 
 ### R1-m04
@@ -701,7 +701,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 
 ### R3-A03
 
-- State: `text_done`
+- State: `closed`
 - Reviewer request: redraw Figure 1 so the mappings from \(z_0\) to
   \(G(z_0)\) and from the refined code to its reconstruction are
   unambiguous, and explain the arrows and the decoder-range curve.
@@ -711,13 +711,20 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   \(\mathcal{R}_{\mathrm{orig}}\). The vertical arrow is latent
   refinement. The caption states that the drawing is schematic and is not
   a measured numerical trajectory.
-- Checked: compiled page 10. Both codes meet the curve. Labels, including
+- Checked: compiled page 11. Both codes meet the curve. Labels, including
   \(M_{\Omega}\widehat{y}\) and the footer, are readable and do not overlap.
+- Checked on close: the local PDF shows \(z_0\) decoded to
+  \(G_{\mathrm{orig}}(z_0)\) and \(\widehat{z}\) decoded to
+  \(\widehat{y}=G_{\mathrm{orig}}(\widehat{z})\). Both outputs lie on the
+  blue curve \(\mathcal{R}_{\mathrm{orig}}\). The vertical arrow is latent
+  refinement. The caption separates \(M_{\Omega}\) from that curve and
+  names the residual between \(M_{\Omega}\widehat{y}\) and \(\boldsymbol{b}\).
+  No figure or tex edit in this closure. `R3-P14` stays `text_done`.
 - Files: `sections/03_method.tex`;
   `figures/view_conditional_latent_prior_final.pdf`.
 - Shared reply: none. `R3-P14` uses the same figure and answers a different
   question.
-- Not done: `R3-06`.
+- Not done: none from this entry. `R3-06` is closed.
 
 ### R3-P14
 
@@ -729,11 +736,11 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   arrow ends at \(G_{\mathrm{orig}}(\widehat{z})\) on the blue curve.
   \(M_{\Omega}\) selects coordinates. \(\mathcal{R}_{\mathrm{orig}}\)
   is that curve. The caption states that they are not the same object.
-- Checked: same page-10 inspection as `R3-A03`.
+- Checked: same page-11 inspection as `R3-A03`.
 - Files: `sections/03_method.tex`;
   `figures/view_conditional_latent_prior_final.pdf`.
 - Shared reply: none. `R3-A03` explains the two mappings and the arrows.
-- Not done: `R3-06`.
+- Not done: none from this entry. `R3-06` is closed.
 
 ### R3-05
 
@@ -766,7 +773,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   against the unknown target. Proofs stay in the appendix. The body states
   the implications. No manuscript edit in this closure. `R3-P15` stays
   `text_done`.
-- Not done: `R3-06`.
+- Not done: none from this entry. `R3-06` is closed.
 
 ### R3-06
 
@@ -806,11 +813,11 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Checked: same pages as `R3-05`.
 - Files: `sections/03_method.tex`; `sections/09_appendix.tex`.
 - Shared reply: none. `R3-05` answers the role of the classical arguments.
-- Not done: `R3-06`.
+- Not done: none from this entry. `R3-06` is closed.
 
 ### R3-A02
 
-- State: `text_done`
+- State: `closed`
 - Reviewer request: distinguish the sampling operator \(M_{\Omega}\) from the
   decoder output set.
 - Change made: text only. The output set is no longer \(\mathcal{M}\) or
@@ -832,9 +839,18 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Files: `sections/02_related_work.tex`; `sections/03_method.tex`;
   `sections/07_discussion.tex`; `sections/09_appendix.tex`.
 - Shared reply: none. `R3-P08` uses the same symbols and answers the
-  imaginary-part reading. `R3-A03` and `R3-P14` stay text_done; their
-  replies now name the curve \(\mathcal{R}_{\mathrm{orig}}\).
-- Not done: `R3-06`.
+  imaginary-part reading. `R3-A03` is closed. `R3-P14` stays text_done.
+  Both replies name the curve \(\mathcal{R}_{\mathrm{orig}}\).
+- Checked on close: \(M_{\Omega}\) is only the coordinate-restriction
+  operator. \(\mathcal{R}_{G}\) is the standardized decoder range.
+  \(\mathcal{R}_{\mathrm{orig}}\) is that range in the original target
+  units. \(\mathcal{R}_{\mathrm{orig},R^{\dagger}}\) is the local set in
+  the recovery condition. The Figure 1 caption separates the blue curve
+  from \(M_{\Omega}\). No \(\mathcal{M}\) or \(\operatorname{Im}(G)\)
+  remains. The notation change did not redraw the figure. The later redraw
+  belongs to `R3-A03`, which is closed. `R3-P08` and
+  `R3-P14` stay `text_done`. No manuscript edit in this closure.
+- Not done: none from this entry. `R3-06` is closed.
 
 ### R3-P08
 
@@ -855,13 +871,50 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `sections/07_discussion.tex`; `sections/09_appendix.tex`.
 - Shared reply: none. `R3-A02` answers the distinction between \(M_{\Omega}\)
   and the output set.
-- Not done: `R3-06`.
+- Not done: none from this entry. `R3-06` is closed.
+
+### R3-A01
+
+- State: `closed`
+- Reviewer request: define symbols and abbreviations at first use, including
+  the abstract and the opening equations.
+- Change made: the abstract defines RMSE and rho, replaces GR-only with the
+  gamma-ray description, and states the recovery caveat without naming
+  S-REC. The body expands MLP, MAP, RMSE, S-REC, GAN, ANN, SHAP, MAE, AE,
+  PCA, V_c, and GR-only at first use. The method names h, I_m, n_tr,
+  gamma_AE, and lambda where they enter. The sampling length L is now N,
+  the window length already used for the length-64 protocol. No equation,
+  table, or reported value changed. Abstract length is 284 words.
+- Checked: compiled PDF, 88 pages, no undefined references. The abstract
+  remains within 300 words.
+- Files: `main.tex`; `sections/01_introduction.tex`;
+  `sections/02_related_work.tex`; `sections/03_method.tex`;
+  `sections/04_data_and_eda.tex`; `sections/05_experiments.tex`.
+- Shared reply: none. `R3-A02` is closed. `R3-06` stays closed.
+- Not done: none for this comment.
+
+### R3-A04
+
+- State: `closed`
+- Reviewer request: use "probability density" in Figure 3 so the axis is
+  not read as the bulk-density log.
+- Change made: the vertical label is now "Probability density". Bins,
+  normalization, colors, transparency, scales, legend, and axis limits are
+  unchanged. The caption already described the clay-volume distributions
+  and was not edited.
+- Checked: compiled page 17. The label is fully readable. The plotting
+  panel matches the previous figure pixel for pixel outside the label
+  strip. 88 pages, no undefined references.
+- Files: `figures/eda_crosswell_vc_distribution.png`;
+  `scripts/clp_csgm_paper_assets.py`.
+- Shared reply: none.
+- Not done: none from this entry.
 
 ## Queue (not yet processed)
 
-R3-A01, R3-A04, R3-A05,
+R3-A05,
 R3-P01 .. R3-P07, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
-R1-m05 remains deferred. `R1-m03`, `R3-A03`, and `R3-P14` are text_done.
-`R3-05` and `R3-P15` are text_done. `R3-A02` and `R3-P08` are text_done.
+R1-m05 remains deferred. `R1-m03` and `R3-P14` are text_done. `R3-A03` is closed.
+`R3-05` and `R3-P15` are text_done. `R3-A02` is closed. `R3-P08` stays text_done.
 `R3-06` is closed.
 `R3-P09` and `R3-P10` are text_done. `R3-P16` remains pending.

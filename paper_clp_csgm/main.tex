@@ -79,7 +79,7 @@ E-mail: \texttt{romulobrito@lenep.uenf.br}}
 Reconstructing a petrophysical target curve is difficult when dense auxiliary
 logs are available along the well but the target is observed only at selected
 depths. Direct models can use those sparse observations as input features,
-yet they do not require the reconstruction to honor them as measurements.
+yet the reconstruction need not honor them as measurements.
 We introduce Conditional Latent-Prior Compressed Sensing with Generative
 Models (CLP-CSGM). A decoder trained on windows of the target curve supplies
 the windows the reconstruction may use. Dense auxiliary logs predict a
@@ -87,26 +87,22 @@ conditional latent code, $z_0$. Latent refinement balances disagreement with
 the sparse measurements against proximity to $z_0$. That code is the
 reference for this balance, not only a starting value. A residual at the
 observed depths can remain. The local recovery bound remains conditional
-and does not certify S-REC.
-The cross-well evaluation uses public Dutch North Sea logs, with three wells
-for model development and one well held out. The main targets are derived:
-clay volume from gamma ray by the Larionov relation, and a processed,
-density-derived porosity. Sparse observations are coordinate subsamples of
-these same curves rather than independently acquired core or laboratory
-measurements.
-CLP-CSGM has lower mean RMSE than the direct autoencoder in
-seven of nine cross-well configurations, chiefly when training
-support is limited, but loses in two. In the GR-only porosity
-benchmark, CLP-CSGM has lower mean RMSE at
-$\rho\in\{0.20,0.30\}$, whereas the autoencoder is lower at
-$\rho\in\{0.40,0.60\}$; their errors are nearly equal at
-$\rho=0.50$.
+and does not show that the trained decoder separates nearby windows.
+The cross-well test uses public Dutch North Sea logs, with three development
+wells and one held-out well. Targets are Larionov clay volume from gamma ray
+and processed density-derived porosity. Sparse observations are subsamples of these curves,
+not independent core or laboratory measurements.
+CLP-CSGM has lower mean root mean square error (RMSE) than the direct
+autoencoder in seven of nine cross-well configurations, chiefly when training
+support is limited, but loses in two. Where gamma ray is the only dense log,
+$\rho$ is the fraction of window depths observed. CLP-CSGM has lower mean
+RMSE at $\rho\in\{0.20,0.30\}$, whereas the autoencoder is lower at
+$\rho\in\{0.40,0.60\}$; their errors are nearly equal at $\rho=0.50$.
 
 At the reference noise standard deviation $0.01$, depth
 interpolation outperforms CLP-CSGM in all nine cross-well
-configurations. This ordering changes under larger measurement
-perturbations, which were not calibrated to field measurement
-uncertainties. A supplementary laboratory-porosity experiment
+configurations. This ordering changes under larger perturbations that were
+not calibrated to field uncertainties. A laboratory-porosity supplement
 also favors the direct autoencoder in mean RMSE. These findings
 show regime-dependent advantages rather than general
 superiority, and broader validation remains necessary.

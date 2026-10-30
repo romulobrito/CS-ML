@@ -28,7 +28,8 @@ Using that penalty still requires a representation of the target window.
 A fixed sparsity basis is a weak description of this window when the logs
 change from one well to another
 \citep{donoho2006compressed,candes2006robust,candes2006stable,bora2017compressed}.
-Conditional Latent-Prior CSGM (CLP-CSGM) learns which target windows the
+Conditional Latent-Prior Compressed Sensing with Generative Models
+(CLP-CSGM) learns which target windows the
 decoder can produce. The conditional map predicts a latent code
 $\boldsymbol{z}_0$ from the dense auxiliary logs. This code provides an
 informed initialization and serves as the reference for the quadratic penalty
@@ -40,13 +41,15 @@ code near $\boldsymbol{z}_0$.
 Section~\ref{subsec:test_time_reconstruction} states this step, including the
 first trajectory and the perturbed restarts. Ridge is the
 primary reference for the map from dense logs to $\boldsymbol{z}_0$, because
-it is a linear low-capacity map, not because it is best in every regime. An
-MLP variant is compared under the same channels and the same split.
+it is a linear low-capacity map, not because it is best in every regime. A
+multilayer perceptron (MLP) variant is compared under the same channels and
+the same split.
 
 The contributions are threefold. First, the dense logs predict
 $\boldsymbol{z}_0$, which initializes the first latent trajectory and remains
 the center of the quadratic penalty, while the sparse values enter as a
-penalized measurement residual. Second, the objective has a MAP/Tikhonov
+penalized measurement residual. Second, the objective has a maximum a
+posteriori (MAP)/Tikhonov
 reading and a local error bound that separates decoder error, a code
 $\boldsymbol{z}_0$ far from a good code, noise, and whether
 nearby windows can be told apart from the measurements. Third, we characterize
@@ -58,10 +61,11 @@ sparse-measurement refinement through ablation studies. We also assess the
 influence of training support, measurement availability, and latent-prior
 architecture.
 
-CLP-CSGM has lower mean RMSE than the direct autoencoder in seven of the
+CLP-CSGM has lower mean root mean square error (RMSE) than the direct
+autoencoder in seven of the
 nine cross-well cells, and those gains concentrate where training support is
 smallest. Other comparators can have lower error in the same grid. With only
 F03-4 held out, these results stay inside that benchmark and do not establish
 general cross-well robustness or operational transferability. The local
-recovery bound remains conditional and does not certify S-REC for the trained
-decoder.
+recovery bound remains conditional and does not certify the set-restricted
+eigenvalue condition (S-REC) for the trained decoder.
