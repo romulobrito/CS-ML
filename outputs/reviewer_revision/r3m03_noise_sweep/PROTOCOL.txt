@@ -1,0 +1,11 @@
+R3-03 noise sweep. Cross-well Vc, held-out F03-4.
+Steps (8, 16, 32), seeds (7, 23, 41), rho (0.05, 0.1, 0.2).
+Noise std (0.01, 0.05, 0.1, 0.2).
+Omega and the standard normal draws follow the published stream.
+Each noise level scales those same draws.
+Decoder and ridge prior are fit once per (step, seed).
+Lambda grid (0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0).
+Lambda is chosen by validation mean-window RMSE.
+prior_only is G(z0), with no measurement term.
+Test-window target std 0.034836.
+Metric: mean of per-window RMSE.

@@ -1,0 +1,47 @@
+{
+  "benchmark": "cross-well F3 Vc, held-out well F03-4",
+  "excluded_wells": [
+    "861",
+    "1254"
+  ],
+  "window_length": 64,
+  "steps": [
+    8,
+    16,
+    32
+  ],
+  "seeds": [
+    7,
+    23,
+    41
+  ],
+  "measurement_ratios": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "noise_stds": [
+    0.01,
+    0.05,
+    0.1,
+    0.2
+  ],
+  "noise_note": "Simulated Gaussian perturbations on subsampled coordinates. Not calibrated laboratory uncertainties.",
+  "objective": "min ||M_Omega y - b||^2 + alpha ||D2 y||^2",
+  "d2": "second difference along the window index, stencil 1, -2, 1",
+  "alpha_grid": [
+    1e-06,
+    0.0001,
+    0.01,
+    1.0,
+    100.0,
+    10000.0,
+    1000000.0
+  ],
+  "alpha_selection": "lowest validation mean of per-window RMSE; ties keep the smaller alpha; test targets are not used",
+  "clp_source": "/home/romulo/Documentos/cs-regressor/outputs/reviewer_revision/r3m03_noise_sweep/tables/detail_by_seed.csv",
+  "clp_refit": false,
+  "pairing": "same measurement seed as the model seed; Omega then one standard normal draw, scaled by each noise level",
+  "metric": "mean of per-window full-window RMSE",
+  "grid_policy": "do not change alpha_grid after test scores are known"
+}

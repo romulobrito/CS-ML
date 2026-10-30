@@ -1,0 +1,14 @@
+R3-03 smoothness audit. Protocol frozen before test scoring.
+Benchmark: cross-well Vc, held-out F03-4. Wells 861 and 1254 are excluded.
+Window length 64. Steps (8, 16, 32). Seeds (7, 23, 41). Rho (0.05, 0.1, 0.2). Noise (0.01, 0.05, 0.1, 0.2).
+Objective: min ||M y - b||^2 + alpha ||D2 y||^2.
+D2 is the second difference along the window index.
+Alpha grid (1e-06, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0).
+Alpha is chosen by validation mean-window RMSE.
+Equal validation scores keep the smaller alpha.
+Test targets are not used to choose alpha.
+The grid is not revised after test scores are known.
+CLP-CSGM is not refit. Scores are joined from the saved noise sweep.
+Pairing reuses that sweep's Omega and standard-normal draws.
+Noise levels are simulated. They are not calibrated laboratory uncertainties.
+Saved sweep: /home/romulo/Documentos/cs-regressor/outputs/reviewer_revision/r3m03_noise_sweep/tables/detail_by_seed.csv.

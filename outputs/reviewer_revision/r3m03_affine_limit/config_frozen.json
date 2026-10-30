@@ -1,0 +1,7 @@
+{
+  "ceiling_alpha": 1000000.0,
+  "affine": "least squares onto span of 1 and the window index",
+  "saved_smoother": "/home/romulo/Documentos/cs-regressor/outputs/reviewer_revision/r3m03_smooth_audit/tables/detail_by_seed.csv",
+  "saved_smoother_overwritten": false,
+  "ceiling_score_gap": 9.71445146547012e-17
+}

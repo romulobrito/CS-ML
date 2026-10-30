@@ -1,0 +1,11 @@
+R3-03 supplement. Cross-well Vc only.
+Train F02-1, F03-2, F06-1. Test F03-4.
+Channels sonic, rhob, ai, vp. Target vc.
+Steps 8, 16, 32. Ratios 0.05, 0.10, 0.20. Seeds 7, 23, 41.
+Tail validation. Measurement seed equals the model seed.
+Noise std 0.01. Full-window RMSE.
+linear_ub: ordinary least squares from [u, b] to the window.
+ridge_direct_ub: ridge from [u, b], alpha chosen on validation.
+interp_sparse: linear depth interpolation of noisy b only.
+CLP and direct AE RMSE are copied from offset 0 of the placement run.
+G(E(y)) on the test windows uses the full target and is not a method.
