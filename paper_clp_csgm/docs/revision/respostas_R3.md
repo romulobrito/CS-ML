@@ -13,7 +13,7 @@ Source comments: `docs/revision/CLP_CSGM_Pareceres_Consolidados.md`.
 
 ## R3-01 -- Clarity and stacked terminology
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
@@ -36,10 +36,13 @@ results.
 
 The same plain description is used in the Introduction, Related work, Method,
 Data and exploratory analysis, Experimental setup, Results, Interpretation,
-scope, and limitations, and the Conclusion. The reported numbers and the
-limits already stated in the abstract are unchanged: the advantage is
-conditional on small training support, the local bound is not an S-REC proof,
-and the gamma-ray-only porosity test is not general porosity performance.
+scope, and limitations, and the Conclusion. The numerical results and the
+manuscript's scope limitations remain unchanged. The Abstract reports
+regime-dependent performance and the need for broader validation. The
+Introduction and theoretical discussion clarify that the conditional bound
+does not establish S-REC for the trained decoder, while the Experimental
+setup and Discussion limit the GR-only porosity benchmark to a controlled
+test.
 
 Where the text was changed: Abstract; Introduction; Related work; Method
 (the opening, the paragraph after the measurement model, the conditional-code
@@ -52,7 +55,7 @@ and limitations; Conclusion; Appendix Supplementary Theoretical Details
 
 ## R3-02 -- Practical advantage versus conventional relations
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
@@ -69,26 +72,44 @@ Larionov relation cannot be evaluated. The task is to reconstruct the
 processed curve from sonic, density, acoustic impedance, and compressional
 velocity while matching a few known values of the curve.
 
-For the F03-4 porosity, density porosity is linear in bulk density, and a
-standard sonic porosity is linear in slowness. If those logs have been
-recorded, the processed porosity is already determined. In this dataset,
-sonic travel time follows the processed porosity almost one to one, and the
-density curve behind it was predicted from sonic and gamma ray. Sonic is left
-out, and gamma ray is the only dense log. The errors do not transfer to a
-porosity interpretation that also uses density, neutron, and sonic.
+For the F03-4 porosity, density-derived porosity can be calculated from bulk
+density and the hypotheses of that relation. A sonic-porosity estimate uses
+another petrophysical relation and is not necessarily identical to the
+density-derived porosity. If the bulk-density log required by the
+density-porosity relation has been recorded, that relation is the appropriate
+calculation. In this dataset, the density behind the processed target was
+predicted from sonic and gamma ray. Sonic travel time follows that processed
+curve almost one to one. That correlation is not validation against
+independent laboratory porosity. Sonic is left out, and gamma ray is the only
+dense log. The errors do not transfer to a porosity interpretation that also
+uses density, neutron, and sonic.
 
 The two F3 benchmarks therefore compare methods that face this incomplete
 input. They are not a contest against Larionov, density porosity, or sonic
 porosity on a fully logged well.
 
+The purpose of CLP-CSGM is not to replace conventional petrophysical formulas
+when their required logs are available. It is to investigate whether a learned
+representation can assist reconstruction when the defining log is unavailable
+and sparse target-property values must be assimilated. However, methodological
+motivation does not establish practical superiority. In the supplementary
+comparison, simple depth interpolation achieves lower RMSE than CLP-CSGM in
+all nine cross-well configurations at the reference noise level. CLP-CSGM
+becomes more competitive under larger simulated measurement perturbations, but
+those perturbations were not calibrated to field uncertainties. Thus, the
+present experiments do not establish that CLP-CSGM should be preferred
+operationally over conventional calculations or simpler reconstruction
+methods.
+
 Where the text was changed: Data and exploratory analysis (the clay-volume
 input-design paragraph); Experimental setup (the F03-4 GR-only porosity
 paragraph); Interpretation, scope, and limitations (the empirical-scope
-paragraphs for the two F3 benchmarks).
+paragraphs for the two F3 benchmarks, including the distinction between
+density-derived and sonic porosity and the interpolation sentences).
 
 ## R3-03 -- Simple comparators and intermediate results
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
@@ -108,7 +129,7 @@ At the two larger noise levels, CLP-CSGM has the lower error in every cell. Thes
 
 Results also shows this ordering in one figure, with one panel per step and one curve per measurement fraction, so the step-8 cells are not averaged away. The horizontal axis is logarithmic. Relative to the curve standard deviation 0.035, on the same scale as the noise, 0.05 is about 1.43 times larger, and 0.10 and 0.20 are about 2.86 and 5.71 times larger. The decoder and the dense-log map are fit once per step and seed. The penalty is selected again on validation for each measurement fraction and each noise level. The noise 0.01 points in that figure are this refit. They keep the same ordering as the published grid and can differ slightly from its cell means.
 
-The detail is in the appendix Direct linear maps, depth interpolation, and measurement noise, with the two tables and one depth example. The Results paragraph states the cell-level ordering next to that figure. The Abstract states that interpolation has lower error in all nine configurations at the reference noise 0.01, and that under larger perturbations that comparison changes. Those noise levels were used for sensitivity analysis and were not calibrated to field measurement uncertainties. The Conclusion keeps the step-8 exceptions at noise 0.05 and states that AE, ordinary least squares, and direct ridge were not rerun across the sweep and that no smoother was added. The Experimental setup announces the experiment, and the Method explains the encoder. These runs are not merged into the submitted tables. This wording does not close the question of how the published noise level was chosen.
+The detail is in the appendix Direct linear maps, depth interpolation, and measurement noise, with the two tables and one depth example. The Results paragraph states the cell-level ordering next to that figure. The Abstract states that interpolation has lower error in all nine configurations at the reference noise 0.01, and that under larger perturbations that comparison changes. Those noise levels were used for sensitivity analysis and were not calibrated to field measurement uncertainties. The Conclusion keeps the step-8 exceptions at noise 0.05 and states that AE, ordinary least squares, and direct ridge were not rerun across the sweep. A second-difference smoother was added later in this same reply. The Experimental setup announces the experiment, and the Method explains the encoder. These runs are not merged into the submitted tables. This wording does not close the question of how the published noise level was chosen.
 
 We have revised the discussion of the noise-sensitivity results to distinguish the observed RMSE ordering from its possible explanation. The revised Results text relates the smaller RMSE increase of CLP-CSGM to the general role of regularization \cite{hansen2010discrete} and discusses representation, noise, and optimization errors in the context of generative compressed sensing \cite{bora2017compressed}.
 
@@ -116,13 +137,17 @@ We explicitly state that the sweep does not isolate the effects of the decoder r
 
 Changes were made in the Results discussion accompanying the RMSE-versus-noise figure, in the appendix Direct linear maps, depth interpolation, and measurement noise, with the Hansen reference added to the bibliography.
 
-Where the text was changed: Abstract (the sentence on interpolation at noise 0.01); Method (the generative-decoder paragraph); Experimental setup (the paragraph after the sparse-coordinate placement check); Results (the discussion accompanying the RMSE-versus-noise figure); Conclusion (the noise paragraph); Appendix Direct linear maps, depth interpolation, and measurement noise.
+A smoothing comparator was added on the same cross-well stream. It minimizes the squared residual at the observed coordinates plus alpha times the squared second difference along the window. Alpha is chosen only on validation, from the frozen grid 1e-6, 1e-4, 1e-2, 1, 1e2, 1e4, and 1e6. The grid was not changed after the test scores. The largest value is selected in 62 of 108 seed rows. Those ceiling curves are already near an affine least-squares fit to the same noisy observations, which is the limit as alpha tends to infinity. The median profile RMSE between alpha=1e6 and that affine fit is 5.2e-5 on all 108 rows and 7.6e-5 on the 62 ceiling rows. The largest scored-RMSE gap on the ceiling rows is 1.9e-5. The affine fit is an additional comparator. It does not replace the validation-selected smoother.
+
+At the reference noise 0.01, the selected smoother has lower mean RMSE than CLP-CSGM in eight of nine cells, and interpolation remains lower than CLP-CSGM in all nine. At noise 0.05 the ordering is mixed: CLP-CSGM is lower in five cells and smoothing in four. At 0.10, CLP-CSGM is lower in eight cells, with smoothing lower at step 8 and measurement fraction 0.20. At 0.20, CLP-CSGM is lower in all nine cells. At measurement fraction 0.05, the smoother mean is higher than interpolation at every noise level. The affine cell mean is lower than CLP-CSGM in all nine cells at noise 0.01. In the one selected-smoother exception, step 32 and measurement fraction 0.05, only one seed selects the ceiling: the affine mean is 0.0240, the selected smoother is 0.0429, and CLP-CSGM is 0.0317. These noise levels remain a sensitivity analysis. They were not calibrated to field or laboratory uncertainty. The ordering does not establish general superiority and does not isolate a regularization mechanism.
+
+Where the text was changed: Abstract (the sentence on interpolation at noise 0.01); Method (the generative-decoder paragraph); Experimental setup (the paragraph after the sparse-coordinate placement check, and the simple-baseline sentence); Results (the discussion accompanying the RMSE-versus-noise figure); Conclusion (the noise paragraph); Appendix Direct linear maps, depth interpolation, and measurement noise (the smoothing table, the affine-limit paragraph, and the two new figures).
 
 **Shared reply:** none. `R3-04` is answered in its own entry. This reply does not close it.
 
 ## R3-04 -- Noise choice and prior/data balance
 
-**Status:** `text_done`
+**Status:** `closed`
 
 We thank the reviewer for asking how the noise level was chosen and how that choice balances the prior against the data fit.
 
@@ -136,13 +161,15 @@ We have revised the discussion of the noise-sensitivity results to distinguish t
 
 We explicitly state that the sweep does not isolate the effects of the decoder restriction, the conditional penalty, and validation-based parameter selection, and that these references do not provide a recovery guarantee for our coordinate-sampling experiments. The revised text retains the advantage of interpolation at the reference noise level and identifies the larger perturbations as a controlled sensitivity analysis. No experiments or numerical results were changed.
 
-Changes were made in the Results discussion accompanying the RMSE-versus-noise figure, in the appendix Direct linear maps, depth interpolation, and measurement noise, with the Hansen reference added to the bibliography. This addition does not define the 30dB label and does not add a smoothing comparator.
+Changes were made in the Results discussion accompanying the RMSE-versus-noise figure, in the appendix Direct linear maps, depth interpolation, and measurement noise, with the Hansen reference added to the bibliography. This addition does not define the 30dB label.
 
-Where the text was changed: Method, subsection Test-time reconstruction (the latent-refinement objective and the residual identity); Method, subsection Interpretation and theoretical context (the MAP proposition and the existence objective); Experimental setup, subsection Training, validation, and test protocol; Results (the discussion accompanying the RMSE-versus-noise figure); Discussion (the measurement-term sentence); Appendix MAP and Tikhonov interpretation; Appendix Existence of a minimizer; Appendix Direct linear maps, depth interpolation, and measurement noise; the implementation-summary table.
+The additional comparisons also clarify the effect of increasing measurement noise on reconstruction accuracy. At the reference noise level, interpolation outperforms CLP-CSGM in all nine cross-well configurations. As the simulated perturbations increase, CLP-CSGM exhibits a smaller increase in reconstruction error and outperforms interpolation in seven of nine configurations at sigma_eta = 0.05 and in all nine at 0.10 and 0.20. Against second-difference regularized smoothing, CLP-CSGM achieves lower RMSE in five, eight, and nine configurations at those respective noise levels. These results support a regime-dependent advantage in robustness to simulated measurement noise, rather than overall superiority. The higher perturbation levels were not calibrated to field measurement uncertainties, and lambda was reselected on validation at each noise level. The score is full-window RMSE. It is not a guarantee that local peaks are recovered. The runs do not isolate the decoder, the conditional prior, or the reselected weight. Smoothing and the affine limit remain documented under R3-03. R3-P09 and R3-P10 stay separate, and R3-P16 remains open for the 30dB label.
+
+Where the text was changed: Method, subsection Test-time reconstruction (the latent-refinement objective and the residual identity); Method, subsection Interpretation and theoretical context (the MAP proposition and the existence objective); Experimental setup, subsection Training, validation, and test protocol (the noise-sweep sentence); Results (the relative-robustness sentences next to the RMSE-versus-noise figure); Discussion (the cross-well noise paragraph); Conclusion (the noise paragraph); Appendix MAP and Tikhonov interpretation; Appendix Existence of a minimizer; Appendix Direct linear maps, depth interpolation, and measurement noise; the implementation-summary table.
 
 ## R3-05 -- Role of the theory section
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
@@ -181,7 +208,52 @@ Existence of a minimizer.
 
 ## R3-06 -- Main result and figure readability
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We reorganized the opening of the cross-well results around three questions:
+when latent refinement helps relative to the direct autoencoder, how it
+compares with simple reconstructions, and when the extra optimization stops
+being worthwhile.
+
+CLP-CSGM Ridge has lower mean RMSE than direct AE in seven of the nine
+cross-well cells. At steps 16 and 32 that ordering holds in the ten-seed
+panel and in every sparse-measurement redraw. At the reference noise 0.01,
+depth interpolation is lower in all nine cells, the affine fit is lower in
+all nine, and the validation-selected smoother is lower in eight of nine.
+The relative robustness at higher simulated noise, already reported for
+R3-04, is unchanged. The extra cost is not presented as justified in
+general.
+
+The five-method RMSE figure now has two rows and one vertical scale within
+each row. The upper row keeps ML only, MLP, PCA, AE, and CLP-CSGM Ridge,
+including the large MLP and PCA errors. The lower row enlarges only ML only,
+AE, and CLP-CSGM Ridge. Error bars remain Student-t 95 percent half-widths
+with three seeds. The caption states that this figure does not include
+depth interpolation or second-difference smoothing, so the enlargement is
+not a ranking of the full comparator set. In the lower row, AE is lower
+than CLP-CSGM at step 8 for the two sparsest ratios.
+
+The depth-profile figure now compares the processed reference, ML only, AE,
+and CLP-CSGM Ridge on one shared clay-volume scale, with depth increasing
+downward. The interval is still step 16, seed 7, and rho 0.20. No value of
+those four curves was dropped. MLP and PCA remain in a separate appendix
+figure on the full range of their stored predictions, including negative
+clay volume. The results text points to that figure.
+
+Results and Discussion both cite the runtime table. On the cross-well grid
+the mean time per test window is 0.23517 s for CLP-CSGM Ridge and 0.03156 s
+for AE. The normalized runtime diagnostic versus AE is 9.79. The text states
+that this diagnostic is not the quotient of those two averages.
+
+No new experiment was run. Seeds, splits, hyperparameters, and the published
+cell means were not changed. The previous figure files are kept under
+`figures/r3m06_originals/`.
+
+Where the text was changed: Results, cross-well subsection; Discussion,
+operational paragraph; Appendix, new wide-range depth-profile figure.
+Script: `scripts/plot_r3m06_manuscript_figures.py`.
 
 ## R3-A01 -- Define symbols at first use
 

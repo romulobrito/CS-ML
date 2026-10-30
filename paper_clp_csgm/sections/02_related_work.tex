@@ -8,14 +8,16 @@ and data-driven methods are widely used to predict petrophysical targets
 \citep{ellis2007well,asquith2004basic,ahmadi2019comparison,wood2020predicting}.
 Recent studies address three neighboring tasks.
 
-Log completion reconstructs missing intervals of a wireline curve from that
-curve. Sequence-based GANs generate synthetic logs and fill gaps in gamma ray,
-sonic, neutron porosity, deep resistivity, and bulk density
+Log completion reconstructs missing intervals of a wireline curve from available
+observations and contextual information, including neighboring depths and other
+log channels. Sequence-based GANs generate synthetic logs and fill gaps in
+gamma ray, sonic, neutron porosity, deep resistivity, and bulk density
 \citep{alfakih2025wellloggan}. A fine-tuned time-series foundation model
 forecasts the next interval of the same suite and flags anomalies, including a
 zero-shot check in a second basin \citep{koeshidayatullah2026timegpt}. The
-unknown is a missing piece of the log, and the trained predictor fills it in
-one pass.
+principal task is to predict missing log responses using the learned temporal
+or spatial context, rather than to optimize a conditional latent code under an
+explicit target-measurement fidelity penalty at inference.
 
 Geomodel translation reconstructs a reservoir-property image from another
 image. A Pix2Pix conditional GAN maps two-dimensional slices of facies,
@@ -30,27 +32,16 @@ volume from logs that include neutron porosity \citep{alfakih2023northsea}.
 Missing log values are treated in preprocessing. At inference the model returns
 the property from the logs, and target values act as training labels.
 
-CLP-CSGM recovers a window of a target property when dense logs are available
-along the window and only sparse observations of that property are in hand.
-The conditional map predicts $\boldsymbol{z}_0=h(\boldsymbol{u})$ from the
-dense logs. This code initializes the first latent trajectory and remains the
-center of the quadratic penalty. The sparse values are measurements
-$\boldsymbol{b}$. After training, latent refinement balances agreement with
-$\boldsymbol{b}$ against deviation from $\boldsymbol{z}_0$. A residual at the
-observed depths can remain. Log completion and geomodel
-translation fill a curve or a map from context. Direct regression predicts the
-property from the logs. CLP-CSGM keeps an explicit measurement penalty
-at inference. These tasks can all exploit available context, including
-observed portions of a well log or a partially masked property image. The
-principal distinction is therefore not the mere availability of known values,
-but how these values enter the reconstruction procedure. The cited completion
-and translation methods primarily learn mappings for gap filling or property
-prediction. In CLP-CSGM, dense auxiliary logs determine a conditional latent
-anchor, while the sparse target observations enter an explicit
-measurement-fidelity penalty during test-time latent refinement. This
-distinction concerns the inference formulation and does not establish
-superior predictive performance over the cited approaches, whose targets,
-observation patterns, and evaluation protocols differ.
+CLP-CSGM addresses target-property reconstruction from dense auxiliary logs
+and sparse observations of the target itself. Its inference formulation
+combines a conditional latent anchor, $\boldsymbol{z}_0=h(\boldsymbol{u})$,
+with an explicit measurement-fidelity penalty applied during latent
+refinement. The distinction from the completion, translation, and
+direct-regression approaches discussed above concerns how the available
+observations enter inference, not whether those methods use known values.
+Because the target properties, observation patterns, and evaluation protocols
+differ, these comparisons establish methodological positioning rather than
+predictive superiority.
 
 The experiments use the processed F3 block data of
 \citet{zhang2025rockphysicslogs}, who combine supervised prediction with
@@ -97,13 +88,10 @@ score/diffusion models for inverse reconstruction
 \citep{dasgupta2024mechanicsdiffusion,jacobsen2025cocogen}.
 
 CLP-CSGM belongs to this explicit conditional inverse-reconstruction setting.
-Dense logs predict $\boldsymbol{z}_0=h(\boldsymbol{u})$ before the search.
-This code initializes the first trajectory and remains the center of the
-quadratic penalty. The other restarts begin at small perturbations of
-$\boldsymbol{z}_0$. The sparse target values enter only through the
-measurement residual. The experiments therefore compare a direct map
-from $[\boldsymbol{u},\boldsymbol{b}]$ to the window, the decoded prediction
-of the conditional prior $G(\boldsymbol{z}_0)$, and a reconstruction that uses
-only the measurements.
-Measurement-conditional generators and posterior-sampling architectures remain
-outside the empirical scope.
+Dense auxiliary logs define the latent anchor $\boldsymbol{z}_0=h(\boldsymbol{u})$,
+while sparse target observations enter the test-time measurement residual. The
+experiments distinguish this formulation from direct
+$[\boldsymbol{u},\boldsymbol{b}]$ prediction, the decoded conditional prior
+$G(\boldsymbol{z}_0)$, and measurement-only CSGM. Measurement-conditional
+generators and posterior-sampling architectures remain outside the empirical
+comparison.

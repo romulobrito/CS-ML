@@ -86,7 +86,8 @@ the windows the reconstruction may use. Dense auxiliary logs predict a
 conditional latent code, $z_0$. Latent refinement balances disagreement with
 the sparse measurements against proximity to $z_0$. That code is the
 reference for this balance, not only a starting value. A residual at the
-observed depths can remain.
+observed depths can remain. The local recovery bound remains conditional
+and does not certify S-REC.
 The cross-well evaluation uses public Dutch North Sea logs, with three wells
 for model development and one well held out. The main targets are derived:
 clay volume from gamma ray by the Larionov relation, and a processed,

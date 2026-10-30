@@ -797,13 +797,16 @@ $\rho=0.05$ and $\rho=0.10$; CLP-CSGM Ridge has lower RMSE only at
 $\rho=0.20$. This is a low-training-support pattern, not a uniform gain at
 every small measurement ratio. The submitted three-seed tables are unchanged.
 Each interval describes variability across the ten seeds on the single
-held-out well F03-4. It is not evidence of generalization across wells. The
+held-out well F03-4. It is not evidence of generalization across wells, and
+the ten seeds are not ten independent geological tests. The
 nine intervals are separate cell summaries, not a simultaneous
 multiplicity-corrected test, and overlapping windows are not counted as extra
-independent samples. Each of these seeds also draws its own coordinate set, so
-the panel does not separate training randomness from observation placement.
+independent samples. Each of these seeds also draws its own coordinates and
+measurement noise, so the panel does not separate training randomness from
+the observation realization.
 Appendix~\ref{app:crosswell_omega_placement} holds the model seeds fixed and
-redraws only that coordinate set.
+redraws those coordinates together with the measurement noise, without
+isolating placement from noise.
 
 \subsection{Explicit-mask direct AE}
 \label{app:crosswell_explicit_mask}
@@ -816,8 +819,18 @@ nine cells, seeds, and noise. Its input is
 $[\boldsymbol{u},\boldsymbol{b}_{\Omega},\mathrm{mask}]$:
 $\boldsymbol{b}_{\Omega}\in\mathbb{R}^{N}$ holds the noisy measurement at each
 observed coordinate and zero elsewhere, and the mask is the binary indicator
-of $\Omega$. MLP, PCA, ablations, and the F03-4 grid were not rerun, and this
+of $\Omega$. Numeric channels are standardized from the training windows only.
+The trailing binary mask is left unscaled, so its entries remain in
+$\{0,1\}$. The mask-aware AE uses the same base training seed as the
+conventional AE. Both direct models and CLP-CSGM Ridge share the same
+partitions, observation coordinates, and noisy target measurements within
+each cell. MLP, PCA, ablations, and the F03-4 grid were not rerun, and this
 method is not added to the main tables.
+
+An earlier historical run scaled the full concatenated vector and trained
+the masked AE at seed offset $100$. That preprocessing zeroed the constant
+mask columns. The difference between that historical variant and the
+corrected protocol cannot be attributed to either change alone.
 
 \begin{table}[htbp]
   \centering
@@ -830,35 +843,40 @@ method is not added to the main tables.
   \adjustbox{max width=\linewidth}{\input{tables/robustness_crosswell_explicit_mask.tex}}
 \end{table}
 
-Table~\ref{tab:crosswell_explicit_mask} shows that the explicit mask does not
-remove the CLP-CSGM advantage where training support is smallest. At steps
-$16$ and $32$, CLP-CSGM Ridge has lower mean RMSE than the masked AE at every
-$\rho$. At step $8$, the masked AE remains better at $\rho=0.05$ and
-$\rho=0.10$, as the unmasked AE does. The mask shifts the direct AE only
-modestly and not always downward: at step $32$, $\rho=0.05$, the masked AE
-has higher mean RMSE than AE $[\boldsymbol{u},\boldsymbol{b}]$. This check
-keeps $\Omega$ fixed inside each cell; it does not test sensitivity to
-observation placement. That placement check is
-Appendix~\ref{app:crosswell_omega_placement}.
-Because $\Omega$ is fixed within each seed and measurement ratio, the
-unmasked AE already receives those measurements in a stable column order.
-The masked input changes that representation rather than supplying coordinate
-information the unmasked AE lacked. The masked AE is also fit from a
-different initialization, with the training seed offset by $100$. This check
-concerns sensitivity to an explicit spatial encoding. It does not isolate
-the latent inverse formulation.
+The corrected explicit-mask AE preserves the binary mask without centering or
+standardization and uses the same base training seed as the conventional AE.
+Both direct models and CLP-CSGM Ridge are evaluated using the same data
+partitions, observation coordinates, and noisy target measurements within
+each cell.
+
+CLP-CSGM Ridge achieves lower mean RMSE than the mask-aware AE in seven of
+the nine cross-well configurations. At steps $16$ and $32$, corresponding to
+the smaller training sets, CLP-CSGM Ridge has lower mean RMSE in all six
+configurations and lower RMSE in $17$ of the $18$ paired seed comparisons.
+At step $8$, the mask-aware AE remains better at measurement ratios $0.05$
+and $0.10$.
+
+Because the sampling coordinates are fixed within each configuration, the
+binary mask is constant across windows, and the conventional AE already
+receives the measurements in a consistent positional order. The experiment
+therefore assesses an alternative explicit spatial encoding, but does not
+isolate the causal effect of latent inverse optimization. The placement
+check is Appendix~\ref{app:crosswell_omega_placement}.
 
 \subsection{Sparse-coordinate placement}
 \label{app:crosswell_omega_placement}
 
 The main protocol samples one coordinate set $\Omega$ for each model seed and
-measurement ratio and then holds it fixed across windows. To test whether the
-CLP-CSGM Ridge versus AE $[\boldsymbol{u},\boldsymbol{b}]$ ranking depends on
-those locations, we redrew $\Omega$ five times on the cross-well $V_c$ grid.
+measurement ratio and then holds it fixed across windows. To check stability
+under new sparse-observation realizations, we redrew $\Omega$ and the
+measurement noise five times on the cross-well $V_c$ grid.
 The model seeds stay at $\{7,23,41\}$, so the decoder and the ridge anchor
-keep the same initialization. The first draw is the published coordinate set.
+keep the same initialization. The first draw is the published coordinate set
+and noise realization.
 The other four draws change only the generator that samples $\Omega$ and the
-noise on $\boldsymbol{b}$. The direct AE is fit again on each draw, because
+noise on $\boldsymbol{b}$, so the positions and the noise change together.
+This check does not isolate the effect of position from the effect of noise.
+The direct AE is fit again on each draw, because
 $\boldsymbol{b}$ is part of its input, and the CLP-CSGM penalty weight is
 selected again on the validation windows of that draw. The score is the same
 full-window RMSE as the main grid. Direct MLP, PCA, structural ablations, and
@@ -884,9 +902,12 @@ At step $8$ and $\rho=0.05$, AE $[\boldsymbol{u},\boldsymbol{b}]$ is lower in
 all fifteen. The two closer step-$8$ cells are not unanimous: five of fifteen
 comparisons favor CLP-CSGM Ridge at $\rho=0.10$, and four of fifteen favor
 the direct AE at $\rho=0.20$. The low-training-support advantage therefore
-does not depend on the one published coordinate set. The step-$8$ ranking is
+does not depend on the one published observation draw. The step-$8$ ranking is
 the less stable of the two regimes, and a single extra draw can reverse an
-individual seed there. This check does not add seeds beyond $\{7,23,41\}$.
+individual seed there. These fifteen comparisons are three model seeds times
+five draws on the single held-out well F03-4. They are not fifteen independent
+wells, and they are not evidence of cross-well generalization. This check does
+not add seeds beyond $\{7,23,41\}$.
 
 \subsection{Direct linear maps, depth interpolation, and measurement noise}
 \label{app:crosswell_simple_baselines}
@@ -991,6 +1012,84 @@ consistent with the cell-level result for the corresponding configuration,
 step $32$ and $\rho=0.20$, and it does not extend to every configuration at
 that noise level.
 
+The same observation stream is also scored with a second-difference smoother.
+For each window it solves
+$\|M_{\Omega}\boldsymbol{y}-\boldsymbol{b}\|_2^2+\alpha\|D^{2}\boldsymbol{y}\|_2^2$,
+where $D^{2}$ is the second difference along the window index. The smoother
+does not use the dense logs. $\alpha$ is chosen only by validation
+full-window RMSE, from the frozen grid
+$10^{-6}$, $10^{-4}$, $10^{-2}$, $1$, $10^{2}$, $10^{4}$, and $10^{6}$.
+Equal validation scores keep the smaller value. Test targets are not used,
+and the grid was not changed after the test scores were known. CLP-CSGM was
+not refit. The largest grid value is selected in 62 of the 108 seed rows,
+and the smallest value is never selected. A selection at the ceiling is the
+best candidate inside the grid, not an optimum beyond it.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Interpolation, validation-selected second-difference smoothing, and
+  CLP-CSGM Ridge on the noise sweep. Entries are mean full-window RMSE over
+  seeds $\{7,23,41\}$, rounded to four decimals. The smoother does not use
+  the dense logs. These noise levels were used for sensitivity analysis and
+  were not calibrated to field measurement uncertainties.}
+  \label{tab:crosswell_smooth}
+  \small
+  \adjustbox{max width=\linewidth}{\input{tables/robustness_crosswell_smooth.tex}}
+\end{table}
+
+Table~\ref{tab:crosswell_smooth} and
+Fig.~\ref{fig:crosswell_smooth} keep every cell. At noise $0.01$, smoothing
+has lower mean RMSE than CLP-CSGM in eight of nine cells. The exception is
+step $32$ and $\rho=0.05$, where the smoother mean is $0.0429$ and the
+CLP-CSGM mean is $0.0317$. Interpolation remains lower than CLP-CSGM in all
+nine cells at that noise. At $0.05$, CLP-CSGM has the lower mean in five
+cells and smoothing in four: step $8$ at $\rho=0.10$ and $\rho=0.20$, and
+steps $16$ and $32$ at $\rho=0.20$. At $0.10$, CLP-CSGM is lower in eight
+cells, and smoothing is lower at step $8$ and $\rho=0.20$. At $0.20$,
+CLP-CSGM is lower in all nine cells. At $\rho=0.05$, the smoother mean is
+higher than interpolation at every noise level in the table. The comparison
+does not establish general superiority, and it does not isolate the
+conditional penalty, the decoder restriction, or the validation choice as a
+separate mechanism.
+
+An affine least-squares fit to the same noisy observations is an additional
+comparator, not a replacement for the selected smoother. It has no penalty
+weight. It is the second-difference problem as $\alpha\to\infty$. On all
+108 rows, the curve at $\alpha=10^{6}$ and this affine curve differ by a
+median mean-window profile RMSE of $5.2\times10^{-5}$ and a maximum of
+$3.7\times10^{-4}$. The largest absolute gap in the scored full-window RMSE
+is $2.0\times10^{-5}$. On the 62 ceiling rows the profile median is
+$7.6\times10^{-5}$ and the largest scored-RMSE gap is $1.9\times10^{-5}$.
+Those ceiling solutions are already near the affine limit
+(Fig.~\ref{fig:crosswell_smooth_affine}). The selected smoother can still
+differ from that limit when validation chooses an interior weight. At noise
+$0.01$ the affine cell mean is lower than CLP-CSGM in all nine cells. In
+the step-$32$, $\rho=0.05$ cell, only one of three seeds selects the
+ceiling: the affine mean there is $0.0240$, against the selected-smoother
+mean $0.0429$ and the CLP-CSGM mean $0.0317$.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{crosswell_vc_smooth_vs_clp.png}
+  \caption{Full-window RMSE of interpolation, validation-selected
+  second-difference smoothing, and CLP-CSGM Ridge. Each panel is one step
+  and one measurement fraction on held-out F03-4. Lines are means of seeds
+  $7$, $23$, and $41$; markers are those seeds. The noise levels are
+  simulated and were not calibrated to field measurement uncertainties.}
+  \label{fig:crosswell_smooth}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.92\linewidth]{crosswell_vc_smooth_affine_gap.png}
+  \caption{Mean per-window RMSE between the $\alpha=10^{6}$ reconstruction
+  and the affine least-squares fit, for all 108 seed rows. Crosses are the
+  62 rows whose validation choice is the grid ceiling. Circles are the 46
+  rows with an interior choice. The vertical coordinate is the profile gap
+  at fixed $\alpha=10^{6}$, not the gap of the validation-selected curve.}
+  \label{fig:crosswell_smooth_affine}
+\end{figure}
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/crosswell_vc_noise_panels_step32_rho020_seed7.png}
@@ -1028,6 +1127,26 @@ in Section~\ref{subsec:ablation_analysis}, where the conditional code
 $\boldsymbol{z}_0$ is not
 helpful at step $8$.
 
+\subsection{Wide-range depth profiles}
+\label{app:crosswell_depth_wide}
+
+Figure~\ref{fig:crosswell_depth_profile} omits MLP $[\boldsymbol{u},\boldsymbol{b}]$
+and PCA $[\boldsymbol{u},\boldsymbol{b}]$ so that the reference, ML only, AE,
+and CLP-CSGM Ridge can share one $V_c$ scale. Figure~\ref{fig:crosswell_depth_profile_wide}
+uses the same held-out interval, step $16$, seed $7$, and $\rho=0.20$, and
+shows every stored value of those two predictions. Their horizontal range
+includes negative clay volume. No coordinate was dropped.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.92\linewidth]{10_depth_profile_crosswell_vc_wide.png}
+  \caption{Same F03-4 interval as Fig.~\ref{fig:crosswell_depth_profile}.
+  MLP $[\boldsymbol{u},\boldsymbol{b}]$ and PCA $[\boldsymbol{u},\boldsymbol{b}]$
+  share the full horizontal range of their stored predictions. Depth
+  increases downward.}
+  \label{fig:crosswell_depth_profile_wide}
+\end{figure}
+
 \subsection{Computational Trade-Offs}
 \label{app:runtime}
 
@@ -1039,8 +1158,11 @@ prediction. Table~\ref{tab:runtime_cost} reports both mean wall-clock time per
 test window and a separate normalized runtime diagnostic relative to AE; the
 latter is the diagnostic shown in Fig.~\ref{fig:runtime_cost}; it is not the exact
 quotient of the averaged seconds in the previous column. In the representative
-cross-well case, the additional cost is substantial relative to AE, but it comes
-with the lowest mean RMSE among the compared methods. In the F03-4 GR-only case,
+cross-well case, the additional cost is substantial relative to AE, but CLP-CSGM
+Ridge has the lowest mean RMSE among the methods listed in
+Table~\ref{tab:runtime_cost}. That statement refers only to the computational-cost
+table. It is not a ranking against the full set of comparators in the paper,
+including depth interpolation. In the F03-4 GR-only case,
 CLP-CSGM Ridge and AE \([u,b]\) have closer average RMSE, so the runtime gap is
 less clearly justified. The extra optimization is most readily justified when
 explicit sparse-measurement consistency produces a meaningful reconstruction
@@ -1183,19 +1305,36 @@ is limited.
 \label{app:phi_lab_861}
 
 This supplement uses the 87 laboratory-porosity samples of well 861 over
-$5205.91$--$5233.72~\mathrm{m}$. The target is $\mathrm{Phi_{lab}}$ as recorded
-at those depths. It is not a porosity curve computed from density or sonic.
-Dense context is gamma ray, deep resistivity, shallow resistivity, and
-lithotype. Density, neutron porosity, sonic porosity, and $\mathrm{Phi_{ND}}$
-are excluded because they track $\mathrm{Phi_{lab}}$.
+$5205.91$--$5233.72~\mathrm{m}$. The target consists of porosity values
+identified as laboratory measurements in the Auddys source dataset
+($\mathrm{Logs}$ table). These values are not deterministically computed from
+the auxiliary gamma-ray, resistivity, or lithotype channels by our processing
+pipeline. Original per-plug laboratory assay records were not available for
+independent verification. Dense context is gamma ray, deep resistivity,
+shallow resistivity, and lithotype. Density, neutron porosity, sonic porosity,
+and $\mathrm{Phi_{ND}}$ are excluded because they track $\mathrm{Phi_{lab}}$.
 
-Depth is split into three contiguous blocks before windowing, so training and
-test windows do not share rows. Windows have length $8$ and step $1$. The last
-$16$ rows of the deepest training block form the validation segment. Seeds are
+Training and test samples are separated into contiguous depth blocks before
+window construction. Windows have length $8$ and step $1$. The last $16$ rows
+of the deepest training block form the validation segment. Seeds are
 $\{7,23,41\}$. For each fold, seed, and ratio, one coordinate set is shared by
 every window. The laboratory value on those coordinates is the measurement,
-with no added noise. RMSE is computed only on the remaining coordinates.
-$\rho=0.25$ uses $m=2$ measurements and $\rho=0.50$ uses $m=4$. The direct AE
+with no added noise. Within each test window, RMSE is computed only at
+coordinates not supplied as measurements to that particular reconstruction.
+However, because the length-$8$ windows overlap with step $1$, the same
+physical depth can be measured in one window and scored as unobserved in
+another. This protocol evaluates within-window sparse assimilation on
+depth-held-out test blocks, not reconstruction at physical depths withheld
+globally from all test windows. Across the $18$ fold--seed--ratio
+configurations, $21$--$27$ physical depths per test block appear both as
+measured and scored coordinates across different windows. Between $84\%$ and
+$100\%$ of scored residual entries correspond to physical depths that were
+supplied as measurements in at least one other window. Those percentages count
+residual entries, not RMSE contribution, and they do not indicate training
+leakage: training and test rows remain disjoint. The nine results per ratio
+are three depth blocks repeated under three seeds, not nine independent
+geological intervals. $\rho=0.25$ uses $m=2$ measurements and $\rho=0.50$ uses
+$m=4$. Coordinate sets are sampled separately at each ratio. The direct AE
 receives $[\boldsymbol{u},\boldsymbol{b}]$ with the same coordinates.
 The decoded prediction of the conditional prior is
 $G(h(\boldsymbol{u}))$, with no latent search. It is reported below as the
@@ -1205,7 +1344,8 @@ method is added to the main F3 tables.
 \begin{table}[htbp]
   \centering
   \caption{Well 861 laboratory-porosity supplement. Entries are the mean
-  held-out RMSE across three depth blocks and three seeds ($n=9$). $\Delta$ is
+  within-window held-out RMSE across three depth blocks and three seeds
+  ($n=9$ block--seed pairs, not nine independent intervals). $\Delta$ is
   AE minus CLP-CSGM Ridge; a negative value means the direct AE has the lower
   mean. CLP$>$AE counts splits in which CLP-CSGM Ridge has the lower RMSE.}
   \label{tab:phi_lab_861}
@@ -1232,48 +1372,41 @@ carries errors large enough to set the mean.
   \adjustbox{max width=\linewidth}{\input{tables/robustness_phi_lab_861_by_block.tex}}
 \end{table}
 
-Table~\ref{tab:phi_lab_861_blocks} locates the tradeoff. On
+Table~\ref{tab:phi_lab_861_blocks} locates the block-level pattern. On
 $5205.91$--$5214.48~\mathrm{m}$, CLP-CSGM Ridge has the lower block-mean RMSE
-at both ratios, and raising $\rho$ from $0.25$ to $0.50$ lowers that RMSE from
-$0.0338$ to $0.0228$ while the direct AE stays near $0.035$. On
+at both ratios. In the shallowest block, mean held-out RMSE decreases from
+$0.0338$ at $\rho=0.25$ to $0.0228$ at $\rho=0.50$, while the direct AE stays
+near $0.035$. Because the coordinate sets are sampled separately at each
+measurement ratio, this comparison changes both the number and the placement
+of observations and does not isolate the effect of measurement count. On
 $5214.67$--$5223.63~\mathrm{m}$ the two methods are close, with CLP-CSGM Ridge
 still slightly lower. On $5224.39$--$5233.72~\mathrm{m}$ the direct AE is lower
 by a wide margin ($0.0691$ and $0.0676$ against $0.0931$ and $0.1016$).
 
-The gain where CLP-CSGM Ridge is ahead has two parts. First, the measurement
-term is doing the work the method is built for: in every block and at both
-ratios, CLP-CSGM Ridge has lower RMSE than the log-only anchor. The laboratory
-coordinates pull the latent code off $h(\boldsymbol{u})$. Second, that pull is
-most useful when $\boldsymbol{z}_0$ is already near a useful code. In the shallowest
-block, mean $\mathrm{Phi_{lab}}$ is $0.092$ with standard deviation $0.019$,
-mean gamma ray is about $15~\mathrm{API}$, and the median deep resistivity is
-about $1900$. Adding two further laboratory coordinates ($\rho=0.50$ rather
-than $0.25$) then cuts the CLP-CSGM Ridge error by about one third. The direct
-AE already receives those coordinates as input features, so the same increase
-in $\rho$ changes it little. The explicit residual, not a larger training pool,
-is what improves CLP-CSGM Ridge there. Each test fold still has $28$ to $35$
-overlapping training windows, so this is not the scarce-window regime of the
-F3 steps $16$ and $32$.
+In every block and at both ratios, CLP-CSGM Ridge has lower RMSE than the
+log-only anchor $G(h(\boldsymbol{u}))$. In the shallowest block, mean
+$\mathrm{Phi_{lab}}$ is $0.092$ with standard deviation $0.019$, mean gamma ray
+is about $15~\mathrm{API}$, and the median deep resistivity is about $1900$.
+The direct AE already receives the laboratory coordinates as input features.
+Each test fold still has $28$ to $35$ overlapping training windows, so this is
+not the scarce-window regime of the F3 steps $16$ and $32$.
 
-The loss on the mean comes from the deepest block, and it is a context shift
-relative to the two blocks that train the anchor when that block is held out.
-Mean $\mathrm{Phi_{lab}}$ rises to $0.145$, mean gamma ray rises to about
-$30~\mathrm{API}$, and the median deep resistivity falls to about $600$. The
-lithotype mix also changes: codes $2$ and $4$ account for $25$ of the $29$
-rows, whereas the middle block is mostly code $1$. The ridge anchor is a
-linear map from $\boldsymbol{u}$ fitted on the other blocks, so
-the decoded prediction $G(\boldsymbol{z}_0)$ differs substantially from the target windows.
-With only $m=2$ or $m=4$ measurements in a length-$8$ window, the residual
-still improves on that anchor ($0.0931$ versus $0.1142$, and $0.1016$ versus
-$0.1234$) but does not catch the direct AE. The AE never has to pass through
-the shifted anchor: the same $\boldsymbol{b}$ enters as features and the map
-is applied in one step. Windows overlap inside each block, so the block
-contrast, not the count of windows, is the depth evidence.
+The larger share of the pooled AE advantage sits in the deepest block. When
+that block is held out, mean $\mathrm{Phi_{lab}}$ rises to $0.145$, mean gamma
+ray rises to about $30~\mathrm{API}$, and the median deep resistivity falls to
+about $600$. The lithotype mix also changes: codes $2$ and $4$ account for
+$25$ of the $29$ rows, whereas the middle block is mostly code $1$. The
+decoded prediction $G(\boldsymbol{z}_0)$ differs substantially from the target
+windows there. With only $m=2$ or $m=4$ measurements in a length-$8$ window,
+CLP-CSGM Ridge still improves on that anchor ($0.0931$ versus $0.1142$, and
+$0.1016$ versus $0.1234$) but does not catch the direct AE.
 
-The tradeoff is therefore where the anchor sits. CLP-CSGM Ridge gains when
-dense logs seen in training still describe the test interval and the
-laboratory coordinates can finish the correction. It loses the pooled mean
-when the test logs move outside that support and only a few measurements are
-available to repair $\boldsymbol{z}_0$. The result does not show that the
-measurement term fails, and it does not extend the F3 low-support advantage
-to a mean win on this laboratory target. It is one cored interval.
+The results are consistent with the hypothesis that sparse-measurement
+refinement is more effective when the conditional latent prior provides a
+representation compatible with the target interval. The larger errors in the
+deepest block coincide with changes in the auxiliary-log characteristics and a
+less accurate prior-only reconstruction. However, the present experiment does
+not isolate prior mismatch as the causal factor explaining the relative
+performance of CLP-CSGM and the direct autoencoder. The result does not extend
+the F3 low-support advantage to a mean win on this laboratory target. It is
+one cored interval.

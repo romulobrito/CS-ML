@@ -50,14 +50,18 @@ Appendix~\ref{app:crosswell_gr_embargo}.
 The second benchmark reconstructs length-$N=64$ windows of the processed
 density-derived F03-4 porosity curve using gamma ray as the only dense input.
 Acoustic travel time is excluded because it is nearly collinear with the target
-(Pearson $r\approx0.9996$) and would provide a near-direct proxy. Density
-porosity is linear in bulk density, and a standard sonic porosity is linear
-in slowness. If those logs have been recorded, the processed porosity is
-already determined, and this test is not a substitute for those calculations.
-Gamma ray is then the only dense log, so the dense context is intentionally
+(Pearson $r\approx0.9996$) and would provide a near-direct proxy. Density-derived
+porosity can be calculated from bulk density together with the hypotheses of
+that relation. A sonic-porosity estimate uses another petrophysical relation
+and is not necessarily identical to the density-derived porosity. If the bulk
+density required by the density-porosity relation has been recorded, that
+relation is the appropriate calculation, and this test is not a substitute
+for it. Gamma ray is then the only dense log, so the dense context is intentionally
 incomplete. The target follows the processing of
 \citet{zhang2025rockphysicslogs}, in which the density curve underlying F03-4
-porosity is itself predicted from sonic and gamma ray.
+porosity is itself predicted from sonic and gamma ray. The high correlation
+with sonic travel time is a property of that processed curve. It is not
+validation against independent laboratory porosity.
 
 Sparse observations are sampled at
 $\rho\in\{0.20,0.30,0.40,0.50,0.60\}$. Depth is partitioned before window
@@ -69,9 +73,10 @@ do not transfer to a suite that also includes density, neutron, and sonic.
 The smaller Lapa pre-salt permeability case
 \citep{alvarez2025nonlinear} is retained as supplementary evidence in
 Appendix~\ref{app:lapa_case}. Appendix~\ref{app:phi_lab_861} reports a
-separate single-well check on laboratory porosity. The direct AE has the
-lower mean held-out RMSE. Laboratory measurements correct the decoded
-prediction of the conditional prior
+separate single-well check on laboratory porosity with depth-held-out blocks
+and within-window scoring of coordinates not supplied as measurements in each
+evaluated window. The direct AE has the lower mean RMSE. Laboratory
+measurements correct the decoded prediction of the conditional prior
 in every split, and that correction is enough where the test logs remain close
 to the support used to fit $h(\boldsymbol{u})$. The check is not part of the main grid.
 
@@ -138,14 +143,14 @@ term of Eq.~\eqref{eq:clp_csgm_objective}. The protocol therefore
 compares direct fusion with operator-based assimilation under a fixed sampling
 pattern, giving the direct models a stable coordinate-to-input mapping within
 each cell. Appendix~\ref{app:crosswell_explicit_mask} gives one direct AE the
-same measurements on the window coordinates plus a binary mask. That mask does
-not remove the CLP-CSGM advantage at steps $16$ and $32$; at step $8$ the
-masked AE remains better at $\rho=0.05$ and $\rho=0.10$, and the mask does not
-uniformly lower the direct AE error. This comparator is not part of the main
-grid.
+same measurements on the window coordinates plus a binary mask that remains
+unscaled. That corrected comparator does not remove the CLP-CSGM advantage at
+steps $16$ and $32$; at step $8$ the masked AE remains better at
+$\rho=0.05$ and $\rho=0.10$. This comparator is not part of the main grid.
 
-Appendix~\ref{app:crosswell_omega_placement} redraws the coordinate set five
-times with the model seeds held fixed. Where training support is smallest
+Appendix~\ref{app:crosswell_omega_placement} redraws the coordinate set and
+the measurement noise five times, while the model-seed identities stay fixed.
+Where training support is smallest
 (steps $16$ and $32$), CLP-CSGM Ridge keeps the lower RMSE in every draw.
 At step $8$, where the development pool is largest, the ranking is less
 stable: AE $[\boldsymbol{u},\boldsymbol{b}]$ stays ahead at $\rho=0.05$ and
@@ -154,12 +159,16 @@ majority of draws at $\rho=0.20$. The cell-level winner still matches the
 published ranking in all nine cells. That check is not part of the main grid.
 
 Appendix~\ref{app:crosswell_simple_baselines} adds direct linear and ridge
-maps from $[\boldsymbol{u},\boldsymbol{b}]$ to the window, and depth
-interpolation of the sparse measurements, on this same cross-well grid.
+maps from $[\boldsymbol{u},\boldsymbol{b}]$ to the window, depth
+interpolation of the sparse measurements, and a second-difference smoother
+whose penalty is chosen on validation, on this same cross-well grid.
 It also raises the measurement-noise standard deviation above the published
-value $0.01$. Section~\ref{sec:results} summarizes that noise dependence
-for interpolation and CLP-CSGM Ridge. The linear maps and the per-seed
-tables are not merged into the submitted nine-cell grid.
+value $0.01$. In that sweep the decoder and the conditional map stay fixed
+for each step and seed, and $\lambda$ is selected again on validation at
+each noise level. Section~\ref{sec:results} summarizes that noise dependence
+for interpolation, second-difference smoothing, and CLP-CSGM Ridge. The
+linear maps and the per-seed tables are not merged into the submitted
+nine-cell grid.
 
 Noise is applied after coordinate subsampling. Each observed coordinate
 receives an independent standard-normal draw, scaled to a fixed standard
@@ -245,16 +254,20 @@ their interpretation remains limited by the small seed panel.
 Two supplements widen that evidence and leave the three-seed tables as the
 main result.
 Appendix~\ref{app:crosswell_seed_panel} repeats the comparison on ten seeds.
-Each extra seed refits the models and draws a new coordinate set, so training
-randomness and observation placement change together. Those intervals describe
-seed-to-seed variability on the single held-out well F03-4. They are not
-evidence of generalization across wells, and the nine cells are not a
+Each extra seed refits the models and draws a new measurement realization, so
+training randomness, observation coordinates, and measurement noise change
+together. Those intervals describe seed-to-seed variability on the single
+held-out well F03-4. They are not ten independent geological tests, they are
+not evidence of generalization across wells, and the nine cells are not a
 simultaneous multiplicity-corrected test. None of those nine
 intervals include zero. The CLP-CSGM advantage remains where training support
 is smallest (steps $16$ and $32$); AE remains better at step $8$ for
 $\rho=0.05$ and $\rho=0.10$.
 Appendix~\ref{app:crosswell_omega_placement} holds the same three model seeds
-and redraws only the coordinate set. The advantage at steps $16$ and $32$
-holds in every draw, and the step-$8$ ranking is the less stable one.
+and redraws observation coordinates together with a new measurement-noise
+realization. That check assesses sensitivity to the measurement realization
+and does not isolate coordinate placement from noise. The advantage at steps
+$16$ and $32$ holds in every draw, and the step-$8$ ranking is the less
+stable one.
 Overlapping windows inside a well are not counted as further independent
 samples.

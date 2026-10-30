@@ -22,7 +22,13 @@ or shale volume
 \citep{koeshidayatullah2026timegpt,alfakih2026pix2geomodel,alfakih2025wellloggan,alfakih2023northsea}.
 CLP-CSGM is the relevant formulation when those dense logs are already
 available and a few observations of the target property enter the
-reconstructed window through that penalty.
+reconstructed window through that penalty. Recent foundation-model work also
+investigates zero-shot transfer of well-log predictions across geological
+basins \citep{koeshidayatullah2026timegpt}. That setting provides a broader
+transfer evaluation than the present cross-well benchmark, which uses F03-4 as
+a single held-out well. Our results characterize sparse target-measurement
+assimilation under this limited evaluation protocol and do not establish
+basin-agnostic transferability.
 
 The depth profiles in
 Figs.~\ref{fig:crosswell_depth_profile} and~\ref{fig:f03_depth} illustrate how
@@ -90,35 +96,62 @@ measurement-only CSGM at step $16$. That run checks the channel. It is not
 the log suite used for the main comparison.
 
 The F03-4 porosity curve is density-derived, and its sparse values are taken
-from that same curve, not from core or laboratory plugs. Density porosity is
-linear in bulk density, and a standard sonic porosity is linear in slowness.
-If those logs have been recorded, the processed porosity is already
-determined. Sonic travel time is left out because it follows this curve
-almost one to one, and the density curve behind the porosity was itself
-predicted from sonic and gamma ray. The test uses gamma ray as the only dense
+from that same curve, not from core or laboratory plugs. Density-derived
+porosity can be calculated from bulk density together with the hypotheses of
+that relation. A sonic-porosity estimate uses another petrophysical relation
+and is not necessarily identical to the density-derived porosity. If the bulk
+density required by the density-porosity relation has been recorded, that
+relation is the appropriate calculation, and CLP-CSGM is not a substitute
+for it. Sonic travel time is left out because it follows this processed curve
+almost one to one. The density curve behind the porosity was itself predicted
+from sonic and gamma ray, so that correlation is not validation against
+independent laboratory porosity. The test uses gamma ray as the only dense
 log. Its errors do not transfer to a porosity interpretation that also uses
-density, neutron, and sonic. The two F3 benchmarks therefore remove the log
-the conventional formula needs and compare methods that must reconstruct the
-processed curve from the remaining logs while matching a few known values.
-They are not a contest against Larionov, density porosity, or sonic porosity
-on a fully logged well, and they are not a test against independent core or
-laboratory measurements.
+density, neutron, and sonic. The cross-well benchmark removes gamma ray, the
+log required by the Larionov relation. The F03-4 benchmark removes sonic
+because of this collinearity with the processed curve. Both compare methods
+that must reconstruct the processed curve from the remaining logs while
+matching a few known values. They are not a contest against Larionov, density
+porosity, or sonic porosity on a fully logged well, and they are not a test
+against independent core or laboratory measurements.
+
+A possible field analogue is a well where the log required for a conventional
+property estimate is missing or unreliable, while a limited number of
+independently acquired property measurements are available. The present F3
+benchmarks reproduce only the restricted-input and sparse-observation
+structure of this situation: their sparse target values are subsampled from
+processed curves, not independently acquired measurements. Therefore, these
+tests establish a controlled comparison of reconstruction methods rather than
+operational validation of that field scenario. The same limit applies to
+simpler reconstruction. Section~\ref{subsec:crosswell_results} and
+Appendix~\ref{app:crosswell_simple_baselines} report that depth interpolation
+has lower full-window RMSE than CLP-CSGM in all nine cross-well
+configurations at the reference noise. As the simulated Gaussian
+perturbation increases, CLP-CSGM shows a smaller RMSE increase and becomes
+lower in most cells, then in every cell. The same regime-dependent pattern
+appears against second-difference smoothing, which also regularizes. This is
+relative robustness of the complete procedure, with $\lambda$ reselected on
+validation at each noise level. The runs do not isolate the decoder, the
+conditional prior, or that reselection, and they do not establish recovery
+of local detail or operational superiority. The higher noise levels were not
+calibrated to field uncertainties. Section~\ref{subsec:crosswell_results}
+also states the extra cost: mean time per window and the normalized runtime
+diagnostic in Table~\ref{tab:runtime_cost} are different quantities, and the
+larger CLP-CSGM time is not justified in general.
 
 The Lapa permeability case
 \citep{alvarez2025nonlinear} extends the evaluation to another lithology and
 target property, but its small sample size limits generalization. The
-laboratory-porosity supplement in Appendix~\ref{app:phi_lab_861} uses
-$\mathrm{Phi_{lab}}$ rather than a curve computed from the wireline suite, and
-it scores only coordinates that were not supplied as measurements. The direct
-AE has the lower pooled mean RMSE. Laboratory coordinates still correct the
-decoded prediction of the conditional prior in every split, and that correction is enough where the test
-logs remain close to the blocks that fit $h(\boldsymbol{u})$. On the deepest
-block the logs move outside that support, the decoded prediction $G(\boldsymbol{z}_0)$ differs substantially from the target windows, and a few measurements improve on the decoded prediction without reaching
-the direct AE. The measurement term still lowers the error relative to the
-decoded prediction of the conditional prior in that block. The supplement therefore does not extend the F3
-low-support advantage to a mean win on this laboratory target. Each test fold
-still has many overlapping training windows, so the direct map is in the
-regime where it was expected to be competitive. Block RMSE and the log
+laboratory-porosity experiment in Appendix~\ref{app:phi_lab_861} provides a
+supplementary assessment on a target not deterministically derived from the
+auxiliary logs by our pipeline. CLP-CSGM Ridge consistently improves upon the
+decoded conditional prior, but the direct autoencoder achieves lower aggregate
+mean RMSE at both measurement ratios. The block-level differences are
+compatible with sensitivity to prior mismatch and changes in the auxiliary-log
+distribution, although these effects are not causally isolated. The evaluation
+is limited to one cored interval and within-window withheld coordinates. Each
+test fold still has many overlapping training windows, so the direct map is in
+the regime where it was expected to be competitive. Block RMSE and the log
 summaries are reported in the appendix. Broader validation requires larger
 multi-well datasets, additional log suites, and facies-conditioned settings.
 

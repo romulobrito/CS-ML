@@ -54,8 +54,14 @@ $5.71$ times that standard deviation, CLP-CSGM Ridge has the lower error in
 all nine configurations. These noise levels were used for sensitivity
 analysis and were not calibrated to field measurement uncertainties. AE
 $[\boldsymbol{u},\boldsymbol{b}]$, ordinary least squares, and direct ridge
-regression were not rerun across this sweep, and no smoothing comparator was
-added, so the change is not a general advantage under noise.
+regression were not rerun across this sweep. A validation-selected
+second-difference smoother, reported in
+Appendix~\ref{app:crosswell_simple_baselines}, has lower mean RMSE than
+CLP-CSGM Ridge in eight of nine cells at the reference noise. CLP-CSGM Ridge
+has the lower mean in five, eight, and nine cells at $0.05$, $0.10$, and
+$0.20$. That pattern is relative robustness of full-window RMSE for the
+complete procedure. It does not make the noise sweep a general advantage
+under noise.
 
 The study presents a latent reconstruction that combines dense-log context
 with sparse target observations. The benefit depends on the regime.
@@ -64,19 +70,18 @@ is reconstruction of processed target logs: cross-well $V_c$ is
 Larionov-derived from gamma ray, F03-4 porosity is density-derived, and
 sparse observations are coordinate subsamples of these same curves rather than
 independently acquired core or laboratory measurements. A separate
-single-well supplement on laboratory porosity scores held-out laboratory
-coordinates and is not part of that processed-log grid. Relative to the
-decoded prediction $G(\boldsymbol{z}_0)$, CLP-CSGM Ridge has lower RMSE in
-every split. It also has the lower block-mean RMSE on the two shallower
-blocks. On the pooled mean, the direct AE is lower. The larger share of that
-error sits in the deepest block. The log differences observed there are
-compatible with a transfer difficulty. They do not establish that shift as
-the only cause. That supplement is one cored interval. The cross-well
-comparison is a controlled single-holdout benchmark on F03-4 and is not
-evidence of operational cross-well or multi-field transferability. Broader
-assessment will require larger multi-well datasets, independently calibrated
-targets, and geological labels. It will also require uncertainty estimates and
-faster latent-refinement strategies.
+single-well supplement on laboratory porosity scores coordinates not supplied
+as measurements within each evaluated window on depth-held-out blocks and is
+not part of that processed-log grid. Relative to the decoded prediction
+$G(\boldsymbol{z}_0)$, CLP-CSGM Ridge has lower RMSE in every block--seed pair.
+It also has the lower block-mean RMSE on the two shallower blocks. On the
+pooled mean, the direct AE is lower. That supplement is one cored interval and
+does not establish operational generalization. The cross-well comparison is a
+controlled single-holdout benchmark on F03-4 and is not evidence of
+operational cross-well or multi-field transferability. Broader assessment will
+require larger multi-well datasets, independently calibrated targets, and
+geological labels. It will also require uncertainty estimates and faster
+latent-refinement strategies.
 
 
 \paragraph*{Author Contributions}\mbox{}\\[0.25em]

@@ -39,9 +39,14 @@ evidence-limit paragraph, before the remaining-work sentence). The Data and
 exploratory analysis section and the Interpretation, scope, and limitations
 section already stated this origin and were left in place.
 
-No new experiments or numerical results were added for this comment. A
-broader independent-measurement test remains open and is addressed under
-R1-M11.
+No new experiments or numerical results were added for this comment.
+
+The supplementary laboratory-porosity experiment addressed under
+R1-M11 provides a limited check against an independently measured
+target, although sparse observations are still obtained by coordinate
+subsampling. The direct autoencoder has the lower pooled mean RMSE.
+Broader validation across independent wells and measurement settings
+remains open.
 
 ---
 
@@ -248,29 +253,24 @@ versus autoencoder tables were not changed.
 
 ## R1-M07 -- Proposition 3 does not verify S-REC on the trained decoder
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
 We thank the reviewer for stressing that the conditional local-recovery
-proposition is conditional and
-does not prove S-REC for the trained decoder. That distinction was already
-stated in the Method section and in Interpretation, scope, and limitations,
-and the appendix diagnostics already say that they do not prove S-REC. The
-original submission did not state it in the Abstract or the Introduction.
+proposition is conditional and does not prove S-REC for the trained
+decoder. Method, Interpretation, scope, and limitations, and the appendix
+diagnostics already stated that limit. The original Abstract did not.
 
-The distinction now stands in the Introduction, the Method, and
-Interpretation, scope, and limitations, so the local-recovery statement is
-not read as a formal recovery guarantee for the trained model. The journal
-abstract limit is 300 words, so the Abstract no longer repeats the bound.
-The Introduction states what the bound does and what it does not: under
-stated conditions it separates decoder error, prior mismatch, measurement
-noise, and local separability, and it does not prove that the measurement
-operator satisfies S-REC on the trained decoder. No new experiments or
-proofs were added for this comment.
+The Abstract now states that the local recovery bound remains conditional
+and does not certify S-REC. The Introduction states what the bound does
+and what it does not: under stated conditions it separates decoder error,
+prior mismatch, measurement noise, and local separability, and it does not
+prove that the measurement operator satisfies S-REC on the trained
+decoder. No new experiments or proofs were added for this comment.
 
-Where the text was changed: the Introduction (sentence after the three
-contributions). The Abstract no longer contains that sentence. Method,
+Where the text was changed: the Abstract (one sentence on the conditional
+bound); the Introduction (sentence after the three contributions). Method,
 subsection Interpretation and theoretical context, and Interpretation,
 scope, and limitations already contained this limit and were left in place.
 
@@ -278,52 +278,52 @@ scope, and limitations already contained this limit and were left in place.
 
 ## R1-M08 -- Direct comparator with explicit mask/coordinates
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
-We thank the reviewer for asking whether the CLP-CSGM gain could come from
-explicit use of the sampling coordinates rather than from the latent inverse
-formulation. The main direct baselines still receive [u, b] with positional
-identity implicit in the column order. We did not add a new method to that
-grid.
+We thank the reviewer for asking for a direct comparator that encodes the
+sampling positions explicitly, so that the CLP-CSGM advantage is not
+attributed only to a more informative observation representation. The main
+direct baselines still receive [u, b] with positional identity implicit in
+the column order. We did not add a new method to that grid.
 
 We added one supplementary direct AE on the same nine cross-well cells,
-seeds {7, 23, 41}, and noise realization. Its input is [u, b_Omega, mask]:
-b_Omega places the noisy measurement on the observed window coordinate and
-is zero elsewhere, and the mask is the binary indicator of Omega. MLP, PCA,
-ablations, and the F03-4 grid were not rerun.
+seeds {7, 23, 41}, and paired noise realizations. Its input is
+[u, b_Omega, mask]: b_Omega places the noisy measurement on the observed
+window coordinate and is zero elsewhere, and the mask is the binary
+indicator of Omega. An audit of the first implementation found that
+standardizing the full concatenated vector zeroed the constant mask
+columns, so the network did not receive the original binary indicators.
+That representation was corrected: numeric channels are standardized from
+training data only, and the trailing binary mask is left unscaled. The
+mask-aware AE also uses the same base training seed as the conventional
+direct AE. MLP, PCA, ablations, and the F03-4 grid were not rerun.
 
-The explicit mask does not remove the CLP-CSGM advantage where training
-support is smallest. At steps 16 and 32, CLP-CSGM Ridge has lower mean RMSE
-than the masked AE at every rho. At step 8, the masked AE remains better at
-rho=0.05 and rho=0.10, as the unmasked AE does. The mask shifts the direct
-AE only modestly and not always downward. This check keeps Omega fixed
-inside each cell.
-
-Because the observation coordinates are fixed within each seed-measurement-ratio
-configuration, the original direct AE already receives measurements with
-consistent positional identity. The explicit-mask variant therefore changes
-the input representation rather than introducing previously unavailable
-coordinate information. In addition, the masked AE uses a different training
-initialization (seed offset of 100). Consequently, this supplementary
-experiment evaluates sensitivity to an explicit spatial encoding, but it
-does not isolate the causal contribution of the latent inverse formulation.
-The observed differences should be interpreted within this limited scope.
+Under that controlled protocol, CLP-CSGM Ridge has lower mean RMSE than the
+mask-aware AE in seven of the nine configurations. At steps 16 and 32, the
+smaller training regimes, CLP-CSGM Ridge has lower mean RMSE in all six
+configurations and lower RMSE in 17 of the 18 paired seed comparisons. At
+step 8, the mask-aware AE remains better at rho=0.05 and rho=0.10. Because
+Omega is fixed within each configuration, the binary mask is constant across
+windows, and the conventional AE already receives the measurements in a
+stable positional order. The experiment therefore assesses an alternative
+explicit spatial encoding. It does not isolate the causal contribution of
+latent inverse optimization, and the difference relative to the historical
+masked-AE run cannot be attributed to the mask preservation alone.
 
 Where the text was changed: Experimental setup, subsection Training,
-validation, and test protocol (the main protocol is unchanged; one sentence
-points to the supplement); Results, subsection Cross-well low-data results
-(one sentence next to the three-seed paired comparison); Appendix,
-subsection Explicit-mask direct AE (table, interpretation, and the closing
-limit on fixed coordinates and the seed offset). The published nine-cell
-tables were not extended with this method.
+validation, and test protocol; Results, subsection Cross-well low-data
+results; Appendix, subsection Explicit-mask direct AE
+(Table~\ref{tab:crosswell_explicit_mask} and the corrected protocol). The
+published nine-cell Ridge-versus-AE tables were not extended with this
+method.
 
 ---
 
 ## R1-M09 -- GR-only porosity is a controlled test
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
@@ -344,8 +344,11 @@ points on that plot. They are not a significance test. The Abstract does
 not report the GR-only RMSE. The Conclusion keeps the same controlled-test
 limit next to that RMSE.
 
-Where the text was changed: Results (the F03-4 depth-profile paragraph);
-Appendix Illustrative sparse-measurement windows; Appendix F03-4 Qualitative
+Where the text was changed: Results, subsection Single-well F03 GR-only
+results (the F03-4 depth-profile paragraph, and two sentences that now report
+the observed RMSE advantage of CLP-CSGM Ridge over the direct autoencoder
+rather than an isolated causal effect of latent refinement); Appendix
+Illustrative sparse-measurement windows; Appendix F03-4 Qualitative
 Reconstruction Views; and the Conclusion (sentences after the F03-4 GR-only
 RMSE). Experimental setup, subsection Single-well F03-4 GR-only porosity
 benchmark, and Interpretation, scope, and limitations already contained the
@@ -360,25 +363,29 @@ from the main inputs is addressed under R2-03.
 
 ## R1-M10 -- Update literature positioning
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
 We thank the reviewer for the four recent studies on well-log reconstruction,
 transferable subsurface learning, and data-driven petrophysical prediction. We
-read them and positioned CLP-CSGM by the task each method solves.
+read them and incorporated them into the bibliographic positioning of
+CLP-CSGM.
 
-Log completion reconstructs missing intervals of a wireline curve from that
-curve. Sequence-based GANs generate synthetic logs and fill gaps in gamma ray,
-sonic, neutron porosity, deep resistivity, and bulk density. A fine-tuned
-time-series foundation model forecasts the next interval of the same suite and
-flags anomalies, including a zero-shot check in a second basin. Geomodel
-translation uses a Pix2Pix conditional GAN to map two-dimensional slices of
-facies, porosity, permeability, and water saturation from a masked image or
-from another property. Direct regression uses ANN and random-forest models to
-predict total porosity, effective porosity, and shale volume from wireline
-logs. In those settings the trained map fills a curve, fills a property image,
-or returns a property from the logs.
+Log completion reconstructs missing intervals of a wireline curve from
+available observations and contextual information, including neighboring
+depths and other log channels. Sequence-based GANs generate synthetic logs
+and fill gaps in gamma ray, sonic, neutron porosity, deep resistivity, and
+bulk density. A fine-tuned time-series foundation model forecasts the next
+interval of the same suite and flags anomalies, including a zero-shot check
+in a second basin. Geomodel translation uses a Pix2Pix conditional GAN to map
+two-dimensional slices of facies, porosity, permeability, and water
+saturation from a masked image or from another property. Direct regression
+uses ANN and random-forest models to predict total porosity, effective
+porosity, and shale volume from wireline logs. In those settings the trained
+map fills a curve, fills a property image, or returns a property from the
+logs. Imputation methods can therefore exploit known observations and
+cross-channel context.
 
 CLP-CSGM recovers a window of a target property when dense logs are available
 along the window and only sparse observations of that property are in hand.
@@ -386,36 +393,31 @@ The conditional map predicts z_0 = h(u) from the dense logs. This code
 initializes the first latent trajectory and remains the center of the
 quadratic penalty. The sparse values remain measurements. After training,
 latent refinement balances agreement with those measurements against
-deviation from z_0. A residual at the observed depths can remain. These
-tasks can all exploit available context, including observed portions of a
-well log or a partially masked property image. The principal distinction is
-therefore not the mere availability of known values, but how these values
-enter the reconstruction procedure. The cited completion and translation
-methods primarily learn mappings for gap filling or property prediction. In
-CLP-CSGM, dense auxiliary logs determine a conditional latent anchor, while
-the sparse target observations enter an explicit measurement-fidelity penalty
-during test-time latent refinement. This distinction concerns the inference
-formulation and does not establish superior predictive performance over the
-cited approaches, whose targets, observation patterns, and evaluation
-protocols differ. We do not compare numerical errors with the four studies.
+deviation from z_0. A residual at the observed depths can remain. The central
+distinction is that CLP-CSGM combines the conditional latent prior with an
+explicit measurement-fidelity penalty during inference. The cited completion
+and translation methods primarily learn mappings for gap filling or property
+prediction. This distinction concerns the inference formulation and does not
+establish superior predictive performance over the cited approaches, whose
+targets, observation patterns, and evaluation protocols differ. We do not
+compare numerical errors with the four studies. The TimeGPT study also
+examines zero-shot transfer across geological basins. Our cross-well
+benchmark retains a single held-out well and does not demonstrate
+basin-agnostic transferability.
 
 Where the text was changed: the Introduction (end of the first paragraph);
-Related work, subsection Petrophysical log prediction (the comparison of the
-three neighboring tasks with CLP-CSGM; the closing sentences now distinguish
-how known values enter inference, not which quantity is unknown); and
-Interpretation, scope, and limitations (the paragraph that states when the
-measurement term is the relevant formulation). Four entries were added to
-the bibliography. This correction rewrote only the Related work closing
-sentences. Introduction, Discussion, and the bibliography were not changed
-again.
-
-No new experiments were added for this comment.
+Related work, subsection Petrophysical log prediction (imputation
+characterization refined; the distinction remains the conditional latent
+prior plus an explicit measurement penalty at inference); and
+Interpretation, scope, and limitations (transferability limit relative to
+basin-level foundation-model evaluation). The four bibliography entries were
+already present. No new experiments were added for this comment.
 
 ---
 
 ## R1-M11 -- Test against independent measurements
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
@@ -424,60 +426,73 @@ produced by deterministic processing of the same log suite. The F3 benchmarks
 remain processed-log reconstructions. We added a separate single-well
 supplement on laboratory porosity and did not put it in the main grid.
 
-The interval is well 861, 87 laboratory-porosity samples from 5205.91 m to
-5233.72 m. Dense context is gamma ray, deep resistivity, shallow resistivity,
-and lithotype. Density and the neutron, sonic, and Phi_ND porosity channels
-are excluded because they track the laboratory porosity. Depth is split into
-three contiguous blocks before windowing. Windows have length 8. For each
-fold, seed, and ratio, the same coordinates are the measurements in every
-window, the measurement is the laboratory value with no added noise, and RMSE
-is computed only on the other coordinates. Seeds are {7, 23, 41}. Ratios are
-0.25 (m=2) and 0.50 (m=4).
+The supplementary target consists of porosity values identified as laboratory
+measurements in the Auddys source dataset, rather than values
+deterministically computed from the auxiliary gamma-ray, resistivity, or
+lithotype channels by our processing pipeline. This provides a limited
+response to the request for a target outside that deterministic log-suite
+processing. Original per-plug laboratory assay records were not available for
+independent verification. The interval is well 861, 87 Phi_lab samples from
+5205.91 m to 5233.72 m. Dense context is gamma ray, deep resistivity, shallow
+resistivity, and lithotype. Density and the neutron, sonic, and Phi_ND
+porosity channels are excluded because they track the laboratory porosity.
 
-The direct AE has the lower mean held-out RMSE at both ratios: 0.0537 versus
-0.0602 at rho=0.25, and 0.0523 versus 0.0580 at rho=0.50. CLP-CSGM Ridge has
-the lower RMSE in 5 of 9 splits at rho=0.25 and in 6 of 9 at rho=0.50. It has
-lower RMSE than the log-only anchor in all 9 splits at both ratios.
+Training and test intervals are separated by contiguous depth blocks before
+windowing. Windows have length 8 and step 1. For each fold, seed, and ratio,
+the same relative coordinates are the measurements in every window, the
+measurement is the laboratory value with no added noise, and RMSE is computed
+only at coordinates not supplied to that reconstruction as measurements.
+Because the test windows overlap, a physical depth scored in one window may
+have been measured in another. Therefore, the experiment is a within-window
+sparse-assimilation evaluation on held-out depth blocks, not a globally
+withheld-depth validation. Seeds are {7, 23, 41}. Ratios are 0.25 (m=2) and
+0.50 (m=4). The nine comparisons per ratio are three depth blocks repeated
+under three seeds, not nine independent geological intervals.
 
-The block split is the tradeoff. On 5205.91--5214.48 m, CLP-CSGM Ridge has the
-lower block-mean RMSE at both ratios. Raising rho from 0.25 to 0.50 lowers
-that RMSE from 0.0338 to 0.0228, while the direct AE stays near 0.035. The
-measurement term is what improves: the anchor is still close to the test logs
-(mean Phi_lab about 0.092, gamma ray about 15 API, high resistivity), and
-extra laboratory coordinates pull the latent code onto the held-out points.
-The direct AE already takes those coordinates as features, so the same
-increase in rho changes it little. The middle block is close, with CLP-CSGM
-Ridge still slightly lower. This is not the scarce-window regime of F3 steps
-16 and 32: each test fold still has 28 to 35 overlapping training windows.
+The direct AE has the lower mean within-window held-out RMSE at both ratios:
+0.0537 versus 0.0602 at rho=0.25, and 0.0523 versus 0.0580 at rho=0.50.
+CLP-CSGM Ridge has the lower RMSE in 5 of 9 block-seed pairs at rho=0.25 and
+in 6 of 9 at rho=0.50. It has lower RMSE than the log-only anchor G(z0) in
+all 9 pairs at both ratios.
+
+On 5205.91--5214.48 m, CLP-CSGM Ridge has the lower block-mean RMSE at both
+ratios. In that shallowest block, mean held-out RMSE decreases from 0.0338 at
+rho=0.25 to 0.0228 at rho=0.50, while the direct AE stays near 0.035. Because
+the coordinate sets are sampled separately at each measurement ratio, this
+comparison changes both the number and the placement of observations and does
+not isolate the effect of measurement count. The middle block is close, with
+CLP-CSGM Ridge still slightly lower. This is not the scarce-window regime of
+F3 steps 16 and 32: each test fold still has 28 to 35 overlapping training
+windows.
 
 The pooled mean is lower for the direct AE, and the larger share of that
-error sits in 5224.39--5233.72 m. Held out,
-that block has mean Phi_lab about 0.145, gamma ray about 30 API, and median
-deep resistivity about 600, against low gamma ray and resistivity near
-1600--1900 in the blocks that train the anchor. The lithotype mix changes as
-well. The decoded prediction G(z0) differs substantially from the target
-windows in that block. With m=2 or m=4 in a length-8 window,
-the residual still beats the log-only anchor (0.0931 versus 0.1142 at
-rho=0.25, and 0.1016 versus 0.1234 at rho=0.50) but does not catch the direct
-AE (0.0691 and 0.0676). These log differences are compatible with a transfer
-difficulty. They do not establish that shift as the only cause.
+error sits in 5224.39--5233.72 m. When that block is held out for testing,
+it has mean Phi_lab about 0.145, gamma ray about 30 API, and median deep
+resistivity about 600, against low gamma ray and resistivity near 1600--1900
+in the blocks that train the anchor. The lithotype mix changes as well. The
+decoded prediction G(z0) differs substantially from the target windows in
+that block. With m=2 or m=4 in a length-8 window, CLP-CSGM Ridge still beats
+the log-only anchor (0.0931 versus 0.1142 at rho=0.25, and 0.1016 versus
+0.1234 at rho=0.50) but does not catch the direct AE (0.0691 and 0.0676).
+These block-level differences are compatible with sensitivity to prior
+mismatch and changes in the auxiliary-log distribution. They do not establish
+prior mismatch as a demonstrated causal explanation of the relative ranking.
 
-CLP-CSGM Ridge has lower RMSE than G(z0) in every split, and it has the lower
+CLP-CSGM Ridge improves upon G(z0) in every block-seed pair and has the lower
 block-mean RMSE on the two shallower blocks. On the pooled mean the direct AE
-is lower. The measurement term does not fail. The F3 low-support advantage is
-not a mean win on this laboratory target. The supplement is one cored
-interval. The Lapa permeability case remains a limited-sample supplement whose
-sparse observations are subsamples of the same permeability series. This
-wording does not close a request for broader operational validation.
+is lower. The F3 low-support advantage is not a mean win on this laboratory
+target. The supplement is one cored interval and does not demonstrate
+operational or cross-well generalization. The Lapa permeability case remains
+a limited-sample supplement whose sparse observations are subsamples of the
+same permeability series. This wording does not close a request for broader
+operational validation.
 
-Where the text was changed: Experimental setup (the sentence after the Lapa
-pointer); Results (the paragraph after the Lapa permeability summary, which
-states the mean ranking, the anchor correction, and where that correction is
-enough); Interpretation, scope, and limitations (the laboratory-porosity
-paragraph, same conclusion); the Conclusion (the sentence after the F3
-evidence limit); and the Appendix, subsection Laboratory porosity on a cored
-interval (pooled table, block table, log summaries, and the gain/loss
-discussion).
+Where the text was changed: Experimental setup (the laboratory-porosity
+sentence); Results (the laboratory-porosity paragraph); Interpretation,
+scope, and limitations (the laboratory-porosity paragraph); the Conclusion
+(the laboratory-supplement sentence); and the Appendix, subsection Laboratory
+porosity on a cored interval (provenance, within-window versus physical-depth
+holdout, residual-entry audit counts, and non-causal block interpretation).
 
 ---
 
@@ -500,37 +515,29 @@ Where the text was changed: the title.
 
 ## R1-m02 -- Reduce overlap between Introduction and Related Work
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
-We thank the reviewer for this suggestion. We tightened the repeated framing
-and left each distinction in the section where it does the work.
+We thank the reviewer for asking us to reduce overlap between the
+Introduction and Related Work. We made a minimal editorial pass rather than a
+structural reorganization.
 
-The Introduction now states once that a direct map from dense logs and sparse
-values need not match those values at inference, and that this paper treats
-the sparse values as measurements. It names log completion, geomodel
-translation, and direct regression only to point to the comparison in Related
-work. The two sentences after the objective name the measurement term and the
-anchor term, and they no longer restate that role.
+The Introduction now concentrates on motivation, the measurement role of the
+sparse observations, the conceptual definition of CLP-CSGM, and the
+contributions. Recent log-completion, geomodel-translation, and
+direct-regression studies are named only briefly, with the detailed
+comparison deferred to Related Work. Related Work concentrates on positioning:
+it retains the four recent references, distinguishes completion, translation,
+and direct regression from CLP-CSGM by how observations enter inference, and
+shortens repeated descriptions of trajectory initialization and restart
+details that remain in the Method section. The mathematical formulation,
+equations, experimental results, and earlier revisions were left unchanged.
 
-Related work, subsection Petrophysical log prediction, no longer opens by
-repeating that direct regression treats sparse values as predictors. The
-comparison of the three neighboring tasks with CLP-CSGM stays there, including
-how the sparse observations enter the inference procedure.
-
-Related work, subsection Conditional generative inverse problems and
-positioning, no longer restates the direct-fusion contrast before the
-experiments. The closing paragraph states where the dense-log anchor and the
-measurement residual enter, then names the three comparators used in the
-experiments.
-
-The objective in the Introduction is unchanged.
-
-Where the text was changed: the Introduction (end of the first paragraph, and
-the two sentences after the objective); Related work, subsection Petrophysical
-log prediction (opening paragraph); and Related work, subsection Conditional
-generative inverse problems and positioning (closing paragraph).
+Where the text was changed: Introduction (pointer to Related Work for the
+recent-study comparison); Related work, subsection Petrophysical log
+prediction (comparative CLP-CSGM paragraph); and Related work, subsection
+Conditional generative inverse problems and positioning (closing paragraph).
 
 ---
 
@@ -556,7 +563,7 @@ Where the text was changed: Method, subsection Test-time reconstruction
 
 ## R1-m04 -- AE as best comparator only in this benchmark
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
