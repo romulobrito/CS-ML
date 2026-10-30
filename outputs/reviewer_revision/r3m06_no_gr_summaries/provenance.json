@@ -1,0 +1,135 @@
+{
+  "protocol": "crosswell_vc_main_no_gr",
+  "note": "Numeric summaries only. The git blobs at outputs/cross_well_vc/direct_ub remain the five-channel runs and must not be replaced.",
+  "files": [
+    {
+      "step": 8,
+      "file": "step08_summary_focus_clp_csgm_vs_ub.csv",
+      "sha256": "de9d572d20cf35f82371a8ad525dba9280e8bda0e946a5529b9a8051b44fd710",
+      "source_worktree": "outputs/cross_well_vc/direct_ub/runs/crosswell_step08_clp_csgm_ablation_ridge/tables/summary_focus_clp_csgm_vs_ub.csv",
+      "git_head_same_path_sha256": "f875facb081e31342e4d94f7a82a41025798816bc6ed07c5f9896055a8aa22ce",
+      "git_head_channels": [
+        "sonic",
+        "rhob",
+        "gr",
+        "ai",
+        "vp"
+      ],
+      "git_head_p_input": 320,
+      "worktree_channels": [
+        "sonic",
+        "rhob",
+        "ai",
+        "vp"
+      ],
+      "worktree_p_input": 256,
+      "seeds": [
+        7,
+        23,
+        41
+      ],
+      "measurement_ratios": [
+        0.05,
+        0.1,
+        0.2
+      ],
+      "measurement_noise_std": 0.01,
+      "window_len": 64,
+      "train_wells": [
+        "F02-1",
+        "F03-2",
+        "F06-1"
+      ],
+      "test_wells": [
+        "F03-4"
+      ],
+      "noise_level_label": "30dB/30dB"
+    },
+    {
+      "step": 16,
+      "file": "step16_summary_focus_clp_csgm_vs_ub.csv",
+      "sha256": "1f84730801bd7d0c61bba6c67312dbd0b68743de5a0c03f57f0138c1911469ba",
+      "source_worktree": "outputs/cross_well_vc/direct_ub/runs/crosswell_step16_clp_csgm_ablation_ridge/tables/summary_focus_clp_csgm_vs_ub.csv",
+      "git_head_same_path_sha256": "b344a7cddf5be355f0e114d83539e27d4ea868903a36366fc189b8b6adaa4941",
+      "git_head_channels": [
+        "sonic",
+        "rhob",
+        "gr",
+        "ai",
+        "vp"
+      ],
+      "git_head_p_input": 320,
+      "worktree_channels": [
+        "sonic",
+        "rhob",
+        "ai",
+        "vp"
+      ],
+      "worktree_p_input": 256,
+      "seeds": [
+        7,
+        23,
+        41
+      ],
+      "measurement_ratios": [
+        0.05,
+        0.1,
+        0.2
+      ],
+      "measurement_noise_std": 0.01,
+      "window_len": 64,
+      "train_wells": [
+        "F02-1",
+        "F03-2",
+        "F06-1"
+      ],
+      "test_wells": [
+        "F03-4"
+      ],
+      "noise_level_label": "30dB/30dB"
+    },
+    {
+      "step": 32,
+      "file": "step32_summary_focus_clp_csgm_vs_ub.csv",
+      "sha256": "f037d1046ab0d4040a204dd0428bb3e55be63bff6729fe383120b7ea338093c5",
+      "source_worktree": "outputs/cross_well_vc/direct_ub/runs/crosswell_step32_clp_csgm_ablation_ridge/tables/summary_focus_clp_csgm_vs_ub.csv",
+      "git_head_same_path_sha256": "8c911a7c2f4aa6544cd06684066d1465b59e8912edbf3b0e5b284f551e29db70",
+      "git_head_channels": [
+        "sonic",
+        "rhob",
+        "gr",
+        "ai",
+        "vp"
+      ],
+      "git_head_p_input": 320,
+      "worktree_channels": [
+        "sonic",
+        "rhob",
+        "ai",
+        "vp"
+      ],
+      "worktree_p_input": 256,
+      "seeds": [
+        7,
+        23,
+        41
+      ],
+      "measurement_ratios": [
+        0.05,
+        0.1,
+        0.2
+      ],
+      "measurement_noise_std": 0.01,
+      "window_len": 64,
+      "train_wells": [
+        "F02-1",
+        "F03-2",
+        "F06-1"
+      ],
+      "test_wells": [
+        "F03-4"
+      ],
+      "noise_level_label": "30dB/30dB"
+    }
+  ]
+}

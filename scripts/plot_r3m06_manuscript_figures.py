@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Redraw manuscript Figures 6 and 7 from saved cross-well outputs.
+"""Redraw the manuscript RMSE and depth figures from saved summaries.
 
-Does not refit models and does not call the benchmark pipeline.
-Original PNGs are copied aside before the paper files are replaced.
-ASCII only.
+The RMSE panels read the no-GR copies under
+outputs/reviewer_revision/r3m06_no_gr_summaries. They do not read the
+five-channel CSVs in outputs/cross_well_vc/direct_ub.
+The depth profile still requires the local NPZ named in PROFILE_NPZ.
+That file is a processed well curve and is not part of the summary bundle.
+Does not refit models. ASCII only.
 """
 
 from __future__ import annotations
 
+import argparse
+import hashlib
+import json
 import shutil
 from pathlib import Path
 from typing import List, Sequence, Tuple
@@ -33,41 +39,14 @@ PROFILE_NPZ = (
     / "tables"
     / "depth_profile_test_block.npz"
 )
-STEP_SUMMARIES: Tuple[Tuple[int, Path], ...] = (
-    (
-        8,
-        ROOT
-        / "outputs"
-        / "cross_well_vc"
-        / "direct_ub"
-        / "runs"
-        / "crosswell_step08_clp_csgm_ablation_ridge"
-        / "tables"
-        / "summary_focus_clp_csgm_vs_ub.csv",
-    ),
-    (
-        16,
-        ROOT
-        / "outputs"
-        / "cross_well_vc"
-        / "direct_ub"
-        / "runs"
-        / "crosswell_step16_clp_csgm_ablation_ridge"
-        / "tables"
-        / "summary_focus_clp_csgm_vs_ub.csv",
-    ),
-    (
-        32,
-        ROOT
-        / "outputs"
-        / "cross_well_vc"
-        / "direct_ub"
-        / "runs"
-        / "crosswell_step32_clp_csgm_ablation_ridge"
-        / "tables"
-        / "summary_focus_clp_csgm_vs_ub.csv",
-    ),
+SUMMARY_DIR = ROOT / "outputs" / "reviewer_revision" / "r3m06_no_gr_summaries"
+PROVENANCE_PATH = SUMMARY_DIR / "provenance.json"
+STEP_SUMMARIES: Tuple[Tuple[int, str], ...] = (
+    (8, "step08_summary_focus_clp_csgm_vs_ub.csv"),
+    (16, "step16_summary_focus_clp_csgm_vs_ub.csv"),
+    (32, "step32_summary_focus_clp_csgm_vs_ub.csv"),
 )
+NO_GR_CHANNELS = ("sonic", "rhob", "ai", "vp")
 # Published cell means used only as a consistency check, not as a data source.
 PUBLISHED_CLP = {
     (8, 0.05): 0.04483,
@@ -112,12 +91,53 @@ def _backup(name: str) -> None:
         shutil.copy2(source, destination)
 
 
-def _load_rmse() -> pd.DataFrame:
-    """Stack the three published step summaries. Seeds and splits stay as stored."""
-    frames: List[pd.DataFrame] = []
-    for step, path in STEP_SUMMARIES:
+def _sha256(path: Path) -> str:
+    """Hash a file without loading it as text."""
+    digest = hashlib.sha256()
+    digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+def _checked_summary_paths() -> List[Tuple[int, Path]]:
+    """Return the three no-GR summaries after checking protocol and hashes."""
+    if not PROVENANCE_PATH.is_file():
+        raise FileNotFoundError(str(PROVENANCE_PATH))
+    payload = json.loads(PROVENANCE_PATH.read_text())
+    records = payload.get("files")
+    if not isinstance(records, list) or len(records) != 3:
+        raise RuntimeError("Provenance does not list three summary files.")
+    by_step = {}
+    for record in records:
+        step = int(record["step"])
+        channels = tuple(record["worktree_channels"])
+        if channels != NO_GR_CHANNELS:
+            raise RuntimeError("Step {0} is not the four-channel protocol.".format(step))
+        if "gr" in channels:
+            raise RuntimeError("Step {0} includes gamma ray.".format(step))
+        if int(record["worktree_p_input"]) != 256:
+            raise RuntimeError("Step {0} p_input is not 4 x 64.".format(step))
+        by_step[step] = record
+    checked: List[Tuple[int, Path]] = []
+    for step, name in STEP_SUMMARIES:
+        record = by_step[step]
+        if str(record["file"]) != name:
+            raise RuntimeError("Provenance filename does not match step {0}.".format(step))
+        path = SUMMARY_DIR / name
         if not path.is_file():
             raise FileNotFoundError(str(path))
+        digest = _sha256(path)
+        if digest != str(record["sha256"]):
+            raise RuntimeError("Hash mismatch for {0}.".format(name))
+        if digest == str(record["git_head_same_path_sha256"]):
+            raise RuntimeError("Step {0} matches the five-channel git blob.".format(step))
+        checked.append((step, path))
+    return checked
+
+
+def _load_rmse() -> pd.DataFrame:
+    """Stack the three no-GR step summaries. Seeds and splits stay as stored."""
+    frames: List[pd.DataFrame] = []
+    for step, path in _checked_summary_paths():
         frame = pd.read_csv(path)
         required = {
             "measurement_ratio",
@@ -159,7 +179,7 @@ def _half_width(row: pd.Series) -> float:
     return float(row["rmse_sem"]) * T_CRIT_DF2
 
 
-def _plot_rmse(data: pd.DataFrame) -> None:
+def _plot_rmse(data: pd.DataFrame, out_dir: Path) -> None:
     """Full five-method view above a zoom of the three lower-RMSE methods."""
     steps = (8, 16, 32)
     rhos = (0.05, 0.10, 0.20)
@@ -238,7 +258,7 @@ def _plot_rmse(data: pd.DataFrame) -> None:
         fontsize=8,
     )
     figure.tight_layout(rect=(0.0, 0.0, 1.0, 0.94))
-    figure.savefig(PAPER_FIG / "results_crosswell_rmse_vs_rho.png", dpi=200)
+    figure.savefig(out_dir / "results_crosswell_rmse_vs_rho.png", dpi=200)
     plt.close(figure)
 
 
@@ -253,10 +273,15 @@ def _finite_limits(arrays: Sequence[np.ndarray]) -> Tuple[float, float]:
     return low - pad, high + pad
 
 
-def _plot_profiles() -> None:
+def _plot_profiles(out_dir: Path) -> None:
     """Shared-scale main profile and a full-range MLP/PCA complement."""
     if not PROFILE_NPZ.is_file():
-        raise FileNotFoundError(str(PROFILE_NPZ))
+        raise FileNotFoundError(
+            "Local depth profile is missing: {0}. It is not in the no-GR summary bundle. "
+            "Regeneration refits the step-16 seed-7 rho-0.20 run and was not executed here.".format(
+                PROFILE_NPZ
+            )
+        )
     archive = np.load(PROFILE_NPZ)
     depth = np.asarray(archive["depth_axis"], dtype=np.float64)
     if depth.ndim != 1 or int(depth.size) < 2:
@@ -292,7 +317,7 @@ def _plot_profiles() -> None:
         fontsize=10,
     )
     figure.tight_layout(rect=(0.0, 0.0, 1.0, 0.96))
-    figure.savefig(PAPER_FIG / "10_depth_profile_crosswell_vc.png", dpi=200)
+    figure.savefig(out_dir / "10_depth_profile_crosswell_vc.png", dpi=200)
     plt.close(figure)
 
     wide_arrays = [np.asarray(archive[key], dtype=np.float64) for key, _label in WIDE_PROFILES]
@@ -338,17 +363,27 @@ def _plot_profiles() -> None:
         y=0.98,
     )
     wide_figure.tight_layout(rect=(0.0, 0.0, 1.0, 0.90))
-    wide_figure.savefig(PAPER_FIG / "10_depth_profile_crosswell_vc_wide.png", dpi=200)
+    wide_figure.savefig(out_dir / "10_depth_profile_crosswell_vc_wide.png", dpi=200)
     plt.close(wide_figure)
 
 
 def main() -> None:
-    """Backup the current paper figures, then write the revised ones."""
-    _backup("results_crosswell_rmse_vs_rho.png")
-    _backup("10_depth_profile_crosswell_vc.png")
-    _plot_rmse(_load_rmse())
-    _plot_profiles()
-    print("wrote revised figures under", PAPER_FIG)
+    """Write the figures. A test directory does not replace the manuscript PNGs."""
+    parser = argparse.ArgumentParser(description="Redraw the manuscript cross-well figures.")
+    parser.add_argument(
+        "--out-dir",
+        default=str(PAPER_FIG),
+        help="Directory for the PNG files. The default is the manuscript figures folder.",
+    )
+    args = parser.parse_args()
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    if out_dir.resolve() == PAPER_FIG.resolve():
+        _backup("results_crosswell_rmse_vs_rho.png")
+        _backup("10_depth_profile_crosswell_vc.png")
+    _plot_rmse(_load_rmse(), out_dir)
+    _plot_profiles(out_dir)
+    print("wrote revised figures under", out_dir)
 
 
 if __name__ == "__main__":
