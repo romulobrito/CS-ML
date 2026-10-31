@@ -76,10 +76,10 @@ E-mail: \texttt{romulobrito@lenep.uenf.br}}
 \maketitle
 
 \begin{abstract}
-Reconstructing a petrophysical target curve is difficult when dense auxiliary
-logs are available along the well but the target is observed only at selected
-depths. Direct models can use those sparse observations as input features,
-yet the reconstruction need not honor them as measurements.
+The goal is to reconstruct a continuous target-property profile along a well
+using dense auxiliary wireline logs and sparse observations of the target
+property at selected depths. Direct models can use those sparse observations
+as input features, yet the reconstruction need not honor them as measurements.
 We introduce Conditional Latent-Prior Compressed Sensing with Generative
 Models (CLP-CSGM). A decoder trained on windows of the target curve supplies
 the windows the reconstruction may use. Dense auxiliary logs predict a
@@ -104,8 +104,8 @@ interpolation outperforms CLP-CSGM in all nine cross-well
 configurations. This ordering changes under larger perturbations that were
 not calibrated to field uncertainties. A laboratory-porosity supplement
 also favors the direct autoencoder in mean RMSE. These findings
-show regime-dependent advantages rather than general
-superiority, and broader validation remains necessary.
+show regime-dependent, not general, superiority, and broader
+validation remains necessary.
 \end{abstract}
 
 \keywords{compressed sensing; generative model; inverse problem;

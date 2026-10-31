@@ -70,6 +70,21 @@ $\boldsymbol{\eta}\sim
 $m\times m$ identity; the noiseless case has
 $\boldsymbol{\eta}=\boldsymbol{0}$.
 
+Although the application is naturally described as missing-data
+reconstruction, it also admits an underdetermined inverse-problem
+formulation. The forward model in Eq.~\eqref{eq:measurement_model} is
+coordinate restriction: $M_{\Omega}$ selects $m<N$ entries of a complete
+window. This operator is not injective on $\mathbb{R}^{N}$, so the sparse
+observations alone do not uniquely determine $\boldsymbol{y}$. Classical
+compressed sensing addresses such problems with a structural prior, typically
+sparsity, whereas CSGM uses the range of a learned generator
+\citep{bora2017compressed}. CLP-CSGM follows that generative
+inverse-reconstruction view and adds a conditional latent prior from the
+dense logs. It does not invert a physical petrophysical forward model, and
+it does not establish unique or exact recovery for the trained decoder.
+Recovery guarantees proved for other sensing operators, including certain
+random matrices, do not transfer to $M_{\Omega}$.
+
 The dense logs and the sparse measurements do different jobs. The dense-log
 vector $\boldsymbol{u}$ predicts the code
 $\boldsymbol{z}_0=h(\boldsymbol{u})$, where $h$ is the conditional map from
@@ -268,10 +283,12 @@ Appendix~\ref{app:crosswell_simple_baselines} reports that check.
 
 \paragraph{Log-conditioned latent prior.}
 Each training target is encoded as
-$\boldsymbol{z}_i=E(\widetilde{\boldsymbol{y}}_i)$, and
-$h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ is fitted from
+$\boldsymbol{z}_i=E(\widetilde{\boldsymbol{y}}_i)$.
+Ridge regression learns
+$h:\mathbb{R}^{p}\rightarrow\mathbb{R}^{k}$ from the standardized auxiliary
+logs and these encoder codes,
 $\{(\widetilde{\boldsymbol{u}}_i,\boldsymbol{z}_i)\}_{i=1}^{n_{\mathrm{tr}}}$.
-For the Ridge variant,
+For that fit,
 $h(\widetilde{\boldsymbol{u}})
 =W\widetilde{\boldsymbol{u}}+\boldsymbol{c}$, with parameters
 
@@ -295,18 +312,23 @@ W\widetilde{\boldsymbol{u}}_i
 \label{eq:ridge_latent_training_objective}
 \end{equation}
 
-where $\alpha\geq 0$ controls the Ridge penalty
+where $\alpha\geq 0$ controls the ridge-regression penalty
 \citep{hoerl1970ridge}. After fitting,
 $h(\widetilde{\boldsymbol{u}})
 =\widehat{W}\widetilde{\boldsymbol{u}}
 +\widehat{\boldsymbol{c}}$, and, suppressing tildes, the contextual anchor is
-$\boldsymbol{z}_0=h(\boldsymbol{u})\in\mathbb{R}^{k}$. The decoder $G$
-determines which target windows can be represented, and $h$ uses dense-log
-context to center the latent search. CLP-CSGM is this scheme; the class of
-$h$ is a configuration choice. Ridge is the primary reference because it is a
+$\boldsymbol{z}_0=h(\boldsymbol{u})\in\mathbb{R}^{k}$.
+At inference, $\boldsymbol{z}_0$ initializes the first trajectory and
+remains the center of the latent penalty. The decoder $G$ turns latent
+codes into target windows. Ridge regression does not replace $G$ and does
+not perform that latent optimization. CLP-CSGM is this scheme; the class of
+$h$ is a configuration choice. It is the primary reference because it is a
 linear map from the dense logs to $\boldsymbol{z}_0$, not because it is the
 best map in every test. An MLP variant of $h$ is compared under the same
 channels and the same split in Section~\ref{subsec:latent_prior_sensitivity}.
+Direct ridge regression is a different comparator: it maps
+$[\boldsymbol{u},\boldsymbol{b}]$ to the target window
+(Appendix~\ref{app:crosswell_simple_baselines}).
 
 \begin{figure}[t]
     \centering

@@ -39,11 +39,12 @@ observed depths can remain. The decoder range and that penalty are separate:
 the range limits which windows can appear, and the penalty keeps the latent
 code near $\boldsymbol{z}_0$.
 Section~\ref{subsec:test_time_reconstruction} states this step, including the
-first trajectory and the perturbed restarts. Ridge is the
-primary reference for the map from dense logs to $\boldsymbol{z}_0$, because
-it is a linear low-capacity map, not because it is best in every regime. A
-multilayer perceptron (MLP) variant is compared under the same channels and
-the same split.
+first trajectory and the perturbed restarts. Ridge regression is the
+reference implementation of that conditional map: it estimates
+$\boldsymbol{z}_0$ from the dense auxiliary logs. It is the primary
+reference because it is a linear low-capacity map, not because it is best
+in every regime. A multilayer perceptron (MLP) variant of the same map is
+compared under the same channels and the same split.
 
 The contributions are threefold. First, the dense logs predict
 $\boldsymbol{z}_0$, which initializes the first latent trajectory and remains

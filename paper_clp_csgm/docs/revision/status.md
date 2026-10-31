@@ -497,7 +497,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   the decoded prediction G(z_0), with no latent search. Ridge is the linear
   reference for z_0. This pass clarifies the existing formulation. The
   equations, the algorithm, and the reported numbers are unchanged.
-  R3-P01, R3-P03, and R3-P06 stay pending.
+  `R3-P01` is closed. `R3-P03` and `R3-P06` stay pending.
 - Files: `main.tex`; `sections/01_introduction.tex`;
   `sections/02_related_work.tex`; `sections/03_method.tex`;
   `sections/04_data_and_eda.tex`; `sections/05_experiments.tex`;
@@ -510,8 +510,8 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   lambda to 0. Scope sentences in the Abstract, Introduction, Method,
   Experimental setup, and Discussion match the reply. No manuscript edit in
   this closure.
-- Shared reply: none. `R3-P01`, `R3-P03`, and `R3-P06` annotate nearby
-  abstract sentences and stay pending.
+- Shared reply: none. `R3-P01` is closed. `R3-P03` and `R3-P06` annotate
+  nearby abstract sentences and stay pending.
 - Not done: a rewrite of the proofs, or closing the PDF annotations.
 
 ### R3-02
@@ -910,10 +910,71 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Shared reply: none.
 - Not done: none from this entry.
 
+### R3-A05
+
+- State: `closed`
+- Reviewer request: introduce Ridge explicitly as ridge regression and state
+  its role in the workflow.
+- Change made: the Introduction names ridge regression as the reference
+  implementation of the conditional map from dense logs to \(z_0\), and
+  keeps it as a linear low-capacity reference rather than the best map in
+  every regime. The Method names the same fit in the log-conditioned prior:
+  it learns \(h\) from standardized auxiliary logs and encoder codes;
+  \(z_0\) initializes the first trajectory and remains the penalty center;
+  \(G\) produces the target windows; ridge regression does not replace the
+  decoder or the latent optimization. Direct ridge regression stays the
+  separate \([u,b]\) comparator. The training equation was not changed, and
+  no result was regenerated.
+- Checked: compiled PDF, 89 pages, no undefined references, no new overfull
+  lines. The MLP comparison and the statement that the linear map is not
+  best in every test remain.
+- Files: `sections/01_introduction.tex`; `sections/03_method.tex`.
+- Shared reply: none.
+- Not done: none from this entry.
+
+### R3-P01
+
+- State: `closed`
+- Reviewer request: the Abstract goal is hard to see; state that a continuous
+  log and a few sparse observations should yield a continuous prediction of
+  the property.
+- Change made: the Abstract opens by stating that goal, using dense auxiliary
+  wireline logs and sparse observations at selected depths. The penalty still
+  allows a residual. The sparse benchmark observations remain subsamples of
+  processed curves, not independent core measurements. Numbers and
+  conclusions are unchanged. The Introduction already stated the same task
+  and was not edited. `R3-P02` is closed.
+- Checked: compiled PDF, 89 pages, no undefined references and no overfull
+  lines. Abstract length is 284 prose words, 300 tokens including numbers.
+- Files: `main.tex`.
+- Shared reply: none.
+- Not done: none from this entry.
+
+### R3-P02
+
+- State: `closed`
+- Reviewer request: the coordinate mask looks weakly linked to an inverse
+  problem and might better be called missing-data reconstruction.
+- Change made: Problem setup states that the application is missing-data
+  reconstruction and also an underdetermined inverse problem. \(M_{\Omega}\)
+  selects \(m<N\) entries and is not injective on \(\mathbb{R}^{N}\).
+  Classical compressed sensing uses a structural prior; CSGM uses a learned
+  generator range \citep{bora2017compressed}. CLP-CSGM adds the conditional
+  latent prior. The text says this is not inversion of a physical
+  petrophysical model and that guarantees for other operators, including
+  certain random matrices, do not transfer to \(M_{\Omega}\). Related work
+  adds that missing-data reconstruction, including inpainting, is studied as
+  an inverse problem \citep{asim2020invertible}. No new equation. The
+  Abstract, S-REC statement, and reported results were not changed.
+- Checked: compiled PDF, 89 pages, no undefined references and no overfull
+  lines. Both citation keys were already in `references.bib`.
+- Files: `sections/03_method.tex`; `sections/02_related_work.tex`.
+- Shared reply: none. `R3-05` and `R3-P15` stay as previously recorded.
+- Not done: none from this entry.
+
 ## Queue (not yet processed)
 
-R3-A05,
-R3-P01 .. R3-P07, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
+R3-P03 .. R3-P07, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
 R1-m05 remains deferred. `R1-m03` and `R3-P14` are text_done. `R3-A03` is closed.
 `R3-05` and `R3-P15` are text_done. `R3-A02` is closed. `R3-P08` stays text_done.
 `R3-06` is closed.

@@ -365,16 +365,83 @@ correct and was not edited.
 
 ## R3-A05 -- State that Ridge is ridge regression
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for requesting clarification of the Ridge component. We
+now explicitly identify it as ridge regression and clarify its role as the
+conditional latent-prior map. During training, ridge regression maps dense
+auxiliary logs to latent codes obtained from the target-window encoder. At
+inference, the predicted code provides the initialization and regularization
+center for latent refinement. Ridge regression does not directly reconstruct
+the target curve in this configuration; the decoder produces the
+reconstruction after latent refinement. We also distinguish this component
+from the direct ridge-regression baseline, which predicts target windows from
+the auxiliary logs and sparse observations.
+
+Where the text was changed: Introduction, the first mention of Ridge;
+Method, subsection Learned model components, paragraph Log-conditioned latent
+prior. The training equation was not changed.
 
 ## R3-P01 -- Unclear objective in the Abstract
 
-**Status:** `pending` (R1-M01 adds target origin in the Abstract; the
-objective/clarity request is not closed)
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for pointing out that the reconstruction goal was not
+sufficiently explicit. We have revised the opening of the Abstract to state
+directly that the task is to reconstruct a continuous target-property profile
+along a well from dense auxiliary logs and sparse observations of the target
+property. We also clarify that the sparse observations in the main benchmarks
+are coordinate subsamples of processed target curves, rather than
+independently acquired core measurements. The revised wording makes the
+reconstruction objective explicit without changing the experimental scope or
+implying operational validation.
+
+Where the text was changed: Abstract, opening sentence. The Introduction
+already states the same task and was not edited. `R3-P02` is closed.
 
 ## R3-P02 -- Framing as an inverse problem
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for raising this important distinction. We agree that
+the application is naturally described as missing-data reconstruction.
+However, missing-data reconstruction and inverse-problem formulations are not
+mutually exclusive.
+
+Classical compressed sensing reconstructs signals from incomplete linear
+observations using structural prior information. Compressed Sensing using
+Generative Models (CSGM) extends this perspective by using the range of a
+learned generator as a prior (Bora et al., 2017). Related generative-prior
+approaches also treat missing-data reconstruction, including inpainting, as
+an inverse problem (Asim et al., 2020).
+
+Our formulation follows this same mathematical perspective. The forward
+observation operator \(M_{\Omega}\) selects \(m<N\) entries of a complete
+target window. Because this operator is not injective on the full signal
+space, the complete window cannot be uniquely recovered from these
+observations alone. CLP-CSGM regularizes the reconstruction through a learned
+decoder range and a conditional latent prior estimated from dense auxiliary
+logs.
+
+We have clarified this relationship in the Problem setup and in the
+compressed-sensing discussion. We do not claim to invert a physical
+petrophysical forward model, and we do not transfer recovery guarantees
+established for other sensing operators to the coordinate-restriction
+operator employed here.
+
+Accordingly, we characterize the application as missing-data reconstruction
+formulated as a regularized, underdetermined inverse problem.
+
+Where the text was changed: Method, subsection Problem setup, after the
+observation model; Related work, subsection Classical and generative
+compressed sensing. Citations reused: `bora2017compressed` and
+`asim2020invertible`. No new equation and no change to the Abstract.
 
 ## R3-P03 -- Admissible reconstruction set
 
