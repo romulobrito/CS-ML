@@ -20,7 +20,10 @@ depth samples and let $\boldsymbol{u}\in\mathbb{R}^{p}$ denote the vectorized
 dense-log channels over the same interval. Target values are observed at the
 ordered coordinate set
 $\Omega=\{\omega_1,\ldots,\omega_m\}\subset\{1,\ldots,N\}$, where
-$1\leq m<N$ and the measurement ratio is $\rho=m/N$.
+$1\leq m<N$. The realized observed fraction is $m/N$.
+In the experiments, $\rho$ is the nominal measurement ratio used to choose
+$m$ (Section~\ref{sec:experiments}). Rounding and a minimum of four
+observations can make $m/N$ differ slightly from $\rho$.
 
 The coordinate-restriction operator
 $M_{\Omega}:\mathbb{R}^{N}\rightarrow\mathbb{R}^{m}$ is represented by

@@ -497,7 +497,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   the decoded prediction G(z_0), with no latent search. Ridge is the linear
   reference for z_0. This pass clarifies the existing formulation. The
   equations, the algorithm, and the reported numbers are unchanged.
-  `R3-P01` is closed. `R3-P03` and `R3-P06` stay pending.
+  `R3-P01`, `R3-P03`, and `R3-P06` are closed.
 - Files: `main.tex`; `sections/01_introduction.tex`;
   `sections/02_related_work.tex`; `sections/03_method.tex`;
   `sections/04_data_and_eda.tex`; `sections/05_experiments.tex`;
@@ -510,8 +510,8 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   lambda to 0. Scope sentences in the Abstract, Introduction, Method,
   Experimental setup, and Discussion match the reply. No manuscript edit in
   this closure.
-- Shared reply: none. `R3-P01` is closed. `R3-P03` and `R3-P06` annotate
-  nearby abstract sentences and stay pending.
+- Shared reply: none. `R3-P01`, `R3-P03`, and `R3-P06` are closed.
+  `R3-P06` annotates a nearby abstract sentence and is answered by `R3-A05`.
 - Not done: a rewrite of the proofs, or closing the PDF annotations.
 
 ### R3-02
@@ -972,9 +972,82 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Shared reply: none. `R3-05` and `R3-P15` stay as previously recorded.
 - Not done: none from this entry.
 
+### R3-P03
+
+- State: `closed`
+- Reviewer request: the expression "admissible reconstruction range" was
+  very difficult to understand.
+- Change made: the Abstract now says a learned decoder maps latent codes to
+  candidate target-property windows and limits which curves it can
+  reconstruct. The phrase "admissible reconstruction range" is gone. The
+  Method already defines \(\mathcal{R}_{G}\) and \(\mathcal{R}_{\mathrm{orig}}\)
+  and was not edited. No equation or result changed.
+- Checked: compiled PDF, 89 pages, no undefined references and no overfull
+  lines. Abstract length is 284 prose words, 300 tokens including numbers.
+- Files: `main.tex`.
+- Shared reply: none. `R3-A02` stays closed.
+- Not done: none from this entry.
+
+### R3-P04
+
+- State: `closed`
+- Reviewer request: say what rho means in the Abstract.
+- Change made: the Abstract calls \(\rho\) the nominal observed fraction
+  for the gamma-ray-only case, before the numeric values. Problem setup
+  states that \(m/N\) is the realized fraction and that \(\rho\) is the
+  nominal ratio used to choose \(m\). Experimental setup names \(\rho\) the
+  nominal measurement ratio and keeps
+  \(m=\max\{4,\operatorname{round}(\rho N)\}\), including even-integer ties.
+  No mask, table, or reported value changed.
+- Checked: compiled PDF, 89 pages, no undefined references and no overfull
+  lines. Abstract length is 281 prose words, 297 tokens including numbers.
+- Files: `main.tex`; `sections/03_method.tex`; `sections/05_experiments.tex`.
+- Shared reply: none.
+- Not done: none from this entry.
+
+### R3-P05
+
+- State: `closed`
+- Reviewer request: explain "weak single-channel context".
+- Change made: the Abstract already names the gamma-ray-only case and was
+  not edited. Experimental setup no longer calls the dense context
+  intentionally incomplete; it still states that gamma ray is the only dense
+  log, that sonic is excluded because of collinearity with the processed
+  porosity, and that the test is not an operational GR-only porosity
+  interpretation. Results now says "controlled GR-only benchmark".
+  Discussion says "gamma ray as the only dense input". Conclusion says
+  "restricted GR-only input". The Data statement that gamma ray is weakly
+  related to the processed porosity, in contrast with sonic, remains.
+  No number or comparison changed.
+- Checked: compiled PDF, 89 pages, no undefined references and no overfull
+  lines.
+- Files: `sections/05_experiments.tex`; `sections/06_results.tex`;
+  `sections/07_discussion.tex`; `sections/08_conclusion.tex`.
+- Shared reply: none.
+- Not done: none from this entry.
+
+### R3-P06
+
+- State: `closed`
+- Reviewer request: say whether ridge regression is used and make that
+  easier to understand.
+- Change made: none in this pass. `R3-A05` already names ridge regression
+  as the reference implementation of the conditional map \(h\). It learns
+  \(z_0\) from standardized auxiliary logs and encoder codes, initializes
+  the first trajectory, and remains the penalty center. The decoder \(G\)
+  and the latent optimization stay separate. Direct ridge regression on
+  \([u,b]\) and the MLP variant of \(h\) remain distinct. Ridge is the
+  linear reference, not a claim of general superiority. The Abstract no
+  longer says "low-capacity latent-prior reference".
+- Checked: local Introduction, Method, and Abstract against the closed
+  `R3-A05` wording. No `.tex` file was edited.
+- Files: none.
+- Shared reply: `R3-A05`.
+- Not done: none from this entry.
+
 ## Queue (not yet processed)
 
-R3-P03 .. R3-P07, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
+R3-P07, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
 R1-m05 remains deferred. `R1-m03` and `R3-P14` are text_done. `R3-A03` is closed.
 `R3-05` and `R3-P15` are text_done. `R3-A02` is closed. `R3-P08` stays text_done.
 `R3-06` is closed.

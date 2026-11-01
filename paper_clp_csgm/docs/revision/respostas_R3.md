@@ -445,19 +445,93 @@ compressed sensing. Citations reused: `bora2017compressed` and
 
 ## R3-P03 -- Admissible reconstruction set
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for identifying this unclear expression. We have
+replaced "admissible reconstruction range" with a direct explanation of the
+decoder's role. The Abstract now states that a learned decoder maps latent
+codes to candidate target-property windows, limiting which curves it can
+reconstruct. The Method section already defines this set formally as the
+decoder range, in standardized units and in the original target units. This
+restriction concerns model representability and does not imply guaranteed
+physical admissibility or exact recovery.
+
+Where the text was changed: Abstract, the decoder sentence. The Method
+definitions from R3-A02 were already correct and were not edited.
 
 ## R3-P04 -- Meaning of rho in the Abstract
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for requesting clarification of rho. The Abstract now
+explicitly identifies rho as the nominal fraction of target-window depths
+selected for observation. We also clarify the distinction between this
+nominal measurement ratio and the realized fraction \(m/N\). In the
+experiments, the number of observed coordinates is determined by
+\(m=\max\{4,\operatorname{round}(\rho N)\}\), so the realized fraction may
+differ slightly from rho because of rounding and the minimum of four
+observations. This clarification does not change the sampling protocol or
+any reported results.
+
+Where the text was changed: Abstract, the gamma-ray-only sentence; Method,
+subsection Problem setup; Experimental setup, the sentence that states
+\(m=\max\{4,\operatorname{round}(\rho N)\}\). The sampling rule itself was
+not changed.
 
 ## R3-P05 -- Weak single-channel context
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for pointing out that the expression "weak
+single-channel context" was unclear. We have clarified that the F03-4
+benchmark uses gamma ray as its only dense auxiliary input to reconstruct a
+processed, density-derived porosity curve. Acoustic travel time is excluded
+because it is nearly collinear with this processed target. The experiment
+therefore evaluates reconstruction under a deliberately restricted input
+configuration, rather than demonstrating that gamma ray is intrinsically
+uninformative. We have replaced ambiguous references to "weak context" with
+descriptions of the GR-only configuration. This controlled benchmark is not
+presented as operational validation of porosity prediction from gamma ray
+alone.
+
+Where the text was changed: Experimental setup, the clause that called the
+dense context intentionally incomplete; Results, the F03-4 profile paragraph;
+Discussion, the depth-profile comparison; Conclusion, the F03-4 stress-test
+sentence. The Abstract already names the gamma-ray-only case and was not
+edited. The statement that gamma ray is weakly correlated with the processed
+porosity, relative to sonic, remains in Data and EDA because it refers to
+that correlation, not to the removed label.
 
 ## R3-P06 -- Ridge regression and low-capacity prior
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for requesting clarification. Yes, ridge regression is
+used to implement the conditional latent-prior map h. It is trained to
+predict latent codes from dense auxiliary logs, using codes obtained from the
+target-window encoder during training. At inference, its prediction z_0
+initializes latent refinement and serves as the center of the quadratic
+latent penalty. The decoder G maps the refined code to the reconstructed
+target-property window. Ridge regression therefore does not replace the
+decoder or perform the latent optimization.
+
+We have clarified these roles in the Introduction and Method. We also
+distinguish the conditional ridge-regression map from the direct
+ridge-regression baseline, which predicts target windows from auxiliary logs
+and sparse observations. The ambiguous phrase in the original Abstract has
+been removed.
+
+No manuscript file was edited for this comment. The wording was already
+introduced by R3-A05, and the Abstract no longer says "low-capacity
+latent-prior reference".
 
 ## R3-P07 -- Symbols in the introductory equations
 

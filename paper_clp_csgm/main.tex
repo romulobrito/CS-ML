@@ -81,8 +81,8 @@ using dense auxiliary wireline logs and sparse observations of the target
 property at selected depths. Direct models can use those sparse observations
 as input features, yet the reconstruction need not honor them as measurements.
 We introduce Conditional Latent-Prior Compressed Sensing with Generative
-Models (CLP-CSGM). A decoder trained on windows of the target curve supplies
-the windows the reconstruction may use. Dense auxiliary logs predict a
+Models (CLP-CSGM). A learned decoder maps latent codes to candidate target-property
+windows, limiting which curves it can reconstruct. Dense auxiliary logs predict a
 conditional latent code, $z_0$. Latent refinement balances disagreement with
 the sparse measurements against proximity to $z_0$. That code is the
 reference for this balance, not only a starting value. A residual at the
@@ -94,8 +94,8 @@ and processed density-derived porosity. Sparse observations are subsamples of th
 not independent core or laboratory measurements.
 CLP-CSGM has lower mean root mean square error (RMSE) than the direct
 autoencoder in seven of nine cross-well configurations, chiefly when training
-support is limited, but loses in two. Where gamma ray is the only dense log,
-$\rho$ is the fraction of window depths observed. CLP-CSGM has lower mean
+support is limited, but loses in two. For the gamma-ray-only case, $\rho$ denotes the nominal observed
+fraction of window depths. CLP-CSGM has lower mean
 RMSE at $\rho\in\{0.20,0.30\}$, whereas the autoencoder is lower at
 $\rho\in\{0.40,0.60\}$; their errors are nearly equal at $\rho=0.50$.
 

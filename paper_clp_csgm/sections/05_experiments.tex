@@ -56,8 +56,7 @@ that relation. A sonic-porosity estimate uses another petrophysical relation
 and is not necessarily identical to the density-derived porosity. If the bulk
 density required by the density-porosity relation has been recorded, that
 relation is the appropriate calculation, and this test is not a substitute
-for it. Gamma ray is then the only dense log, so the dense context is intentionally
-incomplete. The target follows the processing of
+for it. Gamma ray is then the only dense log. The target follows the processing of
 \citet{zhang2025rockphysicslogs}, in which the density curve underlying F03-4
 porosity is itself predicted from sonic and gamma ray. The high correlation
 with sonic travel time is a property of that processed curve. It is not
@@ -108,13 +107,14 @@ validation, and test blocks using fractions $60\%$, $20\%$, and $20\%$ before
 windows are constructed independently. This depth-first partition prevents
 overlap and preserves contiguous-depth generalization.
 
-For each seed and measurement ratio $\rho$, the number of observed coordinates
-is
+For each seed and nominal measurement ratio $\rho$, the number of observed
+coordinates is
 \[
 m=\max\{4,\operatorname{round}(\rho N)\}.
 \]
 We use nearest-integer rounding, with half-integer ties resolved to the nearest
-even integer. One coordinate set
+even integer. The realized fraction is $m/N$, which can differ slightly from
+$\rho$. One coordinate set
 $\Omega=\{\omega_1,\ldots,\omega_m\}$ is sampled for each
 $(\mathrm{seed},\rho)$ cell and held fixed across all training, validation, and
 test windows in that cell. The set defines
