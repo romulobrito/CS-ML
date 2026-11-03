@@ -641,8 +641,7 @@ and the methods used for comparison.
 In CLP-CSGM Ridge, ridge regression implements the conditional map h from
 dense auxiliary logs to the initial latent code z_0. It is an internal
 component of the proposed method, not the direct prediction baseline. This
-distinction was already stated in the Method section under R3-A05 and was
-not rewritten here.
+distinction is stated in Method, subsection Learned model components.
 
 The principal direct comparator emphasized in the cross-well results is
 AE [u,b], which predicts codes of a separately trained target autoencoder
@@ -660,9 +659,9 @@ strongest overall comparator.
 Prior-only and measurement-only CSGM are structural ablations, whereas the
 MLP conditional prior is used for architectural sensitivity analysis.
 
-The experimental description now states the role of AE and names the
-additional comparators. The Method subsection on the conditional map was
-left unchanged. Results, figures, and reported values were not changed.
+Where the text was changed: Experimental setup, subsection Baselines and
+evaluation metrics. The Method definition of the conditional ridge map
+remains unchanged.
 
 ## R3-P12 -- Why predict z rather than y?
 
@@ -747,11 +746,9 @@ residual. It also clarifies that the figure is schematic and does not depict
 a recorded numerical optimization trajectory, and that the observations need
 not be met exactly.
 
-These corrections were already implemented under R3-A03 and the related
-notation revisions, R3-A02 and R3-P08. We inspected Figure 1 on page 12 of
-the current 90-page PDF. The labels remain readable, the arrows end at the
-stated outputs, and the blue curve is R_orig. No further change was made to
-the figure or to the manuscript text.
+The revised Figure 1 and its caption appear in Method, subsection Learned
+model components. The labels remain readable, the arrows end at the stated
+outputs, and the blue curve is \(\mathcal{R}_{\mathrm{orig}}\).
 
 ## R3-P15 -- Confusing propositions
 

@@ -63,10 +63,10 @@ As categorias sao:
 | R3-P08 | Ajuste leve | Dizia que a Figura 1 nao fora regenerada, em contradicao com R3-A03 e R3-P14. | Removida a frase e mantido apenas o uso atual da notacao na figura. | Registra a substituicao de Im(G) sem contradizer o redesenho. | `closed` |
 | R3-P09 | Ajuste substancial | Repetia toda a discussao de R3-04, inclusive detalhes nao pedidos. | Reduzida a geracao do ruido, selecao de lambda e hipotese MAP. | Preserva a escala original e a distincao do label 30dB. | `closed` |
 | R3-P10 | Ajuste substancial | Acrescentava decoder, S-REC e diagnosticos alem da anotacao de covariancia. | Centrada nas matrizes de escala e na covariancia transformada. | A equacao agora responde diretamente a pergunta. | `closed` |
-| R3-P11 | Aprovada | Nenhum problema material. | Nenhuma. | Distingue configuracao proposta, comparador direto, ablacoes e metodos simples. | `closed` |
+| R3-P11 | Ajuste leve | Referia-se ao historico de outro comentario e nao localizava diretamente a alteracao. | Removida a cronologia e indicada a subsecao de baselines. | Distingue configuracao proposta, comparador direto, ablacoes e metodos simples. | `closed` |
 | R3-P12 | Ajuste substancial | A justificativa estava diluida em resultados e ressalvas repetidos. | Reorganizada em funcao do espaco latente, evidencia do procedimento completo e limite. | Defende a metodologia sem atribuir causalidade a compressao. | `closed` |
 | R3-P13 | Ajuste substancial | Descrevia repetidamente as mesmas etapas e tabelas. | Sintetizados G(E(y)), prior-only, full CLP e measurement-only. | Responde ao pedido de resultados intermediarios com a distincao operacional correta. | `closed` |
-| R3-P14 | Aprovada | Nenhum problema material. | Nenhuma. | Explica setas, simbolos e verificacao visual de forma completa. | `closed` |
+| R3-P14 | Ajuste leve | Incluia numero de pagina instavel e historico interno de comentarios. | Substituido pela localizacao da figura e pela verificacao visual relevante. | Explica setas e simbolos de forma completa. | `closed` |
 | R3-P15 | Aprovada | Nenhum problema material. | Nenhuma. | Apresenta a nova organizacao teorica e suas limitacoes. | `closed` |
 | R3-P16 | Aprovada | Nenhum problema material. | Nenhuma. | Preserva SNR de 30 sem unidade confirmada e separa o ruido acrescentado. | `closed` |
 | R3-P17 | Aprovada | Nenhum problema material. | Nenhuma. | Define Vc, escala e procedencia no primeiro uso. | `closed` |
@@ -77,8 +77,8 @@ As categorias sao:
 ## Contagem
 
 - Total analisado: 52.
-- Aprovadas sem alteracao: 21.
-- Ajustes leves: 7.
+- Aprovadas sem alteracao: 19.
+- Ajustes leves: 9.
 - Ajustes substanciais: 23.
 - Requer verificacao adicional: 1.
 
