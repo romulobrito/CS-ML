@@ -151,7 +151,7 @@ Where the text was changed: Abstract (the sentence on interpolation at noise 0.0
 
 We thank the reviewer for asking how the noise level was chosen and how that choice balances the prior against the data fit.
 
-The published cross-well clay-volume benchmark adds independent Gaussian noise after coordinate subsampling. The standard deviation is 0.01 in the units of the clay-volume curve, not one percent of the curve. The held-out curve has standard deviation about 0.035, so 0.01 is about 0.29 times that deviation. The F03-4 porosity benchmark uses the same construction with standard deviation 0.02. These levels were adopted for controlled benchmarks. No calibration to instrumental uncertainty is documented. The input files are labeled 30dB. That label is not the added standard deviation, and this manuscript does not define the procedure behind the label. That definition remains open under R3-P16. Within one run, every compared method receives the same noisy observations. Direct models from the concatenated dense logs and sparse observations standardize those features after the noise is added.
+The published cross-well clay-volume benchmark adds independent Gaussian noise after coordinate subsampling. The standard deviation is 0.01 in the units of the clay-volume curve, not one percent of the curve. The held-out curve has standard deviation about 0.035, so 0.01 is about 0.29 times that deviation. The F03-4 porosity benchmark uses the same construction with standard deviation 0.02. These levels were adopted for controlled benchmarks. No calibration to instrumental uncertainty is documented. The input files are labeled 30dB. That label is not the added standard deviation, and this manuscript does not define the procedure behind the label. R3-P16 records that designation as a filename label, not a verified signal-to-noise ratio. Within one run, every compared method receives the same noisy observations. Direct models from the concatenated dense logs and sparse observations standardize those features after the noise is added.
 
 The MAP statement identifies lambda with the ratio of the noise variance to the latent prior variance when the likelihood is an isotropic Gaussian in the original target units. On that scale the implemented residual equals a standardized residual weighted by the diagonal matrix of the training standard deviations at the observed coordinates. Those standard deviations are not equal. On the cross-well clay-volume training windows, the ratio of the largest to the smallest is about 1.13 at step 8, 1.23 at step 16, and 1.40 at step 32, so one scalar conversion does not turn the unweighted standardized residual into the implemented objective. The displayed objective now uses that weighted residual. The experiments do not compute lambda from the variance ratio. For each seed and measurement ratio, validation full-window RMSE selects one value from the grid 1e-4, 3e-4, 1e-3, 3e-3, 1e-2, 3e-2, and 1e-1, and that value is fixed before the test evaluation. Dividing both objective terms by the number of windows multiplies the objective by one positive factor. That factor leaves the minimizers unchanged. The covariance of this added noise, after standardization, is stated in the standardization paragraph and answered under R3-P10.
 
@@ -535,7 +535,28 @@ latent-prior reference".
 
 ## R3-P07 -- Symbols in the introductory equations
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for requesting clearer definitions of the mathematical
+symbols. In response to the related structural and notation comments, we
+reorganized the manuscript so that the reconstruction objective is presented
+in the Method section rather than in the Introduction.
+
+The Problem setup now defines the target window, auxiliary-log vector,
+observation coordinates, coordinate-restriction operator, sparse measurements,
+and noise model before developing the reconstruction formulation. The
+subsequent subsections introduce the latent code, decoder, conditional map,
+scaling operators, and regularization parameter in their corresponding
+mathematical context.
+
+These changes were introduced under the earlier methodological and notation
+revisions, in particular R2-01 and R3-A01. We have verified that the symbols
+used in the reconstruction equations are explained and that the Introduction
+can now be read without requiring the reader to interpret the full
+optimization objective. The nominal ratio rho remains distinct from the
+realized fraction m/N. No manuscript file was edited for this comment.
 
 ## R3-P08 -- Im(G) may look like the imaginary part
 
@@ -572,7 +593,7 @@ local recovery interpretation.
 
 We thank the reviewer for asking how the measurement noise is set and how the regularization coefficient lambda is determined.
 
-After coordinate subsampling, each observed coordinate receives an independent Gaussian perturbation. Its standard deviation is 0.01 for the cross-well clay-volume benchmark and 0.02 for the F03-4 porosity benchmark, in the units of the target curve. These levels were adopted for controlled benchmarks. No calibration to instrumental uncertainty is documented. The 30dB label of the input files is not this added standard deviation. The procedure behind that label remains open under R3-P16. Within one run, every method uses the same noisy observations.
+After coordinate subsampling, each observed coordinate receives an independent Gaussian perturbation. Its standard deviation is 0.01 for the cross-well clay-volume benchmark and 0.02 for the F03-4 porosity benchmark, in the units of the target curve. These levels were adopted for controlled benchmarks. No calibration to instrumental uncertainty is documented. The 30dB label of the input files is not this added standard deviation. R3-P16 records that label as a filename designation, not a verified signal-to-noise ratio. Within one run, every method uses the same noisy observations.
 
 The MAP statement gives lambda as the ratio of the noise variance to the latent prior variance when the likelihood is isotropic in the original target units. The implemented residual is that original-scale residual. It equals the standardized residual weighted by the diagonal matrix of the training standard deviations at the observed coordinates. Those standard deviations vary by coordinate, so the ratio does not apply to the unweighted standardized residual. The reported runs do not use the ratio. Validation full-window RMSE selects one value from the published grid, and that value is fixed before the test score. Multiplying the whole objective by the same positive factor leaves its minimizers unchanged. The sensitivity sweep uses a different, wider grid: 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, and 100. It omits the factor-of-three candidates from the published grid. A selected weight that also belongs to the published grid does not mean the two searches were the same. Selections that equal 100 are the largest candidate that was tried, not an optimum outside that grid. The covariance of this added noise, after standardization, is stated in the standardization paragraph and answered under R3-P10.
 
@@ -586,7 +607,7 @@ We thank the reviewer for asking what covariance is implied by the standardizati
 
 D_y and D_u rescale each coordinate by its training standard deviation. They are not estimated covariance matrices of the profiles, and this rescaling leaves any correlation already present between coordinates unchanged.
 
-For a fixed set of observed coordinates, the benchmark writes b = M y + eta with eta an isotropic Gaussian in the original target units. Independence across coordinates and a common variance are assumptions of this synthetic noise. They are not a demonstrated description of instrumental noise, and they are not identified with the 30dB filename label. The origin of that label remains open under R3-P16.
+For a fixed set of observed coordinates, the benchmark writes b = M y + eta with eta an isotropic Gaussian in the original target units. Independence across coordinates and a common variance are assumptions of this synthetic noise. They are not a demonstrated description of instrumental noise, and they are not identified with the 30dB filename label. R3-P16 records that label as a filename designation, not a verified signal-to-noise ratio.
 
 The standardized noise is D_Omega inverse times eta. Because D_Omega is diagonal, its covariance is sigma_eta squared times D_Omega to the minus two. The transformation preserves independence. When the training standard deviations differ across coordinates, the standardized variances differ as well. The quadratic likelihood term built from that covariance is the implemented data term divided by sigma_eta squared, which is the term used in the MAP derivation on the original measurement scale.
 
@@ -598,86 +619,304 @@ Where the text was changed: Method, subsection Problem setup (the paragraph Stan
 
 ## R3-P11 -- Baseline identity
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for requesting clarification of the baseline methods.
+We have clarified the distinction between the proposed CLP-CSGM configuration
+and the methods used for comparison.
+
+In CLP-CSGM Ridge, ridge regression implements the conditional map h from
+dense auxiliary logs to the initial latent code z_0. It is an internal
+component of the proposed method, not the direct prediction baseline. This
+distinction was already stated in the Method section under R3-A05 and was
+not rewritten here.
+
+The principal direct comparator emphasized in the cross-well results is
+AE [u,b], which predicts codes of a separately trained target autoencoder
+from auxiliary logs and sparse observations. It has the lowest unweighted
+mean RMSE among the direct baselines MLP, PCA, and AE on the reported
+cross-well grid.
+
+Other direct predictors include ML only, MLP [u,b], and PCA [u,b]. Simple
+approaches, including direct linear regression, direct ridge regression,
+depth interpolation, and second-difference smoothing, are also evaluated.
+At the reference noise level, depth interpolation outperforms CLP-CSGM in
+all nine cross-well configurations, so AE should not be interpreted as the
+strongest overall comparator.
+
+Prior-only and measurement-only CSGM are structural ablations, whereas the
+MLP conditional prior is used for architectural sensitivity analysis.
+
+The experimental description now states the role of AE and names the
+additional comparators. The Method subsection on the conditional map was
+left unchanged. Results, figures, and reported values were not changed.
 
 ## R3-P12 -- Why predict z rather than y?
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for asking why the auxiliary logs are mapped to a
+latent code rather than directly to the target curve, and what role the
+compression plays.
+
+CLP-CSGM is built for limited-information reconstruction. The target
+property is observed only at sparse depths, and the cross-well protocol
+also includes configurations with limited training support. The decoder
+defines the candidate target windows. The conditional map h estimates z_0
+from the dense auxiliary logs. That code initializes the first trajectory
+and remains the center of the latent penalty, while the sparse observations
+update it through the measurement-fidelity term. The latent coordinates are
+therefore the common place for learned window structure, dense-log context,
+and sparse-measurement refinement. In the reported model the search adjusts
+16 variables for each window of length 64.
+
+This is the procedure intended for those regimes. On the cross-well grid,
+CLP-CSGM Ridge has lower mean RMSE than AE [u,b] in seven of nine cells,
+with the more consistent gains at steps 16 and 32 (52 and 27 training
+windows). AE [u,b] also predicts a latent code, so that comparison
+evaluates how the code is conditioned and refined. It is evidence for the
+complete procedure. The step size also changes the window sampling, so the
+result is not a separated effect of window count or of dimension alone.
+
+Direct predictors can map the logs, or the logs together with the sparse
+values, onto the target window. They are not assumed to ignore the sparse
+values. At the reference noise 0.01, depth interpolation has lower mean
+RMSE in all nine cells: when those sparse measurements already support a
+simple reconstruction, that reconstruction is the stronger result. Under
+the larger simulated perturbations, with lambda reselected on validation,
+the complete CLP-CSGM procedure shows the smaller error growth already
+reported. Those levels were not calibrated to field measurement
+uncertainty.
+
+A length-64 window can contain fewer than 16 observations, so the latent
+problem can remain underdetermined. The decoder range and the penalty
+around z_0 are the structural information used in that case. The
+retrospective reconstruction G(E(y)), with mean test RMSE 0.0073, 0.0099,
+and 0.0110 at steps 8, 16, and 32, checks whether the decoder can represent
+a fully observed window. It is not an inference result.
+
+The Method section now states this motivation. The Discussion already
+records the conditional scope of the recovery statement, and the reported
+numbers were not changed.
 
 ## R3-P13 -- Intermediate results
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for asking whether intermediate outputs of the
+proposed methodology are reported.
+
+The manuscript reports three architectural outputs, rather than a trace of
+the optimizer iterations. No per-iteration trajectory is shown.
+
+The retrospective autoencoder reconstruction G(E(y)) evaluates how well the
+trained decoder represents a fully observed target window. The Appendix
+reports mean test RMSE values of 0.0073, 0.0099, and 0.0110 for steps 8,
+16, and 32. This diagnostic uses the complete target window, so it is not
+an inference-time prediction.
+
+The prior-only ablation evaluates the decoded conditional prediction
+G_orig(z_0), with z_0 = h(u), before sparse-measurement refinement. The
+ablation tables place that prediction next to the complete CLP-CSGM
+reconstruction. In the cross-well benchmark, the full method has lower mean
+RMSE than prior-only in all nine configurations, with relative reductions
+from approximately 20.5% to 60.6%.
+
+The full CLP-CSGM results evaluate the reconstruction after latent
+refinement, with the decoder held fixed and with both the measurement
+fidelity term and the penalty centered at z_0. Those results are in the
+main comparison and in the ablation tables.
+
+The measurement-only CSGM variant is also reported. It sets lambda to 0 and
+searches from the sparse observations alone. It is a separate structural
+ablation, not an intermediate stage of the complete method. The comparison
+across these outputs does not isolate compression by itself.
+
+A short pointer in the Method section now states where the retrospective
+check, the prior-only prediction, and the refined reconstruction are
+reported. The numerical results were not changed.
 
 ## R3-P14 -- Arrows and symbols in Figure 1
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
-We thank the reviewer for pointing out that the previous drawing was hard
-to follow.
+We thank the reviewer for pointing out the ambiguities in the original
+Figure 1.
 
-The tilde in the drawing belongs to the dense-log argument of \(h\). It is
-not a second latent code, and that argument is not what is decoded. The
-upper horizontal arrow decodes \(\boldsymbol{z}_0\) to
-\(G_{\mathrm{orig}}(\boldsymbol{z}_0)\). The lower horizontal arrow decodes
-\(\widehat{\boldsymbol{z}}\) and ends at
-\(\widehat{\boldsymbol{y}}=G_{\mathrm{orig}}(\widehat{\boldsymbol{z}})\) on
-the blue curve. \(M_{\Omega}\) and \(\mathcal{R}_{\mathrm{orig}}\)
-are different objects. \(M_{\Omega}\) selects the observed coordinates.
-\(\mathcal{R}_{\mathrm{orig}}\) is the blue curve, the set of
-decoder outputs in the original target units. The drawing no longer
-identifies them with one symbol.
+The figure has been revised to distinguish the conditional latent
+prediction, latent refinement, and decoding operations.
 
-Where the text was changed: Method, subsection Learned model components
-(Figure 1).
+The dense auxiliary logs are mapped through h to the initial latent code
+z_0. The tilde in the drawing belongs to the argument of h. It is not a
+second latent code, and that argument is not what is decoded. The upper
+horizontal arrow shows the decoding of z_0 into G_orig(z_0). The vertical
+arrow represents latent refinement from z_0 to the refined code z_hat, and
+the lower horizontal arrow shows the decoding of z_hat into the final
+reconstructed window G_orig(z_hat).
+
+The blue curve represents R_orig, the range of decoder outputs in the
+original target units. This set is distinct from M_Omega, which is the
+coordinate-restriction operator selecting the observed depths. The notation
+previously written as Im(G) has also been replaced with explicit
+decoder-range notation to avoid confusion.
+
+The revised caption explains these mappings and the role of the measurement
+residual. It also clarifies that the figure is schematic and does not depict
+a recorded numerical optimization trajectory, and that the observations need
+not be met exactly.
+
+These corrections were already implemented under R3-A03 and the related
+notation revisions, R3-A02 and R3-P08. We inspected Figure 1 on page 12 of
+the current 90-page PDF. The labels remain readable, the arrows end at the
+stated outputs, and the blue curve is R_orig. No further change was made to
+the figure or to the manuscript text.
 
 ## R3-P15 -- Confusing propositions
 
-**Status:** `text_done`
+**Status:** `closed`
 
 **Proposed reply:**
 
-We thank the reviewer for saying that the list of propositions was
-confusing.
+We thank the reviewer for pointing out that the original presentation of
+the theoretical propositions was difficult to follow.
 
-The subsection now opens with the three questions the theory is meant to
-answer: how to read the two terms of the objective, when a minimizer
-exists, and which factors condition recovery of the full window. The
-MAP/Tikhonov and existence arguments are identified there as classical
-interpretations, not as new theorems. Their formal statements were moved
-to the appendix, each immediately before its proof. In the body, one
-paragraph states the MAP reading and its limits, and another states what
-existence does and does not give, including the distinction between a
-global minimizer and the numerical solution. Before the conditional
-local-recovery proposition, the text names the four factors in the bound:
-representation error, noise and observed discrepancy, deviation from the
-conditioned code, and local separability. That proposition remains in the
-body, with its hypotheses. The paragraph after it states that the result
-is conditional, that it does not prove S-REC on the trained decoder, that
-the diagnostics do not certify the condition for every pair of windows,
-and that the global-minimizer statement is separate from the
-inexact-optimizer extension. No new guarantee and no new experiment were
-added. This comment overlaps R3-05, which asks how the classical arguments
-help the application. That request is answered in its own reply.
+We have reorganized the theoretical discussion around three questions: how
+to interpret the two terms of the reconstruction objective, under which
+conditions a minimizer exists, and which factors condition recovery of the
+complete target window from sparse observations.
 
-Where the text was changed: Method, subsection Interpretation and
-theoretical context; Appendix MAP and Tikhonov interpretation; Appendix
-Existence of a minimizer.
+The MAP/Tikhonov interpretation and the existence result are classical
+mathematical arguments. They are now summarized in the Method section,
+while their formal statements and proofs appear in the Appendix. We do not
+present these arguments as new theoretical contributions. Under the stated
+Gaussian hypotheses, lambda equals the ratio of the noise variance to the
+latent-prior variance. The experiments do not use that ratio: validation
+selects lambda. Existence assumes a continuous decoder and lambda greater
+than zero. It gives a minimizer. It does not give uniqueness, convexity, or
+convergence of Adam to a global minimizer, and it does not transfer
+automatically to lambda equal to zero. The numerical solution remains
+distinct from a certified global minimizer.
+
+The conditional local-recovery proposition remains in the main text because
+it directly relates the reconstruction formulation to decoder representation
+error, measurement noise and discrepancy, mismatch between the conditioned
+latent code and a reference code, and local measurement separability. The
+bound is stated for decoder outputs in the original target units. It assumes
+a local S-REC condition and does not establish that the trained decoder
+satisfies this condition under coordinate subsampling. The statement for a
+global minimizer is distinguished from the extension to an inexact numerical
+optimizer, which is proved in the Appendix. The result does not claim exact
+recovery or superiority over interpolation or direct regression.
+
+The revised organization separates classical interpretations from the
+conditional recovery analysis and explains the purpose of each result before
+presenting its mathematical statement.
+
+These changes were previously implemented under the theoretical revisions,
+particularly R3-05. We have checked their consistency in the current
+manuscript and made no additional changes to the propositions or proofs.
 
 ## R3-P16 -- Meaning of 30 dB
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for requesting clarification of the "30dB" designation.
+
+The cross-well experiments use processed F3 well-log tables associated with
+the dataset of Zhang et al. (2025). In their study, the authors report an
+experimental condition with an SNR of 30. However, the publication does not
+provide the mathematical definition used to calculate this value or
+explicitly indicate whether it is expressed in decibels.
+
+The input files used in our experiments retain the designation "30dB" in
+their filenames. We have preserved this nomenclature for consistency with
+the dataset and to ensure that the files employed in our experiments remain
+clearly identifiable and reproducible.
+
+We have clarified this point in the Data and exploratory analysis section.
+The designation is not presented as an independently verified
+signal-to-noise ratio.
+
+Importantly, this designation is distinct from the additional Gaussian noise
+introduced into the sparse target observations in our reconstruction
+experiments, with standard deviations of 0.01 for clay volume and 0.02 for
+porosity, expressed in their respective target units.
+
+This clarification does not affect the experimental protocol or the reported
+results.
 
 ## R3-P17 -- Definition of Vc
 
-**Status:** `pending` (Abstract/Conclusions now name Larionov `Vc`; Data
-already defined it. Item stays open until this ID is processed)
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for requesting clarification of the notation \(V_c\).
+
+In this manuscript, \(V_c\) denotes the clay-volume fraction, a dimensionless
+petrophysical quantity. In the F3 cross-well benchmark, this target is a
+processed estimate derived from the gamma-ray log using the Larionov
+relation, following the dataset associated with Zhang et al. (2025).
+
+It is therefore not an independently measured laboratory clay fraction. The
+cross-well experiments reconstruct this processed target curve from the
+available auxiliary logs and sparse observations.
+
+We checked this definition across the manuscript. The Abstract, Discussion,
+and Conclusion already identified the Larionov origin and stated that the
+sparse observations are subsamples of the processed curve rather than
+independent laboratory measurements. At the first use of the notation, in
+Data and exploratory analysis, we now state explicitly that \(V_c\) denotes
+the dimensionless clay-volume fraction estimated from gamma ray using the
+Larionov relation. Tables and figures were left unchanged. The tabulated
+values lie between about 0.01 and 0.27, on a fractional scale.
 
 ## R3-P18 -- Density is ambiguous
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for pointing out the ambiguity of the term "Density" in Figure 3.
+
+We agree that this label could be confused with the bulk-density (RHOB) well log used elsewhere in the manuscript.
+
+The vertical axis of Figure 3 has therefore been relabeled "Probability density", explicitly identifying the statistical quantity represented by the empirical clay-volume distributions. Each histogram is normalized so that its area equals one. The vertical scale is not a count of samples.
+
+This correction distinguishes the probability-density representation from the petrophysical bulk-density log without changing the underlying data or the plotted distributions.
+
+The change was previously implemented under R3-A04. We have verified that the corrected label is preserved in the current manuscript, and no additional figure modification was necessary.
 
 ## R3-P19 -- Figure 7 and GR-derived Vc
 
-**Status:** `pending`
+**Status:** `closed`
+
+**Proposed reply:**
+
+We thank the reviewer for raising two important concerns regarding the readability of the cross-well depth profile and the use of gamma-ray-derived clay volume as the reconstruction target.
+
+The readability revision was implemented earlier. In the revised manuscript, the depth profile is Figure 8. Its four panels share a common clay-volume scale and depth axis, increasing downward, for the specific configuration F03-4, step 16, seed 7, and rho = 0.20. The panels show the processed reference, ML only, the direct autoencoder, and CLP-CSGM Ridge. MLP and PCA, whose substantially larger prediction ranges compressed the earlier visualization, are presented separately in supplementary Figure 24. The revised figure was inspected, and no further changes were necessary.
+
+Regarding the target variable, we agree that clay volume in this benchmark is derived from gamma ray using the Larionov relation, following the dataset associated with Zhang et al. (2025). A correlation of approximately 0.97 between gamma ray and the processed target is therefore expected. When gamma ray is available, the Larionov relation provides the appropriate direct calculation, and we do not propose CLP-CSGM as a replacement for it.
+
+The purpose of this experiment is different: to investigate whether a generative inverse-reconstruction framework can recover a processed petrophysical target when the input information required for its direct calculation is deliberately withheld. To evaluate this setting, we exclude gamma ray from the dense auxiliary inputs while retaining sonic, bulk density, acoustic impedance, and P-wave velocity. CLP-CSGM then combines information from these remaining logs with sparse observations of the target property to reconstruct its continuous profile.
+
+This controlled restriction is intended to investigate the role of conditional latent information and sparse-measurement assimilation in an underdetermined reconstruction problem. It provides a methodological test of reconstruction under incomplete input information, rather than a comparison with the conventional Larionov calculation when gamma ray is available.
+
+We also report a supplementary channel-ablation analysis in which gamma ray is reintroduced. As expected, including this channel reduces reconstruction error. At step 16, rho = 0.10, and without the boundary embargo, CLP-CSGM Ridge achieves a mean RMSE of 0.02689 without gamma ray and 0.01380 with gamma ray. The relative ordering against the direct autoencoder and measurement-only CSGM remains unchanged in this comparison.
+
+The results also establish important limits. Although CLP-CSGM Ridge achieves lower mean RMSE than the direct autoencoder in seven of nine cross-well configurations, depth interpolation outperforms CLP-CSGM in all nine configurations at the reference measurement-noise level. We therefore do not claim general superiority over simpler reconstruction methods.
+
+Finally, the experiment represents a controlled analogue of incomplete petrophysical information, not an operational validation in wells where gamma ray is genuinely unavailable. The sparse target observations are obtained by subsampling a processed Larionov-derived curve rather than from independent laboratory or core measurements. Accordingly, the results characterize the capabilities and limitations of CLP-CSGM under deliberately restricted inputs, while further validation with independently measured targets remains necessary.
+
+These points are addressed in the dataset description, the cross-well results, the supplementary channel-ablation analysis, and the Discussion. We have added one sentence in the Discussion stating this purpose. The present revision does not change the underlying data, figures, or numerical results.

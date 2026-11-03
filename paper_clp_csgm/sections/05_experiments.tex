@@ -178,10 +178,10 @@ F03-4 porosity, in the units of the target curve. It is not a percentage of
 the curve. The held-out $V_c$ curve has standard deviation about $0.035$, so
 $0.01$ is about $0.29$ times that deviation. These two levels were adopted
 for the controlled benchmarks. No calibration to instrumental measurement
-uncertainty is documented. The input files are labeled 30dB. That label is
-not this added standard deviation, and this manuscript does not define the
-procedure behind the label. Within one run, every method uses the same noisy
-observations. Direct $[\boldsymbol{u},\boldsymbol{b}]$ models standardize the
+uncertainty is documented. The input files carry the filename designation 30dB
+(Section~\ref{subsec:field_settings}). That designation is not this added
+standard deviation, and it is not a verified signal-to-noise ratio. Within
+one run, every method uses the same noisy observations. Direct $[\boldsymbol{u},\boldsymbol{b}]$ models standardize the
 concatenated features after the noise has been added.
 
 
@@ -226,6 +226,14 @@ separately trained target autoencoder. CLP-CSGM Ridge is the proposed reference
 configuration.
 Prior-only Ridge and measurement-only CSGM are structural ablations, while the
 MLP latent prior is used only for sensitivity analysis.
+AE $[\boldsymbol{u},\boldsymbol{b}]$ is the direct comparator emphasized in
+the main cross-well comparison because it has the lowest unweighted mean
+RMSE among MLP, PCA, and AE on that grid. That role does not make it the
+strongest comparator overall. Depth interpolation, second-difference
+smoothing, and direct linear and ridge regression from
+$[\boldsymbol{u},\boldsymbol{b}]$ are additional comparators in
+Section~\ref{sec:results} and
+Appendix~\ref{app:crosswell_simple_baselines}.
 
 Metrics are computed after inverse standardization on the original target
 scale. RMSE is the primary metric and selects $\lambda$ on validation data;

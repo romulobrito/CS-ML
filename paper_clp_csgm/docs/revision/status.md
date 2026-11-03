@@ -602,8 +602,8 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   table was not overwritten. Affine cell means favor that fit over CLP in
   9/9 cells at noise 0.01, 4/9 at 0.05, 1/9 at 0.10, and 0/9 at 0.20.
   Selected smoothing favors the smoother in 8/9, 4/9, 1/9, and 0/9.
-- Not done: a field-calibrated noise model; a definition of the 30dB label
-  (`R3-P16`).
+- Not done: a field-calibrated noise model. `R3-P16` is closed: the 30dB
+  string is a filename designation, not a verified signal-to-noise ratio.
 
 ### R3-04
 
@@ -656,9 +656,9 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `sections/09_appendix.tex`; `references.bib`;
   `tables/implementation_summary.tex`.
 - Shared reply: the same evidence is restated under `R3-P09`. `R3-P10`
-  is answered in its own entry. `R3-P16` stays pending.
-- Not done: a field-calibrated noise model and a definition of the 30dB
-  label.
+  is answered in its own entry. `R3-P16` is closed.
+- Not done: a field-calibrated noise model. The 30dB string is a filename
+  designation, not a verified signal-to-noise ratio.
 
 ### R3-P09
 
@@ -674,7 +674,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `sections/06_results.tex`; `sections/07_discussion.tex`;
   `sections/09_appendix.tex`; `tables/implementation_summary.tex`.
 - Shared reply: same evidence as `R3-04`, written as its own entry.
-- Not done: `R3-P16` (origin of 30dB).
+- Not done: none from this entry. `R3-P16` is closed.
 
 ### R3-P10
 
@@ -695,8 +695,8 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Files: `sections/03_method.tex`; `sections/07_discussion.tex`;
   `sections/09_appendix.tex`.
 - Shared reply: none. `R3-04` and `R3-P09` now point to this entry.
-  `R3-P16` stays pending.
-- Not done: a definition of the 30dB label, and an estimated latent
+  `R3-P16` is closed.
+- Not done: an estimated latent
   covariance.
 
 ### R3-A03
@@ -719,7 +719,7 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   blue curve \(\mathcal{R}_{\mathrm{orig}}\). The vertical arrow is latent
   refinement. The caption separates \(M_{\Omega}\) from that curve and
   names the residual between \(M_{\Omega}\widehat{y}\) and \(\boldsymbol{b}\).
-  No figure or tex edit in this closure. `R3-P14` stays `text_done`.
+  No figure or tex edit in this closure. `R3-P14` is `closed`.
 - Files: `sections/03_method.tex`;
   `figures/view_conditional_latent_prior_final.pdf`.
 - Shared reply: none. `R3-P14` uses the same figure and answers a different
@@ -728,19 +728,27 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 
 ### R3-P14
 
-- State: `text_done`
+- State: `closed`
 - Reviewer request: the old Figure 1 was hard to read; a tilded code seemed
   to decode to \(G(z_0)\); the lower blue line led nowhere; \(M=\operatorname{Im}(G)\)
   confused the index operator with the decoder range.
-- Change made: the tilde is on the dense-log argument of \(h\). The lower
-  arrow ends at \(G_{\mathrm{orig}}(\widehat{z})\) on the blue curve.
-  \(M_{\Omega}\) selects coordinates. \(\mathcal{R}_{\mathrm{orig}}\)
-  is that curve. The caption states that they are not the same object.
-- Checked: same page-11 inspection as `R3-A03`.
-- Files: `sections/03_method.tex`;
-  `figures/view_conditional_latent_prior_final.pdf`.
-- Shared reply: none. `R3-A03` explains the two mappings and the arrows.
-- Not done: none from this entry. `R3-06` is closed.
+- Change made: none in this pass. The figure and caption were already
+  revised under `R3-A03`. The tilde is on the dense-log argument of \(h\).
+  The upper arrow decodes \(z_0\) to \(G_{\mathrm{orig}}(z_0)\). The
+  vertical arrow is latent refinement from \(z_0\) to \(\widehat{z}\). The
+  lower arrow ends at \(\widehat{y}=G_{\mathrm{orig}}(\widehat{z})\) on the
+  blue curve. \(M_{\Omega}\) selects coordinates.
+  \(\mathcal{R}_{\mathrm{orig}}\) is that curve. `R3-A02` and `R3-P08`
+  already removed \(\operatorname{Im}(G)\). The caption says the drawing is
+  schematic and that the observations need not be met exactly.
+- Checked: current PDF, page 12. Both horizontal arrows end on the blue
+  curve. The vertical arrow is labeled latent refinement. Labels, including
+  \(M_{\Omega}\widehat{y}\), \(\boldsymbol{b}\), and the residual, are
+  readable and do not overlap. The footer states the balance of the
+  measurement residual and the latent penalty. No tex or figure edit.
+- Files: none.
+- Shared reply: `R3-A03`. `R3-A02` and `R3-P08` cover the notation.
+- Not done: none from this entry. `R3-A03` remains closed.
 
 ### R3-05
 
@@ -771,8 +779,8 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   of Adam. The local-recovery proposition depends on S-REC, which is not
   proved for the trained decoder. A lower objective is not a lower error
   against the unknown target. Proofs stay in the appendix. The body states
-  the implications. No manuscript edit in this closure. `R3-P15` stays
-  `text_done`.
+  the implications. No manuscript edit in this closure. `R3-P15` is
+  `closed`.
 - Not done: none from this entry. `R3-06` is closed.
 
 ### R3-06
@@ -805,15 +813,26 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 
 ### R3-P15
 
-- State: `text_done`
+- State: `closed`
 - Reviewer request: the list of propositions was confusing.
-- Change made: section 3.4 opens with the purpose of each result. Classical
-  statements are in the appendix. Four factors are named before the
-  conditional local-recovery proposition, and the limits follow it.
-- Checked: same pages as `R3-05`.
-- Files: `sections/03_method.tex`; `sections/09_appendix.tex`.
-- Shared reply: none. `R3-05` answers the role of the classical arguments.
-- Not done: none from this entry. `R3-06` is closed.
+- Change made: none in this pass. The reorganization was already in place
+  under `R3-05`. The interpretation subsection opens with the three
+  questions. MAP/Tikhonov and existence are called classical and are not
+  presented as new contributions. Their formal statements and proofs are
+  in the appendix, under `prop:map`, `prop:existence`, `app:map_proof`,
+  and `app:existence_proof`. The conditional local-recovery proposition
+  stays in the Method, after the four factors are named, and its proof and
+  the inexact-optimizer extension stay in
+  `app:conditional_local_recovery`. Lambda in the experiments remains the
+  validation choice. Existence requires a continuous decoder and lambda
+  greater than zero, and it does not give uniqueness, convexity, or global
+  Adam convergence. S-REC stays an assumption and is not claimed for the
+  trained decoder. No `.tex` file was edited.
+- Checked: `sections/03_method.tex` and `sections/09_appendix.tex`. The
+  labels above resolve to one proposition or proof each.
+- Files: none.
+- Shared reply: `R3-05`. `R3-A02`, `R3-P09`, and `R3-P10` were not reopened.
+- Not done: none from this entry. `R3-05` remains closed.
 
 ### R3-A02
 
@@ -1045,10 +1064,185 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
 - Shared reply: `R3-A05`.
 - Not done: none from this entry.
 
+### R3-P07
+
+- State: `closed`
+- Reviewer request: explain the symbols in the equations that were in the
+  Introduction.
+- Change made: none in this pass. `R2-01` already moved the reconstruction
+  objective out of the Introduction and into Method. `R3-A01` already
+  required symbols at first use. The Introduction now describes \(z_0\) in
+  prose and does not display the objective. Problem setup defines
+  \(y\), \(u\), \(N\), \(p\), \(\Omega\), \(m\), \(M_{\Omega}\), \(b\), and
+  \(\eta\) before the measurement equations. The same section keeps
+  \(\rho\) as the nominal ratio and \(m/N\) as the realized fraction.
+  \(z_0=h(u)\), \(G\), \(G_{\mathrm{orig}}\), and \(D_{\Omega}\) are
+  introduced before the reconstruction objective, and \(\lambda\) is the
+  weight of the latent penalty in that objective. The variable latent code
+  \(z\) is the argument of the decoder and the variable of that objective.
+- Checked: `sections/01_introduction.tex` and `sections/03_method.tex`.
+  No `.tex` file was edited.
+- Files: none.
+- Shared reply: `R2-01` and `R3-A01`.
+- Not done: none from this entry.
+
+### R3-P11
+
+- State: `closed`
+- Reviewer request: say which method is the baseline.
+- Change made: Method was not edited. `R3-A05` already states that ridge
+  regression learns \(h\) and that direct ridge regression maps
+  \([u,b]\) to the target window. Baselines and evaluation metrics now
+  states that AE \([u,b]\) is the direct comparator emphasized in the main
+  cross-well comparison because it has the lowest unweighted mean RMSE
+  among MLP, PCA, and AE, and that this role does not make it the strongest
+  comparator overall. Depth interpolation, second-difference smoothing, and
+  direct linear and ridge regression remain additional comparators. The
+  existing sentences that call prior-only and measurement-only structural
+  ablations, and the MLP prior a sensitivity analysis, were kept.
+  Results was not edited: AE remains the direct baseline in the main table,
+  CLP-CSGM Ridge is lower in seven of nine cells, and interpolation is
+  lower in all nine cells at noise \(0.01\).
+- Checked: compiled PDF, 89 pages, no undefined references and no overfull
+  lines.
+- Files: `sections/05_experiments.tex`.
+- Shared reply: `R3-A05`.
+- Not done: none from this entry.
+
+### R3-P12
+
+- State: `closed`
+- Reviewer request: why map u to z rather than to y, and what the
+  compression is for.
+- Change made: after the conditional map in Learned model components, one
+  paragraph states that the latent code serves the sparse-observation and
+  limited-training regimes the method is designed to address. z_0 places
+  the dense logs in the decoder space, and the sparse observations update
+  that code through the fidelity term. The reported search uses k=16 for
+  each length-64 window. AE [u,b] is identified as another latent-code
+  predictor. The paragraph reports the existing seven-of-nine cross-well
+  result and the more consistent gains at steps 16 and 32 (52 and 27
+  training windows) as evidence for the complete procedure, and notes that
+  those steps also change the window sampling. It also states that a
+  length-64 window can contain fewer than 16 observations, with the decoder
+  range and the penalty around z_0 supplying the structural information in
+  that case. Discussion was left unchanged because it already states the
+  conditional scope, the interpolation result at the reference noise, and
+  the absence of an isolated mechanism. No equation, figure, or table
+  changed.
+- Checked: compiled PDF, 90 pages, no undefined references and no overfull
+  lines.
+- Files: `sections/03_method.tex`.
+- Shared reply: none. `R3-A05` and `R3-P11` remain closed.
+- Not done: none from this entry.
+
+### R3-P13
+
+- State: `closed`
+- Reviewer request: whether intermediate results of the learned components
+  are shown.
+- Change made: Learned model components now points from the retrospective
+  decoder check to the prior-only prediction and the refined reconstruction
+  in Section ablation analysis, and states that measurement-only is a
+  separate structural ablation rather than an inference stage. The existing
+  numbers were confirmed and not rewritten: G(E(y)) mean test RMSE 0.0073,
+  0.0099, and 0.0110 at steps 8, 16, and 32; full CLP-CSGM lower than
+  prior-only in all nine cross-well cells, with relative reductions from
+  20.5% to 60.6% in Table ablation_crosswell. No iteration trajectory is
+  reported. No equation, figure, table, or result changed.
+- Checked: compiled PDF, 90 pages, no undefined references and no overfull
+  lines.
+- Files: `sections/03_method.tex`.
+- Shared reply: none. `R3-P11` and `R3-P12` remain closed.
+- Not done: none from this entry.
+
+### R3-P16
+
+- State: `closed`
+- Reviewer request: what 30 dB means.
+- Change made: Data and exploratory analysis states that the cross-well
+  tables are the processed F3 logs associated with Zhang et al. (2025), that
+  those authors report an SNR of 30 without a formula or an explicit unit,
+  and that the filename designation 30dB is retained for reproducibility
+  without treating it as a verified signal-to-noise ratio. The text does not
+  identify the files with the condition in their Figure 7. Experimental
+  setup still separates that designation from the added Gaussian noise, with
+  standard deviations 0.01 and 0.02 in target units. The input files were
+  not replaced.
+- Checked: compiled PDF, 90 pages, 9274187 bytes. No undefined references
+  and no overfull lines. No SNR value was computed or introduced.
+- Files: `sections/04_data_and_eda.tex`; `sections/05_experiments.tex`.
+- Shared reply: none. `R3-04`, `R3-P09`, and `R3-P10` remain closed.
+- Not done: a field-calibrated noise model.
+
+### R3-P17
+
+- State: `closed`
+- Reviewer request: what Vc is.
+- Change made: at the first use of the notation, Data and exploratory
+  analysis now says that the processed porosity target is density-derived,
+  whereas Vc denotes the dimensionless clay-volume fraction estimated from
+  gamma ray using the Larionov relation. The 30dB provenance paragraph from
+  R3-P16 was not changed. Abstract, Discussion, and Conclusion already named
+  the Larionov origin and the absence of independent laboratory measurements.
+  No equation, figure, table, or result was changed.
+- Checked: the 30dB input tables store Vc between 0.0112 and 0.2688, a
+  fraction rather than a percentage. Compiled PDF, 90 pages, 9274235 bytes.
+  No undefined references and no overfull lines.
+- Files: `sections/04_data_and_eda.tex`.
+- Shared reply: none. `R3-P16` remains closed. `R3-P19` is closed.
+- Not done: none from this entry. The gamma-ray-derived target is addressed
+  under `R3-P19` without a new manuscript edit.
+
+### R3-P18
+
+- State: `closed`
+- Reviewer request: replace the ambiguous "Density" label in Figure 3.
+- Change made: none in this pass. Figure 3
+  (`figures/eda_crosswell_vc_distribution.png`,
+  `fig:eda_crosswell_distribution`) already uses the vertical label
+  "Probability density" from `R3-A04`. The legend reads "train wells" and
+  "held-out F03-4". The horizontal axis is the clay-volume fraction. RHOB
+  remains the bulk-density log in the text and tables. The caption, the
+  30dB paragraph, and the Vc definition were not edited.
+- Checked: page 18 of the 90-page PDF. The label is readable, with no
+  overlap or cropping. The same 50-bin histograms have area 1 for the
+  training samples and for F03-4. Their tallest bins are about 12 and 19,
+  while the corresponding sample counts peak at 60 and 51, so the axis is
+  not a count. No figure was regenerated.
+- Files: none.
+- Shared reply: the figure change is the one recorded under `R3-A04`, which
+  remains closed.
+- Not done: none from this entry.
+
+### R3-P19
+
+- State: `closed`
+- Reviewer request: the depth profile was hard to read, and Vc is a weak
+  target because it can be calculated from gamma ray (correlation about 0.97).
+- Change made: one sentence in Discussion, immediately after the exclusion
+  of gamma ray. It states that the exclusion evaluates whether conditional
+  generative reconstruction can recover the processed target from the
+  remaining dense logs and sparse target observations when the input required
+  for the conventional calculation is withheld, as a controlled test under
+  incomplete information. The shared-scale depth profile and the separate
+  MLP/PCA figure remain those of `R3-06`. The numerical results were not
+  changed.
+- Checked: page 32 has one Vc scale, depth increasing downward, and distinct
+  reference, ML only, AE, and CLP-CSGM Ridge curves for step 16, seed 7, and
+  rho 0.20. Page 81 keeps MLP and PCA on their full range. The benchmark
+  default and the figure-provenance check use the channels sonic, rhob, ai,
+  and vp. No figure or result was regenerated. Compiled PDF, 90 pages,
+  9274694 bytes. No undefined references and no overfull lines.
+- Files: `sections/07_discussion.tex`.
+- Shared reply: the figure change remains the one recorded under `R3-06`.
+  `R3-P16`, `R3-P17`, and `R3-P18` remain closed.
+- Not done: none from this entry.
+
 ## Queue (not yet processed)
 
-R3-P07, R3-P11 .. R3-P13, R3-P16 .. R3-P19, AE-01.
-R1-m05 remains deferred. `R1-m03` and `R3-P14` are text_done. `R3-A03` is closed.
-`R3-05` and `R3-P15` are text_done. `R3-A02` is closed. `R3-P08` stays text_done.
+AE-01.
+R1-m05 remains deferred. `R1-m03` is text_done. `R3-P14` is closed. `R3-A03` is closed.
+`R3-05` is closed. `R3-P15` is closed. `R3-A02` is closed. `R3-P08` stays text_done.
 `R3-06` is closed.
-`R3-P09` and `R3-P10` are text_done. `R3-P16` remains pending.
+`R3-P09` and `R3-P10` are text_done. `R3-P16` is closed. `R3-P17` is closed. `R3-P18` is closed. `R3-A04` remains closed. `R3-P19` is closed. `R3-06` remains closed.
