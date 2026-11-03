@@ -1239,9 +1239,34 @@ States: `pending` | `in_progress` | `text_done` | `needs_experiment` | `needs_in
   `R3-P16`, `R3-P17`, and `R3-P18` remain closed.
 - Not done: none from this entry.
 
+### AE-01
+
+- State: `closed`
+- Editor request: narrow broad claims, identify derived and subsampled
+  targets, compare traditional linear methods, respect the small number of
+  wells and realizations, examine observation placement, improve readability,
+  and declare generative-AI use.
+- Change made: the geometry caption now states that OpenAI's ChatGPT, model
+  GPT-5.5, assisted the initial visual organization and that the authors
+  reviewed the figure. The general declaration names ChatGPT for translation,
+  language, length, and the captioned schematics, and names xAI's Grok 4.7
+  for refactoring existing scientific code. Implementation details state that
+  the code was originally written by the authors and that Grok 4.7 assisted
+  later restructuring. No result, table, or figure image was changed.
+- Checked: compiled PDF, 90 pages, 9275720 bytes. No undefined references
+  and no overfull lines. The scientific scope statements from the earlier
+  audit remain. Closed reviewer entries were not reopened.
+- Files: `sections/03_method.tex`; `sections/05_experiments.tex`;
+  `sections/08_conclusion.tex`; `docs/revision/ae01_matriz_conformidade.md`;
+  `docs/revision/respostas_R3.md`.
+- Shared reply: none.
+- Not done: additional wells and an observation-placement design that
+  separates position from noise. Those limits stay stated and are not open
+  disclosure items.
+
 ## Queue (not yet processed)
 
-AE-01.
+None from the Associate Editor list. `AE-01` is closed.
 R1-m05 remains deferred. `R1-m03` is text_done. `R3-P14` is closed. `R3-A03` is closed.
 `R3-05` is closed. `R3-P15` is closed. `R3-A02` is closed. `R3-P08` stays text_done.
 `R3-06` is closed.
