@@ -64,8 +64,8 @@ Where the text was changed: the Abstract; the Introduction (third
 contribution); Experimental setup, subsection Cross-well clay-volume (the
 single held-out well); and the Conclusion (single-holdout paragraph).
 
-No additional held-out wells were added for this comment. Requests for
-further held-out wells or repeated resampling are addressed under R1-M03.
+No additional held-out wells were added for this comment. Further held-out
+wells remain outside the evidence reported here.
 
 ---
 
@@ -291,11 +291,6 @@ RMSE). Experimental setup, subsection Single-well F03-4 GR-only porosity
 benchmark, and Interpretation, scope, and limitations already contained the
 controlled-test limit and were left in place.
 
-No new experiments were added for this comment. A test against independent
-core measurements remains outside this textual revision and is addressed
-under R1-M11. The realism of excluding gamma ray and acoustic travel time
-from the main inputs is addressed under R2-03.
-
 ---
 
 ## R1-M10 -- Update literature positioning
@@ -399,7 +394,7 @@ it retains the four recent references, distinguishes completion, translation,
 and direct regression from CLP-CSGM by how observations enter inference, and
 shortens repeated descriptions of trajectory initialization and restart
 details that remain in the Method section. The mathematical formulation,
-equations, experimental results, and earlier revisions were left unchanged.
+equations, and experimental results were left unchanged.
 
 Where the text was changed: Introduction (pointer to Related Work for the
 recent-study comparison); Related work, subsection Petrophysical log

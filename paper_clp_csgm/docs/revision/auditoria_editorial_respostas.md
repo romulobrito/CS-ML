@@ -22,7 +22,7 @@ As categorias sao:
 | ID | Classificacao | Problema identificado | Alteracao realizada | Justificativa | Situacao final |
 | --- | --- | --- | --- | --- | --- |
 | R1-M01 | Ajuste substancial | Repetia a mesma limitacao em cinco paragrafos e incluia historico interno. | Condensada em origem dos alvos, alcance da evidencia e locais alterados. | Mantem a limitacao central sem desviar para o processo da revisao. | `closed` |
-| R1-M02 | Aprovada | Nenhum problema material. | Nenhuma. | Responde diretamente ao limite de tres pocos de desenvolvimento e um retido. | `closed` |
+| R1-M02 | Ajuste leve | Terminava com uma referencia interna a outro ID de comentario. | Substituida pela limitacao cientifica diretamente relevante. | Responde diretamente ao limite de tres pocos de desenvolvimento e um retido. | `closed` |
 | R1-M03 | Ajuste substancial | Excesso de detalhes operacionais obscurecia o resultado e a limitacao de sobreposicao. | Reorganizada em contagem corrigida, resultado da reamostragem e limite do teste. | Preserva medias, 10/10 particoes e ausencia de um novo poco. | `closed` |
 | R1-M04 | Ajuste substancial | A resposta misturava desenho, resultados e ressalvas em uma enumeracao longa. | Reduzida a painel de dez sementes, ranking por regime e alcance estatistico. | Preserva df=9, intervalos, regimes vencedores e limite de um unico poco. | `closed` |
 | R1-M05 | Ajuste substancial | Repetia Abstract, Conclusion e Highlights quase integralmente. | Sintetizada em ranking condicional, reversao GR-only e interpolacao no ruido de referencia. | Responde diretamente ao pedido de evitar superioridade geral. | `closed` |
@@ -33,7 +33,7 @@ As categorias sao:
 | R1-M10 | Ajuste substancial | Resumia individualmente os quatro artigos em detalhe excessivo. | Reescrita como posicionamento conjunto e diferenca de formulacao. | O revisor pediu posicionamento, nao resenhas extensas. | `closed` |
 | R1-M11 | Ajuste substancial | A resposta reproduzia quase todo o apendice, com muitos numeros secundarios. | Mantidos proveniencia, protocolo, resultados agregados e limitacoes decisivas. | Preserva a resposta ao teste laboratorial sem transformar um intervalo em validacao operacional. | `closed` |
 | R1-m01 | Aprovada | Nenhum problema material. | Nenhuma. | Resposta curta e suficiente. | `closed` |
-| R1-m02 | Aprovada | Nenhum problema material. | Nenhuma. | Explica a reducao de sobreposicao e os locais alterados. | `closed` |
+| R1-m02 | Ajuste leve | Mencionava genericamente "earlier revisions", um detalhe de processo. | Removida a metalinguagem sem alterar a descricao da edicao. | Explica a reducao de sobreposicao e os locais alterados. | `closed` |
 | R1-m03 | Ajuste leve | Incluia a declaracao de IA, que nao responde ao pedido de legibilidade. | Removida a digressao e mantida a verificacao visual. | A resposta agora trata somente da Figura 2. | `closed` |
 | R1-m04 | Aprovada | Nenhum problema material. | Nenhuma. | Delimita corretamente o conjunto de comparadores diretos. | `closed` |
 | R1-m05 | Requer verificacao | A tag congelada ainda nao existe e o repositorio publico nao contem todos os runners da revisao. | Nenhuma mudanca na resposta pendente. | O comentario so pode ser encerrado apos a versao publica corresponder ao manuscrito. | `pending` |
@@ -51,7 +51,7 @@ As categorias sao:
 | R3-A01 | Ajuste substancial | Lista de siglas e simbolos tinha aparencia de checklist interno. | Condensada em definicoes no Abstract e sequencia de definicao no corpo. | Preserva a verificacao de primeira ocorrencia com leitura mais natural. | `closed` |
 | R3-A02 | Ajuste substancial | Incluia historico de outros comentarios e da regeneracao da figura. | Centrada nas tres notacoes de range e no papel de M_Omega. | Responde diretamente a confusao notacional. | `closed` |
 | R3-A03 | Aprovada | Nenhum problema material. | Nenhuma. | Descreve claramente os dois decodings e a seta de refinamento. | `closed` |
-| R3-A04 | Aprovada | Nenhum problema material. | Nenhuma. | Resposta curta e diretamente verificavel. | `closed` |
+| R3-A04 | Ajuste leve | Citava caminho de script e funcao de plotagem. | Mantidos apenas a figura e o local no manuscrito. | Resposta curta e diretamente verificavel. | `closed` |
 | R3-A05 | Aprovada | Nenhum problema material. | Nenhuma. | Diferencia ridge interno e baseline ridge direto. | `closed` |
 | R3-P01 | Aprovada | Nenhum problema material. | Nenhuma. | Responde a anotacao com a nova frase inicial do Abstract. | `closed` |
 | R3-P02 | Aprovada | Nenhum problema material. | Nenhuma. | Reconhece missing-data reconstruction e justifica a formulacao inversa sem alegar inversao fisica. | `closed` |
@@ -67,18 +67,18 @@ As categorias sao:
 | R3-P12 | Ajuste substancial | A justificativa estava diluida em resultados e ressalvas repetidos. | Reorganizada em funcao do espaco latente, evidencia do procedimento completo e limite. | Defende a metodologia sem atribuir causalidade a compressao. | `closed` |
 | R3-P13 | Ajuste substancial | Descrevia repetidamente as mesmas etapas e tabelas. | Sintetizados G(E(y)), prior-only, full CLP e measurement-only. | Responde ao pedido de resultados intermediarios com a distincao operacional correta. | `closed` |
 | R3-P14 | Ajuste leve | Incluia numero de pagina instavel e historico interno de comentarios. | Substituido pela localizacao da figura e pela verificacao visual relevante. | Explica setas e simbolos de forma completa. | `closed` |
-| R3-P15 | Aprovada | Nenhum problema material. | Nenhuma. | Apresenta a nova organizacao teorica e suas limitacoes. | `closed` |
+| R3-P15 | Ajuste leve | Terminava com cronologia de revisoes e outro ID. | Substituida pela localizacao das secoes teoricas alteradas. | Apresenta a nova organizacao teorica e suas limitacoes. | `closed` |
 | R3-P16 | Aprovada | Nenhum problema material. | Nenhuma. | Preserva SNR de 30 sem unidade confirmada e separa o ruido acrescentado. | `closed` |
 | R3-P17 | Aprovada | Nenhum problema material. | Nenhuma. | Define Vc, escala e procedencia no primeiro uso. | `closed` |
-| R3-P18 | Aprovada | Nenhum problema material. | Nenhuma. | Confirma probability density e normalizacao sem alterar a figura. | `closed` |
+| R3-P18 | Ajuste leve | Terminava com referencia a outro ID e controle interno. | Substituida pela localizacao direta da figura alterada. | Confirma probability density e normalizacao sem alterar os dados. | `closed` |
 | R3-P19 | Ajuste substancial | Resposta longa repetia justificativas, limites e numeros de outros comentarios. | Separada em legibilidade, proposito do embargo de GR, ablation e limites. | Preserva o resultado com GR, interpolacao e ausencia de validacao independente. | `closed` |
 | AE-01 | Ajuste substancial | A sintese era correta, mas repetia blocos de respostas individuais. | Reescrita como carta coesa em escopo, comparadores, robustez, apresentacao e IA. | O editor identifica mudancas e limitacoes sem uma colagem de respostas. | `closed` |
 
 ## Contagem
 
 - Total analisado: 52.
-- Aprovadas sem alteracao: 19.
-- Ajustes leves: 9.
+- Aprovadas sem alteracao: 14.
+- Ajustes leves: 14.
 - Ajustes substanciais: 23.
 - Requer verificacao adicional: 1.
 
