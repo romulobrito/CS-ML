@@ -1,4 +1,4 @@
-\begin{thebibliography}{47}
+\begin{thebibliography}{49}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -11,6 +11,23 @@ Reda Abdel~Azim and Abdulrahman Aljehani.
   logs.
 \newblock \emph{Processes}, 10\penalty0 (12):\penalty0 2587, 2022.
 \newblock \doi{10.3390/pr10122587}.
+
+\bibitem[Abdelrahman and Szab{\'o}(2024)]{abdelrahman2024hurst}
+Moataz M.~G. Abdelrahman and Norbert~P. Szab{\'o}.
+\newblock Integrated workflow incorporating the {Hurst} exponent and interval
+  inversion for evaluating groundwater formations.
+\newblock \emph{Hydrogeology Journal}, 32\penalty0 (2):\penalty0 487--507,
+  2024.
+\newblock \doi{10.1007/s10040-023-02752-0}.
+
+\bibitem[Adjei et~al.(2019)Adjei, Wilberforce, Opoku, and
+  Mohammed]{adjei2019probabilistic}
+Stephen Adjei, Aggrey~N. Wilberforce, Daniel Opoku, and Isah Mohammed.
+\newblock Probabilistic approach for shale volume estimation in {Bornu Basin}
+  of {Nigeria}.
+\newblock \emph{Journal of Petroleum and Gas Engineering}, 10\penalty0
+  (4):\penalty0 49--54, 2019.
+\newblock \doi{10.5897/JPGE2019.0319}.
 
 \bibitem[Adler and Öktem(2018)]{adler2018deepbayes}
 Jonas Adler and Ozan Öktem.

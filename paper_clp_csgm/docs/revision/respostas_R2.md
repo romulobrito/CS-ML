@@ -151,9 +151,11 @@ subsection Sparse-coordinate placement.
 We added two complementary robustness checks while retaining the original
 three-seed tables as the main result. First, a ten-seed panel refits both
 methods and redraws coordinates and measurement noise. None of the nine
-paired 95% Student-t intervals includes zero. The regime-dependent ranking is
-unchanged: CLP-CSGM Ridge is lower at steps 16 and 32, whereas the direct
-autoencoder is lower at step 8 for rho=0.05 and rho=0.10.
+paired 95% Student-t intervals includes zero. These are per-configuration
+intervals and were not adjusted for simultaneous multiple comparisons. The
+regime-dependent ranking is unchanged: CLP-CSGM Ridge is lower at steps 16
+and 32, whereas the direct autoencoder is lower at step 8 for
+\(\rho=0.05\) and \(\rho=0.10\).
 
 Second, a panel comprising the published realization and four additional
 draws holds model seeds 7, 23, and 41 fixed while redrawing coordinates and

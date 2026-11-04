@@ -141,10 +141,14 @@ relative robustness of the complete procedure, with $\lambda$ reselected on
 validation at each noise level. The runs do not isolate the decoder, the
 conditional prior, or that reselection, and they do not establish recovery
 of local detail or operational superiority. The higher noise levels were not
-calibrated to field uncertainties. Section~\ref{subsec:crosswell_results}
-also states the extra cost: mean time per window and the normalized runtime
-diagnostic in Table~\ref{tab:runtime_cost} are different quantities, and the
-larger CLP-CSGM time is not justified in general.
+calibrated to field uncertainties. An instrument-aware analysis would require
+estimating gamma-ray and endpoint uncertainties and propagating them through
+the nonlinear Larionov relation. The Gaussian perturbations are therefore
+used here only as a synthetic sensitivity test, not as a model of field
+measurement uncertainty. Section~\ref{subsec:crosswell_results} also states
+the extra cost: mean time per window and the normalized runtime diagnostic
+in Table~\ref{tab:runtime_cost} are different quantities, and the larger
+CLP-CSGM time is not justified in general.
 
 The Lapa permeability case
 \citep{alvarez2025nonlinear} extends the evaluation to another lithology and

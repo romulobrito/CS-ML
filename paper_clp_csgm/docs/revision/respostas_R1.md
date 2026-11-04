@@ -126,11 +126,13 @@ comparison, while retaining the submitted three-seed tables as the main
 result.
 
 With ten seeds, none of the nine paired Student-t intervals for
-DeltaRMSE includes zero. The regime-dependent ranking remains: CLP-CSGM
-Ridge has lower RMSE at every measurement ratio for steps 16 and 32 and at
-step 8, rho=0.20, whereas AE is lower at step 8 for rho=0.05 and rho=0.10.
-Thus, the expanded panel strengthens the evidence for the low-training-support
-regime but does not support uniform superiority.
+\(\Delta\mathrm{RMSE}\) includes zero. These are per-configuration intervals
+and were not adjusted for simultaneous multiple comparisons. The
+regime-dependent ranking remains: CLP-CSGM Ridge has lower RMSE at every
+measurement ratio for steps 16 and 32 and at step 8, \(\rho=0.20\), whereas
+AE is lower at step 8 for \(\rho=0.05\) and \(\rho=0.10\). Thus, the expanded
+panel strengthens the evidence for the low-training-support regime but does
+not support uniform superiority.
 
 Each seed also redraws the sparse coordinates and measurement noise and
 refits the models. The intervals therefore summarize seed-level variability
@@ -189,7 +191,7 @@ The advantage is conditional, not superiority over every method.
 
 We thank the reviewer for noting that the latent prior is not a minor
 implementation detail. An audit of the earlier comparison found that it did
-not isolate the class of h. In the cross-well runs, the MLP prior also
+not isolate the class of \(h\). In the cross-well runs, the MLP prior also
 received gamma ray, while the Ridge prior did not. In the single-well
 GR-only runs, the two priors used different depth partitions, with 224 and
 275 test windows. Those runs are not a controlled ablation.
@@ -199,18 +201,18 @@ fixed. In the controlled cross-well grid, both priors use the channels
 sonic, rhob, ai, and vp, without gamma ray, and the same windows and sparse
 observations. The MLP prior has lower mean RMSE in seven of the nine
 configurations. Ridge has lower mean RMSE at step 32 for measurement ratios
-0.10 and 0.20. The unweighted mean RMSE across the nine configurations
-decreases from 0.028623668 for Ridge to 0.025383384 for MLP, a relative
-reduction of 11.3%. The MLP advantage becomes smaller as the number of
-training windows decreases and is nearly absent at step 32. In the
+0.10 and 0.20. Across the nine configurations, the unweighted mean RMSE
+decreases from 0.0286 for Ridge to 0.0254 for MLP, corresponding to 11.3%
+based on the unrounded values. The MLP advantage becomes smaller as the
+number of training windows decreases and is nearly absent at step 32. In the
 controlled F03-4 GR-only comparison, both priors use the same depth-first
 partition and the same 224 test windows. Ridge has lower mean RMSE at all
 five measurement ratios, with relative reductions of approximately 15.6% to
 19.7% compared with MLP.
 
 Ridge remains the primary reference because it is a linear low-capacity map,
-so the main tables use one fixed h across regimes. It is not presented as
-the best prior in every setting. The class of h should be selected on
+so the main tables use one fixed \(h\) across regimes. It is not presented as
+the best prior in every setting. The class of \(h\) should be selected on
 validation data for the intended regime, not by adopting whichever variant
 wins on the held-out test set. The controlled MLP results were not used to
 replace the main CLP-CSGM Ridge versus direct autoencoder comparison.
@@ -239,6 +241,10 @@ We thank the reviewer for stressing that the conditional local-recovery
 proposition is conditional and does not prove S-REC for the trained
 decoder. Method, Interpretation, scope, and limitations, and the appendix
 diagnostics already stated that limit. The original Abstract did not.
+
+The conditional local-recovery statement referred to as Proposition 3 in the
+reviewed version is now Proposition 1 in the revised manuscript, following
+the reorganization of the theoretical section.
 
 The Abstract now states that the local recovery bound remains conditional
 and does not show that the trained decoder separates nearby windows. The

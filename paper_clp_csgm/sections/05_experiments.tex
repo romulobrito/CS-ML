@@ -177,12 +177,21 @@ is $\sigma_{\eta}=0.01$ for cross-well $V_c$ and $\sigma_{\eta}=0.02$ for
 F03-4 porosity, in the units of the target curve. It is not a percentage of
 the curve. The held-out $V_c$ curve has standard deviation about $0.035$, so
 $0.01$ is about $0.29$ times that deviation. These two levels were adopted
-for the controlled benchmarks. No calibration to instrumental measurement
-uncertainty is documented. The input files carry the filename designation 30dB
+for the controlled benchmarks. These levels define controlled synthetic
+perturbations and are not interpreted as estimates of instrumental
+uncertainty. Gaussian contamination has precedent as a synthetic stress test
+in well-log inversion \citep{abdelrahman2024hurst}, but this precedent does
+not calibrate the amplitudes used here. Because the benchmark target is
+derived from gamma ray through the nonlinear Larionov relation, an
+instrument-aware analysis would require estimating gamma-ray and endpoint
+uncertainties and propagating them through that transformation
+\citep{adjei2019probabilistic}. Such propagation is outside the scope of this
+benchmark. The input files carry the filename designation 30dB
 (Section~\ref{subsec:field_settings}). That designation is not this added
 standard deviation, and it is not a verified signal-to-noise ratio. Within
-one run, every method uses the same noisy observations. Direct $[\boldsymbol{u},\boldsymbol{b}]$ models standardize the
-concatenated features after the noise has been added.
+one run, every method uses the same noisy observations. Direct
+$[\boldsymbol{u},\boldsymbol{b}]$ models standardize the concatenated
+features after the noise has been added.
 
 
 \subsection{Implementation details}

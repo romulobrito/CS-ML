@@ -165,6 +165,16 @@ adopted for controlled benchmarks and were not calibrated to instrumental
 uncertainty. The `30dB` filename designation is separate from this added
 noise and is not interpreted as a verified SNR.
 
+We now make the rationale and its limit explicit. Gaussian contamination has
+precedent as a synthetic well-log inversion stress test (Abdelrahman and
+Szabo, 2024), but this does not calibrate the amplitudes used here. Because
+the cross-well target is gamma-ray-derived, an instrument-aware analysis
+would need to estimate gamma-ray uncertainty and propagate it through the
+nonlinear clay-volume relation. Adjei et al. (2019) illustrate probabilistic
+sampling for uncertainty in gamma-ray-based shale-volume estimation. We did
+not perform that propagation and therefore retain the synthetic,
+uncalibrated interpretation.
+
 The prior-data balance is controlled by \(\lambda\), not by changing the
 noise during a reported run. For each seed and measurement ratio, validation
 full-window RMSE selects \(\lambda\) from
@@ -570,13 +580,13 @@ that correlation, not to the removed label.
 **Proposed reply:**
 
 We thank the reviewer for requesting clarification. Yes, ridge regression is
-used to implement the conditional latent-prior map h. It is trained to
+used to implement the conditional latent-prior map \(h\). It is trained to
 predict latent codes from dense auxiliary logs, using codes obtained from the
-target-window encoder during training. At inference, its prediction z_0
-initializes latent refinement and serves as the center of the quadratic
-latent penalty. The decoder G maps the refined code to the reconstructed
-target-property window. Ridge regression therefore does not replace the
-decoder or perform the latent optimization.
+target-window encoder during training. At inference, its prediction
+\(\boldsymbol{z}_0\) initializes latent refinement and serves as the center
+of the quadratic latent penalty. The decoder \(G\) maps the refined code to
+the reconstructed target-property window. Ridge regression therefore does
+not replace the decoder or perform the latent optimization.
 
 The Introduction and Method now clarify these roles and distinguish the
 conditional ridge-regression map from the direct ridge-regression baseline,
@@ -658,6 +668,14 @@ values define controlled benchmark noise and were not calibrated to
 instrumental uncertainty. The `30dB` filename designation is unrelated to
 this added perturbation.
 
+The revised Experimental setup cites synthetic Gaussian contamination in
+well-log inversion (Abdelrahman and Szabo, 2024) as precedent for the
+stress-test form, not for these amplitudes. It also cites probabilistic
+sampling of uncertainty in gamma-ray-based shale-volume estimation (Adjei et
+al., 2019). We did not estimate tool-specific gamma-ray uncertainty or
+propagate it through the Larionov relation, so the added noise is not
+presented as instrument-calibrated.
+
 The reported experiments select \(\lambda\) by validation full-window RMSE
 for each seed and measurement ratio and fix it before test evaluation. They
 do not compute it from a variance ratio. Under the Gaussian hypotheses of the
@@ -673,7 +691,7 @@ The noise-sensitivity analysis uses a separate wider validation grid for
 \(\lambda\); values at its upper boundary are reported as the largest
 candidate tested, not as optima beyond the grid.
 
-Where the text was changed: Method, subsection Test-time reconstruction (the latent-refinement objective and the residual identity); Method, subsection Interpretation and theoretical context (the MAP proposition); Appendix MAP and Tikhonov interpretation; Appendix Direct linear maps, depth interpolation, and measurement noise; the implementation-summary table.
+Where the text was changed: Method, subsection Test-time reconstruction (the latent-refinement objective and the residual identity); Method, subsection Interpretation and theoretical context (the MAP proposition); Experimental setup; Discussion; Appendix MAP and Tikhonov interpretation; Appendix Direct linear maps, depth interpolation, and measurement noise; the implementation-summary table.
 
 ## R3-P10 -- Covariance
 
@@ -875,13 +893,13 @@ The MAP/Tikhonov interpretation and the existence result are classical
 mathematical arguments. They are now summarized in the Method section,
 while their formal statements and proofs appear in the Appendix. We do not
 present these arguments as new theoretical contributions. Under the stated
-Gaussian hypotheses, lambda equals the ratio of the noise variance to the
+Gaussian hypotheses, \(\lambda\) equals the ratio of the noise variance to the
 latent-prior variance. The experiments do not use that ratio: validation
-selects lambda. Existence assumes a continuous decoder and lambda greater
-than zero. It gives a minimizer. It does not give uniqueness, convexity, or
-convergence of Adam to a global minimizer, and it does not transfer
-automatically to lambda equal to zero. The numerical solution remains
-distinct from a certified global minimizer.
+selects \(\lambda\). Existence assumes a continuous decoder and
+\(\lambda>0\). It gives a minimizer. It does not give uniqueness, convexity,
+or convergence of Adam to a global minimizer, and it does not transfer
+automatically to \(\lambda=0\). The numerical solution remains distinct from
+a certified global minimizer.
 
 The conditional local-recovery proposition remains in the main text because
 it directly relates the reconstruction formulation to decoder representation
