@@ -1,0 +1,72 @@
+diff --git a/paper_clp_csgm/main.tex b/paper_clp_csgm/main.tex
+index dbded2f..281c22b 100644
+--- a/paper_clp_csgm/main.tex
++++ b/paper_clp_csgm/main.tex
+@@ -76,36 +76,37 @@ E-mail: \texttt{romulobrito@lenep.uenf.br}}
+ \maketitle
+ 
+ \begin{abstract}
+-The goal is to reconstruct a continuous target-property profile along a well
+-using dense auxiliary wireline logs and sparse observations of the target
+-property at selected depths. Direct models can use those sparse observations
+-as input features, yet the reconstruction need not honor them as measurements.
+-We introduce Conditional Latent-Prior Compressed Sensing with Generative
+-Models (CLP-CSGM). A learned decoder maps latent codes to candidate target-property
+-windows, limiting which curves it can reconstruct. Dense auxiliary logs predict a
+-conditional latent code, $z_0$. Latent refinement balances disagreement with
+-the sparse measurements against proximity to $z_0$. That code is the
+-reference for this balance, not only a starting value. A residual at the
+-observed depths can remain. The local recovery bound remains conditional
+-and does not show that the trained decoder separates nearby windows.
+-The cross-well test uses public Dutch North Sea logs, with three development
+-wells and one held-out well. Targets are Larionov clay volume from gamma ray
+-and processed density-derived porosity. Sparse observations are subsamples of these curves,
+-not independent core or laboratory measurements.
+-CLP-CSGM has lower mean root mean square error (RMSE) than the direct
+-autoencoder in seven of nine cross-well configurations, chiefly when training
+-support is limited, but loses in two. For the gamma-ray-only case, $\rho$ denotes the nominal observed
+-fraction of window depths. CLP-CSGM has lower mean
+-RMSE at $\rho\in\{0.20,0.30\}$, whereas the autoencoder is lower at
+-$\rho\in\{0.40,0.60\}$; their errors are nearly equal at $\rho=0.50$.
+-
+-At the reference noise standard deviation $0.01$, depth
+-interpolation outperforms CLP-CSGM in all nine cross-well
+-configurations. This ordering changes under larger perturbations that were
+-not calibrated to field uncertainties. A laboratory-porosity supplement
+-also favors the direct autoencoder in mean RMSE. These findings
+-indicate regime-dependent gains relative to the direct autoencoder, rather
+-than overall superiority, and broader validation remains necessary.
++We reconstruct a continuous target-property profile when dense auxiliary
++wireline logs are available but the target is observed at only a few depths.
++Direct predictors can accept those observations as features without retaining
++them as explicit measurements during inference. Conditional Latent-Prior
++Compressed Sensing with Generative Models (CLP-CSGM) instead combines a
++learned target-window representation, a latent anchor
++$\boldsymbol{z}_0$ predicted from
++the dense logs, and test-time refinement against the sparse measurements.
++Its local recovery bound is conditional and does not establish separation of
++nearby windows by the trained decoder.
++
++The cross-well evaluation uses three development wells and F03-4 as the
++held-out well. CLP-CSGM Ridge has lower mean root
++mean square error (RMSE) than a direct autoencoder in seven of nine
++configurations, especially at lower training support; it also improves on its
++conditional prior-only prediction in all
++nine. For the GR-only porosity case, $\rho$ denotes the nominal fraction of
++window depths selected for observation. CLP-CSGM is lower at
++$\rho\in\{0.20,0.30\}$, the autoencoder is lower at
++$\rho\in\{0.40,0.60\}$, and their errors are nearly equal at $\rho=0.50$.
++At the reference noise standard deviation $0.01$, depth interpolation has
++lower RMSE than CLP-CSGM in all nine cross-well configurations. The ordering
++becomes more favorable to CLP-CSGM under larger synthetic perturbations that
++were not calibrated to field uncertainties.
++
++The F3 targets are processed curves: clay volume is Larionov-derived from
++gamma ray, porosity is density-derived, and sparse observations are
++subsamples rather than independent core or laboratory measurements. The
++results support conditional benefits of explicit latent
++refinement in the evaluated regimes, not general superiority, and motivate
++broader validation with independently calibrated targets.
+ \end{abstract}
+ 
+ \keywords{compressed sensing; generative model; inverse problem;

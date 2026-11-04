@@ -10,20 +10,12 @@ paired seeds.
 \subsection{Cross-well low-data results}
 \label{subsec:crosswell_results}
 
-Three questions organize this subsection. Latent refinement adds value
-against the direct AE where training support is smallest: CLP-CSGM Ridge
-has lower mean RMSE in seven of nine cells, and at steps $16$ and $32$ that
-ordering holds in the ten-seed panel and in every sparse-measurement redraw.
-Against simple reconstructions at the reference noise $0.01$, it does not:
-depth interpolation is lower in all nine cells, the affine fit is lower in
-all nine, and the validation-selected smoother is lower in eight of nine.
-The extra iterative cost is not generally repaid. On this cross-well grid,
-Table~\ref{tab:runtime_cost} reports $0.23517$ s per test window for CLP-CSGM
-Ridge and $0.03156$ s for AE $[\boldsymbol{u},\boldsymbol{b}]$. The normalized
-runtime diagnostic versus AE is $9.79$. That diagnostic is not the quotient
-of those two averages. Whether the extra optimization is worthwhile depends
-on the gain against the comparator actually available, not on the comparison
-with direct predictors alone.
+Three questions organize the results. Where does conditional latent
+refinement improve on the strongest direct autoencoder in the main grid, and
+does that ordering persist across additional seeds and measurement
+realizations? What do the structural ablations reveal about the conditional
+prior and sparse-measurement refinement? When do interpolation, smoothing,
+and their lower computational cost make latent optimization unnecessary?
 
 Table~\ref{tab:crosswell_clp_vs_ae} compares CLP-CSGM Ridge with AE
 $[\boldsymbol{u},\boldsymbol{b}]$, the direct baseline with the lowest
@@ -63,28 +55,25 @@ seeds; at step $8$, where the development pool is largest, AE $[\boldsymbol{u},\
 smallest $\rho$ cells, matching the mean-RMSE ordering in Table~\ref{tab:crosswell_clp_vs_ae}.
 Several of these three-seed intervals include zero.
 Appendix~\ref{app:crosswell_seed_panel} repeats the same pairwise comparison
-on ten seeds: none of those intervals include zero. Each interval is
-seed-to-seed variability on the single held-out well F03-4, not evidence of
-generalization across wells. The CLP-CSGM advantage
-remains in the few-window cells (steps $16$ and $32$); AE remains better at
-step $8$ for $\rho=0.05$ and $\rho=0.10$.
-Appendix~\ref{app:crosswell_explicit_mask} repeats the three-seed grid with
-one extra direct AE that sees placed measurements and an unscaled binary
-mask, using the same base seed as AE $[\boldsymbol{u},\boldsymbol{b}]$.
-CLP-CSGM Ridge has lower mean RMSE than that mask-aware AE in seven of nine
-cells, including all six cells at steps $16$ and $32$. At step $8$ the
-masked AE remains better at $\rho=0.05$ and $\rho=0.10$. The check does not
-isolate the latent inverse formulation.
+on ten seeds. None of the nine per-configuration intervals includes zero,
+and the cell ordering remains unchanged: CLP-CSGM is lower at steps $16$ and
+$32$, whereas AE remains lower at step $8$ for $\rho=0.05$ and
+$\rho=0.10$. These intervals describe seed-to-seed variability on F03-4,
+not independent geological tests, and they are not adjusted as one
+simultaneous nine-cell test.
 
-Appendix~\ref{app:crosswell_omega_placement} redraws the sparse coordinates
-five times while the model seeds stay at $\{7,23,41\}$. The published cell
-winner is unchanged in all nine cells. At steps $16$ and $32$, CLP-CSGM Ridge
-has lower RMSE than AE $[\boldsymbol{u},\boldsymbol{b}]$ in every draw. At
-step $8$, AE remains better at $\rho=0.05$ in every draw and at $\rho=0.10$
-on the majority of draws; CLP-CSGM remains better at $\rho=0.20$ on the
-majority of draws. The advantage where training support is smallest therefore
-holds for every tested placement. Step $8$, where that support is largest,
-remains the less stable regime.
+Two further checks preserve this pattern. A direct AE supplied with placed
+measurements and an unscaled binary mask remains higher than CLP-CSGM in
+seven of nine cells, including all six cells at steps $16$ and $32$
+(Appendix~\ref{app:crosswell_explicit_mask}). When the sparse coordinates
+and measurement noise are redrawn five times with model seeds fixed, the
+published winner is unchanged in every cell
+(Appendix~\ref{app:crosswell_omega_placement}). CLP-CSGM is lower in every
+draw at steps $16$ and $32$, while step $8$ retains the mixed ordering of
+the main grid. Because these checks change several sources of variation
+together and add no held-out wells, they support the within-benchmark
+ordering without isolating its cause or extending its geological scope.
+Overlapping windows are not counted as additional independent samples.
 
 Appendix~\ref{app:crosswell_simple_baselines} compares those same nine cells
 with ordinary least squares and ridge regression from
@@ -101,13 +90,17 @@ observation coordinates fixed, while varying the added Gaussian noise and
 reselecting the regularization weight by validation at each noise level.
 At the reference noise level, $\sigma_\eta=0.01$, depth interpolation
 achieves lower mean RMSE than CLP-CSGM in all nine configurations. As the
-perturbation increases, the full-window RMSE of CLP-CSGM grows less: it is
-lower than interpolation in seven of the nine configurations at
-$\sigma_\eta=0.05$, and in all nine at $\sigma_\eta=0.10$ and $0.20$.
-Within this cross-well benchmark, that smaller growth is relative robustness
-of the complete procedure to increasing simulated Gaussian noise, including
-the validation reselection of $\lambda$. It is not a guarantee that local
-peaks are recovered.
+simulated perturbation increases, the relative RMSE comparison becomes more
+favorable to CLP-CSGM: it has lower RMSE than interpolation in seven of the
+nine configurations at $\sigma_\eta=0.05$ and in all nine at
+$\sigma_\eta=0.10$ and $0.20$.
+The same progression appears against the validation-selected
+second-difference smoother in
+Appendix~\ref{app:crosswell_simple_baselines}. Smoothing is lower in eight of
+nine cells at the reference level, whereas CLP-CSGM is lower in five cells
+at $\sigma_\eta=0.05$, eight at $0.10$, and all nine at $0.20$. The
+smoother selects the largest weight in 62 of 108 seed rows; its affine
+infinite-penalty limit is reported separately.
 
 This behavior is consistent with the role of regularization in balancing
 agreement with noisy observations against prior information
@@ -120,33 +113,20 @@ representation or conditional prediction does not describe the target
 accurately. Related generative compressed-sensing theory explicitly
 accounts for representation error, measurement noise, and optimization
 error under suitable assumptions \cite{bora2017compressed}. That theory
-provides context for this interpretation, rather than a guarantee for the
-coordinate-sampling experiments considered here.
+provides context for the observed relative robustness; the sweep itself does
+not separate the effects of decoder restriction, conditional penalization,
+and validation-based parameter selection.
 
-The present sweep does not isolate the contributions of the decoder
-restriction, the conditional penalty, and validation-based parameter
-selection. It also does not establish that the smaller RMSE growth is a
-specific regularization mechanism.
-Appendix~\ref{app:crosswell_simple_baselines} adds a second-difference
-smoother on the same stream. Its weight is chosen on validation from a
-frozen grid, and the largest weight is selected in 62 of 108 seed rows.
-At the reference noise, that smoother has lower mean RMSE than CLP-CSGM
-in eight of nine cells. CLP-CSGM has the lower cell mean in five cells at
-$\sigma_\eta=0.05$, in eight at $0.10$, and in nine at $0.20$. The higher
-simulated levels therefore also favor CLP-CSGM against a comparator that
-regularizes, while smoothing remains ahead at the reference noise. An affine
-fit to the same observations, the infinite-penalty limit,
-stays near the reconstruction at that grid ceiling and is reported
-separately. These orderings do not establish general superiority.
-The held-out target curve has
-a standard deviation of approximately $0.035$; the added noise levels
-$0.05$, $0.10$, and $0.20$ are approximately $1.4$, $2.9$, and $5.7$ times
-this value, respectively. These larger perturbations therefore provide a
-controlled sensitivity analysis rather than a calibrated representation of
-field measurement uncertainty. AE $[\boldsymbol{u},\boldsymbol{b}]$,
-ordinary least squares, and direct ridge were not rerun across the sweep,
-so the comparison in the figure is with depth interpolation. The added
-noise is not the 30dB filename label.
+The held-out target curve has a standard deviation of approximately $0.035$,
+so the added levels $0.05$, $0.10$, and $0.20$ are about $1.4$, $2.9$, and
+$5.7$ times that value. They define a controlled synthetic sensitivity
+analysis, not calibrated field uncertainty, and the added noise is unrelated
+to the 30dB filename label. AE
+$[\boldsymbol{u},\boldsymbol{b}]$, ordinary least squares, and direct ridge
+were not rerun across this sweep. The comparison therefore establishes a
+change in relative full-window RMSE against interpolation and smoothing
+within this protocol, not a general noise threshold or recovery of local
+peaks.
 
 The decoder and the dense-log map are fit once per step and seed. The
 penalty weight is then selected on validation for each measurement fraction
@@ -165,6 +145,14 @@ Ridge matches the published comparison at that noise, while a cell mean can
 differ slightly from the published CLP-CSGM value. At step $16$ and
 $\rho=0.20$, the published mean is $0.01771$ and the refit mean is
 $0.0159$. These runs are not merged into the submitted tables.
+
+The accuracy gains must also be weighed against iterative inference. On this
+cross-well grid, Table~\ref{tab:runtime_cost} reports $0.23517$ s per test
+window for CLP-CSGM Ridge and $0.03156$ s for AE
+$[\boldsymbol{u},\boldsymbol{b}]$; the separately normalized runtime
+diagnostic is $9.79$ and is not the quotient of those averages. The extra
+optimization is most relevant where its accuracy gain exceeds what can be
+obtained from the simpler comparator available for the same observations.
 
 \begin{figure}[!htbp]
     \centering
@@ -186,15 +174,6 @@ $0.0159$. These runs are not merged into the submitted tables.
     Table~\ref{tab:crosswell_noise_sweep}.}
     \label{fig:crosswell_rmse_vs_noise}
 \end{figure}
-
-Taken with the ten-seed panel, the two checks widen the evidence behind the
-three-seed intervals without separating those sources into a factorial design.
-Each of the ten seeds refits the models and draws its own coordinates and
-measurement noise. The five-draw panel holds the model seeds fixed and varies
-coordinates and noise together, so it does not isolate placement from noise.
-Neither panel adds independent wells, and the nine cells are not a joint test.
-Both leave the submitted three-seed tables unchanged. Overlapping windows are
-not counted as extra independent samples.
 
 \begin{table}[!htbp]
     \centering
@@ -245,11 +224,10 @@ window in Fig.~\ref{fig:sparse_recon_crosswell} is a different configuration:
 step $16$, seed $7$, $\rho=0.10$, and window index 0. There, CLP-CSGM Ridge
 is closer to the reference, the autoencoder prediction is positively offset,
 and local deviations remain. These examples illustrate differences in
-reconstruction behavior within the displayed configurations. They do not
-establish a uniform advantage across the benchmark, and they are not a
-statistical-significance claim. The profile is consistent with the aggregate
-RMSE for this cell. Uniform window-level comparisons remain based on the
-aggregate metrics.
+reconstruction behavior within the displayed configurations and are
+consistent with their aggregate RMSE. Their role is qualitative; the paired
+aggregate metrics, rather than individual windows, determine the benchmark
+ordering.
 
 \begin{figure}[!htbp]
     \centering
@@ -364,22 +342,19 @@ RMSE advantage over the direct AE baseline.
 The porosity example is more mixed than the clay-volume profile. In this
 displayed profile, CLP-CSGM Ridge follows parts of the broad trend and smooths
 local variations. Because the profile combines predictions from overlapping
-windows, the view is qualitative. Pointwise recovery and validation against
-independent core-porosity measurements fall outside this visualization. The
+windows, the view is qualitative rather than an independent pointwise test. The
 displayed window in Fig.~\ref{fig:sparse_recon_f03} uses the corresponding
 configuration seed $7$, $\rho=0.20$, and window index 0. There, both
 CLP-CSGM Ridge and AE $[\boldsymbol{u},\boldsymbol{b}]$ miss the central
 depression of the reference. The pooled parity plot in
 Fig.~\ref{fig:f03_parity} prints a correlation of $0.4632$ for CLP-CSGM Ridge
 and $0.3720$ for the autoencoder. Those values describe the points drawn on
-that figure. They do not establish statistical significance, and
-overlapping-window predictions are not independent observations. The method
-uses $m=13$ observations per length-$64$ window and achieves a mean RMSE of
-approximately $0.016$ at $\rho=0.20$. This profile is consistent with the
-lower mean RMSE in Table~\ref{tab:f03_results} at that ratio. The profile is
-illustrative. The aggregate results show that the observed RMSE advantage of CLP-CSGM
-Ridge over the direct autoencoder is concentrated at the sparse end
-of this controlled GR-only benchmark.
+that figure, and overlapping-window predictions are not independent
+observations. With $m=13$ observations per length-$64$ window, CLP-CSGM has
+mean RMSE of approximately $0.016$ at $\rho=0.20$, consistent with
+Table~\ref{tab:f03_results}. Across the aggregate results, its advantage over
+the direct autoencoder remains concentrated at the sparse end of this
+controlled GR-only benchmark.
 
 The limited-sample Lapa permeability case in
 Appendix~\ref{app:lapa_case} provides supplementary evidence. The prior-guided
@@ -470,8 +445,8 @@ RMSE at step $32$ for measurement ratios $0.10$ and $0.20$. The unweighted
 mean RMSE across the nine configurations decreases from $0.02862$ for Ridge
 to $0.02538$ for MLP, a relative reduction of $11.3\%$. The MLP advantage
 becomes smaller as training support decreases and is nearly absent at step
-$32$. Ridge remains the headline comparator for the reason in
-Section~\ref{sec:discussion}: a fixed linear reference, not a claim that it
+$32$. Ridge remains the headline comparator because it is the fixed linear
+reference defined in Section~\ref{subsec:baselines_metrics}, not because it
 dominates MLP on this grid.
 
 \begin{table}[t]
@@ -504,12 +479,9 @@ depends on the evaluated data regime.
     }
 \end{table}
 
-Which map is better depends on the dataset and on how many depths are
-measured, and the difference shrinks as more target values enter
-$\boldsymbol{b}$. Ridge stays the reported reference because it is a fixed
-linear map, not because it wins every cell. The rankings support choosing
-that map on validation data for the intended test, rather than after seeing
-the held-out result.
+Taken together, the rankings show that the preferred map depends on the
+dataset and measurement regime. Its class should be selected on validation
+data for the intended test rather than after observing the held-out result.
 
 \paragraph{Supplementary diagnostics.}
 Appendix~\ref{app:validation_generalization_diagnostics} audits validation,

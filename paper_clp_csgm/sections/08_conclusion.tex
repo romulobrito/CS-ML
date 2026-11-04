@@ -1,87 +1,57 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We introduced CLP-CSGM. A decoder trained on windows of the target curve
-supplies the windows the reconstruction may use. The conditional map predicts
-a latent code $\boldsymbol{z}_0$ from the dense auxiliary logs. This code
-provides an informed initialization and serves as the reference for the
-quadratic penalty during latent refinement. Latent refinement balances
-agreement with the sparse observations against deviation from
-$\boldsymbol{z}_0$. A residual at the observed depths can remain. The
-MAP/Tikhonov reading and the local error bound
-separate measurement noise, decoder error, a code $\boldsymbol{z}_0$ far from
-a good code, and whether
-nearby windows can be told apart from the measurements.
+CLP-CSGM combines a learned target-window representation with two sources of
+information that retain distinct roles at inference: dense auxiliary logs
+predict a latent anchor, and sparse target observations refine that prediction
+through an explicit measurement residual. The resulting MAP/Tikhonov
+interpretation clarifies the balance between the two terms, while the local
+error bound separates decoder mismatch, prior mismatch, measurement noise,
+and local separability under stated conditions.
 
-Under the paired F3 protocols, CLP-CSGM Ridge has lower mean RMSE than AE
-$[\boldsymbol{u},\boldsymbol{b}]$ in seven of nine cross-well cells. On the
-published grid that autoencoder has the lowest unweighted mean RMSE among the
-direct baselines MLP, PCA, and AE $[\boldsymbol{u},\boldsymbol{b}]$. The
-seven-of-nine result is a comparison with this autoencoder, not a ranking
-against interpolation or the direct linear maps. This is a conditional
-advantage where training support is smallest (steps $16$ and $32$), not overall
-superiority: AE
-$[\boldsymbol{u},\boldsymbol{b}]$ has lower mean RMSE at step $8$ for
-$\rho=0.05$ and $\rho=0.10$. The unweighted mean of the nine cell-level mean
-RMSE values decreases from $0.03496$ to $0.02862$, a reduction of approximately
-$18.1\%$. In the F03-4 GR-only benchmark, CLP-CSGM Ridge has the lowest mean
-RMSE at $\rho\in\{0.20,0.30\}$, while AE $[\boldsymbol{u},\boldsymbol{b}]$ has
-lower mean RMSE at $\rho\in\{0.40,0.60\}$. That benchmark assimilates the
-processed porosity curve with gamma ray as the only dense input; the depth
-profile at $\rho=0.20$ follows the broad trend of this curve. It is a
-controlled stress test with that restricted GR-only input and is not
-evidence of general porosity reconstruction performance. The full Ridge model
-has lower mean RMSE than
-prior-only in every cross-well cell and than measurement-only CSGM in seven of
-nine cells. It also has lower mean RMSE than both ablations throughout the
-F03-4 grid. The opposite Ridge--MLP rankings, with the MLP prior lower in
-seven of the nine controlled cross-well cells and Ridge lower throughout the
-controlled GR-only comparison, show that the better map from dense logs to
-$\boldsymbol{z}_0$ depends on the test.
+In the cross-well F3 benchmark, CLP-CSGM Ridge achieves lower mean RMSE than
+the direct autoencoder baseline AE
+$[\boldsymbol{u},\boldsymbol{b}]$ in seven of nine configurations, including
+every tested ratio at steps $16$ and $32$. Across the grid, the unweighted
+mean decreases from $0.03496$ to $0.02862$, an $18.1\%$ reduction. Because
+the sliding step also changes window sampling and overlap, this result
+characterizes the complete procedure in the evaluated limited-support
+configurations rather than a causal effect of training-set size alone. The
+ablations show more directly what refinement contributes: the full model is
+lower than prior-only in all
+nine cross-well cells and lower than measurement-only CSGM in seven. On the
+F03-4 GR-only grid, it is lower than both ablations at every ratio, while its
+ordering against the direct AE changes with the observed fraction. The
+opposite Ridge--MLP rankings across the two benchmarks further show that the
+appropriate conditional map depends on the data regime.
 
-At the reference noise standard deviation $0.01$, depth interpolation of the
-sparse measurements has lower full-window RMSE than CLP-CSGM Ridge in all
-nine configurations and in all $27$ seed comparisons. In that regime the
-sparse measurements already support a competitive simple solution, which
-limits the need for a learned reconstruction. The same windows were then
-rescored at noise standard deviations $0.05$, $0.10$, and $0.20$, with the
-decoder and the dense-log map held fixed and the penalty reselected at each
-level. At $0.05$, about $1.43$ times the held-out curve standard deviation
-$0.035$, CLP-CSGM Ridge has the lower mean RMSE at steps $16$ and $32$ and at
-step $8$ for $\rho=0.20$. At step $8$ for $\rho=0.05$ and $\rho=0.10$,
-interpolation keeps the lower mean. At $0.10$ and $0.20$, about $2.86$ and
-$5.71$ times that standard deviation, CLP-CSGM Ridge has the lower error in
-all nine configurations. These noise levels were used for sensitivity
-analysis and were not calibrated to field measurement uncertainties. AE
-$[\boldsymbol{u},\boldsymbol{b}]$, ordinary least squares, and direct ridge
-regression were not rerun across this sweep. A validation-selected
-second-difference smoother, reported in
-Appendix~\ref{app:crosswell_simple_baselines}, has lower mean RMSE than
-CLP-CSGM Ridge in eight of nine cells at the reference noise. CLP-CSGM Ridge
-has the lower mean in five, eight, and nine cells at $0.05$, $0.10$, and
-$0.20$. That pattern is relative robustness of full-window RMSE for the
-complete procedure. It does not make the noise sweep a general advantage
-under noise.
+Simple methods define the other side of that result. At the reference noise
+standard deviation $0.01$, depth interpolation is lower than CLP-CSGM in all
+nine cross-well cells and the validation-selected smoother is lower in eight.
+When sparse observations already support lower-RMSE depth-domain
+reconstruction, the additional latent optimization is not justified by RMSE.
+Under larger synthetic perturbations, CLP-CSGM becomes lower than
+interpolation in seven cells at $0.05$ and all nine at $0.10$ and $0.20$;
+against smoothing, the corresponding counts are five, eight, and nine. This
+is relative robustness of the complete validation-selected procedure, not an
+instrument-calibrated noise threshold or an isolated effect of the latent
+penalty.
 
-The study presents a latent reconstruction that combines dense-log context
-with sparse target observations. The benefit depends on the regime.
-The F3 evidence
-is reconstruction of processed target logs: cross-well $V_c$ is
-Larionov-derived from gamma ray, F03-4 porosity is density-derived, and
-sparse observations are coordinate subsamples of these same curves rather than
-independently acquired core or laboratory measurements. A separate
-single-well supplement on laboratory porosity scores coordinates not supplied
-as measurements within each evaluated window on depth-held-out blocks and is
-not part of that processed-log grid. Relative to the decoded prediction
-$G(\boldsymbol{z}_0)$, CLP-CSGM Ridge has lower RMSE in every block--seed pair.
-It also has the lower block-mean RMSE on the two shallower blocks. On the
-pooled mean, the direct AE is lower. That supplement is one cored interval and
-does not establish operational generalization. The cross-well comparison is a
-controlled single-holdout benchmark on F03-4 and is not evidence of
-operational cross-well or multi-field transferability. Broader assessment will
-require larger multi-well datasets, independently calibrated targets, and
-geological labels. It will also require uncertainty estimates and faster
-latent-refinement strategies.
+These findings establish a controlled reconstruction result rather than
+operational transfer. Cross-well $V_c$ is Larionov-derived from gamma ray,
+F03-4 porosity is density-derived, and the sparse observations are subsamples
+of those processed curves. The cross-well comparison uses one held-out well
+and does not establish operational cross-well or multi-field transferability.
+In the separate laboratory-porosity supplement,
+CLP-CSGM improves on its decoded conditional prior in every block--seed pair,
+but direct AE retains the lower aggregate mean RMSE. The main empirical
+lesson is therefore conditional: explicit sparse-measurement refinement can
+improve a dense-log-conditioned latent prediction, especially in the
+evaluated limited-support configurations, while accurate low-noise
+observations may favor substantially simpler reconstruction. Testing that
+lesson operationally will require larger multi-well datasets, independently
+calibrated targets, geological labels, uncertainty estimates, and faster
+refinement strategies.
 
 
 \paragraph*{Author Contributions}\mbox{}\\[0.25em]

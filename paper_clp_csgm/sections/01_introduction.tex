@@ -24,49 +24,41 @@ map, or regress porosity and shale volume from the log suite
 Section~\ref{sec:related_work} compares these approaches with the explicit
 measurement-fidelity formulation considered here.
 
-Using that penalty still requires a representation of the target window.
-A fixed sparsity basis is a weak description of this window when the logs
-change from one well to another
+An explicit measurement penalty still requires a useful representation of
+the complete target window. A fixed sparsity basis can be restrictive when
+petrophysical windows vary across wells
 \citep{donoho2006compressed,candes2006robust,candes2006stable,bora2017compressed}.
 Conditional Latent-Prior Compressed Sensing with Generative Models
-(CLP-CSGM) learns which target windows the
-decoder can produce. The conditional map predicts a latent code
-$\boldsymbol{z}_0$ from the dense auxiliary logs. This code provides an
-informed initialization and serves as the reference for the quadratic penalty
-during latent refinement. Latent refinement balances agreement with the sparse
-observations against deviation from $\boldsymbol{z}_0$. A residual at the
-observed depths can remain. The decoder range and that penalty are separate:
-the range limits which windows can appear, and the penalty keeps the latent
-code near $\boldsymbol{z}_0$.
-Section~\ref{subsec:test_time_reconstruction} states this step, including the
-first trajectory and the perturbed restarts. Ridge regression is the
-reference implementation of that conditional map: it estimates
-$\boldsymbol{z}_0$ from the dense auxiliary logs. It is the primary
-reference because it is a linear low-capacity map, not because it is best
-in every regime. A multilayer perceptron (MLP) variant of the same map is
-compared under the same channels and the same split.
+(CLP-CSGM) uses a learned decoder to define the candidate windows and a
+conditional map to predict the latent anchor
+$\boldsymbol{z}_0$ from the dense logs. Test-time optimization then updates
+the latent code using the sparse target measurements while penalizing
+departure from that anchor. Thus, contextual prediction and measurement
+assimilation remain distinct: the dense logs guide the search, whereas the
+sparse values directly assess candidate reconstructions. Ridge regression is
+the linear low-capacity reference for the conditional map, and an MLP variant
+is evaluated under the same channels and split.
 
-The contributions are threefold. First, the dense logs predict
-$\boldsymbol{z}_0$, which initializes the first latent trajectory and remains
-the center of the quadratic penalty, while the sparse values enter as a
-penalized measurement residual. Second, the objective has a maximum a
-posteriori (MAP)/Tikhonov
-reading and a local error bound that separates decoder error, a code
-$\boldsymbol{z}_0$ far from a good code, noise, and whether
-nearby windows can be told apart from the measurements. Third, we characterize
-the regime-dependent behavior of the proposed reconstruction in a controlled
-cross-well benchmark, using three development wells and F03-4 as the single
-held-out test well. We compare the proposed method against direct predictors
-and examine the separate contributions of the conditional prior and
-sparse-measurement refinement through ablation studies. We also assess the
-influence of training support, measurement availability, and latent-prior
+The contributions are threefold. First, CLP-CSGM formulates target-log
+reconstruction as a conditional latent inverse problem in which the
+measurement residual remains active at inference. Second, we use a classical
+maximum-a-posteriori (MAP)/Tikhonov interpretation to clarify the
+reconstruction objective and a conditional local error bound to identify the
+roles of decoder mismatch, latent-prior mismatch, measurement noise, and local
+measurement separability. Third, a controlled cross-well benchmark with three
+development wells and F03-4 as the single held-out well compares the
+formulation with direct predictors and structural ablations
+while varying training support, measurement availability, and latent-prior
 architecture.
 
-CLP-CSGM has lower mean root mean square error (RMSE) than the direct
-autoencoder in seven of the
-nine cross-well cells, and those gains concentrate where training support is
-smallest. Other comparators can have lower error in the same grid. With only
-F03-4 held out, these results stay inside that benchmark and do not establish
-general cross-well robustness or operational transferability. The local
-recovery bound remains conditional and does not certify the set-restricted
-eigenvalue condition (S-REC) for the trained decoder.
+CLP-CSGM Ridge has lower mean root mean square error (RMSE) than the direct
+autoencoder in seven of the nine cross-well cells, with the most consistent
+gains at steps $16$ and $32$, where the training pools are smaller. The full
+model also improves on the conditional prior-only reconstruction in all nine
+cells. At the reference noise level, depth interpolation remains lower in all
+nine configurations, showing that latent optimization is not always needed;
+larger synthetic perturbations yield a more favorable relative ordering for
+CLP-CSGM. These findings characterize the tested regimes rather than general
+cross-well or operational transferability. Likewise, the local recovery
+bound is conditional and does not certify the set-restricted eigenvalue
+condition (S-REC) for the trained decoder.

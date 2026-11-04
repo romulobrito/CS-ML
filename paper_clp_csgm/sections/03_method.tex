@@ -1,16 +1,14 @@
 \section{Method}
 \label{sec:method}
 
-CLP-CSGM uses three pieces. A decoder, trained on windows of the target
-curve, supplies the windows the reconstruction may use. The conditional map
-predicts a latent code $\boldsymbol{z}_0$ from the dense auxiliary logs. This
-code provides an informed initialization and serves as the reference for the
-quadratic penalty during latent refinement. Latent refinement balances
-agreement with the sparse observations against deviation from
-$\boldsymbol{z}_0$. A residual at the observed depths can remain. The decoder
-range and the quadratic penalty are different components.
-This section defines the measurement model, the objective, the comparisons
-that drop one piece, and the error bound.
+CLP-CSGM separates representation, contextual prediction, and measurement
+assimilation. A decoder defines the candidate target windows, dense auxiliary
+logs determine a latent anchor $\boldsymbol{z}_0$, and test-time optimization
+refines that code against the sparse target observations. The quadratic
+penalty keeps the refined code near $\boldsymbol{z}_0$ without requiring an
+exact fit at the observed depths. This section formalizes the measurement
+model and reconstruction objective, defines the structural ablations, and
+states the conditions used in the error interpretation.
 
 \subsection{Problem setup}
 \label{subsec:problem_setup}
@@ -348,21 +346,16 @@ $\boldsymbol{z}_0$ in the latent space of $G$. Sparse observations then
 update that code through the measurement-fidelity term, and the decoder
 returns the window, so the same coordinates carry learned window structure,
 dense-log context, and sparse-measurement refinement. In the reported model
-the search adjusts the $k=16$ code of each length-$64$ window. Direct
-predictors may map the logs, or the logs together with the sparse values,
-onto the target window. AE $[\boldsymbol{u},\boldsymbol{b}]$ also predicts
-a latent code, and the cross-well comparison concerns how that code is
-conditioned and refined. CLP-CSGM Ridge has lower mean RMSE than this
-autoencoder in seven of nine cells, with the more consistent gains at steps
-$16$ and $32$, where the training pools contain $52$ and $27$ windows
-(Section~\ref{sec:results}). Those steps also change the window sampling,
-and the comparison evaluates the complete procedure in those
-limited-support configurations. With the published sampling rule a
-length-$64$ window can contain fewer observations than the $16$ latent
+the search adjusts the $k=16$ code of each length-$64$ window; under the
+published sampling rule, a window can contain fewer observations than latent
 coordinates. The decoder range and the penalty around $\boldsymbol{z}_0$
-supply the structural information used in that case. The resulting accuracy
-follows the adequacy of $G$, the conditional code, and the observations
-available at inference.
+provide the structural information used in that case. Direct predictors may
+instead map the logs, or the logs together with the sparse values, directly
+to the target window. AE $[\boldsymbol{u},\boldsymbol{b}]$ also predicts a
+latent code, so the empirical comparison in Section~\ref{sec:results}
+concerns how that code is conditioned and refined. Reconstruction accuracy
+ultimately depends on the adequacy of $G$, the conditional anchor, and the
+observations available at inference.
 
 \begin{figure}[t]
     \centering

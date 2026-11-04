@@ -1,193 +1,124 @@
 \section{Interpretation, scope, and limitations}
 \label{sec:discussion}
 
-CLP-CSGM uses three pieces that act together. The decoder range
-$\mathcal{R}_{\mathrm{orig}}$ is the set of target windows, in the
-original units, that the decoder can produce.
-The conditional map predicts $\boldsymbol{z}_0=h(\boldsymbol{u})$ from the
-dense logs. This code initializes the first latent trajectory and remains the
-center of the quadratic penalty. The measurement term in Eq.~\eqref{eq:clp_csgm_objective} penalizes
-disagreement with the sparse observations in the original target units and
-does not force those observations to be met exactly. The decoder range limits which windows can
-appear. The code $\boldsymbol{z}_0$ carries the dense logs into that search,
-and the measurement term uses the sparse target values. Unlike direct
-$[\boldsymbol{u},\boldsymbol{b}]$ predictors,
-CLP-CSGM retains $\boldsymbol{b}$ as an explicit measurement penalty during
-inference.
-It is therefore most relevant when dense logs are informative but incomplete
-and sparse target entries should enter that penalty. Log-completion models
-fill a missing interval of a wireline curve, geomodel translation fills a
-property image from another image, and direct regression maps logs to porosity
-or shale volume
-\citep{koeshidayatullah2026timegpt,alfakih2026pix2geomodel,alfakih2025wellloggan,alfakih2023northsea}.
-CLP-CSGM is the relevant formulation when those dense logs are already
-available and a few observations of the target property enter the
-reconstructed window through that penalty. Recent foundation-model work also
-investigates zero-shot transfer of well-log predictions across geological
-basins \citep{koeshidayatullah2026timegpt}. That setting provides a broader
-transfer evaluation than the present cross-well benchmark, which uses F03-4 as
-a single held-out well. Our results characterize sparse target-measurement
-assimilation under this limited evaluation protocol and do not establish
-basin-agnostic transferability.
+The methodological distinction of CLP-CSGM is not the latent representation
+alone, but the way dense context and sparse target measurements enter
+inference. Dense logs determine the anchor
+$\boldsymbol{z}_0=h(\boldsymbol{u})$, while the sparse values remain in an
+explicit measurement residual during latent refinement. This separates the
+method from direct $[\boldsymbol{u},\boldsymbol{b}]$ prediction and from
+approaches that complete a missing log interval, translate one property image
+to another, or regress a target from the available logs
+\citep{koeshidayatullah2026timegpt,alfakih2026pix2geomodel,
+alfakih2025wellloggan,alfakih2023northsea}. The decoder range determines what
+can be represented; the anchor guides the search within that range; and the
+observations can correct the conditioned prediction without being fitted
+exactly.
 
-The depth profiles in
-Figs.~\ref{fig:crosswell_depth_profile} and~\ref{fig:f03_depth} illustrate how
-the balance of these information sources affects reconstruction detail in the
-displayed examples. The multi-channel cross-well context supports closer
-tracking of the broad held-out $V_c$ variations, whereas gamma ray as the
-only dense input produces a smoother F03-4 porosity reconstruction that omits
-some local variations. The displayed porosity window shows that both
-CLP-CSGM and the direct autoencoder can miss a local depression. These
-examples do not establish a uniform advantage across the benchmark. The
-attainable detail is governed jointly by the information in $\boldsymbol{u}$,
-the adequacy of $\mathcal{R}_{\mathrm{orig}}$, and the number and placement of
-observations in $\boldsymbol{b}$.
+The ablations provide the clearest internal evidence for this design. In the
+cross-well grid, the full Ridge model has lower mean RMSE than prior-only in
+all nine cells and lower mean RMSE than measurement-only CSGM in seven. At
+steps $16$ and $32$ it is lower than both ablations at every tested ratio,
+whereas measurement-only inversion is lower in the two step-$8$ exceptions.
+On the F03-4 GR-only grid, the full model is lower than both ablations at all
+five ratios. Sparse-measurement refinement therefore improves the conditioned
+prediction consistently in these experiments, while the value of the
+conditional anchor depends on the configuration.
 
-The ablations in Section~\ref{subsec:ablation_analysis} drop one piece at a
-time. Using only the decoded prediction of the conditional prior, or only the
-measurements, raises the
-error in most cells, and which piece matters more changes with the number of
-training windows. The full Ridge model has lower mean RMSE than
-prior-only throughout the cross-well grid and lower mean RMSE than
-measurement-only CSGM in seven of nine cells. In the two step-$8$ exceptions,
-measurement-only inversion has lower mean RMSE, so the conditional code
-$\boldsymbol{z}_0$ is not helpful in those cells. On the F03-4 grid, where gamma ray is the only
-dense log, the full model has lower mean RMSE than both ablations at every
-tested ratio. The penalty around $\boldsymbol{z}_0$ keeps the search from
-drifting, and the measurement term can still correct it.
+The external comparisons identify where that internal gain translates into
+better prediction. CLP-CSGM Ridge is lower than the direct AE in seven of
+nine cross-well cells, including all cells at steps $16$ and $32$. The
+additional seed and measurement-realization checks preserve that ordering
+within the same held-out well. Because the sliding step also changes window
+sampling and overlap, the result supports the complete procedure in those
+limited-support configurations rather than a causal effect of training-set
+size alone. The depth profiles complement this aggregate evidence: the
+multi-channel model follows the broad $V_c$ variation in the displayed
+cross-well interval, while the GR-only porosity reconstruction is smoother
+and misses some local structure. Attainable detail depends jointly on the
+dense-log information, the decoder range, and the number and placement of
+sparse observations.
 
-The sensitivity results in
-Section~\ref{subsec:latent_prior_sensitivity} show that the class of $h$
-materially changes reconstruction accuracy, and that no single architecture
-is uniformly preferable. In the controlled cross-well comparison, the MLP
-prior has lower mean RMSE in seven of the nine cells. That advantage becomes
-smaller as the number of training windows decreases and is nearly absent at
-step $32$, where Ridge has the lower mean at $\rho=0.10$ and $\rho=0.20$.
-The unweighted mean RMSE across those nine cells falls from $0.02862$ for
-Ridge to $0.02538$ for MLP, a relative reduction of $11.3\%$. On the
-controlled F03-4 GR-only grid, Ridge has lower mean RMSE at all five
-measurement ratios. These comparisons distinguish the CLP-CSGM framework
-from its reference implementation. Ridge remains the primary reported
-configuration because it is a fixed linear low-capacity map: the main tables
-then use one $h$ in every cell, and $h$ is not chosen after seeing the test
-ranking. The MLP results have the same experimental status. This MLP is the
-conditional map $h(\boldsymbol{u})$, not the direct regression MLP
-$[\boldsymbol{u},\boldsymbol{b}]$. The preferred class depends on the regime.
-The class of $h$, the latent dimension, and the regularization should be
-selected on validation data for the intended measurements, not by adopting
-whichever variant wins on the held-out test set. The experiments establish
-this empirical sensitivity to the class of $h$. They do not show that model
-capacity, taken alone, causes the differences.
+The class of the conditional map also matters. Under matched channels and
+splits, the MLP prior is lower than Ridge in seven of nine cross-well cells
+and reduces the unweighted mean RMSE from $0.02862$ to $0.02538$ ($11.3\%$).
+Its advantage narrows as training support decreases, and Ridge is lower at
+step $32$ for $\rho=0.10$ and $\rho=0.20$. The ordering reverses on the
+controlled F03-4 grid, where Ridge is lower at all five ratios. Ridge remains
+the primary reference because it supplies one fixed linear low-capacity map
+across the main grid, not because it is uniformly preferable. The class of
+$h$, latent dimension, and regularization should consequently be chosen on
+validation data for the intended measurements; the experiments do not isolate
+model capacity as the cause of the observed ranking.
 
-The empirical scope is limited by the construction of the benchmark targets.
-In the cross-well experiment, $V_c$ is a processed Larionov-derived curve.
-The gamma-ray index between the clean and shale endpoints is linear in gamma
-ray. The Larionov map from that index to clay volume is not a straight line.
-If gamma ray has been logged, clay volume is obtained from that relation, and
-CLP-CSGM is not a substitute for it. Gamma ray is left out of the main input
-because the clay-volume curve was computed from it. The deliberate exclusion
-of gamma ray is intended to evaluate whether conditional generative
-reconstruction can recover a processed petrophysical target from alternative
-dense logs and sparse target observations when the input required for its
-conventional calculation is withheld. This constitutes a controlled test of
-reconstruction under incomplete information, rather than a replacement for
-the Larionov relation or validation with independently acquired clay-volume
-measurements. Without that log the
-Larionov relation cannot be evaluated. The task is then to reconstruct the
-processed curve from the other dense logs while matching a few known values
-of the curve. Recovery of independently acquired clay-volume measurements is
-outside this scope. Putting gamma ray back, in
-Appendix~\ref{app:crosswell_gr_embargo}, lowers the absolute error and does
-not change the ordering of CLP-CSGM Ridge, the direct AE, and
-measurement-only CSGM at step $16$. That run checks the channel. It is not
-the log suite used for the main comparison.
+Simple reconstruction provides an important counterpoint. At the reference
+noise standard deviation $0.01$, depth interpolation is lower than CLP-CSGM
+in all nine cross-well cells, and the validation-selected second-difference
+smoother is lower in eight. In this regime the sparse observations already
+support lower-RMSE depth-domain reconstruction in this benchmark, so
+iterative latent refinement adds cost without improving RMSE. As the
+synthetic perturbation increases,
+CLP-CSGM becomes lower than interpolation in seven cells at $0.05$ and all
+nine at $0.10$ and $0.20$; against smoothing, the corresponding counts are
+five, eight, and nine. This pattern is relative robustness of the complete
+procedure, with $\lambda$ reselected by validation at each level. Decoder
+restriction, conditional penalization, and parameter reselection are all
+compatible with the behavior, but the sweep does not isolate their individual
+effects.
 
-The F03-4 porosity curve is density-derived, and its sparse values are taken
-from that same curve, not from core or laboratory plugs. Density-derived
-porosity can be calculated from bulk density together with the hypotheses of
-that relation. A sonic-porosity estimate uses another petrophysical relation
-and is not necessarily identical to the density-derived porosity. If the bulk
-density required by the density-porosity relation has been recorded, that
-relation is the appropriate calculation, and CLP-CSGM is not a substitute
-for it. Sonic travel time is left out because it follows this processed curve
-almost one to one. The density curve behind the porosity was itself predicted
-from sonic and gamma ray, so that correlation is not validation against
-independent laboratory porosity. The test uses gamma ray as the only dense
-log. Its errors do not transfer to a porosity interpretation that also uses
-density, neutron, and sonic. The cross-well benchmark removes gamma ray, the
-log required by the Larionov relation. The F03-4 benchmark removes sonic
-because of this collinearity with the processed curve. Both compare methods
-that must reconstruct the processed curve from the remaining logs while
-matching a few known values. They are not a contest against Larionov, density
-porosity, or sonic porosity on a fully logged well, and they are not a test
-against independent core or laboratory measurements.
+The larger perturbations are sensitivity levels rather than estimates of
+field uncertainty. An instrument-aware analysis would require gamma-ray and
+endpoint uncertainties to be propagated through the nonlinear Larionov
+relation. Moreover, AE, ordinary least squares, and direct ridge were not
+rerun across the sweep. The result therefore concerns the reported
+comparisons with interpolation and smoothing, not a universal noise threshold
+or general superiority under noisy measurements. Computational cost reinforces
+this conditional interpretation: CLP-CSGM uses iterative inference, whereas
+direct predictors require one forward pass. Its additional cost is most
+relevant when explicit sparse-measurement refinement yields a meaningful
+accuracy gain; faster solvers, adaptive stopping, and amortized refinement
+remain useful directions.
 
-A possible field analogue is a well where the log required for a conventional
-property estimate is missing or unreliable, while a limited number of
-independently acquired property measurements are available. The present F3
-benchmarks reproduce only the restricted-input and sparse-observation
-structure of this situation: their sparse target values are subsampled from
-processed curves, not independently acquired measurements. Therefore, these
-tests establish a controlled comparison of reconstruction methods rather than
-operational validation of that field scenario. The same limit applies to
-simpler reconstruction. Section~\ref{subsec:crosswell_results} and
-Appendix~\ref{app:crosswell_simple_baselines} report that depth interpolation
-has lower full-window RMSE than CLP-CSGM in all nine cross-well
-configurations at the reference noise. As the simulated Gaussian
-perturbation increases, CLP-CSGM shows a smaller RMSE increase and becomes
-lower in most cells, then in every cell. The same regime-dependent pattern
-appears against second-difference smoothing, which also regularizes. This is
-relative robustness of the complete procedure, with $\lambda$ reselected on
-validation at each noise level. The runs do not isolate the decoder, the
-conditional prior, or that reselection, and they do not establish recovery
-of local detail or operational superiority. The higher noise levels were not
-calibrated to field uncertainties. An instrument-aware analysis would require
-estimating gamma-ray and endpoint uncertainties and propagating them through
-the nonlinear Larionov relation. The Gaussian perturbations are therefore
-used here only as a synthetic sensitivity test, not as a model of field
-measurement uncertainty. Section~\ref{subsec:crosswell_results} also states
-the extra cost: mean time per window and the normalized runtime diagnostic
-in Table~\ref{tab:runtime_cost} are different quantities, and the larger
-CLP-CSGM time is not justified in general.
+The benchmark provenance defines a second boundary on interpretation.
+Cross-well $V_c$ is a processed Larionov-derived curve, so gamma ray is
+withheld from the main input to avoid supplying the source of the target.
+When gamma ray is available, the conventional relation can be evaluated
+directly. Restoring that channel lowers absolute error without changing the
+step-$16$ ordering among CLP-CSGM Ridge, direct AE, and measurement-only CSGM.
+The F03-4 porosity target is likewise processed and density-derived; sonic is
+excluded because it follows that curve almost one to one, and gamma ray is
+the only dense input. In both F3 settings, sparse observations are subsamples
+of the processed target rather than independently acquired property
+measurements. The experiments therefore test reconstruction under deliberately
+restricted information, not replacement of the Larionov or porosity relations
+in a fully logged well.
 
-The Lapa permeability case
-\citep{alvarez2025nonlinear} extends the evaluation to another lithology and
-target property, but its small sample size limits generalization. The
-laboratory-porosity experiment in Appendix~\ref{app:phi_lab_861} provides a
-supplementary assessment on a target not deterministically derived from the
-auxiliary logs by our pipeline. CLP-CSGM Ridge consistently improves upon the
-decoded conditional prior, but the direct autoencoder achieves lower aggregate
-mean RMSE at both measurement ratios. The block-level differences are
-compatible with sensitivity to prior mismatch and changes in the auxiliary-log
-distribution, although these effects are not causally isolated. The evaluation
-is limited to one cored interval and within-window withheld coordinates. Each
-test fold still has many overlapping training windows, so the direct map is in
-the regime where it was expected to be competitive. Block RMSE and the log
-summaries are reported in the appendix. Broader validation requires larger
-multi-well datasets, additional log suites, and facies-conditioned settings.
+A field analogue would combine a missing or unreliable source log with a few
+independently acquired target measurements, but the present benchmarks
+reproduce only its restricted-input and sparse-observation structure. The
+Lapa permeability case \citep{alvarez2025nonlinear} extends the evaluation to
+another lithology and target property with a small sample. The laboratory
+porosity supplement uses a target not deterministically derived from the
+auxiliary logs by this pipeline: CLP-CSGM improves on the decoded conditional
+prior in every block--seed pair, while direct AE has the lower aggregate mean
+RMSE at both ratios. One cored interval, within-window withheld coordinates,
+and overlapping training windows limit the scope of that evidence. Broader
+transfer assessment, such as the cross-basin setting studied by
+\citet{koeshidayatullah2026timegpt}, will require additional wells, log suites,
+independently calibrated targets, and geological labels.
 
+The available metrics are not stratified by lithofacies, texture, or formal
+stratigraphic interval because independent labels are unavailable at each
+depth sample. RMSE, MAE, and relative $\ell_2$ error consequently aggregate
+heterogeneous windows, while the depth profiles provide qualitative rather
+than facies-resolved audits. Such resolution would require independently
+interpreted or core-calibrated interval labels, particularly because decoder
+adequacy and prior accuracy may vary across geological regimes.
 
-The reported metrics are not stratified by lithofacies, lithological texture,
-or formal stratigraphic interval because the available benchmark tables do not
-provide independent geological labels at each depth sample. Consequently,
-RMSE, MAE, and relative $\ell_2$ error aggregate heterogeneous windows. The
-depth profiles provide qualitative audits but no geological performance
-breakdowns. Facies-resolved reliability would require independently interpreted
-or core-calibrated interval labels, particularly because the adequacy of the
-decoder range and the accuracy of the latent prior may vary across geological
-regimes.
-
-The recovery interpretation is also conditional.
-Proposition~\ref{prop:conditional_local_recovery} relates reconstruction error
-to decoder mismatch, latent-prior mismatch, measurement noise, optimization
-quality, and local separability, but does not prove that $M_{\Omega}$ satisfies
-S-REC for the trained decoder. The diagnostics in
-Appendix~\ref{app:separability} evaluate sampled decoder outputs and should not
-be interpreted as an operator-level guarantee.
-
-CLP-CSGM incurs iterative inference cost, whereas direct baselines produce
-predictions through a forward pass. The runtime results in
-Appendix~\ref{app:runtime} show that this additional cost is most justified
-when explicit measurement-consistent refinement produces a meaningful accuracy
-gain. Faster latent solvers, warm starts, adaptive stopping, or amortized
-refinement are natural directions for larger-scale deployment.
+Finally, the theoretical statements retain their conditional scope.
+Proposition~\ref{prop:conditional_local_recovery} separates decoder mismatch,
+latent-prior mismatch, measurement noise, optimization quality, and local
+separability, but assumes rather than proves a local S-REC condition for the
+trained decoder. The sampled diagnostics in
+Appendix~\ref{app:separability} therefore support interpretation of the
+decoder outputs without providing an operator-level recovery guarantee.

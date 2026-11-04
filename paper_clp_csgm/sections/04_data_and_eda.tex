@@ -63,18 +63,16 @@ $\boldsymbol{b}$ at inference.
 
 \paragraph{Channel-target correlations and input design.}
 Table~\ref{tab:eda_correlations} reports descriptive Pearson correlations used
-only to guide input design. Clay volume in this benchmark is computed from gamma ray by the Larionov
-relation \citep{zhang2025rockphysicslogs}. The main cross-well input therefore
-leaves gamma ray out and uses sonic, density, acoustic impedance, and $V_p$.
-With gamma ray included, the model would read the log from which the target
-was computed. This is not the usual field interpretation, in which gamma ray
-is logged and clay volume is obtained from that relation directly. The
-gamma-ray index between the clean and shale endpoints is linear in gamma ray.
-The Larionov map from that index to clay volume is not a straight line. When
-gamma ray has been logged, that relation is the calculation, and the model is
-not a substitute for it. Gamma ray
-is put back only in Appendix~\ref{app:crosswell_gr_embargo}, as a check on
-the effect of that channel.
+only to guide input design. Clay volume in this benchmark is computed from
+gamma ray through the Larionov relation
+\citep{zhang2025rockphysicslogs}; including gamma ray would therefore expose
+the model to the log from which the target was derived. The main cross-well
+input instead uses sonic, density, acoustic impedance, and $V_p$. The
+gamma-ray index is linear between the clean and shale endpoints, whereas the
+Larionov transformation from that index to clay volume is nonlinear. In a
+fully logged well the relation can be evaluated directly, so the proposed
+model is not intended to replace it. Gamma ray is restored only in
+Appendix~\ref{app:crosswell_gr_embargo} to assess the effect of that channel.
 
 \begin{table}[!htbp]
     \centering
