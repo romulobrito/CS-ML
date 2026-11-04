@@ -15,6 +15,10 @@ Source comments: `docs/revision/CLP_CSGM_Pareceres_Consolidados.md`.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> The clarity of writing. The paper is hard to understand with layers of terminology stacking together. Let me take the abstract as an example: “A decoder learned from target-property windows defines the admissible reconstruction range”: what is admissible reconstruction range? Another example is “With Ridge as a low-capacity latent-prior reference”, it is very difficult to understand “low-capacity latent-prior reference”. “Ablations against prior-only and measurement-only CSGM variants indicate that contextual latent anchoring and sparse-measurement consistency make complementary contributions whose relative importance varies across regimes.” If you read it through, it is very difficult to understand things like “contextual latent anchoring”, “sparse- measurement consistency”, etc.
+
 **Proposed reply:**
 
 We revised the manuscript to replace stacked labels with a direct description
@@ -44,6 +48,10 @@ Conclusion; Appendix.
 ## R3-02 -- Practical advantage versus conventional relations
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> The method is very interesting; however, what worries me is how practical this method is: The derivation of the target is very simple: V_clay is just linearly derived from GR with endpoints; whereas porosity is almost a linear function of RHOB or acoustic slowness. If you are trying to predict those logs, why use a complicated ML workflow instead of just a simple linear relationship? I think the authors should put more effort on convincing people why we need to choose ML over traditional methods, other than use traditional linear results as benchmark and try to replicate them.
 
 **Proposed reply:**
 
@@ -99,6 +107,10 @@ density-derived and sonic porosity and the interpolation sentences).
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> The intermediate results and baselines The paper listed several baselines, but the comparison is incomplete. Direct linear or ridge regression, with the same input and evaluation should be included. Methods such as smoothing, interpolation based on the sparse target (core data) should also be compared. Moreover, the authors did not report the intermediate results from the multi-step ML workflow, such as how the encoder reconstructed the original well logs? And why do we need an encoder here, considering there are only 64 values included in the window.
+
 **Proposed reply:**
 
 We added ordinary least squares and direct ridge regression from
@@ -139,6 +151,10 @@ and measurement noise.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> The noise How does the authors choose the noise, thus balancing the influence from the prior / the data fit?
+
 **Proposed reply:**
 
 The benchmark adds independent Gaussian noise after coordinate subsampling,
@@ -178,6 +194,10 @@ implementation-summary table.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> The theoretical section Section 3.4 provides mathematical derivations related to the MAP and Tikhonov regularization. It is unclear how this would impact the application of this method, especially considering that MAP / Tikhonov interpretation and existence of a minimizer are standard arguments.
+
 **Proposed reply:**
 
 We thank the reviewer for noting that the MAP/Tikhonov reading and the
@@ -206,8 +226,7 @@ representation error, observed discrepancy, deviation from
 does not prove that the coordinate mask satisfies S-REC on the trained
 decoder, and the empirical diagnostics do not certify that condition for
 every pair of windows. No new theoretical guarantee and no new experiment
-were added. This comment overlaps R3-P15, which concerns the order of the
-propositions. That request is answered in its own reply.
+were added.
 
 Where the text was changed: Method, subsection Interpretation and
 theoretical context; Appendix MAP and Tikhonov interpretation; Appendix
@@ -216,6 +235,10 @@ Existence of a minimizer.
 ## R3-06 -- Main result and figure readability
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> Readability of the results The manuscript reports many metrics, experimental settings, ablations, and sensitivity comparisons, but the principal finding is difficult to extract. The results should be organized around a few clear questions: when does refinement help, how much does it improve over simple alternatives, and when does the additional complexity cease to be worthwhile? The figures also need improvement. In Figure 6, the large errors of some baselines compress the differences among the better-performing methods near the bottom of the plots. A separate panel or enlarged view would make the relevant comparison easier to assess. Figure 7 has small labels and differing horizontal scales that complicate visual comparison.
 
 **Proposed reply:**
 
@@ -229,9 +252,9 @@ cross-well cells. At steps 16 and 32 that ordering holds in the ten-seed
 panel and in every sparse-measurement redraw. At the reference noise 0.01,
 depth interpolation is lower in all nine cells, the affine fit is lower in
 all nine, and the validation-selected smoother is lower in eight of nine.
-The relative robustness at higher simulated noise, already reported for
-R3-04, is unchanged. The extra cost is not presented as justified in
-general.
+The noise-sensitivity analysis also shows that the relative ranking changes
+under larger simulated perturbations, which were not calibrated to field
+uncertainty. The extra cost is not presented as justified in general.
 
 The five-method RMSE figure now has two rows and one vertical scale within
 each row. The upper row keeps ML only, MLP, PCA, AE, and CLP-CSGM Ridge,
@@ -264,6 +287,10 @@ operational paragraph; Appendix, new wide-range depth-profile figure.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> Define symbols at first use, including those introduced in the abstract and introductory equations.
+
 **Proposed reply:**
 
 We reviewed symbols and abbreviations at their first occurrence. The Abstract
@@ -286,6 +313,10 @@ changed.
 ## R3-A02 -- Separate sampling operator and output set
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> Clearly distinguish the sampling operator MΩ from the decoder range M.
 
 **Proposed reply:**
 
@@ -316,6 +347,10 @@ local recovery interpretation.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> Redraw Figure 1 so that the mappings from z_0 to G(z_0) and from the refined code to its decoded reconstruction are unambiguous. Explain the arrows and the curve representing the decoder range.
+
 **Proposed reply:**
 
 We thank the reviewer for asking that the two decoder mappings and the range
@@ -339,6 +374,10 @@ Where the text was changed: Method, subsection Learned model components
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> Use “probability density” in Figure 3 to avoid confusion with the bulk-density log.
+
 **Proposed reply:**
 
 We thank the reviewer for pointing out the ambiguity. We have changed the
@@ -347,13 +386,17 @@ clarifying that the figure represents statistical distributions of clay
 volume rather than the petrophysical bulk-density log. The underlying data
 and histogram calculations remain unchanged.
 
-Where the figure was changed: `figures/eda_crosswell_vc_distribution.png`,
-and its caption in Data and exploratory analysis. The caption was already
-correct and was not edited.
+Where the figure was changed: Data and exploratory analysis, Figure 3
+(vertical-axis label only). The caption was already correct and was not
+changed.
 
 ## R3-A05 -- State that Ridge is ridge regression
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> Introduce Ridge explicitly as ridge regression and state its role in the workflow.
 
 **Proposed reply:**
 
@@ -376,6 +419,10 @@ prior. The training equation was not changed.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> here i think it is hard to understand the goal. consider rephrase it. you have a contiuous well log and a few sparse core data, the goal is to have a continuous prediction over that property, like permeability
+
 **Proposed reply:**
 
 We thank the reviewer for pointing out that the reconstruction goal was not
@@ -389,11 +436,15 @@ reconstruction objective explicit without changing the experimental scope or
 implying operational validation.
 
 Where the text was changed: Abstract, opening sentence. The Introduction
-already states the same task and was not edited. `R3-P02` is closed.
+already states the same task and was not edited.
 
 ## R3-P02 -- Framing as an inverse problem
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> the probelm doesn’t sound like an inverse problem, or it i s very weakly linked to inverse problem. the position operator M just mask a few points, from the prediciton to get the actual sparse observation. it is better to call it missing data reconstruciton.
 
 **Proposed reply:**
 
@@ -435,6 +486,10 @@ compressed sensing. Citations reused: `bora2017compressed` and
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> very difficult to understand
+
 **Proposed reply:**
 
 We thank the reviewer for identifying this unclear expression. We have
@@ -446,12 +501,16 @@ decoder range, in standardized units and in the original target units. This
 restriction concerns model representability and does not imply guaranteed
 physical admissibility or exact recovery.
 
-Where the text was changed: Abstract, the decoder sentence. The Method
-definitions from R3-A02 were already correct and were not edited.
+Where the text was changed: Abstract, the decoder sentence. The corresponding
+Method definitions were already correct and were not edited.
 
 ## R3-P04 -- Meaning of rho in the Abstract
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> what is rho here?
 
 **Proposed reply:**
 
@@ -473,6 +532,10 @@ not changed.
 ## R3-P05 -- Weak single-channel context
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> what is weak single-channel context?
 
 **Proposed reply:**
 
@@ -500,6 +563,10 @@ that correlation, not to the removed label.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> are you using ridge regression? please make it easier to understand
+
 **Proposed reply:**
 
 We thank the reviewer for requesting clarification. Yes, ridge regression is
@@ -520,6 +587,10 @@ from the Abstract.
 ## R3-P07 -- Symbols in the introductory equations
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> you need to explain the symbols in your equations
 
 **Proposed reply:**
 
@@ -543,6 +614,10 @@ the realized fraction m/N.
 ## R3-P08 -- Im(G) may look like the imaginary part
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> The Im is like imaginary part of G where actually it indicates the range. please consider use another symbol
 
 **Proposed reply:**
 
@@ -569,6 +644,10 @@ local recovery interpretation.
 ## R3-P09 -- Measurement noise and lambda
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> how do you set the measurement noise? and how do you determine the lambda, the regularization coefficient.
 
 **Proposed reply:**
 
@@ -600,6 +679,10 @@ Where the text was changed: Method, subsection Test-time reconstruction (the lat
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> covariance?
+
 **Proposed reply:**
 
 The matrices \(D_y\) and \(D_u\) contain componentwise training standard
@@ -628,6 +711,10 @@ Where the text was changed: Method, subsection Problem setup (the paragraph Stan
 ## R3-P11 -- Baseline identity
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> also not clear what method was used as the baseline in this paper.
 
 **Proposed reply:**
 
@@ -668,6 +755,10 @@ remains unchanged.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> any reason for mapping u to z instead of y directly? what is the point of compressing the data in here?
+
 **Proposed reply:**
 
 The purpose of mapping \(\boldsymbol{u}\) to a latent code is to perform
@@ -696,6 +787,10 @@ now states this motivation and its conditional scope.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> any of these intermediate results were shown in the paper?
+
 **Proposed reply:**
 
 The manuscript now points explicitly to three relevant outputs. First,
@@ -719,6 +814,10 @@ show a per-iteration optimization trajectory.
 ## R3-P14 -- Arrows and symbols in Figure 1
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> also, the plot is very hard to understand. why z_tilda decode to G(z0)? the blue line below leads to nothing. what is M = Im(G)? M is the index function, lm(G) is the range of decoded measurements (the target).
 
 **Proposed reply:**
 
@@ -757,6 +856,10 @@ Figure 1 and its caption.
 ## R3-P15 -- Confusing propositions
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> it is very confusing the author listed these propositions.
 
 **Proposed reply:**
 
@@ -803,6 +906,10 @@ a minimizer, and Conditional local recovery interpretation.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> what do you mean by 30dB?
+
 **Proposed reply:**
 
 We thank the reviewer for requesting clarification of the "30dB" designation.
@@ -834,6 +941,10 @@ results.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> what is Vc?
+
 **Proposed reply:**
 
 We thank the reviewer for requesting clarification of the notation \(V_c\).
@@ -860,6 +971,10 @@ values lie between about 0.01 and 0.27, on a fractional scale.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> use probability density, pdf, or other words. the density is confusing as there is the RHOB density log.
+
 **Proposed reply:**
 
 We thank the reviewer for pointing out the ambiguity of the term "Density" in Figure 3.
@@ -875,6 +990,10 @@ Where the figure was changed: Data and exploratory analysis, Figure 3.
 ## R3-P19 -- Figure 7 and GR-derived Vc
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> very difficult to see the results. also, the Vc is not a very good target, it might be calculated from GR. you could  have predicted it almost perfectly using just GR, see the correlation 0.97
 
 **Proposed reply:**
 
@@ -908,12 +1027,13 @@ embargo-style boundary check.
 
 **Status:** `closed`
 
-The compliance matrix is `docs/revision/ae01_matriz_conformidade.md`.
-The conditional-geometry schematic was prepared with ChatGPT assistance, and
-xAI's Grok 4.7 was used to refactor existing scientific code. The research
-implementation was not originally generated by AI. The geometry caption, the
-general declaration, and Implementation details now state those uses. No
-result was changed.
+**Associate Editor's comment:**
+
+> The reviewers agree that the manuscript addresses an important problem in petrophysical log reconstruction and presents a technically interesting latent-space framework supported by open code and thorough ablation studies.
+>
+> However, an important concern of the reviewers is that the empirical validation remains too limited to support broad claims. The primary targets are derived quantities (e.g., clay volume and porosity), and the sparse observations are obtained through artificial subsampling, meaning that the experiments demonstrate reconstruction under controlled benchmark conditions rather than validation against independent measurements. The reviewers therefore recommend moderating claims regarding practical applicability and transferability. Still regarding applicability, one reviewer underlines that prediction of clay volume and porosity is a simple linear problem and a clear evidence over why the proposed ML workflow is superior to traditional linear methods is therefore needed. Additional concerns include the limited number of wells, the small number of random realizations, and the sensitivity of the results to observation placement. Lastly, maybe because of the use of Ai to edit the text, the manuscript is sometimes hard to understand, with the stacking of terminologies such as, for example, "low-capacity latent-prior reference", "admissible reconstruction range",etc. The paper readability should therefore be checked carefully (and if AI was used to improve the text then it should be acknoweldged according to the Elsevier policy).
+>
+> Overall, the reviewers find the work interesting but believe that additional validation, stronger benchmarking, and more cautious interpretation of the results are needed to support the conclusions.
 
 **Proposed reply:**
 

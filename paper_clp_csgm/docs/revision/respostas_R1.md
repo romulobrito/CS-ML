@@ -14,6 +14,10 @@ Source comments: `docs/revision/CLP_CSGM_Pareceres_Consolidados.md`.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> The cross-well target VcV_c is Larionov-derived from gamma ray, and the F03-4 porosity target is itself processed/density-derived. The authors acknowledge this limitation, but it is central and should be emphasized earlier, including in the Abstract and Conclusions.
+
 **Proposed reply:**
 
 We agree that the origin of the targets is central to the interpretation of
@@ -38,6 +42,10 @@ Interpretation, scope, and limitations.
 ## R1-M02 -- Few wells and operational transfer
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> Only three wells are used for development and one well is held out for testing. That is useful as a controlled test, but it is not enough to support broad statements about cross-well robustness or operational transferability. The language should remain clearly benchmark-specific.
 
 **Proposed reply:**
 
@@ -73,6 +81,10 @@ wells remain outside the evidence reported here.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> At the largest window step, the development pool contains only about 27 windows before validation splitting. The performance gains in those low-data settings are interesting, but with such small sample support, repeated resampling or additional held-out wells would make the conclusions much more convincing.
+
 **Proposed reply:**
 
 The reviewer is correct that support is small at the largest step. We also
@@ -101,6 +113,10 @@ development-split resampling.
 ## R1-M04 -- Three seeds and uncertainty intervals
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> The manuscript correctly uses Student-tt intervals and explicitly notes the limitation, but n=3n=3 is still very small. I suggest increasing the seed count if computationally feasible, especially because several intervals include zero and the ranking changes by regime.
 
 **Proposed reply:**
 
@@ -131,6 +147,10 @@ subsection Ten-seed CLP versus AE panel.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> CLP-CSGM outperforms the direct AE baseline in seven of nine cross-well cells, but loses in two cells; in the GR-only benchmark, AE becomes better at higher measurement ratios. This should be framed as a conditional advantage rather than overall superiority. The paper generally does this well, but the Abstract/Highlights could be even more explicit.
+
 **Proposed reply:**
 
 We agree and have revised the Abstract, Conclusion, and submission Highlights
@@ -160,6 +180,10 @@ The advantage is conditional, not superiority over every method.
 ## R1-M06 -- Why Ridge is the primary reference
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> The MLP prior is better in all nine cross-well cells, whereas Ridge is better in the single-well benchmark. This is not a minor implementation detail; it shows that the prior model materially affects performance. The authors should discuss more clearly why Ridge remains the primary reference despite MLP being consistently better in the cross-well grid.
 
 **Proposed reply:**
 
@@ -205,6 +229,10 @@ versus autoencoder tables were not changed.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> Proposition 3 is explicitly conditional and does not prove S-REC for the trained decoder. That distinction is important and should remain very clear in the Abstract/Introduction so readers do not interpret the theory as a formal recovery guarantee for the actual trained model.
+
 **Proposed reply:**
 
 We thank the reviewer for stressing that the conditional local-recovery
@@ -230,6 +258,10 @@ scope, and limitations already contained this limit and were left in place.
 ## R1-M08 -- Direct comparator with explicit mask/coordinates
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> The direct baselines use fixed sampled coordinates with implicit positional identity, which is reasonable. Still, I would like to see one stronger direct baseline that explicitly encodes the sampling mask/coordinates, especially because the proposed method uses MΩM_\Omega explicitly. This would better isolate whether the gain comes from the latent inverse formulation or simply from better use of coordinate information.
 
 **Proposed reply:**
 
@@ -261,6 +293,10 @@ results; Appendix, subsection Explicit-mask direct AE.
 ## R1-M09 -- GR-only porosity is a controlled test
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> Using GR alone is useful as a stress test, and the authors are transparent about this. However, this should not be presented as evidence for general porosity reconstruction performance. It is a controlled sparse-assimilation experiment under intentionally incomplete context.
 
 **Proposed reply:**
 
@@ -297,6 +333,10 @@ controlled-test limit and were left in place.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> The Introduction and Discussion could be enriched with more recent studies on well-log reconstruction, transferable subsurface learning, and data-driven petrophysical property prediction, particularly to better position the proposed framework against recent advances. https://doi.org/10.1016/j.engeos.2026.100536, 10.1016/j.geoen.2025.214342. https://doi.org/10.1038/s41598-025-95709-0, https://doi.org/10.1109/ACCESS.2023.3336623
+
 **Proposed reply:**
 
 We incorporated the four suggested studies into the Introduction, Related
@@ -324,14 +364,19 @@ Petrophysical log prediction; Interpretation, scope, and limitations.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> The most valuable addition would be even a small test against independent core-derived porosity/permeability or another target not generated by deterministic processing of the same log suite. The current Lapa permeability case helps, but it is described as limited-sample supplementary evidence.
+
 **Proposed reply:**
 
 We added a separate single-well supplement using 87 porosity values identified
-as laboratory measurements in the Auddys source dataset. These values are not
-computed from the gamma-ray, resistivity, or lithotype inputs by our
-processing pipeline. Original per-plug assay records were not available for
-independent verification, so we describe this as a limited laboratory-porosity
-check rather than fully verified core validation.
+as laboratory measurements in the source table associated with the Lapa field
+dataset of Alvarez et al. (2025). These values are not computed from the
+gamma-ray, resistivity, or lithotype inputs by our processing pipeline.
+Original per-plug assay records were not available for independent
+verification, so we describe this as a limited laboratory-porosity check
+rather than fully verified core validation.
 
 Training and test intervals are separated by contiguous depth blocks before
 windowing. RMSE is evaluated only at coordinates not supplied as measurements
@@ -362,6 +407,10 @@ on a cored interval.
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> The title is accurate but quite long. It could be shortened slightly while retaining “Conditional Latent-Prior” and “Petrophysical Target-Log Reconstruction.”
+
 **Proposed reply:**
 
 We thank the reviewer for the suggestion. We shortened the title slightly by
@@ -378,6 +427,10 @@ Where the text was changed: the title.
 ## R1-m02 -- Reduce overlap between Introduction and Related Work
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> The Introduction and Related Work are strong, but some paragraphs could be tightened to reduce overlap between direct prediction, conditional inverse problems, and measurement-consistency framing.
 
 **Proposed reply:**
 
@@ -407,6 +460,10 @@ Conditional generative inverse problems and positioning (closing paragraph).
 
 **Status:** `closed`
 
+**Reviewer's comment:**
+
+> Figure 2 is informative and technically useful, but the text density is high. Some labels could be enlarged for print readability.
+
 **Proposed reply:**
 
 We redrew Figure 2 at full line width with larger labels and less text inside
@@ -423,6 +480,10 @@ Where the text was changed: Method, subsection Test-time reconstruction
 ## R1-m04 -- AE as best comparator only in this benchmark
 
 **Status:** `closed`
+
+**Reviewer's comment:**
+
+> The statement that the direct AE is the “most competitive direct baseline” is supported within this benchmark, but should always be read as benchmark-specific rather than generally strongest.
 
 **Proposed reply:**
 
@@ -448,6 +509,12 @@ autoencoder).
 ## R1-m05 -- Frozen code version
 
 **Status:** `pending`
+
+**Reviewer's comment:**
+
+> Since the code is public, this is a major strength. I suggest the authors also provide a frozen release/tag corresponding exactly to the manuscript version rather than only a live GitHub repository.
+
+**Proposed reply:**
 
 **Deferred.** Do not create the tag during the revision. The manuscript and
 the code are still changing: this round added tests (step-32 development

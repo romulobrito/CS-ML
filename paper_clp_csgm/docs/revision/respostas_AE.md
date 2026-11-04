@@ -12,6 +12,9 @@ The canonical AE-01 reply is maintained in
 synthesis`, after the Reviewer 3 responses. It is not duplicated here so
 that the revision package has a single authoritative version.
 
+For submission assembly, do not include this pointer as the response itself.
+Insert the canonical AE-01 reply exactly once in the final response letter.
+
 The supporting evidence and closure decision are recorded in
 `docs/revision/ae01_matriz_conformidade.md` and
 `docs/revision/status.md`.

@@ -53,9 +53,9 @@ As categorias sao:
 | R3-A03 | Aprovada | Nenhum problema material. | Nenhuma. | Descreve claramente os dois decodings e a seta de refinamento. | `closed` |
 | R3-A04 | Ajuste leve | Citava caminho de script e funcao de plotagem. | Mantidos apenas a figura e o local no manuscrito. | Resposta curta e diretamente verificavel. | `closed` |
 | R3-A05 | Aprovada | Nenhum problema material. | Nenhuma. | Diferencia ridge interno e baseline ridge direto. | `closed` |
-| R3-P01 | Aprovada | Nenhum problema material. | Nenhuma. | Responde a anotacao com a nova frase inicial do Abstract. | `closed` |
+| R3-P01 | Ajuste leve | Terminava com o estado administrativo de outro ID. | Removida a referencia interna sem alterar a resposta. | Responde a anotacao com a nova frase inicial do Abstract. | `closed` |
 | R3-P02 | Aprovada | Nenhum problema material. | Nenhuma. | Reconhece missing-data reconstruction e justifica a formulacao inversa sem alegar inversao fisica. | `closed` |
-| R3-P03 | Aprovada | Nenhum problema material. | Nenhuma. | Substitui a expressao obscura e limita a interpretacao do range. | `closed` |
+| R3-P03 | Ajuste leve | Referia-se a outro ID para explicar definicoes ja corretas. | Substituida por uma referencia direta as definicoes de Method. | Substitui a expressao obscura e limita a interpretacao do range. | `closed` |
 | R3-P04 | Aprovada | Nenhum problema material. | Nenhuma. | Define rho e distingue a fracao realizada. | `closed` |
 | R3-P05 | Aprovada | Nenhum problema material. | Nenhuma. | Explica GR-only sem chamar GR de intrinsecamente fraco. | `closed` |
 | R3-P06 | Ajuste leve | Terminava com uma nota interna de que nenhum arquivo fora editado para esse ID. | A alteracao textual foi descrita diretamente, sem cronologia entre comentarios. | Mantem a explicacao da regressao ridge e de seu papel. | `closed` |
@@ -77,10 +77,15 @@ As categorias sao:
 ## Contagem
 
 - Total analisado: 52.
-- Aprovadas sem alteracao: 14.
-- Ajustes leves: 14.
+- Aprovadas sem alteracao: 12.
+- Ajustes leves: 16.
 - Ajustes substanciais: 23.
 - Requer verificacao adicional: 1.
+
+Esta e a contagem final da versao atual. As contagens 19/9/23/1 e
+14/14/23/1 eram estados intermediarios anteriores, respectivamente, a cinco
+ajustes leves adicionais e a remocao final de referencias internas em
+R3-P01 e R3-P03. Elas nao devem ser usadas para descrever o estado final.
 
 ## Ajustes substanciais - registro consolidado
 
