@@ -179,8 +179,8 @@
     \begin{block}{Objetivo}
       \scriptsize
       Construir uma trilha de \Vp{} que preserve a interpreta\c{c}\~ao
-      f\'isica, quantifique a incerteza e evite que o ML apenas copie o
-      perfil s\^onico.
+      f\'isica, explicite as principais fontes de incerteza e limita\c{c}\~oes
+      e evite que o ML apenas copie o perfil s\^onico.
     \end{block}
   \end{columns}
 \end{frame}
@@ -243,7 +243,7 @@
   \end{block}
 \end{frame}
 
-\begin{frame}{Mensagem central: cada etapa remove uma incerteza diferente}
+\begin{frame}{Mensagem central: cada etapa trata uma limita\c{c}\~ao distinta}
   \centering
   \begin{tikzpicture}[
     node distance=0.55cm,
@@ -255,13 +255,13 @@
   ]
     \node[box,fill=po861blue!14,draw=po861blue] (e1) {%
       \textbf{Etapa 1 -- o que o perfil consegue informar?}\\
-      \phiND{} \'e o insumo confi\'avel; FZI, permeabilidade e HFU
-      n\~ao devem ser previstos diretamente.
+      No cen\'ario estudado, \phiND{} \'e o insumo utiliz\'avel; FZI,
+      permeabilidade e HFU n\~ao foram recuper\'aveis de forma confi\'avel.
     };
     \node[box,fill=po861green!14,draw=po861green,below=of e1] (e2) {%
-      \textbf{Etapa 2 -- como transformar os insumos em velocidade?}\\
-      DEM/SC calibrado por HFU + Gassmann produz a tend\^encia f\'isica
-      de \Vp{} e explicita onde a calibra\c{c}\~ao falha.
+      \textbf{Etapa 2 -- como incorporar esses insumos \`a f\'isica?}\\
+      DEM/SC calibrado por HFU de laborat\'orio + Gassmann produz a
+      tend\^encia interpret\'avel de \Vp{} e mostra onde a calibra\c{c}\~ao falha.
     };
     \node[box,fill=orange!15,draw=orange!80!black,below=of e2] (e3) {%
       \textbf{Etapa 3 -- o desvio restante \'e previs\'ivel?}\\
@@ -273,9 +273,10 @@
   \end{tikzpicture}
   \vspace{0.10cm}
   \begin{exampleblock}{Resultado consolidado}
-    A cadeia reduz o MAPE de \Vp{} contra o DSI de
-    \textbf{7,3\%} (Gassmann) para \textbf{2,8\%} (h\'ibrido RF OOF),
-    mas a evid\^encia continua restrita ao po\c{c}o~861.
+    No po\c{c}o~861, o MAPE contra o DSI cai de \textbf{7,3\%} (Gassmann)
+    para \textbf{2,1--2,8\%} (h\'ibrido OOF; linear e RF). A contribui\c{c}\~ao
+    principal \'e a cadeia interpret\'avel perfil $\rightarrow$ f\'isica
+    $\rightarrow$ res\'iduo, n\~ao apenas a redu\c{c}\~ao do erro.
   \end{exampleblock}
 \end{frame}
 
@@ -379,11 +380,13 @@
       \scriptsize
       \begin{enumerate}
         \item Usar \phiND{} como porosidade de entrada.
-        \item Usar HFU de laborat\'orio, n\~ao a classifica\c{c}\~ao
-              autom\'atica (acur\'acia 35,6\%).
+        \item Condicionar a f\'isica \`a HFU de laborat\'orio j\'a
+              dispon\'ivel na tabela integrada (n\~ao \`a classifica\c{c}\~ao
+              autom\'atica; acur\'acia 35,6\%).
         \item Levar o microCT para a f\'isica de rochas, n\~ao como
               feature extra de regress\~ao.
-        \item N\~ao insistir em ML direto para FZI e permeabilidade.
+        \item N\~ao insistir, neste cen\'ario, em ML direto para FZI e
+              permeabilidade.
       \end{enumerate}
     \end{block}
   \end{columns}
@@ -399,7 +402,7 @@
     arr/.style={-{Stealth[length=2.4mm]},thick,po861blue},
   ]
     \node[box,fill=po861blue!12,draw=po861blue] (p) at (0,0.85)
-      {\textbf{Perfil}\\\phiND{} + HFU lab};
+      {\textbf{Perfil}\\\phiND{} (wireline)};
     \node[box,fill=orange!12,draw=orange!80!black] (ct) at (0,-0.85)
       {\textbf{microCT}\\forma + minerais};
     \node[box,fill=po861green!12,draw=po861green] (dem) at (5.00,0)
@@ -413,11 +416,13 @@
     \draw[arr] (dem) -- (gas);
     \draw[arr,dashed] (gas.south) -- (dsi.north);
   \end{tikzpicture}
-  \vspace{0.12cm}
-  \begin{exampleblock}{Mudanca de pergunta}
-    A Etapa~1 n\~ao tenta mais inferir textura a partir dos perfis.
-    A Etapa~2 mede a textura nos plugs, calibra a resposta el\'astica por
-    HFU e somente ent\~ao extrapola ao perfil.
+  \vspace{0.10cm}
+  \begin{exampleblock}{Depend\^encia operacional da HFU}
+    \scriptsize
+    A HFU usada nas 87 linhas vem da tabela laboratorial integrada
+    (r\'otulo por profundidade), n\~ao de classifica\c{c}\~ao pelos perfis.
+    Em po\c{c}o novo, transferir essa informa\c{c}\~ao \'e um problema
+    distinto da calibra\c{c}\~ao el\'astica por HFU nos plugs.
   \end{exampleblock}
 \end{frame}
 
@@ -438,8 +443,8 @@
       $\rightarrow$ ajusta $\alpha$ e escala de $K_m,G_m$ por HFU};
     \node[box,below=of a,fill=po861green!12,draw=po861green] (b)
       {\textbf{2. Aplicar ao perfil}\\
-      \phiND{} + HFU de laborat\'orio
-      $\rightarrow$ DEM/SC em 87 profundidades};
+      \phiND{} (perfil) + HFU lab. da tabela integrada
+      $\rightarrow$ DEM/SC em 87 profundidades (lookup, sem classificar HFU)};
     \node[box,below=of b,fill=orange!12,draw=orange!80!black] (c)
       {\textbf{3. Saturar e validar}\\
       Gassmann com $K_f=2{,}2$~GPa, $S_w=1$
@@ -448,14 +453,15 @@
     \draw[arr] (b) -- (c);
   \end{tikzpicture}
   \vspace{0.08cm}
-  \begin{block}{Ponto cr\'itico}
-    HFU4 n\~ao tem plug. Ela recebe par\^ametros de recurso
-    (\emph{fallback}) e, portanto, menor confian\c{c}a antes mesmo da
-    compara\c{c}\~ao com o s\^onico.
+  \begin{block}{Pontos cr\'iticos}
+    \scriptsize
+    HFU4 n\~ao tem plug e usa \emph{fallback}.
+    A cadeia atual pressup\~oe HFU laboratorial por profundidade;
+    n\~ao foi demonstrada execu\c{c}\~ao s\'o com perfis convencionais.
   \end{block}
 \end{frame}
 
-\begin{frame}[shrink=8]{Metodologia DEM/SC: da matriz mineral ao arcabou\c{c}o poroso}
+\begin{frame}[shrink=10]{Metodologia DEM/SC: da matriz mineral ao arcabou\c{c}o poroso}
   \scriptsize
   \begin{columns}[T,onlytextwidth]
     \column{0.49\textwidth}
@@ -467,12 +473,13 @@
         \left(\sum_j f_jM_j+
         \left[\sum_j\frac{f_j}{M_j}\right]^{-1}\right).
       \]
-      A raz\~ao de aspecto $\alpha$ controla o efeito da forma do poro:
-      $\alpha$ baixo representa poro mais achatado e mais complacente.
+      $\alpha$ \'e um par\^ametro efetivo da inclus\~ao porosa:
+      $\alpha$ baixo aumenta a complac\^encia. O valor calibrado n\~ao
+      identifica, por si s\'o, a geometria real dos poros.
     \end{block}
     \begin{block}{2. Differential Effective Medium}
-      Poros secos ($K_i=G_i=0$) s\~ao adicionados incrementalmente at\'e
-      a porosidade alvo $\phi$:
+      O DEM integra a evolu\c{c}\~ao de $K$ e $G$ \`a medida que poros
+      secos ($K_i=G_i=0$) s\~ao inseridos at\'e a porosidade alvo $\phi$:
       \[
         (1-y)\frac{dK}{dy}=(K_i-K)P^*,\qquad
         (1-y)\frac{dG}{dy}=(G_i-G)Q^*.
@@ -494,15 +501,16 @@
     \begin{exampleblock}{4. Satura\c{c}\~ao de Gassmann}
       \[
         K_{\mathrm{sat}}=K_{\mathrm{dry}}+
-        \frac{(1-K_{\mathrm{dry}}/K_0)^2}{D},
+        \frac{(1-K_{\mathrm{dry}}/K_0)^2}{D},\quad
+        G_{\mathrm{sat}}=G_{\mathrm{dry}},
       \]
       \[
         D=\frac{\phi}{K_f}+\frac{1-\phi}{K_0}
-        -\frac{K_{\mathrm{dry}}}{K_0^2},
-        \qquad G_{\mathrm{sat}}=G_{\mathrm{dry}}.
+        -\frac{K_{\mathrm{dry}}}{K_0^2}.
       \]
-      Adotado: $K_f=2{,}2$~GPa e $S_w=1$.
-      O fluido entra somente depois de construir o arcabou\c{c}o seco.
+      O fluido altera $K$ e $\rho$; $G$ permanece. A varia\c{c}\~ao de
+      \Vp{} depende da competi\c{c}\~ao rigidez--densidade
+      ($K_f=2{,}2$~GPa, $S_w=1$).
     \end{exampleblock}
   \end{columns}
 \end{frame}
@@ -637,34 +645,45 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Testes multiescala n\~ao justificam trocar o baseline}
+\begin{frame}{Multiescala melhora parte das m\'etricas, mas n\~ao promove o baseline}
   \footnotesize
   \begin{columns}[T,onlytextwidth]
-    \column{0.49\textwidth}
-    \begin{block}{microCT sequencial nos plugs}
+    \column{0.52\textwidth}
+    \begin{block}{M1 vs M2b forward (10 plugs)}
       \scriptsize
-      \begin{itemize}
-        \item Monoescala M1: 9,1\% in-sample; 14,8\% LOO.
-        \item Multiescala forward M2b: 8,7\% in-sample; 12,0\% LOO.
-        \item O ganho in-sample \'e s\'o 0,4 ponto percentual e o RMSE
-              piora: crit\'erio de promo\c{c}\~ao n\~ao atendido.
-      \end{itemize}
+      \begin{tabular}{lrr}
+        \toprule
+        Escopo & M1 & M2b \\
+        \midrule
+        MAPE in-sample & 9,1\% & 8,7\% \\
+        MAPE LOO & 14,8\% & 12,0\% \\
+        RMSE in-sample (km/s) & 0,52 & 0,54 \\
+        RMSE LOO (km/s) & 0,85 & 0,78 \\
+        \bottomrule
+      \end{tabular}
+      \vspace{0.06cm}
+      Crit\'erio pr\'e-registrado: promover s\'o se in-sample \emph{e} LOO
+      ganharem $\geq 2{,}0$~p.p.\ de MAPE. Aqui o LOO melhora 2,9~p.p.,
+      mas o in-sample s\'o 0,4~p.p.\ e o RMSE in-sample piora.
     \end{block}
-    \column{0.49\textwidth}
+    \column{0.46\textwidth}
     \begin{exampleblock}{Fra\c{c}\~oes NMR no perfil}
       \scriptsize
       \begin{itemize}
         \item M1 Gassmann: MAPE 7,3\%; vi\'es $+0{,}27$~km/s.
         \item M3 NMR: MAPE 8,5\%; vi\'es $+0{,}04$~km/s.
-        \item O NMR centra a m\'edia, mas aumenta a dispers\~ao ponto a ponto.
+        \item O NMR centra a m\'edia, mas aumenta a dispers\~ao.
         \item CMR versus CT nos plugs: $r\approx-0{,}30$.
       \end{itemize}
     \end{exampleblock}
   \end{columns}
-  \vspace{0.10cm}
-  \centering
-  \textbf{Decis\~ao:} manter DEM monoescala + Gassmann como baseline
-  f\'isico da Etapa~3.
+  \vspace{0.08cm}
+  \begin{block}{Interpreta\c{c}\~ao}
+    \scriptsize
+    H\'a melhoria parcial, sobretudo no LOO, por\'em ainda sem vantagem
+    suficientemente consistente entre os crit\'erios para substituir o
+    baseline monoescala + Gassmann da Etapa~3.
+  \end{block}
 \end{frame}
 
 \section{Etapa 3}
@@ -772,17 +791,18 @@
       \end{itemize}
     \end{block}
     \column{0.49\textwidth}
-    \begin{exampleblock}{O que a OOF demonstra}
+    \begin{exampleblock}{O que a OOF avalia}
       \scriptsize
-      Generaliza\c{c}\~ao para outro trecho de profundidade dentro do
-      po\c{c}o~861. As 87 predi\c{c}\~oes podem ser comparadas diretamente
-      ao DSI sem usar previs\~oes de treino.
+      Previsibilidade do \emph{corretor residual} em trechos reservados
+      do pr\'oprio po\c{c}o~861. As 87 predi\c{c}\~oes de teste podem ser
+      confrontadas ao DSI sem usar previs\~oes de treino.
     \end{exampleblock}
     \begin{exampleblock}{O que a OOF n\~ao demonstra}
       \scriptsize
-      N\~ao \'e po\c{c}o cego: os outros blocos do mesmo po\c{c}o fornecem
-      os r\'otulos de treinamento. Transfer\^encia exige manter o s\^onico
-      do novo po\c{c}o completamente fora do treino.
+      N\~ao valida a cadeia completa de forma independente: a f\'isica
+      foi calibrada nos plugs do mesmo intervalo e os r\'otulos de treino
+      usam o s\^onico dos outros blocos. Transfer\^encia interpo\c{c}os
+      permanece necess\'aria.
     \end{exampleblock}
   \end{columns}
 \end{frame}
@@ -800,11 +820,12 @@
         \item $V_{\mathrm{p,Gassmann}}$.
       \end{itemize}
     \end{block}
-    \begin{exampleblock}{Sa\'idas e modelo}
+    \begin{exampleblock}{Sa\'idas e protocolo}
       \scriptsize
-      Random Forest: 200 \'arvores, semente 42.
+      Refer\^encia experimental: RF (200 \'arvores, semente 42).
       Prediz \dVp{} no bloco reservado; as tr\^es rodadas formam 87
-      predi\c{c}\~oes OOF.
+      predi\c{c}\~oes OOF. O mesmo protocolo \'e aplicado aos demais
+      regressores da sensibilidade.
     \end{exampleblock}
     \column{0.51\textwidth}
     \centering
@@ -827,7 +848,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultado central: MAPE $7,3\% \rightarrow 2,8\%$ e vi\'es quase nulo}
+\begin{frame}{Resultado central: o res\'iduo \'e previs\'ivel no po\c{c}o~861}
   \begin{columns}[T,onlytextwidth]
     \column{0.39\textwidth}
     \footnotesize
@@ -837,16 +858,17 @@
       Modelo & MAPE & RMSE & Vi\'es \\
       \midrule
       Gassmann & 7,3\% & 0,48 & $+0{,}27$ \\
-      H\'ibrido RF & \textbf{2,8\%} & \textbf{0,18} & $+0{,}01$ \\
+      H\'ibrido RF & 2,8\% & 0,18 & $+0{,}01$ \\
+      H\'ibrido linear & \textbf{2,1\%} & \textbf{0,14} & $+0{,}00$ \\
       \bottomrule
     \end{tabular}
     \vspace{0.10cm}
     \raggedright
-    {\scriptsize Unidades do RMSE e vi\'es: km/s.
-    O ganho \'e OOF por blocos, n\~ao ajuste nas mesmas linhas.}
+    {\scriptsize Unidades: km/s. M\'etricas OOF por blocos; RF \'e a
+    refer\^encia experimental; a linear obteve o menor MAPE.}
     \begin{block}{O que foi demonstrado}
-      \scriptsize Parte do desvio DEM/Gassmann--DSI tem estrutura nos
-      perfis dentro do intervalo do po\c{c}o~861.
+      \scriptsize Parte do desvio DEM/Gassmann--DSI tem estrutura
+      previs\'ivel nos perfis dentro do intervalo do po\c{c}o~861.
     \end{block}
     \column{0.59\textwidth}
     \slidefigure[0.77]{fig3_vp_hybrid_depth_hfu}{DSI, Gassmann e h\'ibrido
@@ -859,7 +881,7 @@
   \centering
   \begin{tabular}{cccrrr}
     \toprule
-    HFU & $n$ & Plugs & MAPE Gassmann & MAPE h\'ibrido & Vi\'es h\'ibrido \\
+    HFU & $n$ & Plugs & MAPE Gassmann & MAPE h\'ibr.\ RF & Vi\'es RF \\
     \midrule
     1 & 42 & 4 & 6,8\% & 2,2\% & $+0{,}02$ \\
     2 & 29 & 4 & 2,2\% & 2,3\% & $-0{,}09$ \\
@@ -867,12 +889,12 @@
     4 & 6 & 0 & 28,1\% & 4,8\% & $+0{,}17$ \\
     \bottomrule
   \end{tabular}
-  \vspace{0.12cm}
+  \vspace{0.10cm}
   \begin{columns}[T,onlytextwidth]
     \column{0.49\textwidth}
-    \begin{block}{Leitura positiva}
+    \begin{block}{Leitura}
       \scriptsize
-      O corretor preserva HFU2, onde a f\'isica j\'a fecha, e reduz o
+      O corretor RF preserva HFU2, onde a f\'isica j\'a fecha, e reduz o
       erro em HFU1, HFU3 e HFU4.
     \end{block}
     \column{0.49\textwidth}
@@ -880,12 +902,12 @@
       \scriptsize
       O maior ganho aparece na HFU4 com apenas seis linhas.
       O ML compensa defici\^encia de calibra\c{c}\~ao local; n\~ao
-      identifica um novo mecanismo f\'isico.
+      identifica, isoladamente, um novo mecanismo f\'isico.
     \end{exampleblock}
   \end{columns}
 \end{frame}
 
-\begin{frame}{O resultado n\~ao depende de um \'unico regressor}
+\begin{frame}{Corre\c{c}\~ao residual: ganhos mesmo com modelos simples}
   \begin{columns}[T,onlytextwidth]
     \column{0.42\textwidth}
     \footnotesize
@@ -905,12 +927,17 @@
       \bottomrule
     \end{tabular}
     \vspace{0.08cm}
-    \raggedright
-    {\scriptsize A regress\~ao linear sugere que a parcela previs\'ivel do
-    res\'iduo \'e aproximadamente linear neste intervalo.}
+    \begin{block}{Leitura}
+      \scriptsize
+      Mesmo protocolo OOF, mesmas entradas e mesmo alvo.
+      A linear obteve o melhor desempenho: rela\c{c}\~ao preditiva
+      aproximadamente linear \emph{neste} conjunto, n\~ao mecanismo
+      f\'isico demonstrado.
+    \end{block}
     \column{0.56\textwidth}
-    \slidefigure[0.72]{fig3_regressor_sensitivity_mape}{Sensibilidade do
-    MAPE h\'ibrido OOF ao regressor; RF em destaque.}
+    \slidefigure[0.64]{fig3_regressor_sensitivity_mape}{MAPE h\'ibrido OOF
+    por regressor. RF permanece refer\^encia experimental; a linear
+    lidera numericamente.}
   \end{columns}
 \end{frame}
 
@@ -933,11 +960,12 @@
     \vspace{0.10cm}
     \raggedright
     {\scriptsize Com janelas de 16 linhas, a suaviza\c{c}\~ao perde os
-    degraus associados \`a HFU4. O CLP s\'o cruza o RF denso quando
-    $\rho\gtrsim0{,}7$ das profundidades de teste t\^em res\'iduo conhecido.}
+    degraus associados \`a HFU4. O CLP s\'o se aproxima do corretor
+    pontual quando $\rho\gtrsim0{,}7$ das profundidades de teste t\^em
+    res\'iduo conhecido.}
     \column{0.58\textwidth}
-    \slidefigure[0.72]{fig3_clp_comparison_mape}{Gassmann, RF h\'ibrido e
-    variantes CLP-CSGM sob o mesmo confronto com o DSI.}
+    \slidefigure[0.72]{fig3_clp_comparison_mape}{Gassmann, corretor
+    pontual RF e variantes CLP-CSGM no mesmo confronto com o DSI.}
   \end{columns}
 \end{frame}
 
@@ -959,41 +987,45 @@
     2 & Gassmann fecha o DSI? & casamento 87/87 & MAPE & 7,3\% \\
     2 & Gassmann remove o vi\'es? & casamento 87/87 & vi\'es & $+0{,}27$~km/s \\
     \midrule
-    3 & Res\'iduo \'e previs\'ivel? & 3 blocos OOF & $R^2$ residual & 0,79 \\
-    3 & H\'ibrido fecha o DSI? & 3 blocos OOF & MAPE RF & 2,8\% \\
-    3 & H\'ibrido remove o vi\'es? & 3 blocos OOF & vi\'es RF & $+0{,}01$~km/s \\
+    3 & Res\'iduo previs\'ivel? & 3 blocos OOF & $R^2$ residual RF & 0,79 \\
+    3 & H\'ibrido vs DSI & 3 blocos OOF & MAPE linear / RF & 2,1\% / 2,8\% \\
+    3 & Vi\'es residual & 3 blocos OOF & vi\'es linear / RF & $\approx 0$ / $+0{,}01$ \\
     \bottomrule
   \end{tabular}
   \vspace{0.12cm}
   \begin{block}{Encadeamento l\'ogico}
     A Etapa~1 escolhe os insumos; a Etapa~2 produz uma baseline
-    interpret\'avel; a Etapa~3 corrige apenas a parcela local que a
-    baseline n\~ao explica.
+    interpret\'avel; a Etapa~3 investiga a parcela local do desvio que
+    ainda pode ser aprendida a partir dos dados.
   \end{block}
 \end{frame}
 
-\begin{frame}{O que os resultados provam -- e o que ainda n\~ao provam}
+\begin{frame}{O que os resultados demonstram -- e quais quest\~oes permanecem abertas}
   \begin{columns}[T,onlytextwidth]
     \column{0.49\textwidth}
     \begin{block}{Evid\^encia obtida}
       \scriptsize
       \begin{itemize}
         \item \phiND{} \'e uma entrada conservadora para a f\'isica.
-        \item DEM/SC calibrado por HFU fecha a ordem de grandeza de \Vp{}.
-        \item O res\'iduo p\'os-Gassmann \'e model\'avel em blocos de
-              profundidade dentro do po\c{c}o~861.
-        \item Um corretor simples j\'a captura a maior parte desse sinal.
+        \item DEM/SC calibrado por HFU lab.\ fecha a ordem de grandeza
+              de \Vp{}.
+        \item O res\'iduo p\'os-Gassmann \'e previs\'ivel em blocos
+              reservados do po\c{c}o~861.
+        \item Corretor simples (inclusive linear) captura boa parte
+              desse sinal.
       \end{itemize}
     \end{block}
     \column{0.49\textwidth}
-    \begin{exampleblock}{Limites}
+    \begin{exampleblock}{Quest\~oes abertas}
       \scriptsize
       \begin{itemize}
-        \item 87 linhas em apenas 28~m; facies se repetem entre blocos.
-        \item O s\^onico entra no alvo da Etapa~3: OOF n\~ao \'e po\c{c}o cego.
-        \item HFU4 tem seis linhas e nenhum plug.
-        \item O corretor pode reunir efeitos de press\~ao, anisotropia,
-              fluido, HFU e escala de medida sem separ\'a-los fisicamente.
+        \item 87 linhas em apenas 28~m; f\'acies se repetem entre blocos.
+        \item OOF avalia o corretor residual, n\~ao a cadeia completa
+              em po\c{c}o independente.
+        \item HFU4 tem seis linhas e nenhum plug; HFU do perfil exige
+              r\'otulo laboratorial.
+        \item O res\'iduo estat\'istico pode misturar press\~ao,
+              anisotropia, fluido e escala sem identific\'a-los.
       \end{itemize}
     \end{exampleblock}
   \end{columns}
@@ -1020,9 +1052,10 @@
       \scriptsize
       \begin{itemize}
         \item Mesmo po\c{c}o e intervalo do treinamento.
-        \item Reportar simultaneamente Gassmann, h\'ibrido RF e linear.
+        \item Reportar Gassmann, h\'ibrido linear e RF em paralelo.
         \item Preservar a regra anti-vazamento e as predi\c{c}\~oes OOF.
-        \item Tratar HFU3/4 com incerteza expl\'icita.
+        \item Declarar confian\c{c}a reduzida em HFU3/4 e a depend\^encia
+              da HFU laboratorial.
       \end{itemize}
     \end{exampleblock}
   \end{columns}
@@ -1038,19 +1071,21 @@
 \begin{frame}{Conclus\~oes}
   \footnotesize
   \begin{enumerate}
-    \item \textbf{Etapa 1:} \phiND{} \'e o elo confi\'avel entre perfil e
-          f\'isica; FZI, permeabilidade e HFU n\~ao devem ser alvos diretos.
-    \item \textbf{Etapa 2:} DEM/SC calibrado por HFU + Gassmann reduz o
-          problema a um erro de 7,3\%, com vi\'es positivo de 0,27~km/s.
-    \item \textbf{Etapa 3:} o corretor residual RF reduz o MAPE OOF para
-          2,8\% e o vi\'es para 0,01~km/s; a regress\~ao linear chega a 2,1\%.
-    \item \textbf{Diagn\'ostico por HFU:} o ganho aparece onde a calibra\c{c}\~ao
-          f\'isica \'e mais fraca, sobretudo HFU3/4; HFU2 permanece est\'avel.
-    \item \textbf{Escolha de modelo:} RF pontual supera CLP em janelas;
-          com poucos r\'otulos esparsos, o limite \'e a densidade de
-          calibra\c{c}\~ao, n\~ao a arquitetura.
-    \item \textbf{Escopo:} prova de conceito local no po\c{c}o~861;
-          valida\c{c}\~ao interpo\c{c}os ainda \'e obrigat\'oria.
+    \item \textbf{Etapa 1:} no cen\'ario estudado, \phiND{} \'e o elo
+          utiliz\'avel entre perfil e f\'isica; FZI, permeabilidade e HFU
+          n\~ao foram recuper\'aveis de forma confi\'avel pelos perfis.
+    \item \textbf{Etapa 2:} DEM/SC + Gassmann fornecem \Vp{} interpret\'avel
+          (MAPE 7,3\%; vi\'es $+0{,}27$~km/s), condicionados \`a HFU
+          laboratorial e \`a calibra\c{c}\~ao dispon\'ivel.
+    \item \textbf{Etapa 3:} a corre\c{c}\~ao residual reduz o MAPE OOF para
+          2,1\% (linear) e 2,8\% (RF); ganhos expressivos ocorrem mesmo
+          com modelos de baixa complexidade.
+    \item \textbf{Diagn\'ostico por HFU:} o ganho concentra-se onde a
+          calibra\c{c}\~ao f\'isica \'e mais fraca (HFU3/4); HFU2 permanece
+          est\'avel.
+    \item \textbf{Alcance:} a OOF mostra previsibilidade local do res\'iduo
+          no po\c{c}o~861; a transfer\^encia operacional e a quantifica\c{c}\~ao
+          formal de incerteza preditiva permanecem abertas.
   \end{enumerate}
 \end{frame}
 
@@ -1063,8 +1098,8 @@
       \item Testar transfer\^encia cega do corretor 861 $\rightarrow$ 1045.
       \item Repetir o fluxo completo no 1045 para separar
             transfer\^encia de reprodutibilidade.
-      \item Somente depois avaliar uso em perfil de produ\c{c}\~ao ou
-            invers\~ao s\'ismica.
+      \item Separar erro preditivo de quantifica\c{c}\~ao formal de
+            incerteza e s\'o ent\~ao avaliar uso operacional.
     \end{enumerate}
     \column{0.47\textwidth}
     \centering
