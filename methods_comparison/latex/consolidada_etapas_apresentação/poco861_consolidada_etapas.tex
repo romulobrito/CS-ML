@@ -131,8 +131,8 @@
     {\usebeamerfont{institute} UENF / LENEP}\\[0.08cm]
     {\usebeamerfont{date} Novembro de 2026}\\[0.18cm]
     {\footnotesize
-      87 profundidades em 28~m $\cdot$ 10 plugs microCT $\cdot$ ROCKPHYS
-      $\cdot$ DSI/CMR\\[0.08cm]
+      87 profundidades em 28~m $\cdot$ 10 plugs de microtomografia
+      $\cdot$ ensaios el\'asticos $\cdot$ s\^onico/RMN\\[0.08cm]
       Diagn\'ostico ML $\rightarrow$ DEM/SC + Gassmann
       $\rightarrow$ corre\c{c}\~ao residual}
   \end{center}
@@ -159,9 +159,10 @@
       \scriptsize
       \begin{itemize}
         \item Perfis cobrem o po\c{c}o, mas n\~ao resolvem toda a textura.
-        \item Laborat\'orio e microCT trazem detalhe, mas em poucos pontos.
-        \item O s\^onico mede \Vp{} continuamente, por\'em n\~ao explica
-              sozinho a origem f\'isica das varia\c{c}\~oes.
+        \item Ensaios de laborat\'orio e microtomografia trazem detalhe,
+              mas em poucos pontos.
+        \item O perfil s\^onico mede \Vp{} continuamente, por\'em n\~ao
+              explica sozinho a origem f\'isica das varia\c{c}\~oes.
       \end{itemize}
     \end{block}
     \column{0.50\textwidth}
@@ -185,38 +186,41 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}[shrink=16]{Os dados s\~ao complementares, escassos e medidos em escalas diferentes}
+\begin{frame}[shrink=20]{Os dados s\~ao complementares, escassos e medidos em escalas diferentes}
   \scriptsize
   \begin{columns}[T,onlytextwidth]
-    \column{0.47\textwidth}
+    \column{0.48\textwidth}
     \centering
-    \setlength{\tabcolsep}{3pt}
+    \setlength{\tabcolsep}{2.5pt}
+    \renewcommand{\arraystretch}{0.95}
     \begin{tabular}{%
-      >{\raggedright\arraybackslash}p{1.65cm}%
-      >{\raggedright\arraybackslash}p{2.35cm}r}
+      >{\raggedright\arraybackslash}p{2.35cm}%
+      >{\raggedright\arraybackslash}p{1.95cm}r}
       \toprule
       Fonte & Informa\c{c}\~ao principal & Cobertura \\
       \midrule
       Perfis convencionais & litologia, densidade, $\phi$, resistividade
         & 87 linhas \\
-      Laborat\'orio & \philab{}, $k$, FZI, HFU, \Vp{}/\Vs{}
+      Laborat\'orio & \philab{}, $k$, FZI, HFU
         & pontual \\
-      microCT & geometria e minerais
+      Ensaios el\'asticos (ROCKPHYS) & \Vp{}/\Vs{} de plug
+        & 28 medidas \\
+      Microtomografia (microCT) & geometria e minerais
         & 10 plugs \\
-      DSI & \Vp{}/\Vs{} \emph{in situ}
+      Perfil s\^onico (DSI) & \Vp{}/\Vs{} \emph{in situ}
         & 182 amostras \\
-      CMR & parti\c{c}\~ao macro/micro
+      Perfil de RMN (CMR) & sistema poroso ($T_2$)
         & 152 amostras \\
       \bottomrule
     \end{tabular}
-    \vspace{0.08cm}
+    \vspace{0.06cm}
     \begin{block}{Desbalanceamento}
       \scriptsize
       HFU1/2/3/4: 42/29/10/6 linhas.
       A HFU4 n\~ao possui plug de calibra\c{c}\~ao, justamente onde a
       f\'isica apresenta o maior erro.
     \end{block}
-    \column{0.51\textwidth}
+    \column{0.50\textwidth}
     \begin{exampleblock}{Principais dificuldades}
       \scriptsize
       \begin{itemize}
@@ -234,7 +238,7 @@
       \end{itemize}
     \end{exampleblock}
   \end{columns}
-  \vspace{0.05cm}
+  \vspace{0.04cm}
   \begin{block}{Consequ\^encia metodol\'ogica}
     \scriptsize
     A cadeia precisa evitar vazamento, validar por blocos de profundidade,
@@ -271,12 +275,14 @@
     \draw[arr] (e1) -- node[right,font=\scriptsize] {insumos} (e2);
     \draw[arr] (e2) -- node[right,font=\scriptsize] {res\'iduo} (e3);
   \end{tikzpicture}
-  \vspace{0.10cm}
+  \vspace{0.06cm}
   \begin{exampleblock}{Resultado consolidado}
-    No po\c{c}o~861, o MAPE contra o DSI cai de \textbf{7,3\%} (Gassmann)
-    para \textbf{2,1--2,8\%} (h\'ibrido OOF; linear e RF). A contribui\c{c}\~ao
-    principal \'e a cadeia interpret\'avel perfil $\rightarrow$ f\'isica
-    $\rightarrow$ res\'iduo, n\~ao apenas a redu\c{c}\~ao do erro.
+    \scriptsize
+    No po\c{c}o~861, o MAPE contra o s\^onico cai de \textbf{7,3\%}
+    (Gassmann) para \textbf{2,1--2,8\%} (h\'ibrido OOF; linear e RF).
+    A contribui\c{c}\~ao principal \'e a cadeia interpret\'avel perfil
+    $\rightarrow$ f\'isica $\rightarrow$ res\'iduo, n\~ao apenas a
+    redu\c{c}\~ao do erro.
   \end{exampleblock}
 \end{frame}
 
@@ -288,9 +294,10 @@
       \scriptsize
       \begin{itemize}
         \item 87 linhas: perfis + laborat\'orio, 5205,91--5233,72~m.
-        \item 10 plugs: microCT, \philab{} e calibra\c{c}\~ao el\'astica.
-        \item 28 medidas ROCKPHYS de \Vp{}/\Vs{}.
-        \item 182 amostras DSI e 152 amostras CMR no intervalo.
+        \item 10 plugs: microtomografia, \philab{} e calibra\c{c}\~ao
+              el\'astica.
+        \item 28 ensaios el\'asticos de laborat\'orio (\Vp{}/\Vs{}).
+        \item 182 amostras do perfil s\^onico e 152 do perfil de RMN.
       \end{itemize}
     \end{block}
     \begin{block}{Segmenta\c{c}\~ao}
@@ -305,7 +312,7 @@
         \item \textbf{Etapa 1:} tr\^es blocos cont\'iguos de profundidade
               (OOF) e LOPO nos dez plugs.
         \item \textbf{Etapa 2:} linha de base, in-sample, LOO nos plugs e
-              confronto 87/87 com o DSI.
+              confronto 87/87 com o s\^onico.
         \item \textbf{Etapa 3:} os mesmos tr\^es blocos OOF; cada linha
               recebe uma predi\c{c}\~ao de um modelo que n\~ao viu seu bloco.
       \end{itemize}
@@ -323,8 +330,8 @@
     \column{0.48\textwidth}
     \footnotesize
     \begin{block}{Pergunta}
-      Oito curvas wireline conseguem prever \philab{}, \fzilab{},
-      permeabilidade e HFU em um intervalo ainda n\~ao visto?
+      Oito curvas de perfil convencional conseguem prever \philab{},
+      \fzilab{}, permeabilidade e HFU em um intervalo ainda n\~ao visto?
     \end{block}
     \begin{exampleblock}{Regra contra vazamento}
       Laborat\'orio entra como alvo $y$, nunca como entrada $X$.
@@ -383,8 +390,8 @@
         \item Condicionar a f\'isica \`a HFU de laborat\'orio j\'a
               dispon\'ivel na tabela integrada (n\~ao \`a classifica\c{c}\~ao
               autom\'atica; acur\'acia 35,6\%).
-        \item Levar o microCT para a f\'isica de rochas, n\~ao como
-              feature extra de regress\~ao.
+        \item Levar a microtomografia para a f\'isica de rochas, n\~ao
+              como feature extra de regress\~ao.
         \item N\~ao insistir, neste cen\'ario, em ML direto para FZI e
               permeabilidade.
       \end{enumerate}
@@ -402,15 +409,15 @@
     arr/.style={-{Stealth[length=2.4mm]},thick,po861blue},
   ]
     \node[box,fill=po861blue!12,draw=po861blue] (p) at (0,0.85)
-      {\textbf{Perfil}\\\phiND{} (wireline)};
+      {\textbf{Perfil}\\\phiND{} (convencional)};
     \node[box,fill=orange!12,draw=orange!80!black] (ct) at (0,-0.85)
-      {\textbf{microCT}\\forma + minerais};
+      {\textbf{Microtomografia}\\forma + minerais};
     \node[box,fill=po861green!12,draw=po861green] (dem) at (5.00,0)
       {\textbf{DEM/SC}\\$K_{\mathrm{dry}},G_{\mathrm{dry}}$};
     \node[box,fill=drpyellow!25,draw=orange!80!black] (gas) at (9.10,0)
       {\textbf{Gassmann}\\\Vp{}, \Vs{} saturados};
     \node[box,fill=gray!12,draw=gray] (dsi) at (9.10,-1.85)
-      {\textbf{DSI}\\valida, n\~ao calibra};
+      {\textbf{S\^onico}\\valida, n\~ao calibra};
     \draw[arr] (p.east) -- ++(0.55,0) |- (dem.west);
     \draw[arr] (ct.east) -- ++(0.55,0) |- (dem.west);
     \draw[arr] (dem) -- (gas);
@@ -428,7 +435,7 @@
 
 \section{Etapa 2}
 
-\begin{frame}{Etapa 2: aprender nos plugs, aplicar nas 87 linhas, validar no DSI}
+\begin{frame}{Etapa 2: aprender nos plugs, aplicar nas 87 linhas, validar no s\^onico}
   \centering
   \begin{tikzpicture}[
     node distance=0.45cm,
@@ -439,7 +446,7 @@
     arr/.style={-{Stealth[length=2.5mm]},thick,po861blue},
   ]
     \node[box] (a) {\textbf{1. Calibrar nos 10 plugs}\\
-      \philab{} + microCT + \Vp{} ROCKPHYS
+      \philab{} + microtomografia + \Vp{} de laborat\'orio
       $\rightarrow$ ajusta $\alpha$ e escala de $K_m,G_m$ por HFU};
     \node[box,below=of a,fill=po861green!12,draw=po861green] (b)
       {\textbf{2. Aplicar ao perfil}\\
@@ -448,7 +455,7 @@
     \node[box,below=of b,fill=orange!12,draw=orange!80!black] (c)
       {\textbf{3. Saturar e validar}\\
       Gassmann com $K_f=2{,}2$~GPa, $S_w=1$
-      $\rightarrow$ confronto com o DSI sem reajuste};
+      $\rightarrow$ confronto com o s\^onico sem reajuste};
     \draw[arr] (a) -- (b);
     \draw[arr] (b) -- (c);
   \end{tikzpicture}
@@ -466,7 +473,7 @@
   \begin{columns}[T,onlytextwidth]
     \column{0.49\textwidth}
     \begin{block}{1. Matriz e geometria}
-      Fra\c{c}\~oes de calcita/dolomita do microCT formam
+      Fra\c{c}\~oes de calcita/dolomita da microtomografia formam
       $K_m$, $G_m$ e $\rho_m$ pela m\'edia Voigt--Reuss--Hill:
       \[
         M_{\mathrm{VRH}}=\frac{1}{2}
@@ -605,14 +612,14 @@
     \vspace{0.10cm}
     \raggedright
     {\scriptsize 87/87 profundidades casadas. Unidades do RMSE e vi\'es:
-    km/s. O DSI n\~ao foi usado para reajustar o DEM.}
+    km/s. O s\^onico n\~ao foi usado para reajustar o DEM.}
     \begin{block}{Por que isso leva \`a Etapa 3}
       \scriptsize A f\'isica fecha a ordem de grandeza, mas o deslocamento
       positivo de 0,27~km/s ainda domina parte relevante do erro.
     \end{block}
     \column{0.61\textwidth}
-    \slidefigure[0.76]{fig2_vp_dry_gassmann_sonic_depth}{Trilhas do DSI,
-    DEM seco e DEM + Gassmann ao longo do intervalo.}
+    \slidefigure[0.76]{fig2_vp_dry_gassmann_sonic_depth}{Trilhas do
+    s\^onico, DEM seco e DEM + Gassmann ao longo do intervalo.}
   \end{columns}
 \end{frame}
 
@@ -641,7 +648,7 @@
     \end{block}
     \column{0.55\textwidth}
     \slidefigure[0.74]{fig2_vp_error_vs_depth}{Erro relativo do DEM seco
-    contra o DSI; os maiores desvios coincidem com a HFU4.}
+    contra o s\^onico; os maiores desvios coincidem com a HFU4.}
   \end{columns}
 \end{frame}
 
@@ -667,13 +674,13 @@
       mas o in-sample s\'o 0,4~p.p.\ e o RMSE in-sample piora.
     \end{block}
     \column{0.46\textwidth}
-    \begin{exampleblock}{Fra\c{c}\~oes NMR no perfil}
+    \begin{exampleblock}{Fra\c{c}\~oes de RMN no perfil}
       \scriptsize
       \begin{itemize}
         \item M1 Gassmann: MAPE 7,3\%; vi\'es $+0{,}27$~km/s.
-        \item M3 NMR: MAPE 8,5\%; vi\'es $+0{,}04$~km/s.
-        \item O NMR centra a m\'edia, mas aumenta a dispers\~ao.
-        \item CMR versus CT nos plugs: $r\approx-0{,}30$.
+        \item M3 RMN: MAPE 8,5\%; vi\'es $+0{,}04$~km/s.
+        \item O RMN centra a m\'edia, mas aumenta a dispers\~ao.
+        \item RMN versus microtomografia nos plugs: $r\approx-0{,}30$.
       \end{itemize}
     \end{exampleblock}
   \end{columns}
@@ -787,7 +794,7 @@
         \item s\^onico, DTCO/DTSM e \phiS{} em $X$;
         \item res\'iduo observado como entrada;
         \item ajuste de hiperpar\^ametros no bloco de teste;
-        \item recalibra\c{c}\~ao DEM/SC usando o DSI.
+        \item recalibra\c{c}\~ao DEM/SC usando o s\^onico.
       \end{itemize}
     \end{block}
     \column{0.49\textwidth}
@@ -795,7 +802,7 @@
       \scriptsize
       Previsibilidade do \emph{corretor residual} em trechos reservados
       do pr\'oprio po\c{c}o~861. As 87 predi\c{c}\~oes de teste podem ser
-      confrontadas ao DSI sem usar previs\~oes de treino.
+      confrontadas ao s\^onico sem usar previs\~oes de treino.
     \end{exampleblock}
     \begin{exampleblock}{O que a OOF n\~ao demonstra}
       \scriptsize
@@ -867,12 +874,12 @@
     {\scriptsize Unidades: km/s. M\'etricas OOF por blocos; RF \'e a
     refer\^encia experimental; a linear obteve o menor MAPE.}
     \begin{block}{O que foi demonstrado}
-      \scriptsize Parte do desvio DEM/Gassmann--DSI tem estrutura
+      \scriptsize Parte do desvio DEM/Gassmann--s\^onico tem estrutura
       previs\'ivel nos perfis dentro do intervalo do po\c{c}o~861.
     \end{block}
     \column{0.59\textwidth}
-    \slidefigure[0.77]{fig3_vp_hybrid_depth_hfu}{DSI, Gassmann e h\'ibrido
-    RF OOF; faixa lateral = HFU de laborat\'orio.}
+    \slidefigure[0.77]{fig3_vp_hybrid_depth_hfu}{S\^onico, Gassmann e
+    h\'ibrido RF OOF; faixa lateral = HFU de laborat\'orio.}
   \end{columns}
 \end{frame}
 
@@ -965,7 +972,7 @@
     res\'iduo conhecido.}
     \column{0.58\textwidth}
     \slidefigure[0.72]{fig3_clp_comparison_mape}{Gassmann, corretor
-    pontual RF e variantes CLP-CSGM no mesmo confronto com o DSI.}
+    pontual RF e variantes CLP-CSGM no mesmo confronto com o s\^onico.}
   \end{columns}
 \end{frame}
 
@@ -984,11 +991,11 @@
     1 & FZI pelo perfil? & 3 blocos OOF & $R^2$ RF & $-0{,}82$ \\
     \midrule
     2 & DEM fecha o lab? & LOO em 10 plugs & MAPE & 14,8\% \\
-    2 & Gassmann fecha o DSI? & casamento 87/87 & MAPE & 7,3\% \\
+    2 & Gassmann fecha o s\^onico? & casamento 87/87 & MAPE & 7,3\% \\
     2 & Gassmann remove o vi\'es? & casamento 87/87 & vi\'es & $+0{,}27$~km/s \\
     \midrule
     3 & Res\'iduo previs\'ivel? & 3 blocos OOF & $R^2$ residual RF & 0,79 \\
-    3 & H\'ibrido vs DSI & 3 blocos OOF & MAPE linear / RF & 2,1\% / 2,8\% \\
+    3 & H\'ibrido vs s\^onico & 3 blocos OOF & MAPE linear / RF & 2,1\% / 2,8\% \\
     3 & Vi\'es residual & 3 blocos OOF & vi\'es linear / RF & $\approx 0$ / $+0{,}01$ \\
     \bottomrule
   \end{tabular}
