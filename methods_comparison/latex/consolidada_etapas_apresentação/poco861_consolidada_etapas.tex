@@ -330,31 +330,31 @@
     \column{0.48\textwidth}
     \footnotesize
     \begin{block}{Pergunta}
-      Oito curvas de perfil convencional conseguem prever \philab{},
-      \fzilab{}, permeabilidade e HFU em um intervalo ainda n\~ao visto?
+      Os perfis convencionais conseguem prever \philab{}, \fzilab{},
+      permeabilidade e HFU em um intervalo ainda n\~ao visto?
     \end{block}
     \begin{exampleblock}{Regra contra vazamento}
-      Laborat\'orio entra como alvo $y$, nunca como entrada $X$.
-      Ao prever FZI, \philab{}, $k_{\mathrm{lab}}$, RQI e HFU ficam fora.
+      Dados de laborat\'orio entram apenas como alvo $y$, nunca como
+      entrada $X$.
     \end{exampleblock}
     \column{0.50\textwidth}
     \centering
     \scriptsize
     \begin{tabular}{lrr}
       \toprule
-      Rela\c{c}\~ao & Vari\'avel & Pearson $r$ \\
+      Alvo & Fonte da associa\c{c}\~ao & Pearson $r$ \\
       \midrule
-      Perfil $\rightarrow$ \philab{} & Phi\_Neutron & 0,737 \\
-      Perfil $\rightarrow$ \philab{} & \phiND{} & 0,701 \\
-      Perfil $\rightarrow$ FZI & \phiND{} & 0,308 \\
-      Laborat\'orio $\rightarrow$ FZI & RQI & 0,887 \\
-      Laborat\'orio $\rightarrow$ FZI & $k_{\mathrm{lab}}$ & 0,709 \\
+      \philab{} & perfil (melhor curva) & 0,74 \\
+      \philab{} & perfil (\phiND{}) & 0,70 \\
+      FZI & perfil & 0,31 \\
+      FZI & laborat\'orio & 0,89 \\
+      FZI & laborat\'orio ($k$) & 0,71 \\
       \bottomrule
     \end{tabular}
     \vspace{0.12cm}
     \begin{block}{Diagn\'ostico}
       \scriptsize
-      Porosidade deixa assinatura nas curvas. FZI depende de textura e
+      Porosidade deixa assinatura nos perfis. FZI depende de textura e
       conectividade que os perfis convencionais n\~ao resolvem.
     \end{block}
   \end{columns}
@@ -367,21 +367,20 @@
     \centering
     \begin{tabular}{lrr}
       \toprule
-      Alvo / m\'etodo & RMSE & $R^2$ OOF \\
+      Alvo (previs\~ao OOF) & RMSE & $R^2$ \\
       \midrule
-      \philab{} -- RF & 0,033~pu & 0,146 \\
-      \fzilab{} -- RF & 1,813 & $-0{,}819$ \\
-      $k_{\mathrm{lab}}$ -- RF & 76,2~mD & $-15{,}4$ \\
+      \philab{} & 0,033~pu & 0,146 \\
+      \fzilab{} & 1,813 & $-0{,}819$ \\
+      $k_{\mathrm{lab}}$ & 76,2~mD & $-15{,}4$ \\
       \midrule
-      \phiND{} direto vs \philab{} & 0,032~pu & \textbf{0,446} \\
-      RF alinhado vs \philab{} & 0,036~pu & 0,300 \\
+      \phiND{} vs \philab{} (direto) & 0,032~pu & \textbf{0,446} \\
       \bottomrule
     \end{tabular}
     \vspace{0.10cm}
     \raggedright
     {\scriptsize $R^2<0$ significa erro maior que prever a m\'edia.
-    O resultado de \phiND{} direto elimina complexidade sem perder
-    capacidade preditiva.}
+    \phiND{} direto supera a previs\~ao ML de \philab{} sem
+    acrescentar complexidade.}
     \column{0.49\textwidth}
     \begin{block}{Decis\~oes que habilitam a Etapa 2}
       \scriptsize
@@ -391,7 +390,7 @@
               dispon\'ivel na tabela integrada (n\~ao \`a classifica\c{c}\~ao
               autom\'atica; acur\'acia 35,6\%).
         \item Levar a microtomografia para a f\'isica de rochas, n\~ao
-              como feature extra de regress\~ao.
+              para o ML da Etapa~1.
         \item N\~ao insistir, neste cen\'ario, em ML direto para FZI e
               permeabilidade.
       \end{enumerate}
