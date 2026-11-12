@@ -330,31 +330,32 @@
     \column{0.48\textwidth}
     \footnotesize
     \begin{block}{Pergunta}
-      Os perfis convencionais conseguem prever \philab{}, \fzilab{},
-      permeabilidade e HFU em um intervalo ainda n\~ao visto?
+      Oito curvas de perfil convencional conseguem prever \philab{},
+      \fzilab{}, permeabilidade e HFU em um intervalo ainda n\~ao visto?
     \end{block}
     \begin{exampleblock}{Regra contra vazamento}
-      Dados de laborat\'orio entram apenas como alvo $y$, nunca como
-      entrada $X$.
+      Laborat\'orio entra como alvo $y$, nunca como entrada $X$.
+      Ao prever FZI, \philab{}, $k_{\mathrm{lab}}$, RQI e HFU ficam fora
+      de $X$.
     \end{exampleblock}
     \column{0.50\textwidth}
     \centering
     \scriptsize
     \begin{tabular}{lrr}
       \toprule
-      Alvo & Fonte da associa\c{c}\~ao & Pearson $r$ \\
+      Rela\c{c}\~ao & Vari\'avel & Pearson $r$ \\
       \midrule
-      \philab{} & perfil (melhor curva) & 0,74 \\
-      \philab{} & perfil (\phiND{}) & 0,70 \\
-      FZI & perfil & 0,31 \\
-      FZI & laborat\'orio & 0,89 \\
-      FZI & laborat\'orio ($k$) & 0,71 \\
+      Perfil $\rightarrow$ \philab{} & Phi\_Neutron & 0,737 \\
+      Perfil $\rightarrow$ \philab{} & \phiND{} & 0,701 \\
+      Perfil $\rightarrow$ FZI & \phiND{} & 0,308 \\
+      Laborat\'orio $\rightarrow$ FZI & RQI & 0,887 \\
+      Laborat\'orio $\rightarrow$ FZI & $k_{\mathrm{lab}}$ & 0,709 \\
       \bottomrule
     \end{tabular}
     \vspace{0.12cm}
     \begin{block}{Diagn\'ostico}
       \scriptsize
-      Porosidade deixa assinatura nos perfis. FZI depende de textura e
+      Porosidade deixa assinatura nas curvas. FZI depende de textura e
       conectividade que os perfis convencionais n\~ao resolvem.
     \end{block}
   \end{columns}
@@ -364,23 +365,30 @@
   \begin{columns}[T,onlytextwidth]
     \column{0.49\textwidth}
     \footnotesize
+    \begin{block}{Features $X$ (8 curvas)}
+      \scriptsize
+      GR, densidade, Res\_Deep, Res\_Shallow, Phi\_Neutron,
+      \phiS{}, \phiND{} e litotipo.
+      Nenhuma propriedade de laborat\'orio entra em $X$.
+    \end{block}
     \centering
+    \vspace{0.06cm}
     \begin{tabular}{lrr}
       \toprule
-      Alvo (previs\~ao OOF) & RMSE & $R^2$ \\
+      Alvo / m\'etodo & RMSE & $R^2$ OOF \\
       \midrule
-      \philab{} & 0,033~pu & 0,146 \\
-      \fzilab{} & 1,813 & $-0{,}819$ \\
-      $k_{\mathrm{lab}}$ & 76,2~mD & $-15{,}4$ \\
+      \philab{} -- RF & 0,033~pu & 0,146 \\
+      \fzilab{} -- RF & 1,813 & $-0{,}819$ \\
+      $k_{\mathrm{lab}}$ -- RF & 76,2~mD & $-15{,}4$ \\
       \midrule
-      \phiND{} vs \philab{} (direto) & 0,032~pu & \textbf{0,446} \\
+      \phiND{} direto vs \philab{} & 0,032~pu & \textbf{0,446} \\
+      RF alinhado vs \philab{} & 0,036~pu & 0,300 \\
       \bottomrule
     \end{tabular}
-    \vspace{0.10cm}
+    \vspace{0.08cm}
     \raggedright
     {\scriptsize $R^2<0$ significa erro maior que prever a m\'edia.
-    \phiND{} direto supera a previs\~ao ML de \philab{} sem
-    acrescentar complexidade.}
+    \phiND{} direto elimina complexidade sem perder capacidade preditiva.}
     \column{0.49\textwidth}
     \begin{block}{Decis\~oes que habilitam a Etapa 2}
       \scriptsize
@@ -390,7 +398,7 @@
               dispon\'ivel na tabela integrada (n\~ao \`a classifica\c{c}\~ao
               autom\'atica; acur\'acia 35,6\%).
         \item Levar a microtomografia para a f\'isica de rochas, n\~ao
-              para o ML da Etapa~1.
+              como feature extra de regress\~ao.
         \item N\~ao insistir, neste cen\'ario, em ML direto para FZI e
               permeabilidade.
       \end{enumerate}
@@ -521,7 +529,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Calibra\c{c}\~ao por HFU e valida\c{c}\~ao leave-one-out}
+\begin{frame}[shrink=4]{Calibra\c{c}\~ao por HFU e valida\c{c}\~ao leave-one-out}
   \footnotesize
   \begin{columns}[T,onlytextwidth]
     \column{0.49\textwidth}
@@ -564,6 +572,17 @@
       HFU4, sem plug, continua usando \emph{fallback}.
     \end{exampleblock}
   \end{columns}
+  \vspace{0.04cm}
+  {\scriptsize
+  Nota:
+  $\mathrm{MAPE}
+  =\dfrac{100}{n}\sum_{i=1}^{n}
+  \dfrac{|V_{p,i}^{\mathrm{pred}}-V_{p,i}^{\mathrm{ref}}|}
+         {V_{p,i}^{\mathrm{ref}}}$
+  (aqui, ref.\ = lab.\ nos plugs; no perfil, ref.\ = s\^onico).\\
+  No LOO: reunimos as 10 previs\~oes de teste e calculamos
+  \emph{um} MAPE sobre esses pares; n\~ao \'e a m\'edia de 10 MAPEs
+  separados por fold.}
 \end{frame}
 
 \begin{frame}{Calibra\c{c}\~ao reduz o erro, mas o LOO define a expectativa realista}
@@ -597,9 +616,10 @@
 
 \begin{frame}{No perfil, Gassmann melhora o MAPE; o vi\'es permanece}
   \begin{columns}[T,onlytextwidth]
-    \column{0.37\textwidth}
+    \column{0.30\textwidth}
     \footnotesize
     \centering
+    \setlength{\tabcolsep}{3pt}
     \begin{tabular}{lrrr}
       \toprule
       Modelo & MAPE & RMSE & Vi\'es \\
@@ -608,25 +628,26 @@
       + Gassmann & \textbf{7,3\%} & 0,48 & $+0{,}27$ \\
       \bottomrule
     \end{tabular}
-    \vspace{0.10cm}
+    \vspace{0.08cm}
     \raggedright
-    {\scriptsize 87/87 profundidades casadas. Unidades do RMSE e vi\'es:
-    km/s. O s\^onico n\~ao foi usado para reajustar o DEM.}
+    {\scriptsize 87/87 profundidades. RMSE e vi\'es em km/s.
+    O s\^onico n\~ao reajusta o DEM.}
     \begin{block}{Por que isso leva \`a Etapa 3}
-      \scriptsize A f\'isica fecha a ordem de grandeza, mas o deslocamento
-      positivo de 0,27~km/s ainda domina parte relevante do erro.
+      \scriptsize A f\'isica fecha a ordem de grandeza, mas o vi\'es
+      de $+0{,}27$~km/s ainda domina parte do erro.
     \end{block}
-    \column{0.61\textwidth}
-    \slidefigure[0.76]{fig2_vp_dry_gassmann_sonic_depth}{Trilhas do
-    s\^onico, DEM seco e DEM + Gassmann ao longo do intervalo.}
+    \column{0.68\textwidth}
+    \slidefigure[0.86]{fig2_vp_dry_gassmann_sonic_depth}{Trilhas do
+    s\^onico, DEM seco e DEM + Gassmann.}
   \end{columns}
 \end{frame}
 
 \begin{frame}{O erro da f\'isica n\~ao \'e uniforme entre HFUs}
   \begin{columns}[T,onlytextwidth]
-    \column{0.43\textwidth}
+    \column{0.32\textwidth}
     \footnotesize
     \centering
+    \setlength{\tabcolsep}{3pt}
     \begin{tabular}{cccr}
       \toprule
       HFU & Linhas & Plugs & MAPE seco \\
@@ -637,17 +658,16 @@
       4 & 6 & 0 & \textbf{30,4\%} \\
       \bottomrule
     \end{tabular}
-    \vspace{0.08cm}
+    \vspace{0.06cm}
     \begin{block}{Interpreta\c{c}\~ao}
       \scriptsize
       HFU2 \'e o benchmark interno. HFU4 usa \emph{fallback} sem plug.
-      HFU1 e HFU2 t\^em quatro plugs cada, mas diferem porque
-      $\alpha$ satura no limite em HFU1: amostragem n\~ao \'e a \'unica
+      Em HFU1, $\alpha$ satura no limite: amostragem n\~ao \'e a \'unica
       causa.
     \end{block}
-    \column{0.55\textwidth}
-    \slidefigure[0.74]{fig2_vp_error_vs_depth}{Erro relativo do DEM seco
-    contra o s\^onico; os maiores desvios coincidem com a HFU4.}
+    \column{0.66\textwidth}
+    \slidefigure[0.86]{fig2_vp_error_vs_depth}{Erro relativo do DEM seco
+    contra o s\^onico; maiores desvios na HFU4.}
   \end{columns}
 \end{frame}
 
@@ -856,29 +876,30 @@
 
 \begin{frame}{Resultado central: o res\'iduo \'e previs\'ivel no po\c{c}o~861}
   \begin{columns}[T,onlytextwidth]
-    \column{0.39\textwidth}
+    \column{0.31\textwidth}
     \footnotesize
     \centering
-    \begin{tabular}{lrrr}
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabular}{@{}lrrr@{}}
       \toprule
       Modelo & MAPE & RMSE & Vi\'es \\
       \midrule
       Gassmann & 7,3\% & 0,48 & $+0{,}27$ \\
-      H\'ibrido RF & 2,8\% & 0,18 & $+0{,}01$ \\
-      H\'ibrido linear & \textbf{2,1\%} & \textbf{0,14} & $+0{,}00$ \\
+      H\'ibr.\ RF & 2,8\% & 0,18 & $+0{,}01$ \\
+      H\'ibr.\ linear & \textbf{2,1\%} & \textbf{0,14} & $+0{,}00$ \\
       \bottomrule
     \end{tabular}
-    \vspace{0.10cm}
+    \vspace{0.08cm}
     \raggedright
-    {\scriptsize Unidades: km/s. M\'etricas OOF por blocos; RF \'e a
-    refer\^encia experimental; a linear obteve o menor MAPE.}
+    {\scriptsize km/s; OOF por blocos. RF \'e refer\^encia; linear tem
+    o menor MAPE.}
     \begin{block}{O que foi demonstrado}
       \scriptsize Parte do desvio DEM/Gassmann--s\^onico tem estrutura
-      previs\'ivel nos perfis dentro do intervalo do po\c{c}o~861.
+      previs\'ivel nos perfis do po\c{c}o~861.
     \end{block}
-    \column{0.59\textwidth}
-    \slidefigure[0.77]{fig3_vp_hybrid_depth_hfu}{S\^onico, Gassmann e
-    h\'ibrido RF OOF; faixa lateral = HFU de laborat\'orio.}
+    \column{0.67\textwidth}
+    \slidefigure[0.86]{fig3_vp_hybrid_depth_hfu}{S\^onico, Gassmann e
+    h\'ibrido RF OOF; faixa = HFU lab.}
   \end{columns}
 \end{frame}
 
