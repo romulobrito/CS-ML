@@ -642,11 +642,11 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{O erro da f\'isica n\~ao \'e uniforme entre HFUs}
+\begin{frame}[shrink=5]{O erro da f\'isica n\~ao \'e uniforme entre HFUs}
   \begin{columns}[T,onlytextwidth]
-    \column{0.32\textwidth}
-    \footnotesize
+    \column{0.46\textwidth}
     \centering
+    \scriptsize
     \setlength{\tabcolsep}{3pt}
     \begin{tabular}{cccr}
       \toprule
@@ -658,16 +658,14 @@
       4 & 6 & 0 & \textbf{30,4\%} \\
       \bottomrule
     \end{tabular}
-    \vspace{0.06cm}
-    \begin{block}{Interpreta\c{c}\~ao}
-      \scriptsize
-      HFU2 \'e o benchmark interno. HFU4 usa \emph{fallback} sem plug.
-      Em HFU1, $\alpha$ satura no limite: amostragem n\~ao \'e a \'unica
-      causa.
-    \end{block}
-    \column{0.66\textwidth}
-    \slidefigure[0.86]{fig2_vp_error_vs_depth}{Erro relativo do DEM seco
-    contra o s\^onico; maiores desvios na HFU4.}
+    \vspace{0.04cm}
+    \slidefigure[0.52]{fig2_alpha_by_hfu}{Raz\~ao de aspecto $\alpha$ da
+    otimiza\c{c}\~ao (verde) versus mediana da microtomografia (azul).
+    HFU1 e HFU3 saturam em $0{,}95$; HFU4 n\~ao tem plug.}
+    \column{0.52\textwidth}
+    \slidefigure[0.78]{fig2_vp_error_vs_depth}{Erro relativo do DEM seco
+    contra o s\^onico. A linha vertical tracejada marca erro zero
+    (DEM $=$ s\^onico); \`a direita, o DEM supera o s\^onico.}
   \end{columns}
 \end{frame}
 
