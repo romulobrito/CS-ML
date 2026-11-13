@@ -672,41 +672,47 @@
 \begin{frame}{Multiescala melhora parte das m\'etricas, mas n\~ao promove o baseline}
   \footnotesize
   \begin{columns}[T,onlytextwidth]
-    \column{0.52\textwidth}
-    \begin{block}{M1 vs M2b forward (10 plugs)}
+    \column{0.54\textwidth}
+    \begin{block}{Poro \'unico vs micro+meso da microCT (10 plugs)}
       \scriptsize
       \begin{tabular}{lrr}
         \toprule
-        Escopo & M1 & M2b \\
+        Escopo & Poro \'unico & Micro+meso \\
         \midrule
         MAPE in-sample & 9,1\% & 8,7\% \\
         MAPE LOO & 14,8\% & 12,0\% \\
         RMSE in-sample (km/s) & 0,52 & 0,54 \\
         RMSE LOO (km/s) & 0,85 & 0,78 \\
         \bottomrule
-      \end{tabular}
-      \vspace{0.06cm}
-      Crit\'erio pr\'e-registrado: promover s\'o se in-sample \emph{e} LOO
-      ganharem $\geq 2{,}0$~p.p.\ de MAPE. Aqui o LOO melhora 2,9~p.p.,
-      mas o in-sample s\'o 0,4~p.p.\ e o RMSE in-sample piora.
+      \end{tabular}\par
+      \vspace{0.05cm}
+      \raggedright
+      Poro \'unico: um $\alpha$ efetivo por HFU.
+      Micro+meso: fra\c{c}\~oes da microtomografia por HFU, sem
+      reajustar o plug avaliado.\par
+      \vspace{0.04cm}
+      Promover s\'o se in-sample \emph{e} LOO ganharem
+      $\geq 2{,}0$~p.p.\ de MAPE. O LOO melhora 2,9~p.p., mas o
+      in-sample s\'o 0,4~p.p.\ e o RMSE in-sample piora.
     \end{block}
-    \column{0.46\textwidth}
-    \begin{exampleblock}{Fra\c{c}\~oes de RMN no perfil}
+    \column{0.44\textwidth}
+    \begin{exampleblock}{No perfil: poro \'unico vs fra\c{c}\~oes de RMN}
       \scriptsize
       \begin{itemize}
-        \item M1 Gassmann: MAPE 7,3\%; vi\'es $+0{,}27$~km/s.
-        \item M3 RMN: MAPE 8,5\%; vi\'es $+0{,}04$~km/s.
-        \item O RMN centra a m\'edia, mas aumenta a dispers\~ao.
+        \item Poro \'unico + Gassmann: MAPE 7,3\%; vi\'es $+0{,}27$~km/s.
+        \item Fra\c{c}\~oes de RMN + Gassmann: MAPE 8,5\%;
+              vi\'es $+0{,}04$~km/s.
+        \item A RMN centra a m\'edia, mas aumenta a dispers\~ao.
         \item RMN versus microtomografia nos plugs: $r\approx-0{,}30$.
       \end{itemize}
     \end{exampleblock}
   \end{columns}
-  \vspace{0.08cm}
+  \vspace{0.06cm}
   \begin{block}{Interpreta\c{c}\~ao}
     \scriptsize
-    H\'a melhoria parcial, sobretudo no LOO, por\'em ainda sem vantagem
-    suficientemente consistente entre os crit\'erios para substituir o
-    baseline monoescala + Gassmann da Etapa~3.
+    H\'a melhoria parcial do modelo de dois poros, sobretudo no LOO,
+    por\'em ainda sem vantagem consistente para substituir o baseline
+    de poro \'unico + Gassmann da Etapa~3.
   \end{block}
 \end{frame}
 
