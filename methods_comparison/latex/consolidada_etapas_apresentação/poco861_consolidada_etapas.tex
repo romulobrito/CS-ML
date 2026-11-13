@@ -968,23 +968,27 @@
 
 \begin{frame}{Corre\c{c}\~ao residual: ganhos mesmo com modelos simples}
   \begin{columns}[T,onlytextwidth]
-    \column{0.42\textwidth}
+    \column{0.48\textwidth}
     \footnotesize
     \centering
-    \begin{tabular}{lrr}
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{@{}lrrr@{}}
       \toprule
-      Regressor & $R^2$ res. & MAPE \\
+      Regressor & $R^2$ res. & RMSE & MAPE \\
       \midrule
-      Linear & 0,88 & \textbf{2,1\%} \\
-      Random Forest & 0,79 & 2,8\% \\
-      Gradient Boosting & 0,69 & 3,0\% \\
-      XGBoost & 0,52 & 3,6\% \\
-      Ridge & 0,14 & 6,1\% \\
-      MLP & $-0{,}04$ & 6,5\% \\
+      Linear & 0,88 & \textbf{0,14} & \textbf{2,1\%} \\
+      Random Forest & 0,79 & 0,18 & 2,8\% \\
+      Gradient Boosting & 0,69 & 0,22 & 3,0\% \\
+      XGBoost & 0,52 & 0,27 & 3,6\% \\
+      Ridge & 0,14 & 0,36 & 6,1\% \\
+      MLP & $-0{,}04$ & 0,40 & 6,5\% \\
       \midrule
-      Gassmann & -- & 7,3\% \\
+      Gassmann & -- & 0,48 & 7,3\% \\
       \bottomrule
-    \end{tabular}
+    \end{tabular}\par
+    \vspace{0.04cm}
+    \raggedright
+    {\scriptsize RMSE em km/s, nas 87 previs\~oes OOF.}
     \vspace{0.08cm}
     \begin{block}{Leitura}
       \scriptsize
@@ -993,7 +997,7 @@
       aproximadamente linear \emph{neste} conjunto, n\~ao mecanismo
       f\'isico demonstrado.
     \end{block}
-    \column{0.56\textwidth}
+    \column{0.50\textwidth}
     \slidefigure[0.64]{fig3_regressor_sensitivity_mape}{MAPE h\'ibrido OOF
     por regressor. RF permanece refer\^encia experimental; a linear
     lidera numericamente.}
